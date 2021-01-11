@@ -1,0 +1,17 @@
+apiVersion: v2
+name: prysm
+version: 1.0.5
+kubeVersion: "^1.14.0-0"
+description: Golang implementation of the Ethereum 2.0 client.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - p2p
+home: https://prysmaticlabs.com/
+sources:
+  - https://github.com/prysmaticlabs/prysm/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+appVersion: 1.0.5

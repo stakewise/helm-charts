@@ -1,0 +1,41 @@
+# Default values for prysm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+# A node which implements the DiscoveryV5 protocol for peer
+# discovery. The purpose of this service is to provide a starting point for
+# newly connected services to find other peers outside of their network.
+bootnode:
+  # Whether to deploy bootnode or not.
+  enabled: false
+
+  # Service Cluster IP
+  clusterIP: ""
+
+  # Docker image
+  image:
+    repository: "gcr.io/prysmaticlabs/prysm/bootnode"
+    tag: "HEAD-242888"
+    pullPolicy: IfNotPresent
+
+  # Optional private key used for identity
+  privateKey: ""
+
+  # Extra flags to pass to the bootnode
+  extraFlags:
+    - "--external-ip=$(POD_IP)"
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  resources:
+    requests:
+      cpu: 2m
+      memory: 25Mi
+
+  # used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  priorityClassName: "high-priority"

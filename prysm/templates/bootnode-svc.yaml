@@ -1,0 +1,28 @@
+{{- if.Values.bootnode.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bootnode.fullname" . }}
+  labels:
+    app: {{ template "prysm.name" . }}
+    chart: {{ template "prysm.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    component: "bootnode"
+spec:
+  selector:
+    app: {{ template "prysm.name" . }}
+    release: {{ .Release.Name | quote }}
+    component: "bootnode"
+  type: ClusterIP
+{{- if .Values.bootnode.clusterIP }}
+  clusterIP: {{ .Values.bootnode.clusterIP }}
+{{- end }}
+  ports:
+    - name: discv5
+      port: 4000
+      targetPort: discv5
+    - name: metrics
+      port: 5000
+      targetPort: metrics
+{{- end }}
