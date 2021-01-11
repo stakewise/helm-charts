@@ -4,7 +4,7 @@ Kubernetes Helm chart for deploying Ethereum [Geth](https://github.com/ethereum/
 
 ## TL;DR;
 
-```console
+```bash
 $ git clone git@github.com:stakewise/helm-charts.git
 $ cd helm-charts
 $ helm install my-release ./geth
@@ -24,7 +24,7 @@ Can be used to deploy private ETH1 chain or its components (bootnode, miner or n
 
 To install the chart with the release name `my-release`:
 
-```console
+```bash
 $ git clone git@github.com:stakewise/helm-charts.git
 $ cd helm-charts
 $ helm install my-release ./geth
@@ -38,7 +38,7 @@ The command deploys Geth on the Kubernetes cluster in the default configuration.
 
 To uninstall/delete the `my-release` deployment:
 
-```console
+```bash
 $ helm delete my-release
 ```
 
@@ -46,7 +46,7 @@ The command removes all the Kubernetes components but PVC's associated with the 
 
 To delete the PVC's associated with `my-release`:
 
-```console
+```bash
 $ kubectl delete pvc -l release=my-release
 ```
 
@@ -54,7 +54,7 @@ $ kubectl delete pvc -l release=my-release
 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
-```console
+```bash
 $ helm install my-release ./geth --set bootnode.enabled=true
 ```
 
@@ -62,7 +62,7 @@ The above command enables the bootnode deployment.
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
-```console
+```bash
 $ helm install my-release ./geth -f values.yaml
 ```
 
