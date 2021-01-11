@@ -1,0 +1,25 @@
+{{- if and .Values.node.enabled .Values.node.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    component: "node"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+{{- if .Values.node.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.node.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.node.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.node.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "geth.name" . }}
+      release: {{ .Release.Name | quote }}
+      component: "node"
+{{- end }}

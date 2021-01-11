@@ -15,6 +15,10 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "node.fullname" -}}
+{{- printf "%s-%s" .Release.Name "node" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "bootnode.fullname" -}}
 {{- printf "%s-%s" .Release.Name "bootnode" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}

@@ -1,0 +1,25 @@
+{{- if and .Values.node.enabled .Values.node.verticalAutoscaler.enabled }}
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "node.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    component: "node"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "node.fullname" . }}
+  updatePolicy:
+    updateMode: {{ .Values.node.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.node.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl .Values.node.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+  {{- end }}
+{{- end }}

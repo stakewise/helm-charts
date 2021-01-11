@@ -1,0 +1,41 @@
+{{- if and .Values.node.enabled (or .Values.node.rpc.enabled .Values.node.ws.enabled) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "node.fullname" . }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    component: "node"
+{{- if and .Values.node.metrics.enabled .Values.node.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.node.metrics.svcAnnotations | nindent 4 | trim }}
+{{- end }}
+spec:
+  selector:
+    app: {{ template "geth.name" . }}
+    release: {{ .Release.Name | quote }}
+    component: "node"
+  type: ClusterIP
+{{- if .Values.node.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  ports:
+  {{- if .Values.node.rpc.enabled }}
+    - name: rpc
+      port: 8545
+      targetPort: rpc
+  {{- end }}
+  {{- if .Values.node.ws.enabled }}
+    - name: ws
+      port: 8546
+      targetPort: ws
+  {{- end }}
+  {{- if .Values.node.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.node.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}
