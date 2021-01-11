@@ -1,0 +1,47 @@
+# Default values for geth.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Pod Security Context
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+# Init image is used to chown data volume, initialise genesis, etc.
+initImage:
+  repository: "busybox"
+  tag: "1.33"
+  pullPolicy: IfNotPresent
+
+# Network (chain) ID
+networkId: ""
+
+# The purpose of the boot node is to provide a starting point for
+# newly connected nodes to find other peers.
+bootnode:
+  # Whether to deploy bootnode or not.
+  enabled: false
+
+  ## Geth image version
+  ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
+  image:
+    repository: "ethereum/client-go"
+    tag: "alltools-v1.9.25"
+    pullPolicy: IfNotPresent
+
+  # Node key for the identity
+  privateKey: "xxx"
+  publicKey: "xxx"
+
+  # Extra flags to pass to the bootnode
+  extraFlags:
+    - "--verbosity=4"
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  resources: { }
+
+  # used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  priorityClassName: ""

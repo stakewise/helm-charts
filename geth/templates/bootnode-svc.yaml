@@ -1,0 +1,39 @@
+{{- if .Values.bootnode.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bootnode.fullname" . }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    component: "bootnode"
+spec:
+  selector:
+    app: {{ template "geth.name" . }}
+    release: {{ .Release.Name | quote }}
+    component: "bootnode"
+  type: ClusterIP
+  ports:
+    - name: http-rpc
+      port: 8545
+      targetPort: http-rpc
+      protocol: TCP
+    - name: discovery-tcp
+      port: 30303
+      targetPort: discovery-tcp
+      protocol: TCP
+    - name: discovery-udp
+      port: 30303
+      targetPort: discovery-udp
+      protocol: UDP
+    - name: bootnode-tcp
+      port: 30301
+      targetPort: bootnode-tcp
+      protocol: TCP
+    - name: bootnode-udp
+      port: 30301
+      targetPort: bootnode-udp
+      protocol: UDP
+{{- end }}

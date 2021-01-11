@@ -1,0 +1,19 @@
+apiVersion: v2
+name: geth
+version: v1.9.25
+kubeVersion: "^1.14.0-0"
+description: Official Golang implementation of the Ethereum v1 protocol.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - geth
+  - p2p
+home: https://www.ethereum.org/
+sources:
+  - https://github.com/ethereum/go-ethereum/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+appVersion: v1.9.25
