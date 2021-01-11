@@ -1,0 +1,25 @@
+{{- if and .Values.beacon.enabled .Values.beacon.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "beacon.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "prysm.name" . }}
+    chart: {{ template "prysm.chart" . }}
+    component: "beacon"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+{{- if .Values.beacon.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.beacon.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.beacon.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.beacon.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      app: {{ template "prysm.name" . }}
+      release: {{ .Release.Name | quote }}
+      component: "beacon"
+{{- end }}

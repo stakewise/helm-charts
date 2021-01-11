@@ -1,0 +1,45 @@
+{{- if.Values.beacon.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "beacon.fullname" . }}
+  labels:
+    app: {{ template "prysm.name" . }}
+    chart: {{ template "prysm.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+    component: "beacon"
+{{- if and .Values.beacon.metrics.enabled .Values.beacon.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.beacon.metrics.svcAnnotations | nindent 4 | trim }}
+{{- end }}
+spec:
+  selector:
+    app: {{ template "prysm.name" . }}
+    release: {{ .Release.Name | quote }}
+    component: "beacon"
+{{- if .Values.beacon.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.beacon.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+{{- if .Values.beacon.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  ports:
+    - name: grpc
+      port: 4000
+      targetPort: grpc
+  {{- if .Values.slasher.enabled }}
+    - name: slasher-grpc
+      port: 4002
+      targetPort: slasher-grpc
+  {{- end }}
+  {{- if .Values.beacon.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.beacon.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}
