@@ -45,3 +45,92 @@ bootnode:
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   priorityClassName: ""
+
+# Miner is used to include transactions into blocks.
+miner:
+  # Whether to deploy miner or not.
+  enabled: false
+
+  ## Geth image version
+  ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
+  image:
+    repository: "ethereum/client-go"
+    tag: "v1.9.25"
+    pullPolicy: IfNotPresent
+
+  # Assign unique account to each miner
+  # The amount of replicas will be equal to the number of accounts
+  # Read following before adding new accounts: https://ethereum.stackexchange.com/a/15779
+  accounts:
+    - password: ""
+      privateKey: ""
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  resources: { }
+
+  # Vertical Pod Autoscaler config
+  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  verticalAutoscaler:
+    # If true a VPA object will be created for the StatefulSet
+    enabled: false
+    updateMode: Off
+    containerPolicies: { }
+
+  # Extra flags to pass to the miner
+  extraFlags:
+    - "--nat=extip:$(POD_IP)"
+    - "--syncmode=full"
+
+  # If false, data ownership will not be reset at startup
+  # This allows the geth miner to be run with an arbitrary user
+  initChownData: true
+
+  metrics:
+    # Whether to enable metrics collection or not
+    enabled: false
+
+    port: 6060
+
+    # Extra flags to pass for collecting metrics
+    flags:
+      - "--metrics"
+      - "--pprof"
+      - "--pprof.addr=0.0.0.0"
+      - "--pprof.port=6060"
+
+    # Metrics collection annotations to add to miner pods
+    podAnnotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "6060"
+      prometheus.io/path: "/debug/metrics/prometheus"
+
+  # Whether or not to allocate persistent volume disk for the data directory.
+  # In case of node failure, the node data directory will still persist.
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 300Gi
+
+  # Affinity Settings
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: kubernetes.io/hostname
+            labelSelector:
+              matchLabels:
+                app: {{ template "geth.name" . }}
+                release: {{ .Release.Name | quote }}
+                component: "miner"
+
+  # used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  priorityClassName: ""
+
+# Genesis configuration
+genesis: { }

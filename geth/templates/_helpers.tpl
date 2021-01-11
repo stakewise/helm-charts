@@ -23,6 +23,14 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- printf "%s_SERVICE_HOST" (include "bootnode.fullname" .) | upper | replace "-" "_" -}}
 {{- end -}}
 
+{{- define "miner.fullname" -}}
+{{- printf "%s-%s" .Release.Name "miner" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
+{{- define "genesis.fullname" -}}
+{{- printf "%s-%s" .Release.Name "genesis" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}

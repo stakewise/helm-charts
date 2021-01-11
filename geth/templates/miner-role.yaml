@@ -1,0 +1,31 @@
+{{- if .Values.miner.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: {{ template "miner.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    component: "miner"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+rules:
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - {{ template "geth.fullname" . }}
+{{- if .Values.genesis }}
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames:
+      - {{ template "genesis.fullname" . }}
+    verbs: ["get"]
+{{- end }}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      - {{ template "miner.fullname" . }}
+    verbs: ["get"]
+{{- end }}

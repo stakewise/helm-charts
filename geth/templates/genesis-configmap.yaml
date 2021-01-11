@@ -1,0 +1,15 @@
+{{- if and .Values.miner.enabled .Values.genesis }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "genesis.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "geth.name" . }}
+    chart: {{ template "geth.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+data:
+  genesis: |
+    {{ .Values.genesis | nindent 4 | trim }}
+{{- end }}
