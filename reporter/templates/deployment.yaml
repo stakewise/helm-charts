@@ -1,0 +1,66 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "reporter.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "reporter.name" . }}
+    chart: {{ template "reporter.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: {{ template "reporter.name" . }}
+      release: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "reporter.name" . }}
+        release: {{ .Release.Name | quote }}
+      annotations:
+        checksum/reporter-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/reporter-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+      {{- if and .Values.metrics.enabled .Values.metrics.podAnnotations }}
+        {{ toYaml .Values.metrics.podAnnotations | nindent 8 | trim }}
+      {{- end }}
+    spec:
+    {{- if .Values.tolerations }}
+      tolerations:
+        {{ tpl .Values.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.affinity }}
+      affinity:
+        {{ tpl .Values.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "reporter.fullname" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+    {{- if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "reporter.fullname" . }}
+            - secretRef:
+                name: {{ template "reporter.fullname" . }}
+        {{- if .Values.metrics.enabled }}
+          ports:
+            - containerPort: {{ .Values.metrics.port }}
+              name: metrics
+              protocol: TCP
+        {{- end }}
+        {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}

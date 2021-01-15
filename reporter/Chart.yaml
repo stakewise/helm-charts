@@ -1,0 +1,17 @@
+apiVersion: v2
+name: reporter
+version: 0.1.0
+kubeVersion: "^1.14.0-0"
+description: The StakeWise application for reporting pool validator balances.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/tsudmi/balance-reporters/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+appVersion: 0.1.0

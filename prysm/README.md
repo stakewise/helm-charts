@@ -66,4 +66,4 @@ Alternatively, a YAML file that specifies the values for the parameters can be p
 $ helm install my-release ./prysm -f values.yaml
 ```
 
-> **Tip**: You can use the default [values.yaml](values.yaml)
+> **Tip**: You can override the default [values.yaml](values.yaml)

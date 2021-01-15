@@ -1,0 +1,65 @@
+# Default values for reporter.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+# Pod Security Context
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+# Termination Grace Period
+# https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+terminationGracePeriodSeconds: 1800
+
+# Docker image
+image:
+  repository: "stakewiselabs/balance-reporter"
+  tag: "HEAD-f5972e3"
+  pullPolicy: IfNotPresent
+
+# Configure resource requests and limits.
+# http://kubernetes.io/docs/user-guide/compute-resources/
+resources:
+  requests:
+    cpu: 10m
+    memory: 100Mi
+
+# used to assign priority to pod
+# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+priorityClassName: ""
+
+settings:
+  # notifications
+  telegramToken: ""
+  telegramChatId: ""
+
+  # connections
+  web3WsEndpoint: "ws://<eth1 chain endpoint>"
+  web3HttpEndpoint: ""
+  beaconChainRpcEndpoint: "<eth2 chain endpoint>"
+
+  # middlewares
+  injectPOAMiddleware: "True"
+  injectStaleCheckMiddleware: "True"
+  staleCheckMiddlewareAllowableDelay: "120"
+  injectRetryRequestMiddleware: "True"
+  injectLocalFilterMiddleware: "False"
+  applyGasPriceStrategy: "True"
+  maxTxWaitSeconds: "120"
+
+  # reporter balance
+  balanceWarningThreshold: "0.5"
+  balanceErrorThreshold: "0.01"
+
+  # transactions
+  transactionTimeout: "600"
+
+  # contracts
+  poolContractAddress: "0x0"
+  rewardEthContractAddress: "0x0"
+  stakedEthContractAddress: "0x0"
+  balanceReportersContractAddress: "0x0"
+
+  # credentials
+  reporterPrivateKey: ""

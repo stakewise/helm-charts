@@ -1,0 +1,26 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: {{ template "reporter.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "reporter.name" . }}
+    chart: {{ template "reporter.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+rules:
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - {{ template "reporter.fullname" . }}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames:
+      - {{ template "reporter.fullname" . }}
+    verbs: ["get"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames:
+      - {{ template "reporter.fullname" . }}
+    verbs: ["get"]
