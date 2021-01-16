@@ -116,17 +116,7 @@ miner:
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: |
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                app: {{ template "geth.name" . }}
-                release: {{ .Release.Name | quote }}
-                component: "miner"
+  affinity: { }
 
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
@@ -190,7 +180,16 @@ node:
       prometheus.io/path: "/debug/metrics/prometheus"
 
   # defines whether the service must be headless
-  svcHeadless: true
+  svcHeadless: false
+
+  # Configure session affinity for to hit the same geth node
+  # for the period specified in `timeoutSeconds`
+  # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: true
+    # The session duration in seconds
+    timeoutSeconds: 86400
 
   # Ingress
   # https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -238,16 +237,7 @@ node:
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: |
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchLabels:
-            app: {{ template "geth.name" . }}
-            release: {{ .Release.Name | quote }}
-            component: "node"
-        topologyKey: "kubernetes.io/hostname"
-
+  affinity: { }
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   priorityClassName: ""

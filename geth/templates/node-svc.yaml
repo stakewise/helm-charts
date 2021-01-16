@@ -18,6 +18,12 @@ spec:
     app: {{ template "geth.name" . }}
     release: {{ .Release.Name | quote }}
     component: "node"
+{{- if .Values.node.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.node.sessionAffinity.timeoutSeconds }}
+{{- end }}
   type: ClusterIP
 {{- if .Values.node.svcHeadless }}
   clusterIP: None
