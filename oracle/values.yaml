@@ -1,4 +1,4 @@
-# Default values for reporter.
+# Default values for oracle.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -14,8 +14,8 @@ terminationGracePeriodSeconds: 1800
 
 # Docker image
 image:
-  repository: "stakewiselabs/balance-reporter"
-  tag: "HEAD-f5972e3"
+  repository: "stakewiselabs/oracle"
+  tag: "HEAD-1fad773"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -48,7 +48,7 @@ settings:
   applyGasPriceStrategy: "True"
   maxTxWaitSeconds: "120"
 
-  # reporter balance
+  # oracle balance
   balanceWarningThreshold: "0.5"
   balanceErrorThreshold: "0.01"
 
@@ -59,7 +59,7 @@ settings:
   poolContractAddress: "0x0"
   rewardEthContractAddress: "0x0"
   stakedEthContractAddress: "0x0"
-  balanceReportersContractAddress: "0x0"
+  oraclesContractAddress: "0x0"
 
   # credentials
-  reporterPrivateKey: ""
+  oraclePrivateKey: ""

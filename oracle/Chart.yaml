@@ -1,8 +1,8 @@
 apiVersion: v2
-name: reporter
+name: oracle
 version: 0.1.0
 kubeVersion: "^1.14.0-0"
-description: The StakeWise application for reporting pool validator balances.
+description: The StakeWise application for submitting off-chain data to smart contracts.
 type: application
 keywords:
   - ethereum
@@ -10,7 +10,7 @@ keywords:
   - staking
 home: https://stakewise.io/
 sources:
-  - https://github.com/tsudmi/balance-reporters/
+  - https://github.com/stakewise/oracle/
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io

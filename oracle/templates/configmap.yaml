@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "reporter.fullname" . }}
+  name: {{ template "oracle.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "reporter.name" . }}
-    chart: {{ template "reporter.chart" . }}
+    app: {{ template "oracle.name" . }}
+    chart: {{ template "oracle.chart" . }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 data:
@@ -26,7 +26,7 @@ data:
   APPLY_GAS_PRICE_STRATEGY: {{ .Values.settings.applyGasPriceStrategy | quote }}
   MAX_TX_WAIT_SECONDS: {{ .Values.settings.maxTxWaitSeconds | quote }}
 
-  # reporter balance
+  # oracle balance
   BALANCE_WARNING_THRESHOLD: {{ .Values.settings.balanceWarningThreshold | quote }}
   BALANCE_ERROR_THRESHOLD: {{ .Values.settings.balanceErrorThreshold | quote }}
 
@@ -37,4 +37,4 @@ data:
   POOL_CONTRACT_ADDRESS: {{ .Values.settings.poolContractAddress | quote }}
   REWARD_ETH_CONTRACT_ADDRESS: {{ .Values.settings.rewardEthContractAddress | quote }}
   STAKED_ETH_CONTRACT_ADDRESS: {{ .Values.settings.stakedEthContractAddress | quote }}
-  BALANCE_REPORTERS_CONTRACT_ADDRESS: {{ .Values.settings.balanceReportersContractAddress | quote }}
+  ORACLES_CONTRACT_ADDRESS: {{ .Values.settings.oraclesContractAddress | quote }}

@@ -1,18 +1,18 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ template "reporter.fullname" . }}
+  name: {{ template "oracle.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "reporter.name" . }}
-    chart: {{ template "reporter.chart" . }}
+    app: {{ template "oracle.name" . }}
+    chart: {{ template "oracle.chart" . }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 roleRef:
   kind: Role
   apiGroup: rbac.authorization.k8s.io
-  name: {{ template "reporter.fullname" . }}
+  name: {{ template "oracle.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "reporter.fullname" . }}
+    name: {{ template "oracle.fullname" . }}
     namespace: {{ .Release.Namespace }}

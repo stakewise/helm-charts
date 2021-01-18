@@ -1,11 +1,11 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{ template "reporter.fullname" . }}
+  name: {{ template "oracle.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "reporter.name" . }}
-    chart: {{ template "reporter.chart" . }}
+    app: {{ template "oracle.name" . }}
+    chart: {{ template "oracle.chart" . }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:
@@ -14,16 +14,16 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      app: {{ template "reporter.name" . }}
+      app: {{ template "oracle.name" . }}
       release: {{ .Release.Name | quote }}
   template:
     metadata:
       labels:
-        app: {{ template "reporter.name" . }}
+        app: {{ template "oracle.name" . }}
         release: {{ .Release.Name | quote }}
       annotations:
-        checksum/reporter-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        checksum/reporter-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/oracle-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/oracle-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
       {{- if and .Values.metrics.enabled .Values.metrics.podAnnotations }}
         {{ toYaml .Values.metrics.podAnnotations | nindent 8 | trim }}
       {{- end }}
@@ -40,7 +40,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "reporter.fullname" . }}
+      serviceAccountName: {{ template "oracle.fullname" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -51,9 +51,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ template "reporter.fullname" . }}
+                name: {{ template "oracle.fullname" . }}
             - secretRef:
-                name: {{ template "reporter.fullname" . }}
+                name: {{ template "oracle.fullname" . }}
         {{- if .Values.metrics.enabled }}
           ports:
             - containerPort: {{ .Values.metrics.port }}

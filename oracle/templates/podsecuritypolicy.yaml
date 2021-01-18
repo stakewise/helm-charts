@@ -1,11 +1,11 @@
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: {{ template "reporter.fullname" . }}
+  name: {{ template "oracle.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    app: {{ template "reporter.name" . }}
-    chart: {{ template "reporter.chart" . }}
+    app: {{ template "oracle.name" . }}
+    chart: {{ template "oracle.chart" . }}
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 spec:
