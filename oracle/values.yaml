@@ -15,7 +15,7 @@ terminationGracePeriodSeconds: 1800
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "HEAD-1fad773"
+  tag: "HEAD-7c96cb7"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
