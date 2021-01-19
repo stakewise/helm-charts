@@ -7,7 +7,7 @@ metadata:
   labels:
     app: {{ template "horcrux.name" . }}
     chart: {{ template "horcrux.chart" . }}
-    component: "admin"
+    component: "dispatcher"
     release: {{ .Release.Name | quote }}
     heritage: {{ .Release.Service | quote }}
 rules:

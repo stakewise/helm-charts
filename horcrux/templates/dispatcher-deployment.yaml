@@ -63,7 +63,6 @@ spec:
             httpGet:
               path: "/health/"
               port: http
-            initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5
             periodSeconds: 60
@@ -71,7 +70,6 @@ spec:
             httpGet:
               path: "/health/"
               port: http
-            initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5
             periodSeconds: 60
