@@ -4,7 +4,7 @@ securityContext:
 
 image:
   repository: "stakewiselabs/horcrux"
-  tag: "HEAD-7cad796"
+  tag: "HEAD-2d78703"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
