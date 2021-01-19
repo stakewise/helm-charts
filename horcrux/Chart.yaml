@@ -1,0 +1,17 @@
+apiVersion: v2
+name: horcrux
+version: 1.0.0
+appVersion: 1.0.0
+kubeVersion: "^1.14.0-0"
+description: The StakeWise BLS hocrux.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/stakewise/bls-horcrux/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io

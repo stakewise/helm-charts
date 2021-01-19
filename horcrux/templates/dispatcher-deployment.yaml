@@ -1,0 +1,68 @@
+{{- if .Values.dispatcher.enabled }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "dispatcher.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "horcrux.name" . }}
+    chart: {{ template "horcrux.chart" . }}
+    component: "dispatcher"
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "horcrux.name" . }}
+      release: {{ .Release.Name | quote }}
+      component: "dispatcher"
+  template:
+    metadata:
+      labels:
+        app: {{ template "horcrux.name" . }}
+        release: {{ .Release.Name | quote }}
+        component: "dispatcher"
+      annotations:
+        checksum/dispatcher-secret: {{ include (print $.Template.BasePath "/dispatcher-secret.yaml") . | sha256sum }}
+    spec:
+    {{- if .Values.dispatcher.tolerations }}
+      tolerations:
+        {{ tpl .Values.dispatcher.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.dispatcher.affinity }}
+      affinity:
+        {{ tpl .Values.dispatcher.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "dispatcher.fullname" . }}
+      priorityClassName: {{ .Values.dispatcher.priorityClassName | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: [ "uvicorn", "dispatcher.main:app" ]
+          envFrom:
+            - secretRef:
+                name: {{ template "horcrux.fullname" . }}
+          env:
+            - name: DATABASE_PATH
+              value: "sqlite:////data/dispatcher/dispatcher.db"
+        {{- with .Values.dispatcher.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+          ports:
+            - name: http
+              containerPort: 8000
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data/dispatcher
+      volumes:
+        - name: data
+          emptyDir: {}
+{{- end }}
