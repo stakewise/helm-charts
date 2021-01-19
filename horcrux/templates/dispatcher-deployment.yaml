@@ -44,10 +44,10 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: [ "uvicorn", "dispatcher.main:app" ]
+          command: [ "uvicorn", "dispatcher.main:app", "--host=0.0.0.0", "--port=8000" ]
           envFrom:
             - secretRef:
-                name: {{ template "horcrux.fullname" . }}
+                name: {{ template "dispatcher.fullname" . }}
           env:
             - name: DATABASE_PATH
               value: "sqlite:////data/dispatcher/dispatcher.db"
