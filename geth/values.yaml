@@ -145,18 +145,18 @@ node:
 
   # RPC configuration.
   rpc:
-    enabled: true
+    enabled: false
     api: "web3,eth,net"
-    corsDomain: "eth1-node.chain.svc.cluster.local"
-    vhosts: "eth1-node.chain.svc.cluster.local"
+    corsDomain: ""
+    vhosts: ""
     ingressEnabled: false
     ingressPath: /
 
   # WebSocket configuration.
   ws:
-    enabled: true
-    api: "eth,net"
-    origins: "eth1-node.chain.svc.cluster.local"
+    enabled: false
+    api: "web3,eth,net"
+    origins: ""
     ingressEnabled: false
     ingressPath: /ws
 
@@ -187,7 +187,7 @@ node:
   # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
   sessionAffinity:
     # Whether to enable session affinity or not
-    enabled: true
+    enabled: false
     # The session duration in seconds
     timeoutSeconds: 86400
 
@@ -238,6 +238,11 @@ node:
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: { }
+
+  # Toleration Settings
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [ ]
+
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   priorityClassName: ""

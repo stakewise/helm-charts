@@ -21,7 +21,7 @@ bootnode:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/bootnode"
-    tag: "HEAD-242888"
+    tag: "HEAD-9b367b"
     pullPolicy: IfNotPresent
 
   # Optional private key used for identity
@@ -51,7 +51,7 @@ slasher:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/slasher"
-    tag: "v1.0.5"
+    tag: "v1.1.0"
     pullPolicy: IfNotPresent
 
   extraFlags:
@@ -115,7 +115,7 @@ beacon:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    tag: "v1.0.5"
+    tag: "v1.1.0"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
@@ -136,10 +136,6 @@ beacon:
     # Beacon chain options
     - "--accept-terms-of-use"
     - "--http-web3provider=<eth1 chain endpoint>"
-
-    # features
-    - "--disable-grpc-gateway"
-    - "--head-sync"
 
     # p2p options
     - "--p2p-max-peers=100"
@@ -168,7 +164,7 @@ beacon:
   # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
   sessionAffinity:
     # Whether to enable session affinity or not
-    enabled: true
+    enabled: false
     # The session duration in seconds
     timeoutSeconds: 86400
 
@@ -217,11 +213,15 @@ beacon:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 100Gi
+    size: 300Gi
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
   affinity: { }
+
+  # Toleration Settings
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [ ]
 
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/

@@ -29,6 +29,10 @@ spec:
       affinity:
         {{ tpl .Values.node.affinity . | nindent 8 | trim }}
     {{- end }}
+    {{- if .Values.node.tolerations }}
+      tolerations:
+        {{ tpl .Values.node.tolerations . | nindent 8 | trim }}
+    {{- end }}
     {{- with .Values.securityContext }}
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
