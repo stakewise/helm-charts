@@ -112,7 +112,7 @@ miner:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 300Gi
+    size: 400Gi
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -233,7 +233,7 @@ node:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 300Gi
+    size: 400Gi
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
