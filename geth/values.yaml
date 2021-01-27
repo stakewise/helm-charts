@@ -208,7 +208,7 @@ node:
 
   # Extra flags to pass to the node
   extraFlags:
-    - "--syncmode=fast"
+    - "--syncmode=light"
 
   # Vertical Pod Autoscaler config
   # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
@@ -233,7 +233,7 @@ node:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 400Gi
+    size: 20Gi
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
