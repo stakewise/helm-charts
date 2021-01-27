@@ -135,12 +135,12 @@ node:
     pullPolicy: IfNotPresent
 
   # How many geth nodes to run simultaneously
-  replicas: 2
+  replicas: 1
 
   # Pod disruption budget
   # https://kubernetes.io/docs/tasks/run-application/configure-pdb/
   podDisruptionBudget:
-    enabled: true
+    enabled: false
     maxUnavailable: 1
 
   # RPC configuration.
