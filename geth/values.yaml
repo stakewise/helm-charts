@@ -233,7 +233,7 @@ node:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 20Gi
+    size: 5Gi
 
   # Affinity Settings
   # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
