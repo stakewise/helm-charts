@@ -55,6 +55,9 @@ settings:
   # transactions
   transactionTimeout: "600"
 
+  # processing interval
+  processInterval: "180"
+
   # contracts
   poolContractAddress: "0x0"
   rewardEthContractAddress: "0x0"
