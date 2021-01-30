@@ -3,8 +3,8 @@ securityContext:
   runAsUser: 1001
 
 image:
-  repository: "stakewiselabs/horcrux"
-  tag: "HEAD-3889788"
+  repository: "stakewiselabs/bls-horcrux"
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
