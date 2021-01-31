@@ -24,9 +24,6 @@ spec:
       annotations:
         checksum/oracle-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         checksum/oracle-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-      {{- if and .Values.metrics.enabled .Values.metrics.podAnnotations }}
-        {{ toYaml .Values.metrics.podAnnotations | nindent 8 | trim }}
-      {{- end }}
     spec:
     {{- if .Values.tolerations }}
       tolerations:
@@ -54,12 +51,6 @@ spec:
                 name: {{ template "oracle.fullname" . }}
             - secretRef:
                 name: {{ template "oracle.fullname" . }}
-        {{- if .Values.metrics.enabled }}
-          ports:
-            - containerPort: {{ .Values.metrics.port }}
-              name: metrics
-              protocol: TCP
-        {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}

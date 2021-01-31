@@ -15,7 +15,7 @@ terminationGracePeriodSeconds: 1800
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "HEAD-7c96cb7"
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -40,12 +40,12 @@ settings:
   beaconChainRpcEndpoint: "<eth2 chain endpoint>"
 
   # middlewares
-  injectPOAMiddleware: "True"
-  injectStaleCheckMiddleware: "True"
+  injectPOAMiddleware: "False"
+  injectStaleCheckMiddleware: "False"
   staleCheckMiddlewareAllowableDelay: "120"
-  injectRetryRequestMiddleware: "True"
+  injectRetryRequestMiddleware: "False"
   injectLocalFilterMiddleware: "False"
-  applyGasPriceStrategy: "True"
+  applyGasPriceStrategy: "False"
   maxTxWaitSeconds: "120"
 
   # oracle balance
@@ -56,7 +56,7 @@ settings:
   transactionTimeout: "600"
 
   # processing interval
-  processInterval: "180"
+  processInterval: "30"
 
   # contracts
   poolContractAddress: "0x0"
