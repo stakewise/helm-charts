@@ -15,7 +15,7 @@ terminationGracePeriodSeconds: 1800
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.0.0"
+  tag: "v1.0.1"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -46,14 +46,14 @@ settings:
   injectRetryRequestMiddleware: "False"
   injectLocalFilterMiddleware: "False"
   applyGasPriceStrategy: "False"
-  maxTxWaitSeconds: "120"
+  maxTxWaitSeconds: "180"
 
   # oracle balance
-  balanceWarningThreshold: "0.5"
-  balanceErrorThreshold: "0.01"
+  balanceWarningThreshold: "0.05"
+  balanceErrorThreshold: "0.008"
 
   # transactions
-  transactionTimeout: "600"
+  transactionTimeout: "3600"
 
   # processing interval
   processInterval: "30"
