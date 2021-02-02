@@ -12,6 +12,14 @@ securityContext:
 # https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
 terminationGracePeriodSeconds: 1800
 
+# Affinity Settings
+# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+affinity: { }
+
+# Toleration Settings
+# https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+tolerations: [ ]
+
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
