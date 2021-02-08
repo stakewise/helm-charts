@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.0.1"
+  tag: "v1.0.3"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -61,7 +61,7 @@ settings:
   balanceErrorThreshold: "0.008"
 
   # transactions
-  transactionTimeout: "3600"
+  transactionTimeout: "10800"
 
   # processing interval
   processInterval: "30"
