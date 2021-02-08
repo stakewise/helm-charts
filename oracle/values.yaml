@@ -44,6 +44,7 @@ settings:
 
   # connections
   web3WsEndpoint: "ws://<eth1 chain endpoint>"
+  web3WsEndpointTimeout: "60"
   web3HttpEndpoint: ""
   beaconChainRpcEndpoint: "<eth2 chain endpoint>"
 

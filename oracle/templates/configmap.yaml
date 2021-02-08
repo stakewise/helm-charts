@@ -14,6 +14,7 @@ data:
 
   # connections
   WEB3_WS_ENDPOINT: {{ .Values.settings.web3WsEndpoint | quote }}
+  WEB3_WS_ENDPOINT_TIMEOUT: {{ .Values.settings.web3WsEndpointTimeout | quote }}
   WEB3_HTTP_ENDPOINT: {{ .Values.settings.web3HttpEndpoint | quote }}
   BEACON_CHAIN_RPC_ENDPOINT: {{ .Values.settings.beaconChainRpcEndpoint | quote }}
 
