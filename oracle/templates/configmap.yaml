@@ -12,6 +12,9 @@ data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
 
+  # telegram
+  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifications | quote }}
+
   # connections
   WEB3_WS_ENDPOINT: {{ .Values.settings.web3WsEndpoint | quote }}
   WEB3_WS_ENDPOINT_TIMEOUT: {{ .Values.settings.web3WsEndpointTimeout | quote }}

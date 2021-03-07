@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.0.5"
+  tag: "v1.0.6"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -39,6 +39,7 @@ priorityClassName: ""
 
 settings:
   # notifications
+  sendTelegramNotifications: "True"
   telegramToken: ""
   telegramChatId: ""
 
