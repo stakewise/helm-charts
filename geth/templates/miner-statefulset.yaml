@@ -88,7 +88,6 @@ spec:
           {{- end }}
             - "--mine"
             - "--miner.threads=1"
-            - "--nousb"
             - "--datadir=/mnt/ethereum"
             - "--ethash.dagdir=/mnt/ethereum/.ethash"
             - "--unlock=0"

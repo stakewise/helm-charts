@@ -88,7 +88,6 @@ spec:
             - "--ws.origins={{ .Values.node.ws.origins }}"
             - "--ws.api={{ .Values.node.ws.api }}"
           {{- end }}
-            - "--nousb"
             - "--datadir=/mnt/ethereum"
             - "--ethash.dagdir=/mnt/ethereum/.ethash"
             - "--ipcdisable"

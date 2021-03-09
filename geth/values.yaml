@@ -27,7 +27,7 @@ bootnode:
   ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
   image:
     repository: "ethereum/client-go"
-    tag: "alltools-v1.9.25"
+    tag: "alltools-v1.10.1"
     pullPolicy: IfNotPresent
 
   # Node key for the identity
@@ -55,7 +55,7 @@ miner:
   ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
   image:
     repository: "ethereum/client-go"
-    tag: "v1.9.25"
+    tag: "v1.10.1"
     pullPolicy: IfNotPresent
 
   # Assign unique account to each miner
@@ -131,7 +131,7 @@ node:
   ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
   image:
     repository: "ethereum/client-go"
-    tag: "v1.9.25"
+    tag: "v1.10.1"
     pullPolicy: IfNotPresent
 
   # How many geth nodes to run simultaneously
