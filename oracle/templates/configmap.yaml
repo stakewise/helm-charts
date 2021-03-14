@@ -45,3 +45,4 @@ data:
   REWARD_ETH_CONTRACT_ADDRESS: {{ .Values.settings.rewardEthContractAddress | quote }}
   STAKED_ETH_CONTRACT_ADDRESS: {{ .Values.settings.stakedEthContractAddress | quote }}
   ORACLES_CONTRACT_ADDRESS: {{ .Values.settings.oraclesContractAddress | quote }}
+  VRC_CONTRACT_ADDRESS: {{ .Values.settings.vrcContractAddress | quote }}

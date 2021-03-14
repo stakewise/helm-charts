@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.0.6"
+  tag: "HEAD-b553b2b"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -73,6 +73,7 @@ settings:
   rewardEthContractAddress: "0x0"
   stakedEthContractAddress: "0x0"
   oraclesContractAddress: "0x0"
+  vrcContractAddress: "0x0"
 
   # credentials
   oraclePrivateKey: ""
