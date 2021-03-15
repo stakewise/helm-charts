@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "HEAD-961a0bb"
+  tag: "HEAD-b0143cd"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -57,6 +57,7 @@ settings:
   injectLocalFilterMiddleware: "False"
   applyGasPriceStrategy: "False"
   maxTxWaitSeconds: "180"
+  oracleVoteMaxGas: "250000"
 
   # oracle balance
   balanceWarningThreshold: "0.05"
