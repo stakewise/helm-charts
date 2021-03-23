@@ -74,7 +74,6 @@ settings:
   rewardEthContractAddress: "0x0"
   stakedEthContractAddress: "0x0"
   oraclesContractAddress: "0x0"
-  vrcContractAddress: "0x0"
 
   # credentials
   oraclePrivateKey: ""
