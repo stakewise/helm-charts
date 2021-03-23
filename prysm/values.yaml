@@ -21,7 +21,7 @@ bootnode:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/bootnode"
-    tag: "HEAD-0f1d14"
+    tag: "HEAD-d2b111"
     pullPolicy: IfNotPresent
 
   # Optional private key used for identity
@@ -51,7 +51,7 @@ slasher:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/slasher"
-    tag: "v1.3.3"
+    tag: "v1.3.4"
     pullPolicy: IfNotPresent
 
   extraFlags:
@@ -115,7 +115,7 @@ beacon:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    tag: "v1.3.3"
+    tag: "v1.3.4"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget

@@ -29,6 +29,7 @@ data:
   INJECT_LOCAL_FILTER_MIDDLEWARE: {{ .Values.settings.injectLocalFilterMiddleware | quote }}
   APPLY_GAS_PRICE_STRATEGY: {{ .Values.settings.applyGasPriceStrategy | quote }}
   MAX_TX_WAIT_SECONDS: {{ .Values.settings.maxTxWaitSeconds | quote }}
+  ORACLE_VOTE_GAS_LIMIT: {{ .Values.settings.oracleVoteGasLimit | quote }}
 
   # oracle balance
   BALANCE_WARNING_THRESHOLD: {{ .Values.settings.balanceWarningThreshold | quote }}
