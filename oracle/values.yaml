@@ -31,7 +31,7 @@ image:
 resources:
   requests:
     cpu: 10m
-    memory: 100Mi
+    memory: 200Mi
 
 # used to assign priority to pod
 # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
