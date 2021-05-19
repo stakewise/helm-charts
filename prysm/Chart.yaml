@@ -14,4 +14,4 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-appVersion: v1.3.8-hotfix-6c0942
+appVersion: v1.3.9
