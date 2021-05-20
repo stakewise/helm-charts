@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.1.1"
+  tag: "HEAD-3c76121"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -48,6 +48,8 @@ settings:
   web3WsEndpointTimeout: "60"
   web3HttpEndpoint: ""
   beaconChainRpcEndpoint: "<eth2 chain endpoint>"
+
+  etherscanAddressBaseUrl: "https://etherscan.io/address/"
 
   # middlewares
   injectPOAMiddleware: "False"
@@ -74,6 +76,21 @@ settings:
   rewardEthContractAddress: "0x0"
   stakedEthContractAddress: "0x0"
   oraclesContractAddress: "0x0"
+  daoAddress: "0x0"
+  multicallContractAddress: "0x0"
+  merkleDistributorContractAddress: "0x0"
+  balancerVaultContractAddress: "0x0"
+  uniswapV3PositionManagerContractAddress: "0x0"
+  ensResolverContractAddress: "0x0"
+
+  daoEnsDomain: "stakewise.eth"
+  oracleEnsTextRecord: "oraclesconfig"
+  balancerSubgraphUrl: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-v2"
+  uniswapV2subgraphUrl: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
+  # TODO: replace with official Uniswap v3 graph
+  uniswapV3subgraphUrl: "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-subgraph"
+  ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
+
 
   # credentials
   oraclePrivateKey: ""
