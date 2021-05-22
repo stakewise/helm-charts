@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "HEAD-76822db"
+  tag: "HEAD-cee19a0"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
