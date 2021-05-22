@@ -66,10 +66,10 @@ settings:
   balanceErrorThreshold: "0.008"
 
   # transactions
-  transactionTimeout: "10800"
+  transactionTimeout: "1800"
 
   # processing interval
-  processInterval: "30"
+  processInterval: "300"
 
   # contracts
   poolContractAddress: "0x0"
