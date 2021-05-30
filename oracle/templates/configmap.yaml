@@ -51,7 +51,6 @@ data:
   MULTICALL_CONTRACT_ADDRESS: {{ .Values.settings.multicallContractAddress | quote }}
   MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS: {{ .Values.settings.merkleDistributorContractAddress | quote }}
   BALANCER_VAULT_CONTRACT_ADDRESS: {{ .Values.settings.balancerVaultContractAddress | quote }}
-  UNISWAP_V3_POSITION_MANAGER_CONTRACT_ADDRESS: {{ .Values.settings.uniswapV3PositionManagerContractAddress | quote }}
   ENS_RESOLVER_CONTRACT_ADDRESS: {{ .Values.settings.ensResolverContractAddress | quote }}
   DAO_ENS_DOMAIN: {{ .Values.settings.daoEnsDomain | quote }}
   ORACLES_ENS_TEXT_RECORD: {{ .Values.settings.oracleEnsTextRecord | quote }}

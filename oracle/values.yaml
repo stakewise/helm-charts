@@ -80,7 +80,6 @@ settings:
   multicallContractAddress: "0x0"
   merkleDistributorContractAddress: "0x0"
   balancerVaultContractAddress: "0x0"
-  uniswapV3PositionManagerContractAddress: "0x0"
   ensResolverContractAddress: "0x0"
 
   daoEnsDomain: "stakewise.eth"
