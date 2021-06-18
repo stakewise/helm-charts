@@ -20,6 +20,7 @@ data:
   WEB3_WS_ENDPOINT_TIMEOUT: {{ .Values.settings.web3WsEndpointTimeout | quote }}
   WEB3_HTTP_ENDPOINT: {{ .Values.settings.web3HttpEndpoint | quote }}
   BEACON_CHAIN_RPC_ENDPOINT: {{ .Values.settings.beaconChainRpcEndpoint | quote }}
+  ETHERSCAN_ADDRESS_BASE_URL: {{ .Values.settings.etherscanAddressBaseUrl | quote }}
 
   # middlewares
   INJECT_POA_MIDDLEWARE: {{ .Values.settings.injectPOAMiddleware | quote }}
@@ -46,3 +47,14 @@ data:
   REWARD_ETH_CONTRACT_ADDRESS: {{ .Values.settings.rewardEthContractAddress | quote }}
   STAKED_ETH_CONTRACT_ADDRESS: {{ .Values.settings.stakedEthContractAddress | quote }}
   ORACLES_CONTRACT_ADDRESS: {{ .Values.settings.oraclesContractAddress | quote }}
+  DAO_ADDRESS: {{ .Values.settings.daoAddress | quote }}
+  MULTICALL_CONTRACT_ADDRESS: {{ .Values.settings.multicallContractAddress | quote }}
+  MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS: {{ .Values.settings.merkleDistributorContractAddress | quote }}
+  BALANCER_VAULT_CONTRACT_ADDRESS: {{ .Values.settings.balancerVaultContractAddress | quote }}
+  ENS_RESOLVER_CONTRACT_ADDRESS: {{ .Values.settings.ensResolverContractAddress | quote }}
+  DAO_ENS_DOMAIN: {{ .Values.settings.daoEnsDomain | quote }}
+  ORACLES_ENS_TEXT_RECORD: {{ .Values.settings.oracleEnsTextRecord | quote }}
+  BALANCER_SUBGRAPH_URL: {{ .Values.settings.balancerSubgraphUrl | quote }}
+  UNISWAP_V2_SUBGRAPH_URL: {{ .Values.settings.uniswapV2subgraphUrl | quote }}
+  UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3subgraphUrl | quote }}
+  IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}

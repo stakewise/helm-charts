@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "stakewiselabs/oracle"
-  tag: "v1.1.1"
+  tag: "1.3.1"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -49,6 +49,8 @@ settings:
   web3HttpEndpoint: ""
   beaconChainRpcEndpoint: "<eth2 chain endpoint>"
 
+  etherscanAddressBaseUrl: "https://etherscan.io/address/"
+
   # middlewares
   injectPOAMiddleware: "False"
   injectStaleCheckMiddleware: "False"
@@ -64,16 +66,29 @@ settings:
   balanceErrorThreshold: "0.008"
 
   # transactions
-  transactionTimeout: "10800"
+  transactionTimeout: "1800"
 
   # processing interval
-  processInterval: "30"
+  processInterval: "300"
 
   # contracts
   poolContractAddress: "0x0"
   rewardEthContractAddress: "0x0"
   stakedEthContractAddress: "0x0"
   oraclesContractAddress: "0x0"
+  daoAddress: "0x0"
+  multicallContractAddress: "0x0"
+  merkleDistributorContractAddress: "0x0"
+  balancerVaultContractAddress: "0x0"
+  ensResolverContractAddress: "0x0"
+
+  daoEnsDomain: "stakewise.eth"
+  oracleEnsTextRecord: "oraclesconfig"
+  balancerSubgraphUrl: "https://api.thegraph.com/subgraphs/name/balancer-labs/balancer-v2"
+  uniswapV2subgraphUrl: "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2"
+  uniswapV3subgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3"
+  ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
+
 
   # credentials
   oraclePrivateKey: ""
