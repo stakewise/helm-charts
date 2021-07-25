@@ -115,7 +115,7 @@ beacon:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    tag: "v1.3.11"
+    tag: "v1.4.2"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
