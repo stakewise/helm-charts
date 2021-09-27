@@ -1,0 +1,17 @@
+{{- if .Values.bootnode.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  name: {{ include "geth.fullname" . }}-bootnode
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+    component: "bootnode"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "geth.fullname" . }}-bootnode
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "geth.fullname" . }}-bootnode
+    namespace: {{ .Release.Namespace }}
+{{- end }}

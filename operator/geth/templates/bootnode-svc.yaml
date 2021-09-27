@@ -1,0 +1,21 @@
+{{- if .Values.bootnode.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "geth.fullname" . }}-bootnode
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+    component: "bootnode"
+spec:
+  selector:
+    {{- include "geth.selectorLabels" . | nindent 4 }}
+    component: "bootnode"
+  type: ClusterIP
+  ports:
+    {{- range $service := .Values.bootnode.services }}
+    - name: {{ $service.name }}
+      port: {{ $service.port }}
+      targetPort: {{ $service.name }}
+      protocol: {{ $service.protocol }}
+    {{- end }}
+{{- end }}

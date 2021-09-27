@@ -1,0 +1,153 @@
+{{- if .Values.miner.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ include "geth.fullname" . }}-miner
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+    component: "miner"
+spec:
+  selector:
+    matchLabels:
+      {{- include "geth.selectorLabels" . | nindent 6 }}
+      component: "miner"
+  serviceName: {{ include "geth.fullname" . }}-miner
+  replicas: {{ len .Values.miner.accounts }}
+  template:
+    metadata:
+      labels:
+        {{- include "geth.selectorLabels" . | nindent 8 }}
+        component: "miner"
+    {{- if and .Values.miner.metrics.enabled .Values.miner.metrics.podAnnotations }}
+      annotations:
+        {{ toYaml .Values.miner.metrics.podAnnotations | nindent 8 | trim }}
+    {{- end }}
+    spec:
+    {{- if .Values.miner.affinity }}
+      affinity:
+        {{ tpl .Values.miner.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ include "geth.fullname" . }}-miner
+      priorityClassName: {{ .Values.miner.priorityClassName | quote }}
+      initContainers:
+      {{- if and .Values.miner.persistence.enabled .Values.miner.initChownData }}
+        - name: init-chown-data
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/mnt/ethereum"]
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/ethereum
+      {{- end }}
+        - name: init-miner
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+                [[ -f /mnt/ethereum/miner-password ]] && exit;
+                geth account import --datadir=/mnt/ethereum --password /mnt/miners/$(hostname)-pass /mnt/miners/$(hostname);
+                cat /mnt/miners/$(hostname)-pass > /mnt/ethereum/miner-password
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/ethereum
+            - name: miners
+              mountPath: /mnt/miners
+      {{- if .Values.genesis }}
+        - name: genesis
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args: ["[[ -d /mnt/ethereum/geth ]] || geth init --datadir=/mnt/ethereum /etc/ethereum/genesis.json"]
+          volumeMounts:
+            - name: genesis
+              mountPath: /etc/ethereum
+              readOnly: true
+            - name: data
+              mountPath: /mnt/ethereum
+      {{- end }}
+      containers:
+        - name: miner
+          image: "{{ .Values.miner.image.repository }}:{{ .Values.miner.image.tag }}"
+          imagePullPolicy: {{ .Values.miner.image.pullPolicy }}
+          args:
+          {{- if not (empty .Values.networkId) }}
+            - "--networkid={{ .Values.networkId }}"
+          {{- end }}
+            - "--mine"
+            - "--miner.threads=1"
+            - "--datadir=/mnt/ethereum"
+            - "--ethash.dagdir=/mnt/ethereum/.ethash"
+            - "--unlock=0"
+            - "--password=/mnt/ethereum/miner-password"
+            - "--ipcdisable"
+          {{- if .Values.bootnode.enabled }}
+            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@$({{ include "geth.fullname" . }}-bootnode):30301"
+          {{- end }}
+          {{- range .Values.miner.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.miner.metrics.enabled }}
+          {{- range .Values.miner.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+          {{- if .Values.miner.metrics.enabled }}
+            - containerPort: {{ .Values.miner.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          {{- range $service := .Values.miner.services }}
+            - containerPort: {{ $service.port }}
+              name: {{ $service.name }}
+              protocol: {{ $service.protocol }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/ethereum
+        {{- with .Values.miner.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      volumes:
+        - name: miners
+          secret:
+            secretName: {{ include "geth.fullname" . }}-miner
+      {{- if .Values.genesis }}
+        - name: genesis
+          configMap:
+            name: {{ include "geth.fullname" . }}-genesis
+            items:
+              - key: genesis
+                path: genesis.json
+      {{- end }}
+{{- if (not .Values.miner.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "geth.selectorLabels" . | nindent 10 }}
+          component: "miner"
+      spec:
+        accessModes: {{ .Values.miner.persistence.accessModes }}
+        storageClassName: {{ .Values.miner.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.miner.persistence.size | quote }}
+{{- end }}
+{{- end }}

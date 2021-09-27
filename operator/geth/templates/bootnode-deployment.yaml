@@ -1,0 +1,64 @@
+{{- if .Values.bootnode.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "geth.fullname" . }}-bootnode
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+    component: "bootnode"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "geth.selectorLabels" . | nindent 6 }}
+      component: "bootnode"
+  template:
+    metadata:
+      {{- include "geth.selectorLabels" . | nindent 6 }}
+      component: "bootnode"
+      annotations:
+        checksum/bootnode-secret: {{ include (print $.Template.BasePath "/bootnode-secret.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ include "geth.fullname" . }}-bootnode
+      priorityClassName: {{ .Values.bootnode.priorityClassName | quote }}
+      containers:
+        - name: bootnode
+          image: "{{ .Values.bootnode.image.repository }}:{{ .Values.bootnode.image.tag }}"
+          imagePullPolicy: {{ .Values.bootnode.image.pullPolicy }}
+          command: ["bootnode"]
+          args:
+            - "--nodekey=/etc/ethereum/nodekey"
+            - "--nat=extip:$(POD_IP)"
+          {{- range .Values.bootnode.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          volumeMounts:
+            - name: nodekey
+              mountPath: /etc/ethereum
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            {{- range $service := .Values.bootnode.services }}
+            - containerPort: {{ $service.port }}
+              name: {{ $service.name }}
+              protocol: {{ $service.protocol }}
+            {{- end }}
+        {{- with .Values.bootnode.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      volumes:
+        - name: nodekey
+          secret:
+            secretName: {{ include "geth.fullname" . }}-bootnode
+            items:
+              - key: nodeKey
+                path: nodekey
+{{- end }}

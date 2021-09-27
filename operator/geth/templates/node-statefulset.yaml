@@ -1,0 +1,169 @@
+{{- if .Values.node.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ include "geth.fullname" . }}-node
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+    component: "node"
+spec:
+  selector:
+    matchLabels:
+      {{- include "geth.selectorLabels" . | nindent 6 }}
+      component: "node"
+  serviceName: {{ include "geth.fullname" . }}-node
+  replicas: {{ .Values.node.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "geth.selectorLabels" . | nindent 8 }}
+        component: "node"
+    spec:
+    {{- if .Values.node.affinity }}
+      affinity:
+        {{ tpl .Values.node.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.node.tolerations }}
+      tolerations:
+        {{ tpl .Values.node.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ include "geth.fullname" . }}-node
+      priorityClassName: {{ .Values.node.priorityClassName | quote }}
+      initContainers:
+      {{- if and .Values.node.persistence.enabled .Values.node.initChownData }}
+        - name: init-chown-data
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/mnt/ethereum"]
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/ethereum
+      {{- end }}
+      {{- if .Values.genesis }}
+        - name: genesis
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          command: ["/bin/sh", "-c"]
+          args: ["[[ -d /mnt/ethereum/geth ]] || geth init --datadir=/mnt/ethereum /etc/ethereum/genesis.json"]
+          volumeMounts:
+            - name: genesis
+              mountPath: /etc/ethereum
+              readOnly: true
+            - name: data
+              mountPath: /mnt/ethereum
+      {{- end }}
+      containers:
+        - name: node
+          image: "{{ .Values.node.image.repository }}:{{ .Values.node.image.tag }}"
+          imagePullPolicy: {{ .Values.node.image.pullPolicy }}
+        {{- if .Values.node.command }}
+          command: {{ .Values.node.command }}
+        {{- end }}
+          args:
+          {{- if not (empty .Values.networkId) }}
+            - "--networkid={{ .Values.networkId }}"
+          {{- end }}
+          {{- if .Values.node.rpc.enabled }}
+            - "--http"
+            - "--http.addr=0.0.0.0"
+            - "--http.corsdomain={{ .Values.node.rpc.corsDomain }}"
+            - "--http.vhosts={{ .Values.node.rpc.vhosts }}"
+            - "--http.api={{ .Values.node.rpc.api }}"
+          {{- end }}
+          {{- if .Values.node.ws.enabled }}
+            - "--ws"
+            - "--ws.addr=0.0.0.0"
+            - "--ws.origins={{ .Values.node.ws.origins }}"
+            - "--ws.api={{ .Values.node.ws.api }}"
+          {{- end }}
+            - "--datadir=/mnt/ethereum"
+            - "--ethash.dagdir=/mnt/ethereum/.ethash"
+            - "--ipcdisable"
+          {{- if .Values.bootnode.enabled }}
+            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@$({{ include "geth.fullname" . }}-bootnode):30301"
+          {{- end }}
+          {{- range .Values.node.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.node.metrics.enabled }}
+          {{- range .Values.node.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+          {{- range $service := .Values.node.services }}
+            - containerPort: {{ $service.port }}
+              name: {{ $service.name }}
+              protocol: {{ $service.protocol }}
+          {{- end }}
+          {{- if .Values.node.rpc.enabled }}
+            - name: rpc
+              containerPort: 8545
+          {{- end }}
+          {{- if .Values.node.ws.enabled }}
+            - name: ws
+              containerPort: 8546
+          {{- end }}
+          {{- if .Values.node.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.node.metrics.port }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/ethereum
+        {{- if .Values.node.rpc.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8545
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8545
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+        {{- end }}
+        {{- with .Values.node.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      volumes:
+      {{- if .Values.genesis }}
+        - name: genesis
+          configMap:
+            name: {{ include "geth.fullname" . }}-genesis
+            items:
+              - key: genesis
+                path: genesis.json
+      {{- end }}
+{{- if (not .Values.node.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "geth.labels" . | nindent 10 }}
+          component: "node"
+      spec:
+        accessModes: {{ .Values.node.persistence.accessModes }}
+        storageClassName: {{ .Values.node.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.node.persistence.size | quote }}
+{{- end }}
+{{- end }}

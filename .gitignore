@@ -2,3 +2,4 @@
 
 # ignore fetched subcharts
 **/charts
+!operator/charts
