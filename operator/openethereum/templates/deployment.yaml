@@ -1,0 +1,117 @@
+{{ $chainConfig := index $.Values.openethereum.chains $.Values.openethereum.chain }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "openethereum.fullname" . }}
+  labels:
+    {{- include "openethereum.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "openethereum.selectorLabels" . | nindent 6 }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "openethereum.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "openethereum.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['/bin/sh', '/mnt/scripts/entrypoint.sh']
+          args:
+            {{- if $chainConfig.bootnodes }}
+            - "--bootnodes"
+            - "{{ join "," $chainConfig.bootnodes }}"
+            {{- end }}
+            - "-d"
+            - "/mnt/data"
+            - "--chain"
+            - "{{ $.Values.openethereum.chain }}"
+            - "--jsonrpc-interface"
+            - "all"
+            - "--jsonrpc-port"
+            - "8545"
+            - "--ws-interface"
+            - "all"
+            - "--ws-port"
+            - "8546"
+            - "--min-peers"
+            - "50"
+            - "--max-peers"
+            - "100"
+            {{- if .Values.openethereum.metrics.enabled }}
+            - "--metrics"
+            - "--metrics-port"
+            - {{ .Values.openethereum.metrics.port | quote }}
+            {{- end }}
+            {{- with .Values.openethereum.extraFlags }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          ports:
+          {{- range $service := .Values.services }}
+            - containerPort: {{ $service.port }}
+              name: {{ $service.name }}
+              protocol: {{ $service.protocol }}
+          {{- end }}
+          {{- if .Values.openethereum.metrics.enabled }}
+            - containerPort: {{ .Values.openethereum.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          {{- with (index .Values.services 0) }}
+          livenessProbe:
+            tcpSocket:
+              port: {{ .port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: {{ .port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /mnt/data
+            - name: scripts
+              mountPath: /mnt/scripts
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "openethereum.fullname" . }}
+      {{- if and .Values.persistence.enabled (eq .Values.persistence.type "pvc") }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "openethereum.fullname" .) }}
+      {{- end -}}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
