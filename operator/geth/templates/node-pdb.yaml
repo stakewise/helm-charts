@@ -3,6 +3,7 @@ apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
   name: {{ include "geth.fullname" . }}-node
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "geth.labels" . | nindent 4 }}
     component: "node"

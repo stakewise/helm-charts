@@ -1,15 +1,16 @@
-{{- if or .Values.bootnode.enabled .Values.node.enabled .Values.miner.enabled }}
+{{- if or .Values.bootnode.enabled .Values.node.enabled }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: {{ include "geth.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "geth.labels" . | nindent 4 }}
 spec:
   privileged: false
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
-  {{- if or (and .Values.node.enabled .Values.node.initChownData) (and .Values.miner.enabled .Values.miner.initChownData) }}
+  {{- if or (and .Values.node.enabled .Values.node.initChownData) }}
     # Default set from Docker, without DAC_OVERRIDE or CHOWN
     - FOWNER
     - FSETID
@@ -37,7 +38,7 @@ spec:
   hostIPC: false
   hostPID: false
   runAsUser:
-  {{- if or (and .Values.node.enabled .Values.node.initChownData) (and .Values.miner.enabled .Values.miner.initChownData) }}
+  {{- if or (and .Values.node.enabled .Values.node.initChownData) }}
     rule: 'RunAsAny'
   {{- else }}
     rule: 'MustRunAsNonRoot'

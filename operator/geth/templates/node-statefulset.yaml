@@ -3,6 +3,7 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: {{ include "geth.fullname" . }}-node
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "geth.labels" . | nindent 4 }}
     component: "node"
@@ -86,7 +87,7 @@ spec:
             - "--ethash.dagdir=/mnt/ethereum/.ethash"
             - "--ipcdisable"
           {{- if .Values.bootnode.enabled }}
-            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@$({{ include "geth.fullname" . }}-bootnode):30301"
+            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@{{ include "geth.fullname" . }}-bootnode:30301"
           {{- end }}
           {{- range .Values.node.extraFlags }}
             - {{ . | quote }}

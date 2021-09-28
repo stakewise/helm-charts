@@ -1,8 +1,9 @@
-{{- if and .Values.miner.enabled .Values.genesis }}
+{{- if and .Values.genesis }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ include "geth.fullname" . }}-genesis
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "geth.labels" . | nindent 4 }}
     component: genesis
