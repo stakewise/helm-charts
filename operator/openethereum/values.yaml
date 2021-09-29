@@ -74,7 +74,7 @@ openethereum:
       ## e.g:
       ## rules:
       ##   - alert: OpenEthereumSnapshotOufOfSync
-      ##     expr: snapshot_download_chunks_done{service="{{ template "openethereum.fullname" . }}"} < snapshot_download_chunks{service="{{ template "openethereum.fullname" . }}"}
+      ##     expr: snapshot_download_chunks_done{service="{{ include "openethereum.fullname" . }}"} < snapshot_download_chunks{service="{{ template "openethereum.fullname" . }}"}
       ##     for: 30m
       ##     labels:
       ##       severity: error
