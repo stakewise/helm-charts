@@ -1,3 +1,4 @@
+{{- if and .Values.node.enabled .Values.node.metrics.enabled .Values.node.metrics.serviceMonitor.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -2372,3 +2373,4 @@ data:
       "uid": "20d61ee55e26e1a0cd293c03854fb657",
       "version": 1
     }
+{{ end }}

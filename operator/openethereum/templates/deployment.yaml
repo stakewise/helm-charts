@@ -60,6 +60,8 @@ spec:
             - "--metrics"
             - "--metrics-port"
             - {{ .Values.openethereum.metrics.port | quote }}
+            - "--metrics-interface"
+            - "all"
             {{- end }}
             {{- with .Values.openethereum.extraFlags }}
               {{- toYaml . | nindent 12 }}
