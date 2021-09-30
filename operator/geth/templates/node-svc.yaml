@@ -2,19 +2,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
 {{- if and .Values.node.metrics.enabled .Values.node.metrics.svcAnnotations }}
   annotations:
     {{ toYaml .Values.node.metrics.svcAnnotations | nindent 4 | trim }}
 {{- end }}
 spec:
   selector:
-    {{- include "geth.selectorLabels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.selectorLabels" . | nindent 4 }}
 {{- if .Values.node.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:

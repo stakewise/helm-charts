@@ -1,16 +1,16 @@
-{{- if or .Values.bootnode.enabled .Values.node.enabled }}
+{{- if or .Values.bootnode.enabled .Values.beacon.enabled }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: {{ template "geth.fullname" . }}
-  namespace: {{ .Release.Namespace | quote }}
+  name: {{ template "prysm.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
+    {{- include "prysm.labels" . | nindent 4 }}
 spec:
   privileged: false
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
-  {{- if or (and .Values.node.enabled .Values.node.initChownData) }}
+  {{- if and .Values.beacon.enabled .Values.beacon.initChownData.enabled }}
     # Default set from Docker, without DAC_OVERRIDE or CHOWN
     - FOWNER
     - FSETID
@@ -38,7 +38,7 @@ spec:
   hostIPC: false
   hostPID: false
   runAsUser:
-  {{- if or (and .Values.node.enabled .Values.node.initChownData) }}
+  {{- if and .Values.beacon.enabled .Values.beacon.initChownData.enabled }}
     rule: 'RunAsAny'
   {{- else }}
     rule: 'MustRunAsNonRoot'

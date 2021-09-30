@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   {{- if .Values.node.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.node.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
+    {{- include "node.labels" . | nindent 4 }}
     {{- if .Values.node.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.node.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
@@ -37,6 +37,5 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "geth.selectorLabels" . | nindent 6 }}
-      component: "node"
+      {{- include "node.selectorLabels" . | nindent 6 }}
 {{- end }}

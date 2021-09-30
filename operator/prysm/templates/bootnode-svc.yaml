@@ -1,0 +1,22 @@
+{{- if.Values.bootnode.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "bootnode.fullname" . }}
+  labels:
+    {{- include "bootnode.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "bootnode.selectorLabels" . | nindent 4 }}
+  type: ClusterIP
+{{- if .Values.bootnode.clusterIP }}
+  clusterIP: {{ .Values.bootnode.clusterIP }}
+{{- end }}
+  ports:
+    - name: discv5
+      port: 4000
+      targetPort: discv5
+    - name: metrics
+      port: 5000
+      targetPort: metrics
+{{- end }}

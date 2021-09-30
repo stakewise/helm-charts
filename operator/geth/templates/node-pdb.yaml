@@ -2,11 +2,10 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
 spec:
 {{- if .Values.node.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.node.podDisruptionBudget.minAvailable }}
@@ -16,6 +15,5 @@ spec:
 {{- end }}
   selector:
     matchLabels:
-      {{- include "geth.selectorLabels" . | nindent 6 }}
-      component: "node"
+      {{- include "node.selectorLabels" . | nindent 6 }}
 {{- end }}

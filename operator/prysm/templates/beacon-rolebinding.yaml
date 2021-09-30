@@ -1,0 +1,17 @@
+{{- if .Values.beacon.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "beacon.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "beacon.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "beacon.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "beacon.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

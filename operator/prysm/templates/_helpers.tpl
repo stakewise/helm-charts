@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "geth.name" -}}
+{{- define "prysm.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,76 +10,68 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "geth.fullname" -}}
+{{- define "prysm.fullname" -}}
 {{- $name := default .Chart.Name .Values.nameOverride -}}
 {{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "node.fullname" -}}
-{{- printf "%s-%s" .Release.Name "node" | trunc 63 | trimSuffix "-" -}}
+{{- define "beacon.fullname" -}}
+{{- printf "%s-%s" .Release.Name "beacon" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "bootnode.fullname" -}}
 {{- printf "%s-%s" .Release.Name "bootnode" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "bootnode.serviceHost" -}}
-{{- printf "%s_SERVICE_HOST" (include "bootnode.fullname" .) | upper | replace "-" "_" -}}
-{{- end -}}
-
-{{- define "genesis.fullname" -}}
-{{- printf "%s-%s" .Release.Name "genesis" | trunc 63 | trimSuffix "-" -}}
+{{- define "slasher.fullname" -}}
+{{- printf "%s-%s" .Release.Name "slasher" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "geth.chart" -}}
+{{- define "prysm.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "geth.labels" -}}
-helm.sh/chart: {{ include "geth.chart" . }}
-{{ include "geth.selectorLabels" . }}
+{{- define "prysm.labels" -}}
+helm.sh/chart: {{ include "prysm.chart" . }}
+{{ include "prysm.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
+{{- define "beacon.labels" -}}
+{{ include "prysm.labels" . }}
+component: beacon
+{{- end }}
+
 {{- define "bootnode.labels" -}}
-{{ include "geth.labels" . }}
-component: "bootnode"
-{{- end }}
-
-{{- define "genesis.labels" -}}
-{{ include "geth.labels" . }}
-component: "genesis"
-{{- end }}
-
-{{- define "node.labels" -}}
-{{ include "geth.labels" . }}
-component: "node"
+{{ include "prysm.labels" . }}
+component: bootnode
 {{- end }}
 
 {{/*
 Selector labels
 */}}
-{{- define "geth.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "geth.name" . }}
+{{- define "prysm.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "prysm.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{- define "bootnode.selectorLabels" -}}
-{{ include "geth.selectorLabels" . }}
-component: bootnode
+{{- define "beacon.selectorLabels" -}}
+{{ include "prysm.selectorLabels" . }}
+component: beacon
 {{- end }}
-{{- define "node.selectorLabels" -}}
-{{ include "geth.selectorLabels" . }}
-component: node
+
+{{- define "bootnode.selectorLabels" -}}
+{{ include "prysm.selectorLabels" . }}
+component: bootnode
 {{- end }}
 
 {{/*

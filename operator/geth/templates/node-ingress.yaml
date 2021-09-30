@@ -3,11 +3,10 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
   {{- with .Values.node.ingress.labels }}
     {{ toYaml . | nindent 4 | trim }}
   {{- end }}

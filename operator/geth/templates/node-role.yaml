@@ -2,22 +2,21 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
 rules:
   - apiGroups: ["extensions"]
     resources: ["podsecuritypolicies"]
     verbs: ["use"]
     resourceNames:
-      - {{ include "geth.fullname" . }}
+      - {{ template "geth.fullname" . }}
 {{- if .Values.genesis }}
   - apiGroups: [""]
     resources: ["configmaps"]
     resourceNames:
-      - {{ include "geth.fullname" . }}-genesis
+      - {{ template "genesis.fullname" . }}
     verbs: ["get"]
 {{- end }}
 {{- end }}

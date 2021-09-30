@@ -1,0 +1,191 @@
+{{- if .Values.beacon.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "beacon.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "beacon.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "beacon.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "beacon.fullname" . }}
+  replicas: {{ .Values.beacon.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "beacon.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- if .Values.beacon.affinity }}
+      affinity:
+        {{ tpl .Values.beacon.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.beacon.tolerations }}
+      tolerations:
+        {{ tpl .Values.beacon.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "beacon.fullname" . }}
+      priorityClassName: {{ .Values.beacon.priorityClassName | quote }}
+      initContainers:
+      {{- if and .Values.beacon.persistence.enabled .Values.beacon.initChownData.enabled }}
+        - name: init-chown-data
+          image: "{{ .Values.beacon.initChownData.image.repository }}:{{ .Values.beacon.initChownData.image.tag }}"
+          imagePullPolicy: {{ .Values.beacon.initChownData.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      {{- if and .Values.slasher.enabled .Values.slasher.persistence.enabled .Values.slasher.initChownData.enabled }}
+        - name: init-slasher-chown-data
+          image: "{{ .Values.slasher.initChownData.image.repository }}:{{ .Values.slasher.initChownData.image.tag }}"
+          imagePullPolicy: {{ .Values.slasher.initChownData.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: slasher-data
+              mountPath: /data
+      {{- end }}
+      {{- if .Values.beacon.persistence.enabled }}
+        - name: cleanup-network-keys
+          image: "{{ .Values.beacon.initChownData.image.repository }}:{{ .Values.beacon.initChownData.image.tag }}"
+          imagePullPolicy: {{ .Values.beacon.initChownData.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["rm", "-f", "/data/network-keys"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.beacon.image.repository }}:{{ .Values.beacon.image.tag }}"
+          imagePullPolicy: {{ .Values.beacon.image.pullPolicy }}
+          args:
+            - "--datadir=/data"
+            - "--rpc-host=0.0.0.0"
+            - "--rpc-port=4000"
+            - "--p2p-tcp-port=13000"
+            - "--p2p-udp-port=12000"
+          {{- range .Values.beacon.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.beacon.metrics.enabled }}
+          {{- range .Values.beacon.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: 4000
+              name: grpc
+              protocol: TCP
+            - containerPort: 13000
+              name: p2p-tcp
+              protocol: TCP
+            - containerPort: 12000
+              name: p2p-udp
+              protocol: UDP
+          {{- if .Values.beacon.metrics.enabled }}
+            - containerPort: {{ .Values.beacon.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- with .Values.beacon.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.beacon.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.beacon.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      {{- if .Values.slasher.enabled }}
+        - name: slasher
+          image: "{{ .Values.slasher.image.repository }}:{{ .Values.slasher.image.tag }}"
+          imagePullPolicy: {{ .Values.slasher.image.pullPolicy }}
+          args:
+            - "--beacon-rpc-provider=localhost:4000"
+            - "--datadir=/data"
+            - "--rpc-host=0.0.0.0"
+            - "--rpc-port=4002"
+            {{- range .Values.slasher.extraFlags }}
+            - {{ . | quote }}
+            {{- end }}
+          ports:
+            - containerPort: 4002
+              name: slasher-grpc
+              protocol: TCP
+          volumeMounts:
+            - name: slasher-data
+              mountPath: /data
+          {{- with .Values.slasher.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
+          {{- with .Values.slasher.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
+          {{- with .Values.slasher.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
+      {{- end }}
+{{- if or (not .Values.beacon.persistence.enabled) (not .Values.slasher.persistence.enabled) }}
+      volumes:
+      {{- if (not .Values.beacon.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+      {{- end }}
+      {{- if (not .Values.slasher.persistence.enabled) }}
+        - name: slasher-data
+          emptyDir: {}
+      {{- end }}
+{{- else }}
+  volumeClaimTemplates:
+  {{- if .Values.beacon.persistence.enabled }}
+    - metadata:
+        name: data
+        labels:
+          app: {{ template "prysm.name" . }}
+          component: "beacon"
+          release: {{ .Release.Name | quote }}
+          heritage: {{ .Release.Service | quote }}
+      spec:
+        accessModes: {{ .Values.beacon.persistence.accessModes }}
+        storageClassName: {{ .Values.beacon.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.beacon.persistence.size | quote }}
+  {{- end }}
+  {{- if and .Values.slasher.enabled .Values.beacon.persistence.enabled }}
+    - metadata:
+        name: slasher-data
+        labels:
+          app: {{ template "prysm.name" . }}
+          component: "beacon"
+          release: {{ .Release.Name | quote }}
+          heritage: {{ .Release.Service | quote }}
+      spec:
+        accessModes: {{ .Values.slasher.persistence.accessModes }}
+        storageClassName: {{ .Values.slasher.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.slasher.persistence.size | quote }}
+  {{- end }}
+{{- end }}
+{{- end }}

@@ -2,17 +2,16 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "geth.fullname" . }}-node
+    name: {{ template "node.fullname" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

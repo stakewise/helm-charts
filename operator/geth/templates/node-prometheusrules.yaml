@@ -2,21 +2,21 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   {{- if .Values.node.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.node.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
+    {{- include "node.labels" . | nindent 4 }}
     {{- if .Values.node.metrics.prometheusRule.additionalLabels }}
     {{- toYaml .Values.node.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   {{- with .Values.node.metrics.prometheusRule.rules }}
   groups:
-    - name: {{ include "geth.fullname" $ }}-node
+    - name: {{ template "node.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
 {{- end }}

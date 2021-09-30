@@ -2,23 +2,20 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ include "geth.fullname" . }}-node
+  name: {{ template "node.fullname" . }}
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
-    component: "node"
+    {{- include "node.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "geth.selectorLabels" . | nindent 6 }}
-      component: "node"
-  serviceName: {{ include "geth.fullname" . }}-node
+      {{- include "node.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "node.fullname" . }}
   replicas: {{ .Values.node.replicas }}
   template:
     metadata:
       labels:
-        {{- include "geth.selectorLabels" . | nindent 8 }}
-        component: "node"
+        {{- include "node.selectorLabels" . | nindent 8 }}
     spec:
     {{- if .Values.node.affinity }}
       affinity:
@@ -32,7 +29,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ include "geth.fullname" . }}-node
+      serviceAccountName: {{ template "node.fullname" . }}
       priorityClassName: {{ .Values.node.priorityClassName | quote }}
       initContainers:
       {{- if and .Values.node.persistence.enabled .Values.node.initChownData }}
@@ -87,7 +84,7 @@ spec:
             - "--ethash.dagdir=/mnt/ethereum/.ethash"
             - "--ipcdisable"
           {{- if .Values.bootnode.enabled }}
-            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@{{ include "geth.fullname" . }}-bootnode:30301"
+            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@$({{ template "bootnode.serviceHost" . }}):30301"
           {{- end }}
           {{- range .Values.node.extraFlags }}
             - {{ . | quote }}
@@ -145,7 +142,7 @@ spec:
       {{- if .Values.genesis }}
         - name: genesis
           configMap:
-            name: {{ include "geth.fullname" . }}-genesis
+            name: {{ template "genesis.fullname" . }}
             items:
               - key: genesis
                 path: genesis.json
