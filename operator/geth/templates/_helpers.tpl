@@ -19,14 +19,6 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" .Release.Name "node" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "bootnode.fullname" -}}
-{{- printf "%s-%s" .Release.Name "bootnode" | trunc 63 | trimSuffix "-" -}}
-{{- end -}}
-
-{{- define "bootnode.serviceHost" -}}
-{{- printf "%s_SERVICE_HOST" (include "bootnode.fullname" .) | upper | replace "-" "_" -}}
-{{- end -}}
-
 {{- define "genesis.fullname" -}}
 {{- printf "%s-%s" .Release.Name "genesis" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
@@ -50,11 +42,6 @@ app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{- define "bootnode.labels" -}}
-{{ include "geth.labels" . }}
-component: "bootnode"
-{{- end }}
-
 {{- define "genesis.labels" -}}
 {{ include "geth.labels" . }}
 component: "genesis"
@@ -73,10 +60,6 @@ app.kubernetes.io/name: {{ include "geth.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
-{{- define "bootnode.selectorLabels" -}}
-{{ include "geth.selectorLabels" . }}
-component: bootnode
-{{- end }}
 {{- define "node.selectorLabels" -}}
 {{ include "geth.selectorLabels" . }}
 component: node

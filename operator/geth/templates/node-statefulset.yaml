@@ -83,9 +83,6 @@ spec:
             - "--datadir=/mnt/ethereum"
             - "--ethash.dagdir=/mnt/ethereum/.ethash"
             - "--ipcdisable"
-          {{- if .Values.bootnode.enabled }}
-            - "--bootnodes=enode://{{ .Values.bootnode.publicKey }}@$({{ template "bootnode.serviceHost" . }}):30301"
-          {{- end }}
           {{- range .Values.node.extraFlags }}
             - {{ . | quote }}
           {{- end }}

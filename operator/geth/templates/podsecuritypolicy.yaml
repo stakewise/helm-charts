@@ -1,4 +1,4 @@
-{{- if or .Values.bootnode.enabled .Values.node.enabled }}
+{{- if .Values.node.enabled }}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:

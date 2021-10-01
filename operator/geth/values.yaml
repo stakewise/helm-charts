@@ -17,54 +17,6 @@ initImage:
 # Network (chain) ID
 networkId: ""
 
-# The purpose of the boot node is to provide a starting point for
-# newly connected nodes to find other peers.
-bootnode:
-  # Whether to deploy bootnode or not.
-  enabled: false
-
-  ## Geth image version
-  ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
-  image:
-    repository: "ethereum/client-go"
-    tag: "alltools-v1.10.6"
-    pullPolicy: IfNotPresent
-
-  # Node key for the identity
-  privateKey: "xxx"
-  publicKey: "xxx"
-
-  # Extra flags to pass to the bootnode
-  extraFlags:
-    - "--verbosity=4"
-
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources: { }
-
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  priorityClassName: ""
-
-  # used to expose bootnode ports
-  # ref: https://kubernetes.io/docs/concepts/services-networking/service/
-  services:
-    - name: http-rpc
-      port: 8545
-      protocol: TCP
-    - name: discovery-tcp
-      port: 30303
-      protocol: TCP
-    - name: discovery-udp
-      port: 30303
-      protocol: UDP
-    - name: bootnode-tcp
-      port: 30301
-      protocol: TCP
-    - name: bootnode-udp
-      port: 30301
-      protocol: UDP
-
 # A node is used to interact with Ethereum transactions, contracts.
 node:
   # Whether to deploy node or not.

@@ -12,7 +12,7 @@ $ helm install my-release ./operator/geth
 
 ## Introduction
 
-Can be used to deploy private ETH1 chain or its components (bootnode, miner or node) on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+Can be used to deploy private ETH1 chain node on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
@@ -55,10 +55,8 @@ $ kubectl delete pvc -l release=my-release
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release ./operator/geth --set bootnode.enabled=true
+$ helm install my-release ./operator/geth --set node.enabled=true
 ```
-
-The above command enables the bootnode deployment.
 
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
