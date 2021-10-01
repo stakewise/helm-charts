@@ -167,7 +167,7 @@ persistence:
   # storageClassName: default
   accessModes:
     - ReadWriteOnce
-  size: 100Gi
+  size: 350Gi
   # annotations: {}
   finalizers:
     - kubernetes.io/pvc-protection

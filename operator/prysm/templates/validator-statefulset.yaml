@@ -1,0 +1,127 @@
+{{- if .Values.validator.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "validator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "validator.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "validator.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "validator.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/keystore: {{ include (print $.Template.BasePath "/validator-secret.yaml") . | sha256sum }}
+    spec:
+    {{- if .Values.validator.tolerations }}
+      tolerations:
+        {{ tpl .Values.validator.tolerations . | nindent 12 | trim }}
+    {{- end }}
+    {{- if .Values.validator.affinity }}
+      affinity:
+        {{ tpl .Values.validator.affinity . | nindent 12 | trim }}
+    {{- end }}
+    {{- with .Values.validator.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 12 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "validator.fullname" . }}
+      priorityClassName: {{ .Values.validators.priorityClassName | quote }}
+      initContainers:
+      {{- if and .Values.validators.persistence.enabled .Values.validators.initChownData.enabled }}
+        - name: init-chown-data
+          image: "{{ .Values.validators.initChownData.image.repository }}:{{ .Values.validators.initChownData.image.tag }}"
+          imagePullPolicy: {{ .Values.validators.initChownData.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.validators.securityContext.runAsUser }}:{{ .Values.validators.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.validators.image.repository }}:{{ .Values.validators.image.tag }}"
+          imagePullPolicy: {{ .Values.validators.image.pullPolicy }}
+          args:
+            - "--datadir=/data"
+            - "--beacon-rpc-provider={{ .Values.validators.beaconChainRpcEndpoint }}"
+            - "--wallet-dir=/home/.eth2validators/prysm-wallet-v2"
+            - "--wallet-password-file=/home/.eth2validators/password.txt"
+          {{- if .Values.validator.metrics.enabled }}
+          {{- range .Values.validator.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          {{- range .Values.validators.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.validator.metrics.enabled }}
+          ports:
+            - containerPort: {{ .Values.validator.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+        {{- with .Values.validators.resources }}
+          resources:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: keymanageropts
+              mountPath: "/home/.eth2validators/prysm-wallet-v2/direct/keymanageropts.json"
+              subPath: keymanageropts.json
+              readOnly: true
+            - name: keystore
+              mountPath: "/home/.eth2validators/prysm-wallet-v2/direct/accounts"
+            - name: password
+              mountPath: "/home/.eth2validators/password.txt"
+              subPath: password.txt
+              readOnly: true
+        {{- with .Values.validators.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+        {{- with .Values.validators.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+      volumes:
+        - name: keymanageropts
+          configMap:
+            name: {{ template "validator.fullname" . }}
+            items:
+              - key: keymanageropts.json
+                path: keymanageropts.json
+        - name: keystore
+          secret:
+            secretName: {{ template "validator.fullname" . }}-keystore
+        - name: password
+          secret:
+            secretName: {{ template "validator.fullname" . }}-pass
+            items:
+              - key: password.txt
+                path: password.txt
+{{- if (not .Values.validators.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "validator.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.validators.persistence.accessModes }}
+        storageClassName: {{ .Values.validators.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.validators.persistence.size | quote }}
+{{- end }}
+{{ end }}

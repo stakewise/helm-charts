@@ -43,17 +43,6 @@ spec:
             - name: data
               mountPath: /data
       {{- end }}
-      {{- if and .Values.slasher.enabled .Values.slasher.persistence.enabled .Values.slasher.initChownData.enabled }}
-        - name: init-slasher-chown-data
-          image: "{{ .Values.slasher.initChownData.image.repository }}:{{ .Values.slasher.initChownData.image.tag }}"
-          imagePullPolicy: {{ .Values.slasher.initChownData.image.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
-          volumeMounts:
-            - name: slasher-data
-              mountPath: /data
-      {{- end }}
       {{- if .Values.beacon.persistence.enabled }}
         - name: cleanup-network-keys
           image: "{{ .Values.beacon.initChownData.image.repository }}:{{ .Values.beacon.initChownData.image.tag }}"
@@ -113,46 +102,10 @@ spec:
           livenessProbe:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-      {{- if .Values.slasher.enabled }}
-        - name: slasher
-          image: "{{ .Values.slasher.image.repository }}:{{ .Values.slasher.image.tag }}"
-          imagePullPolicy: {{ .Values.slasher.image.pullPolicy }}
-          args:
-            - "--beacon-rpc-provider=localhost:4000"
-            - "--datadir=/data"
-            - "--rpc-host=0.0.0.0"
-            - "--rpc-port=4002"
-            {{- range .Values.slasher.extraFlags }}
-            - {{ . | quote }}
-            {{- end }}
-          ports:
-            - containerPort: 4002
-              name: slasher-grpc
-              protocol: TCP
-          volumeMounts:
-            - name: slasher-data
-              mountPath: /data
-          {{- with .Values.slasher.resources }}
-          resources:
-            {{ toYaml . | nindent 12 | trim }}
-          {{- end }}
-          {{- with .Values.slasher.readinessProbe }}
-          readinessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-          {{- end }}
-          {{- with .Values.slasher.livenessProbe }}
-          livenessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-          {{- end }}
-      {{- end }}
-{{- if or (not .Values.beacon.persistence.enabled) (not .Values.slasher.persistence.enabled) }}
+{{- if not .Values.beacon.persistence.enabled }}
       volumes:
       {{- if (not .Values.beacon.persistence.enabled) }}
         - name: data
-          emptyDir: {}
-      {{- end }}
-      {{- if (not .Values.slasher.persistence.enabled) }}
-        - name: slasher-data
           emptyDir: {}
       {{- end }}
 {{- else }}
@@ -171,21 +124,6 @@ spec:
         resources:
           requests:
             storage: {{ .Values.beacon.persistence.size | quote }}
-  {{- end }}
-  {{- if and .Values.slasher.enabled .Values.beacon.persistence.enabled }}
-    - metadata:
-        name: slasher-data
-        labels:
-          app: {{ template "prysm.name" . }}
-          component: "beacon"
-          release: {{ .Release.Name | quote }}
-          heritage: {{ .Release.Service | quote }}
-      spec:
-        accessModes: {{ .Values.slasher.persistence.accessModes }}
-        storageClassName: {{ .Values.slasher.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.slasher.persistence.size | quote }}
   {{- end }}
 {{- end }}
 {{- end }}

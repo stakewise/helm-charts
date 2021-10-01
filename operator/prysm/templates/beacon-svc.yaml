@@ -26,11 +26,6 @@ spec:
     - name: grpc
       port: 4000
       targetPort: grpc
-  {{- if .Values.slasher.enabled }}
-    - name: slasher-grpc
-      port: 4002
-      targetPort: slasher-grpc
-  {{- end }}
   {{- if .Values.beacon.metrics.enabled }}
     - name: metrics
       port: {{ .Values.beacon.metrics.port }}

@@ -1,0 +1,21 @@
+{{- if and .Values.validator.enabled .Values.validator.verticalAutoscaler.enabled }}
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "validator.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "validator.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "validator.fullname" . }}
+  updatePolicy:
+    updateMode: {{ .Values.validator.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.validator.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl .Values.validator.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+  {{- end }}
+{{- end }}

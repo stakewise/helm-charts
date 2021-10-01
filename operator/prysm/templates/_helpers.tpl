@@ -23,8 +23,8 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" .Release.Name "bootnode" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "slasher.fullname" -}}
-{{- printf "%s-%s" .Release.Name "slasher" | trunc 63 | trimSuffix "-" -}}
+{{- define "validator.fullname" -}}
+{{- printf "%s-%s" .Release.Name "validator" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
@@ -56,6 +56,11 @@ component: beacon
 component: bootnode
 {{- end }}
 
+{{- define "validator.labels" -}}
+{{ include "prysm.labels" . }}
+component: validator
+{{- end }}
+
 {{/*
 Selector labels
 */}}
@@ -72,6 +77,11 @@ component: beacon
 {{- define "bootnode.selectorLabels" -}}
 {{ include "prysm.selectorLabels" . }}
 component: bootnode
+{{- end }}
+
+{{- define "validator.selectorLabels" -}}
+{{ include "prysm.selectorLabels" . }}
+component: validator
 {{- end }}
 
 {{/*
