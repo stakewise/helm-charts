@@ -23,7 +23,7 @@ spec:
     {{- end }}
     {{- if .Values.beacon.affinity }}
       affinity:
-        {{ toYaml .Values.beacon.affinity | nindent 8 | trim }}
+        {{ toYaml .Values.beacon.affinity | nindent 8 }}
     {{- end }}
     {{- if .Values.beacon.tolerations }}
       tolerations:
@@ -47,27 +47,17 @@ spec:
             - name: data
               mountPath: /data
       {{- end }}
-      {{- if .Values.beacon.persistence.enabled }}
-        - name: cleanup-network-keys
-          image: "{{ .Values.beacon.initChownData.image.repository }}:{{ .Values.beacon.initChownData.image.tag }}"
-          imagePullPolicy: {{ .Values.beacon.initChownData.image.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command: ["rm", "-f", "/data/network-keys"]
-          volumeMounts:
-            - name: data
-              mountPath: /data
-      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.beacon.image.repository }}:{{ .Values.beacon.image.tag }}"
           imagePullPolicy: {{ .Values.beacon.image.pullPolicy }}
           args:
-            - "--datadir=/data"
-            - "--rpc-host=0.0.0.0"
-            - "--rpc-port=4000"
-            - "--p2p-tcp-port=13000"
-            - "--p2p-udp-port=12000"
+            - lighthouse
+            - bn
+            - --staking
+            - --http-address=0.0.0.0
+            - --eth1-endpoints={{ .Values.beacon.eth1Endpoints | join "," }}
+            - --datadir={{ .Values.beacon.dataDirPath }}
           {{- range .Values.beacon.extraFlags }}
             - {{ . | quote }}
           {{- end }}
@@ -77,15 +67,15 @@ spec:
           {{- end }}
           {{- end }}
           ports:
-            - containerPort: 4000
-              name: grpc
+            - containerPort: 9000
+              name: peer-tcp
               protocol: TCP
-            - containerPort: 13000
-              name: p2p-tcp
-              protocol: TCP
-            - containerPort: 12000
-              name: p2p-udp
+            - containerPort: 9000
+              name: peer-udp
               protocol: UDP
+            - containerPort: 5052
+              protocol: TCP
+              name: http
           {{- if .Values.beacon.metrics.enabled }}
             - containerPort: {{ .Values.beacon.metrics.port }}
               name: metrics
@@ -93,7 +83,7 @@ spec:
           {{- end }}
           volumeMounts:
             - name: data
-              mountPath: /data
+              mountPath: {{ .Values.beacon.dataDirPath }}
         {{- with .Values.beacon.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -118,7 +108,7 @@ spec:
     - metadata:
         name: data
         labels:
-          app: {{ template "prysm.name" . }}
+          app: {{ template "lighthouse.name" . }}
           component: "beacon"
           release: {{ .Release.Name | quote }}
           heritage: {{ .Release.Service | quote }}

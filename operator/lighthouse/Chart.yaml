@@ -1,0 +1,16 @@
+apiVersion: v2
+name: lighthouse
+description: Rust implementation of the Ethereum 2.0 client.
+type: application
+kubeVersion: "^1.18.0-0"
+version: 1.4.2
+appVersion: "v1.4.2"
+keywords:
+  - ethereum
+  - blockchain
+  - lighthouse
+  - p2p
+home: https://lighthouse-book.sigmaprime.io/
+sources:
+  - https://github.com/sigp/lighthouse
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png

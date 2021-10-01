@@ -1,4 +1,4 @@
-# Default values for prysm.
+# Default values for lighthouse.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -8,54 +8,18 @@ securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
-# A node which implements the DiscoveryV5 protocol for peer
-# discovery. The purpose of this service is to provide a starting point for
-# newly connected services to find other peers outside of their network.
-bootnode:
-  # Whether to deploy bootnode or not.
-  enabled: false
-
-  # Service Cluster IP
-  clusterIP: ""
-
-  # Docker image
-  image:
-    repository: "gcr.io/prysmaticlabs/prysm/bootnode"
-    tag: "HEAD-4f31ba"
-    pullPolicy: IfNotPresent
-
-  # Optional private key used for identity
-  privateKey: ""
-
-  # Extra flags to pass to the bootnode
-  extraFlags:
-    - "--external-ip=$(POD_IP)"
-
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources:
-    requests:
-      cpu: 2m
-      memory: 25Mi
-
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  priorityClassName: "high-priority"
-
-
 # Beacon chain is responsible for running a full Proof-of-Stake blockchain
 beacon:
   # Whether to deploy beacon chain or not.
   enabled: true
 
   # How many beacon chain pods to run simultaneously
-  replicas: 2
+  replicas: 1
 
   # Docker image
   image:
-    repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    #tag: "v1.4.4"
-    tag: "v2.0.0-rc.1"
+    repository: "sigp/lighthouse"
+    tag: "v2.0.0-rc.0"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
@@ -73,24 +37,26 @@ beacon:
     containerPolicies: { }
 
   extraFlags:
-    # Beacon chain options
-    - "--accept-terms-of-use"
-    - "--http-web3provider=<eth1 chain endpoint>"
+    - "--network=mainnet"
 
-    # p2p options
-    - "--p2p-max-peers=100"
-    - "--enable-peer-scorer"
+  # The path to the beacon chain data directory. 
+  dataDirPath: /data/lighthouse/beacon
+
+  # Ethereum 1 node endpoints.
+  eth1Endpoints:
+    - http://127.0.0.1:8545
+    - http://127.0.0.1:8546
 
   metrics:
     # Whether to enable metrics collection or not
     enabled: false
 
-    port: 9090
+    port: 5054
 
     # Extra flags to pass for collecting metrics
     flags:
-      - "--monitoring-port=9090"
-      - "--monitoring-host=0.0.0.0"
+      - "--metrics"
+      - "--metrics-address=0.0.0.0"
 
     # Metrics collection annotations to add to service
     svcAnnotations:
@@ -178,8 +144,8 @@ beacon:
     failureThreshold: 3
     successThreshold: 1
     httpGet:
-      path: /healthz
-      port: 9090
+      path: /lighthouse/health
+      port: 5052
       scheme: HTTP
   livenessProbe:
     initialDelaySeconds: 60
@@ -188,8 +154,8 @@ beacon:
     failureThreshold: 60
     successThreshold: 1
     httpGet:
-      path: /healthz
-      port: 9090
+      path: /lighthouse/health
+      port: 5052
       scheme: HTTP
 
   # If false, data ownership will not be reset at startup
@@ -238,9 +204,8 @@ validator:
 
   # Docker image
   image:
-    repository: "gcr.io/prysmaticlabs/prysm/validator"
-    #tag: "v1.4.4"
-    tag: "v2.0.0-rc.2"
+    repository: "sigp/lighthouse"
+    tag: "v2.0.0-rc.0"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
