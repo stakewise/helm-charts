@@ -49,13 +49,13 @@ beacon:
   enabled: true
 
   # How many beacon chain pods to run simultaneously
-  replicas: 2
+  replicas: 1
 
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
     #tag: "v1.4.4"
-    tag: "v2.0.0-rc.1"
+    tag: "v2.0.0-rc.2"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
@@ -264,6 +264,12 @@ validator:
     - "--disable-account-metrics"
     - "--attest-timely"
     - "--enable-doppelganger"
+  
+  secrets:
+    # Wallet password
+    password: ""
+    # Keystore file content
+    keystore: ""
 
   metrics:
     # Whether to enable metrics collection or not
