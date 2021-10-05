@@ -19,7 +19,7 @@ beacon:
   # Docker image
   image:
     repository: "sigp/lighthouse"
-    tag: "v2.0.0-rc.0"
+    tag: "v2.0.0"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
@@ -204,7 +204,7 @@ validator:
   # Docker image
   image:
     repository: "sigp/lighthouse"
-    tag: "v2.0.0-rc.0"
+    tag: "v2.0.0"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
