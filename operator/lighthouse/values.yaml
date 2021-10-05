@@ -136,7 +136,6 @@ beacon:
 
   # Configure liveness and readiness probes
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  # NB! readinessProbe and livenessProbe must be disabled before genesis
   readinessProbe:
     initialDelaySeconds: 180
     timeoutSeconds: 1
@@ -221,25 +220,33 @@ validator:
     enabled: false
     updateMode: Off
     containerPolicies: { }
+  
+  # This field determines how long it will wait before the validator client starts or restarts.
+  # It's a way to protect the validator client from double attesting or block proposing when the DB is out-of-date.
+  startWaitTime: 780
 
   extraFlags:
-    - "--accept-terms-of-use"
     - "--graffiti=StakeWise"
-    - "--disable-rewards-penalties-logging"
-    - "--disable-account-metrics"
-    - "--attest-timely"
-    - "--enable-doppelganger"
+  
+  networkID: "mainnet"
+
+  # Validator keys
+  secrets:
+    keystore:
+      data: ""
+      password: ""
+      publicKey: ""
 
   metrics:
     # Whether to enable metrics collection or not
     enabled: false
 
-    port: 9090
+    port: 5064
 
     # Extra flags to pass for collecting metrics
     flags:
-      - "--monitoring-port=9090"
-      - "--monitoring-host=0.0.0.0"
+      - "--metrics"
+      - "--metrics-address=0.0.0.0"
 
     # Metrics collection annotations to add to service
     svcAnnotations:
@@ -307,7 +314,6 @@ validator:
 
   # Configure liveness and readiness probes
   # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  # NB! readinessProbe and livenessProbe must be disabled before genesis
   readinessProbe:
     initialDelaySeconds: 180
     timeoutSeconds: 1
@@ -315,8 +321,8 @@ validator:
     failureThreshold: 3
     successThreshold: 1
     httpGet:
-      path: /healthz
-      port: 9090
+      path: /metrics
+      port: 5064
       scheme: HTTP
   livenessProbe:
     initialDelaySeconds: 60
@@ -325,8 +331,8 @@ validator:
     failureThreshold: 60
     successThreshold: 1
     httpGet:
-      path: /healthz
-      port: 9090
+      path: /metrics
+      port: 5064
       scheme: HTTP
 
   # If false, data ownership will not be reset at startup

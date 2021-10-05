@@ -265,6 +265,9 @@ validator:
     - "--attest-timely"
     - "--enable-doppelganger"
   
+  # Beacon Chain node address
+  beaconChainRpcEndpoint: "eth2-beacon.chain.svc.cluster.local:4000"
+  
   secrets:
     # Wallet password
     password: ""

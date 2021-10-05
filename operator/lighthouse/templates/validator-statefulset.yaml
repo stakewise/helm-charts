@@ -11,6 +11,7 @@ spec:
   selector:
     matchLabels:
       {{- include "validator.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "validator.fullname" . }}
   template:
     metadata:
       labels:
@@ -26,39 +27,42 @@ spec:
       affinity:
         {{ tpl .Values.validator.affinity . | nindent 12 | trim }}
     {{- end }}
-    {{- with .Values.validator.securityContext }}
+    {{- with .Values.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 12 | trim }}
+        {{- toYaml . | nindent 8 }}
     {{- end }}
       serviceAccountName: {{ template "validator.fullname" . }}
-      priorityClassName: {{ .Values.validators.priorityClassName | quote }}
+      priorityClassName: {{ .Values.validator.priorityClassName | quote }}
       initContainers:
-      {{- if and .Values.validators.persistence.enabled .Values.validators.initChownData.enabled }}
+      {{- if and .Values.validator.persistence.enabled .Values.validator.initChownData.enabled }}
         - name: init-chown-data
-          image: "{{ .Values.validators.initChownData.image.repository }}:{{ .Values.validators.initChownData.image.tag }}"
-          imagePullPolicy: {{ .Values.validators.initChownData.image.pullPolicy }}
+          image: "{{ .Values.validator.initChownData.image.repository }}:{{ .Values.validator.initChownData.image.tag }}"
+          imagePullPolicy: {{ .Values.validator.initChownData.image.pullPolicy }}
           securityContext:
             runAsUser: 0
-          command: ["chown", "-R", "{{ .Values.validators.securityContext.runAsUser }}:{{ .Values.validators.securityContext.runAsUser }}", "/data"]
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
           volumeMounts:
             - name: data
               mountPath: /data
       {{- end }}
+        - name: init-wait
+          image: alpine:3.13.2
+          command: ['sh', '-c', 'echo "Wait for {{ .Values.validator.startWaitTime }} second(s) for extra slashing protection!" && sleep {{ .Values.validator.startWaitTime }}']
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.validators.image.repository }}:{{ .Values.validators.image.tag }}"
-          imagePullPolicy: {{ .Values.validators.image.pullPolicy }}
+          image: "{{ .Values.validator.image.repository }}:{{ .Values.validator.image.tag }}"
+          imagePullPolicy: {{ .Values.validator.image.pullPolicy }}
           args:
+            - "lighthouse"
+            - "vc"
             - "--datadir=/data"
-            - "--beacon-rpc-provider={{ .Values.validators.beaconChainRpcEndpoint }}"
-            - "--wallet-dir=/home/.eth2validators/lighthouse-wallet-v2"
-            - "--wallet-password-file=/home/.eth2validators/password.txt"
+            - "--beacon-nodes=http://{{ template "beacon.fullname" . }}:5052"
           {{- if .Values.validator.metrics.enabled }}
           {{- range .Values.validator.metrics.flags }}
             - {{ . | quote }}
           {{- end }}
           {{- end }}
-          {{- range .Values.validators.extraFlags }}
+          {{- range .Values.validator.extraFlags }}
             - {{ . | quote }}
           {{- end }}
           {{- if .Values.validator.metrics.enabled }}
@@ -67,48 +71,37 @@ spec:
               name: metrics
               protocol: TCP
           {{- end }}
-        {{- with .Values.validators.resources }}
+        {{- with .Values.validator.resources }}
           resources:
             {{ toYaml . | nindent 16 | trim }}
         {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: keymanageropts
-              mountPath: "/home/.eth2validators/lighthouse-wallet-v2/direct/keymanageropts.json"
-              subPath: keymanageropts.json
-              readOnly: true
             - name: keystore
-              mountPath: "/home/.eth2validators/lighthouse-wallet-v2/direct/accounts"
-            - name: password
-              mountPath: "/home/.eth2validators/password.txt"
-              subPath: password.txt
-              readOnly: true
-        {{- with .Values.validators.readinessProbe }}
+              mountPath: "/data/validators/{{ .Values.validator.secrets.keystore.publicKey }}/voting-keystore.json"
+              subPath: voting-keystore.json
+            - name: validator-definitions
+              mountPath: "/data/validators/{{ .Values.validator.networkID }}/validator_definitions.yml"
+              subPath: validator_definitions.yaml
+              readOnly: false
+        {{- with .Values.validator.readinessProbe }}
           readinessProbe:
-            {{ toYaml . | nindent 16 | trim }}
+            {{- toYaml . | nindent 12 }}
         {{- end }}
-        {{- with .Values.validators.livenessProbe }}
+        {{- with .Values.validator.livenessProbe }}
           livenessProbe:
-            {{ toYaml . | nindent 16 | trim }}
+            {{- toYaml . | nindent 12 }}
         {{- end }}
       volumes:
-        - name: keymanageropts
-          configMap:
-            name: {{ template "validator.fullname" . }}
-            items:
-              - key: keymanageropts.json
-                path: keymanageropts.json
         - name: keystore
           secret:
             secretName: {{ template "validator.fullname" . }}-keystore
-        - name: password
+        - name: validator-definitions
           secret:
-            secretName: {{ template "validator.fullname" . }}-pass
-            items:
-              - key: password.txt
-                path: password.txt
-{{- if (not .Values.validators.persistence.enabled) }}
+            secretName: {{ template "validator.fullname" . }}-validator-definitions
+            defaultMode: 0666
+{{- if (not .Values.validator.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}
@@ -118,10 +111,10 @@ spec:
         labels:
           {{- include "validator.labels" . | nindent 10 }}
       spec:
-        accessModes: {{ .Values.validators.persistence.accessModes }}
-        storageClassName: {{ .Values.validators.persistence.storageClassName }}
+        accessModes: {{ .Values.validator.persistence.accessModes }}
+        storageClassName: {{ .Values.validator.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.validators.persistence.size | quote }}
+            storage: {{ .Values.validator.persistence.size | quote }}
 {{- end }}
 {{ end }}

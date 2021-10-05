@@ -12,7 +12,7 @@ spec:
   privileged: false
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
-  {{- if .Values.validators.initChownData.enabled }}
+  {{- if .Values.validator.initChownData.enabled }}
     # Default set from Docker, without DAC_OVERRIDE or CHOWN
     - FOWNER
     - FSETID
@@ -40,7 +40,7 @@ spec:
   hostIPC: false
   hostPID: false
   runAsUser:
-  {{- if .Values.validators.initChownData.enabled }}
+  {{- if .Values.validator.initChownData.enabled }}
     rule: 'RunAsAny'
   {{- else }}
     rule: 'MustRunAsNonRoot'
