@@ -1,4 +1,4 @@
-{{- if and .Values.genesis }}
+{{- if .Values.genesis }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
