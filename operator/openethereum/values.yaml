@@ -96,6 +96,16 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+# Init image is used to chown data volume, initialise genesis, etc.
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+# If false, data ownership will not be reset at startup
+# This allows the geth node to be run with an arbitrary user
+initChownData: true
+
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -105,18 +115,9 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
-
-podSecurityContext:
-  fsGroup: 2000
-
 securityContext:
-  capabilities:
-    drop:
-    - ALL
-  readOnlyRootFilesystem: true
-  runAsNonRoot: true
-  runAsUser: 1000
+  fsGroup: 1001
+  runAsUser: 1001
 
 services:
   - name: rpc

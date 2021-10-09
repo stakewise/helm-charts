@@ -1,0 +1,43 @@
+{{- if and .Values.prysm.validator.enabled .Values.prysm.validator.metrics.enabled .Values.prysm.validator.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-validator
+  {{- if .Values.prysm.validator.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.prysm.validator.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-validator.labels" . | nindent 4 }}
+    {{- if .Values.prysm.validator.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.prysm.validator.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.prysm.validator.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.prysm.validator.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.prysm.validator.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.prysm.validator.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.prysm.validator.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.prysm.validator.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.prysm.validator.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.prysm.validator.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.prysm.validator.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.prysm.validator.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "prysm-validator.labels" . | nindent 6 }}
+{{- end }}

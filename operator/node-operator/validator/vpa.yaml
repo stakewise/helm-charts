@@ -1,0 +1,21 @@
+{{- if and .Values.prysm.validator.enabled .Values.prysm.validator.verticalAutoscaler.enabled }}
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-validator
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-validator.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "node-operator.fullname" . }}-prysm-validator
+  updatePolicy:
+    updateMode: {{ .Values.prysm.validator.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.prysm.validator.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl .Values.prysm.validator.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+  {{- end }}
+{{- end }}

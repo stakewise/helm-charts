@@ -1,0 +1,113 @@
+{{- if .Values.lighthouse.beacon.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "lighthouse-beacon.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "lighthouse-beacon.labels" . | nindent 6 }}
+  serviceName: {{ template "node-operator.fullname" . }}
+  replicas: {{ .Values.lighthouse.beacon.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "lighthouse-beacon.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.lighthouse.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.lighthouse.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.lighthouse.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "node-operator.fullname" . }}
+      priorityClassName: {{ .Values.lighthouse.priorityClassName | quote }}
+      {{- if and .Values.prysm.beacon.persistence.enabled .Values.prysm.beacon.initChownData }}
+      initContainers:
+        {{- include "init-chown" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.lighthouse.beacon.image.repository }}:{{ .Values.lighthouse.beacon.image.tag }}"
+          imagePullPolicy: {{ .Values.lighthouse.beacon.image.pullPolicy }}
+          args:
+            - lighthouse
+            - bn
+            - --staking
+            - --http-address=0.0.0.0
+            - --eth1-endpoints={{ .Values.lighthouse.beacon.eth1Endpoints | join "," }}
+            - --datadir=/data
+          {{- range .Values.lighthouse.beacon.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.lighthouse.beacon.metrics.enabled }}
+          {{- range .Values.lighthouse.beacon.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: 9000
+              name: peer-tcp
+              protocol: TCP
+            - containerPort: 9000
+              name: peer-udp
+              protocol: UDP
+            - containerPort: 5052
+              protocol: TCP
+              name: http
+          {{- if .Values.lighthouse.beacon.metrics.enabled }}
+            - containerPort: {{ .Values.lighthouse.beacon.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- with .Values.lighthouse.beacon.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.lighthouse.beacon.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.lighthouse.beacon.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+{{- if not .Values.lighthouse.beacon.persistence.enabled }}
+      volumes:
+      {{- if (not .Values.lighthouse.beacon.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+      {{- end }}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "lighthouse-beacon.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.lighthouse.beacon.persistence.accessModes }}
+        storageClassName: {{ .Values.lighthouse.beacon.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.lighthouse.beacon.persistence.size | quote }}
+{{- end }}
+{{- end }}

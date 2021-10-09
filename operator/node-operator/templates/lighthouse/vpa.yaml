@@ -1,0 +1,21 @@
+{{- if and .Values.lighthouse.beacon.enabled .Values.lighthouse.beacon.verticalAutoscaler.enabled }}
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "lighthouse-beacon.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  updatePolicy:
+    updateMode: {{ .Values.lighthouse.beacon.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.lighthouse.beacon.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl .Values.lighthouse.beacon.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+  {{- end }}
+{{- end }}

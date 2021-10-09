@@ -1,0 +1,43 @@
+{{- if and .Values.openethereum.metrics.enabled .Values.openethereum.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "node-operator.fullname" . }}-openethereum
+  {{- if .Values.openethereum.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.openethereum.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "openethereum.labels" . | nindent 4 }}
+    {{- if .Values.openethereum.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.openethereum.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.openethereum.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.openethereum.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.openethereum.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.openethereum.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.openethereum.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.openethereum.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.openethereum.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.openethereum.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.openethereum.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.openethereum.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "openethereum.labels" . | nindent 6 }}
+{{- end }}

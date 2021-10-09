@@ -1,0 +1,43 @@
+{{- if and .Values.prysm.enabled .Values.prysm.beacon.enabled .Values.prysm.beacon.metrics.enabled .Values.prysm.beacon.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-beacon
+  {{- if .Values.prysm.beacon.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.prysm.beacon.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
+    {{- if .Values.prysm.beacon.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.prysm.beacon.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.prysm.beacon.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.prysm.beacon.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.prysm.beacon.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.prysm.beacon.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.prysm.beacon.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.prysm.beacon.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.prysm.beacon.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.prysm.beacon.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.prysm.beacon.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.prysm.beacon.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "prysm-beacon.labels" . | nindent 6 }}
+{{- end }}

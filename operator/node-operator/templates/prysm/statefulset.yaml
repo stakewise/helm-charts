@@ -1,0 +1,139 @@
+{{- if .Values.prysm.beacon.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-beacon
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "prysm-beacon.labels" . | nindent 6 }}
+  serviceName: {{ template "node-operator.fullname" . }}
+  replicas: {{ .Values.prysm.beacon.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "prysm-beacon.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.prysm.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.prysm.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.prysm.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "node-operator.fullname" . }}
+      priorityClassName: {{ .Values.prysm.priorityClassName | quote }}
+      initContainers:
+      {{- if and .Values.prysm.beacon.persistence.enabled .Values.prysm.beacon.initChownData }}
+        {{- include "init-chown" . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.prysm.beacon.persistence.enabled }}
+        - name: cleanup-network-keys
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["rm", "-f", "/data/network-keys"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      {{- if .Values.prysm.beacon.prater }}
+        - name: download-genesis-state
+          image: "curlimages/curl:latest"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          args: ["--output", "/data/gensis.ssz", "https://raw.githubusercontent.com/eth2-clients/eth2-networks/32dcce003694ea17e04bc17cc56de2f7909a1d95/shared/prater/genesis.ssz"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        - name: node
+          image: "{{ .Values.prysm.beacon.image.repository }}:{{ .Values.prysm.beacon.image.tag }}"
+          imagePullPolicy: {{ .Values.prysm.beacon.image.pullPolicy }}
+          args:
+            - "--datadir=/data"
+            - "--rpc-host=0.0.0.0"
+            - "--rpc-port=4000"
+            - "--p2p-tcp-port=13000"
+            - "--p2p-udp-port=12000"
+          {{- if .Values.prysm.beacon.prater }}
+            - "--prater"
+            - "--genesis-state=/data/gensis.ssz"
+          {{- end }}
+          {{- range .Values.prysm.beacon.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.prysm.beacon.metrics.enabled }}
+          {{- range .Values.prysm.beacon.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: 4000
+              name: grpc
+              protocol: TCP
+            - containerPort: 13000
+              name: p2p-tcp
+              protocol: TCP
+            - containerPort: 12000
+              name: p2p-udp
+              protocol: UDP
+          {{- if .Values.prysm.beacon.metrics.enabled }}
+            - containerPort: {{ .Values.prysm.beacon.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- with .Values.prysm.beacon.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.prysm.beacon.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.prysm.beacon.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+{{- if (not .Values.prysm.beacon.persistence.enabled) }}
+      volumes:
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "prysm-beacon.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.prysm.beacon.persistence.accessModes }}
+        storageClassName: {{ .Values.prysm.beacon.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.prysm.beacon.persistence.size | quote }}
+{{- end }}
+{{- end }}

@@ -55,7 +55,7 @@ beacon:
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
     #tag: "v1.4.4"
-    tag: "v2.0.0"
+    tag: "v2.0.1"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget
@@ -239,8 +239,7 @@ validator:
   # Docker image
   image:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    #tag: "v1.4.4"
-    tag: "v2.0.0"
+    tag: "v2.0.1"
     pullPolicy: IfNotPresent
 
   # Enable pod disruption budget

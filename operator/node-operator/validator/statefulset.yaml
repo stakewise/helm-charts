@@ -1,0 +1,125 @@
+{{- if .Values.prysm.validator.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-validator
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-validator.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "prysm-validator.labels" . | nindent 6 }}
+  serviceName: {{ template "node-operator.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+      annotations:
+        checksum/keystore: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.prysm.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.prysm.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.prysm.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "node-operator.fullname" . }}
+      priorityClassName: {{ .Values.prysm.priorityClassName | quote }}
+      {{- if and .Values.prysm.beacon.persistence.enabled .Values.prysm.beacon.initChownData }}
+      initContainers:
+        {{- include "init-chown" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: validator
+          image: "{{ .Values.prysm.validator.image.repository }}:{{ .Values.prysm.validator.image.tag }}"
+          imagePullPolicy: {{ .Values.prysm.validator.image.pullPolicy }}
+          args:
+            - "--datadir=/data"
+            - "--beacon-rpc-provider={{ .Values.prysm.validator.beaconChainRpcEndpoint }}"
+            - "--wallet-dir=/home/.eth2validators/prysm-wallet-v2"
+            - "--wallet-password-file=/home/.eth2validators/password.txt"
+          {{- if .Values.prysm.validator.metrics.enabled }}
+          {{- range .Values.prysm.validator.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          {{- range .Values.prysm.validator.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.prysm.validator.metrics.enabled }}
+          ports:
+            - containerPort: {{ .Values.prysm.validator.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+        {{- with .Values.prysm.validator.resources }}
+          resources:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: keymanageropts
+              mountPath: "/home/.eth2validators/prysm-wallet-v2/direct/keymanageropts.json"
+              subPath: keymanageropts.json
+              readOnly: true
+            - name: keystore
+              mountPath: "/home/.eth2validators/prysm-wallet-v2/direct/accounts"
+            - name: password
+              mountPath: "/home/.eth2validators/password.txt"
+              subPath: password.txt
+              readOnly: true
+        {{- with .Values.prysm.validator.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with .Values.prysm.validator.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+      volumes:
+        - name: keymanageropts
+          configMap:
+            name: {{ template "validator.fullname" . }}
+            items:
+              - key: keymanageropts.json
+                path: keymanageropts.json
+        - name: keystore
+          secret:
+            secretName: {{ template "validator.fullname" . }}-keystore
+        - name: password
+          secret:
+            secretName: {{ template "validator.fullname" . }}-pass
+            items:
+              - key: password.txt
+                path: password.txt
+{{- if (not .Values.prysm.validator.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "validator.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.prysm.validator.persistence.accessModes }}
+        storageClassName: {{ .Values.prysm.validator.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.prysm.validator.persistence.size | quote }}
+{{- end }}
+{{ end }}

@@ -1,0 +1,20 @@
+{{- if and .Values.prysm.validator.enabled .Values.prysm.validator.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "node-operator.fullname" . }}-prysm-validator
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "prysm-validator.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "node-operator.selectorLabels" . | nindent 4 }}
+  type: ClusterIP
+{{- if .Values.prysm.validator.clusterIP }}
+  clusterIP: {{ .Values.prysm.validator.clusterIP }}
+{{- end }}
+  ports:
+    - name: metrics
+      port: {{ .Values.prysm.validator.metrics.port }}
+      targetPort: metrics
+{{- end }}

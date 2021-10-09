@@ -1,0 +1,33 @@
+{{- if .Values.openethereum.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "node-operator.fullname" . }}-openethereum
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "openethereum.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "node-operator.selectorLabels" . | nindent 4 }}
+    {{- include "openethereum.labels" . | nindent 4 }}
+{{- if .Values.openethereum.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.openethereum.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+  ports:
+    - name: rpc
+      port: 8545
+      targetPort: rpc
+    - name: ws
+      port: 8546
+      targetPort: ws
+  {{- if .Values.openethereum.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.openethereum.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}
+

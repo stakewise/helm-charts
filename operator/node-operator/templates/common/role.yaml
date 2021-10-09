@@ -1,0 +1,27 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "node-operator.fullname" . }}
+  labels:
+    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "common.labels" . | nindent 4 }}
+rules:
+  - apiGroups: ["extensions"]
+    resources: ["podsecuritypolicies"]
+    verbs: ["use"]
+    resourceNames:
+      - {{ template "node-operator.fullname" . }}
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get"]
+    resourceNames:
+      - {{ template "node-operator.fullname" . }}-prysm-bootnode
+      - {{ template "node-operator.fullname" . }}-prysm-validator-keystore
+      - {{ template "node-operator.fullname" . }}-prysm-validator-pass
+  - apiGroups: [""]
+    resources: ["configmap"]
+    verbs: ["get"]
+    resourceNames:
+      - {{ include "node-operator.fullname" . }}-openethereum
+{{- end }}

@@ -1,11 +1,11 @@
-{{- if .Values.prysm.validator.enabled }}
+{{- if .Values.validator.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "node-operator.fullname" . }}
+  name: {{ template "node-operator.fullname" . }}-prysm-validator
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
-    {{- include "prysm-validator.labels" . | nindent 4 }}
+    {{- include "validator.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep
 data:
