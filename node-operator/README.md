@@ -54,11 +54,11 @@ $ kubectl exec -ti node-operator-vault-0 -- vault operator unseal
 Join the remaining pods to the Raft cluster and unseal them. The pods will need to communicate directly so we'll configure the pods to use the internal service provided by the Helm chart:
 
 ```console
-kubectl exec -ti node-operator-vault-1 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
-kubectl exec -ti node-operator-vault-1 -- vault operator unseal
+$ kubectl exec -ti node-operator-vault-1 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
+$ kubectl exec -ti node-operator-vault-1 -- vault operator unseal
 
-kubectl exec -ti node-operator-vault-2 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
-kubectl exec -ti node-operator-vault-2 -- vault operator unseal
+$ kubectl exec -ti node-operator-vault-2 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
+$ kubectl exec -ti node-operator-vault-2 -- vault operator unseal
 ```
 
 To verify if the Raft cluster has successfully been initialized, run the following.
