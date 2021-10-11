@@ -42,13 +42,13 @@ Please see the many options supported in the `values.yaml` file.
 
 ### Vault usage
 
-After deploy initialize and unseal Vault: https://www.vaultproject.io/docs/platform/k8s/helm/run#cli-initialize-and-unseal
+After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 
-Initialize and unseal vault-0 pod:
+Initialize and unseal `node-operator-vault-0` pod:
 
 ```console
-kubectl exec -ti node-operator-vault-0 -- vault operator init
-kubectl exec -ti node-operator-vault-0 -- vault operator unseal
+$ kubectl exec -ti node-operator-vault-0 -- vault operator init
+$ kubectl exec -ti node-operator-vault-0 -- vault operator unseal
 ```
 
 Join the remaining pods to the Raft cluster and unseal them. The pods will need to communicate directly so we'll configure the pods to use the internal service provided by the Helm chart:
@@ -63,16 +63,16 @@ kubectl exec -ti node-operator-vault-2 -- vault operator unseal
 
 To verify if the Raft cluster has successfully been initialized, run the following.
 
-First, login using the root token on the node-operator-vault-0 pod:
+First, login using the root token on the `node-operator-vault-0` pod:
 
 ```console
-kubectl exec -ti node-operator-vault-0 -- vault login
+$ kubectl exec -ti node-operator-vault-0 -- vault login
 ```
 
 Next, list all the raft peers:
 
 ```console
-kubectl exec -ti node-operator-vault-0 -- vault operator raft list-peers
+$ kubectl exec -ti node-operator-vault-0 -- vault operator raft list-peers
 
 Node                                    Address                        State       Voter
 ----                                    -------                        -----       -----
@@ -83,19 +83,27 @@ e6876c97-aaaa-a92e-b99a-0aafab105745    vault-1.vault-internal:8201    follower 
 
 Vault with integrated storage (Raft) is now ready to use!
 
-### Vault auto unseal
+### Vault Auto Unseal
 
 1. Create Google Service Account and Download JSON
 
 ```console
-gcloud iam service-accounts create SERVICE_ACCOUNT_ID \
+$ gcloud iam service-accounts create SERVICE_ACCOUNT_ID \
     --description="DESCRIPTION" \
     --display-name="DISPLAY_NAME"
-gcloud iam service-accounts keys create key-file \
+$ gcloud iam service-accounts keys create key-file \
     --iam-account=sa-name@project-id.iam.gserviceaccount.com
 ```
 
-2. Create keyring
+2. Create Kubernetes secret with GCP credentials generated above
+
+```console
+$ kubectl create secret generic gcp-creds \
+  --from-file=gcp-creds.json=./google-project-ID.json \
+  --namespace node-operator
+```
+
+3. Create keyring
 
 ```console
 gcloud kms keyrings create key-ring \
@@ -107,12 +115,51 @@ gcloud kms keys add-iam-policy-binding key \
     --role roles/cloudkms.cryptoKeyEncrypterDecrypter
 ```
 
-3. Create Kubernetes secret with GCP credentials
+4. Update `values.yaml`
 
-```console
-kubectl create secret generic gcp-creds \
-  --from-file=gcp-creds.json=./google-project-ID.json
+```yaml
+vault:
+    ....
+    ha:
+      ...
+      raft:
+        enabled: true
+        config: |
+          ui = true
+          listener "tcp" {
+            tls_disable = 1
+            address = "[::]:8200"
+            cluster_address = "[::]:8201"
+          }
+          storage "raft" {
+            path = "/vault/data"
+          }
+          service_registration "kubernetes" {}
+          seal "gcpckms" {
+             project     = "PROJECT_ID"
+             region      = "global"
+             key_ring    = "KEY_RING"
+             crypto_key  = "vault"
+          }
+    extraEnvironmentVars:
+      GOOGLE_REGION: global
+      GOOGLE_PROJECT: PROJECT_ID
+      GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/PROJECT_ID/gcp-creds.json
+    volumes:
+      - name: gcp-creds
+        secret:
+          secretName: gcp-creds
+          items:
+            - key: gcp-creds.json
+              path: gcp-creds.json
+    volumeMounts:
+      - name: gcp-creds
+        mountPath: "/vault/userconfig/stakewise/gcp-creds.json"
+        subPath: gcp-creds.json
+        readOnly: true
 ```
+
+5. Deploy chart with updated `values.yaml`
 
 ### Configure Vault + Kubernetes authentication
 
@@ -134,8 +181,12 @@ Success! Enabled kubernetes auth method at: kubernetes/
 
 Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.
 
+> **Google Cloud Platform issuer example:**
+> 
+> `issuer="https://container.googleapis.com/v1/projects/PROJECT_ID/locations/REGION_NAME/clusters/CLUSTER_NAME"`
+
 ```console
-vault write auth/kubernetes/config \
+$ vault write auth/kubernetes/config \
   issuer="https://kubernetes.default.svc.cluster.local" \
   token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
@@ -158,9 +209,9 @@ path "validators/*" {
 EOF
 ```
 
-The data of `kv-v2` requires that an additional path element of data is included after its mount path (in this case, validators/).
+The data of `kv-v2` requires that an additional path element of data is included after its mount path (in this case, validators/data).
 
-Finally, create a Kubernetes authentication role named database that binds this policy with a Kubernetes service account named `node-operator`.
+Finally, create a Kubernetes authentication role named node-operator that binds this policy with a Kubernetes service account named `node-operator`.
 
 ```console
 $ vault write auth/kubernetes/role/node-operator \
