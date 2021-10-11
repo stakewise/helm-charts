@@ -1,0 +1,9 @@
+dependencies:
+- name: vault
+  repository: https://helm.releases.hashicorp.com
+  version: 0.16.1
+- name: secrets-store-csi-driver
+  repository: https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+  version: 0.2.0
+digest: sha256:6770df97cd88aa4d2a6390c1eb9d01b4e0799b870573ef96e342112697b2a2c7
+generated: "2021-10-11T21:04:24.731845+03:00"

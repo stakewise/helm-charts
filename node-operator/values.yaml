@@ -372,7 +372,7 @@ openethereum:
   priorityClassName: ""
 
 
-## Configuration for prysm eth v2 beacon chain node and validators
+## Configuration for prysm eth v2 beacon chain node
 ## ref: https://docs.prylabs.network/docs/getting-started/
 ##
 prysm:
@@ -552,7 +552,7 @@ prysm:
       size: 350Gi
 
 
-## Configuration for lighthouse eth v2 beacon chain node and validators
+## Configuration for lighthouse eth v2 beacon chain node
 ## ref: https://lighthouse-book.sigmaprime.io/
 ##
 lighthouse:
@@ -728,3 +728,89 @@ lighthouse:
       accessModes:
         - ReadWriteOnce
       size: 350Gi
+
+
+## Configuration for validators
+## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
+## ref: https://docs.prylabs.network/docs/getting-started
+##
+validators:
+  enabled: false
+
+  # What type of validator to use.
+  # Options: prysm, lighthouse
+  type: prysm
+
+  # How many validators to run simultaneously
+  replicas: 1
+
+## Configuration for HashiCorp Vault
+## ref: https://www.vaultproject.io/docs/platform/k8s/helm
+##
+vault:
+  enabled: false
+  injector:
+    enabled: false
+  server:
+    enabled: true
+    ha:
+      enabled: true
+      replicas: 3
+      raft:
+        enabled: true
+        # Note: Configuration files are stored in ConfigMaps so sensitive data
+        # such as passwords should be either mounted through extraSecretEnvironmentVars
+        # or through a Kube secret.  For more information see:
+        # https://www.vaultproject.io/docs/platform/k8s/helm/run#protecting-sensitive-vault-configurations
+        config: |
+          ui = true
+          listener "tcp" {
+            tls_disable = 1
+            address = "[::]:8200"
+            cluster_address = "[::]:8201"
+          }
+          storage "raft" {
+            path = "/vault/data"
+          }
+          service_registration "kubernetes" {}
+          # Example configuration for using auto-unseal, using Google Cloud KMS. The
+          # GKMS keys must already exist, and the cluster must have a service account
+          # that is authorized to access GCP KMS.
+          #seal "gcpckms" {
+          #   project     = "vault-helm-dev-246514"
+          #   region      = "global"
+          #   key_ring    = "vault-helm-unseal-kr"
+          #   crypto_key  = "vault-helm-unseal-key"
+          #}
+    # extraEnvironmentVars is a list of extra environment variables to set with the stateful set. These could be
+    # used to include variables required for auto-unseal.
+    extraEnvironmentVars: {}
+      # GOOGLE_REGION: global
+      # GOOGLE_PROJECT: myproject
+      # GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/myproject/myproject-creds.json
+
+    # volumes is a list of volumes made available to all containers. These are rendered
+    # via toYaml rather than pre-processed like the extraVolumes value.
+    # The purpose is to make it easy to share volumes between containers.
+    volumes: null
+    #   - name: plugins
+    #     emptyDir: {}
+
+    # volumeMounts is a list of volumeMounts for the main server container. These are rendered
+    # via toYaml rather than pre-processed like the extraVolumes value.
+    # The purpose is to make it easy to share volumes between containers.
+    volumeMounts: null
+    #   - mountPath: /usr/local/libexec/vault
+    #     name: plugins
+    #     readOnly: true
+
+  ui:
+    enabled: true
+  csi:
+    enabled: true
+
+## Configuration for secrets store CSI driver
+## ref: https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/v0.3.0/charts/secrets-store-csi-driver
+##
+csi:
+  enabled: false

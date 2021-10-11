@@ -1,6 +1,6 @@
 apiVersion: v2
 name: node-operator
-description: A Helm chart for Kubernetes
+description: A Helm chart for installing and configuring Node Operator infrastructure on Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -22,3 +22,25 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
+
+keywords:
+  - ethereum
+  - blockchain
+  - lighthouse
+  - prysm
+  - geth
+  - openethereum
+  - stakewise
+  - p2p
+
+home: https://stakewise.io/
+
+dependencies:
+  - name: secrets-store-csi-driver
+    repository: https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
+    version: 0.2.0
+    condition: csi.enabled
+  - name: vault
+    repository: https://helm.releases.hashicorp.com
+    version: 0.16.1
+    condition: vault.enabled
