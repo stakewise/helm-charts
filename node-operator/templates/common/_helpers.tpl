@@ -45,14 +45,13 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Additional components labels
 */}}
-{{- define "common.labels" -}}               component: common               {{- end }}
-{{- define "geth.labels" -}}                 component: geth                 {{- end }}
-{{- define "openethereum.labels" -}}         component: openethereum         {{- end }}
-{{- define "prysm-beacon.labels" -}}         component: prysm-beacon         {{- end }}
-{{- define "prysm-bootnode.labels" -}}       component: prysm-bootnode       {{- end }}
-{{- define "prysm-validator.labels" -}}      component: prysm-validator      {{- end }}
-{{- define "lighthouse-beacon.labels" -}}    component: lighthouse-beacon    {{- end }}
-{{- define "lighthouse-validator.labels" -}} component: lighthouse-validator {{- end }}
+{{- define "common.labels" -}}            component: common               {{- end }}
+{{- define "geth.labels" -}}              component: geth                 {{- end }}
+{{- define "openethereum.labels" -}}      component: openethereum         {{- end }}
+{{- define "prysm-beacon.labels" -}}      component: prysm-beacon         {{- end }}
+{{- define "prysm-bootnode.labels" -}}    component: prysm-bootnode       {{- end }}
+{{- define "lighthouse-beacon.labels" -}} component: lighthouse-beacon    {{- end }}
+{{- define "validator.labels" -}}         component: validator {{- end }}
 
 {{/*
 Selector labels
@@ -74,7 +73,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create the name of the service account to use
+Update permissions on files inside /data directory
 */}}
 {{- define "init-chown" -}}
 - name: init-chown
@@ -86,4 +85,58 @@ Create the name of the service account to use
   volumeMounts:
     - name: data
       mountPath: /data
+{{- end }}
+
+{{/*
+Initialize validator configs
+*/}}
+{{- define "init-validator" -}}
+- name: init-validator
+  image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+  securityContext:
+    runAsUser: 0
+  command: ['/bin/sh', '/data/scripts/entrypoint.sh']
+  env:
+    - name: VALIDATOR_PUBLICKEY
+      value: {{ .Values.validator.publicKey }}
+  volumeMounts:
+    - name: data
+      mountPath: /data
+    - name: configs
+      mountPath: "/mnt/configs"
+    - name: secrets
+      mountPath: "/mnt/secrets"
+    - name: vault-secrets
+      mountPath: "/mnt/vault"
+    - name: validator-init
+      mountPath: /data/scripts
+{{- end }}
+
+{{/*
+Validator beacon node
+*/}}
+{{- define "beacon-rpc-node" -}}
+{{- if $.Values.validator.beaconChainRpcEndpoint }}
+{{- if eq $.Values.validator.type "prysm" }}
+- "--beacon-rpc-provider={{ $.Values.validator.beaconChainRpcEndpoint }}"
+{{- else if eq $.Values.validator.type "lighthouse" }}
+- "--beacon-nodes={{ $.Values.validator.beaconChainRpcEndpoint }}"
+{{- end }}
+{{- else }}
+{{- if eq $.Values.validator.type "prysm" }}
+- "--beacon-rpc-provider={{ template "node-operator.fullname" $ }}-prysm-beacon:4000"
+{{- else if eq $.Values.validator.type "lighthouse" }}
+- "--beacon-nodes=http://{{ template "node-operator.fullname" $ }}-lighthouse-beacon:5052"
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validator graffiti
+*/}}
+{{- define "validator-graffiti" -}}
+{{- if $.Values.validator.graffiti }}
+- "--graffiti={{ $.Values.validator.graffiti }}"
+{{- end }}
 {{- end }}

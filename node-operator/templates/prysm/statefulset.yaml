@@ -56,10 +56,12 @@ spec:
         - name: download-genesis-state
           image: "curlimages/curl:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-          args: ["--output", "/data/gensis.ssz", "https://raw.githubusercontent.com/eth2-clients/eth2-networks/32dcce003694ea17e04bc17cc56de2f7909a1d95/shared/prater/genesis.ssz"]
+          command: ['/bin/sh', '/data/scripts/entrypoint.sh']
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: scripts
+              mountPath: /data/scripts
       {{- end }}
       containers:
         - name: node
@@ -118,8 +120,13 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-{{- if (not .Values.prysm.beacon.persistence.enabled) }}
       volumes:
+      {{- if .Values.prysm.beacon.prater }}
+        - name: scripts
+          configMap:
+            name: {{ include "node-operator.fullname" . }}-prysm-prater
+      {{- end }}
+{{- if (not .Values.prysm.beacon.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}

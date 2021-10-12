@@ -106,9 +106,9 @@ $ kubectl create secret generic gcp-creds \
 3. Create keyring
 
 ```console
-gcloud kms keyrings create key-ring \
+$ gcloud kms keyrings create key-ring \
     --location location
-gcloud kms keys add-iam-policy-binding key \
+$ gcloud kms keys add-iam-policy-binding key \
     --keyring key-ring \
     --location location \
     --member principal-type:principal-email \
