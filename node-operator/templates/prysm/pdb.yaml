@@ -1,4 +1,4 @@
-{{- if and .Values.prysm.enabled .Values.prysm.beacon.enabled .Values.prysm.beacon.podDisruptionBudget.enabled }}
+{{- if and .Values.prysm.enabled .Values.prysm.enabled .Values.prysm.podDisruptionBudget.enabled }}
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
@@ -7,11 +7,11 @@ metadata:
     {{- include "node-operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
 spec:
-{{- if .Values.prysm.beacon.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.prysm.beacon.podDisruptionBudget.minAvailable }}
+{{- if .Values.prysm.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.prysm.podDisruptionBudget.minAvailable }}
 {{- end }}
-{{- if .Values.prysm.beacon.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.prysm.beacon.podDisruptionBudget.maxUnavailable }}
+{{- if .Values.prysm.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.prysm.podDisruptionBudget.maxUnavailable }}
 {{- end }}
   selector:
     matchLabels:

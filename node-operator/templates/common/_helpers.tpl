@@ -111,6 +111,15 @@ Initialize validator configs
       mountPath: "/mnt/vault"
     - name: validator-init
       mountPath: /data/scripts
+- name: init-slashing
+  image: "{{ (pluck .Values.validator.type .Values.validator.image | first ).repository }}:{{ (pluck .Values.validator.type .Values.validator.image | first ).tag }}"
+  imagePullPolicy: {{ .Values.validator.image.pullPolicy }}
+  command: ['/bin/sh', '/data/scripts/slashing.sh']
+  volumeMounts:
+    - name: data
+      mountPath: /data
+    - name: validator-init
+      mountPath: /data/scripts
 {{- end }}
 
 {{/*

@@ -5,7 +5,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "node-operator.fullname" $root }}-validator-{{.}}
+  name: {{ template "node-operator.fullname" $root }}-validator{{.}}
   labels:
     {{- include "node-operator.labels" $root | nindent 4 }}
     {{- include "validator.labels" $root | nindent 4 }}
@@ -69,6 +69,14 @@ spec:
             - {{ . | quote }}
             {{- end }}
           {{- end }}
+          lifecycle:
+            preStop:
+              exec:
+                {{- if eq $root.Values.validator.type "prysm" }}
+                command: ["validator", "slashing-protection", "export", "--datadir=/data/prysm", "--slashing-protection-export-dir=/data"]
+                {{- else if eq $root.Values.validator.type "lighthouse" }}
+                command: ["lighthouse", "account", "validator", "slashing-protection", "export", "/data/slashing_protection.json", "--datadir=/data/lighthouse"]
+                {{- end }}
         {{- if $root.Values.validator.metrics.enabled }}
           ports:
             - containerPort: {{ $root.Values.validator.metrics.port }}

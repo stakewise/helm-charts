@@ -22,8 +22,9 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-# Pod Security Context
-# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
 securityContext:
   fsGroup: 1001
   runAsUser: 1001
@@ -33,9 +34,9 @@ securityContext:
 ##
 rbac:
   create: true
-  pspEnabled: true
 
-# Init image is used to chown data volume, initialise genesis, etc.
+## Init image is used to chown data volume, initialise genesis, etc.
+##
 initImage:
   repository: "busybox"
   tag: "1.34"
@@ -49,12 +50,14 @@ geth:
 
   ## Geth image version
   ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
+  ##
   image:
     repository: "ethereum/client-go"
     tag: "v1.10.9"
     pullPolicy: IfNotPresent
 
-  # How many geth nodes to run simultaneously
+  ## How many geth nodes to run simultaneously
+  ##
   replicas: 2
 
   ## Configure pod disruption budgets for Alertmanager
@@ -66,33 +69,43 @@ geth:
     enabled: false
     maxUnavailable: 1
 
-  # Network (chain) ID
+  ## Network (chain) ID
+  ##
   networkId: "mainnet"
 
-  # RPC configuration.
+  ## RPC configuration.
+  ##
   rpc:
     enabled: false
     api: "web3,eth,net"
     corsDomain: ""
     vhosts: ""
 
-  # WebSocket configuration.
+  ## WebSocket configuration.
+  ##
   ws:
     enabled: false
     api: "web3,eth,net"
     origins: ""
 
-  # Extra flags to pass to the node
+  ## Extra flags to pass to the node
+  ##
   extraFlags:
     - "--syncmode=light"
 
+  ## Monitoring
+  ##
   metrics:
-    # Whether to enable metrics collection or not
+    ## Whether to enable metrics collection or not
+    ##
     enabled: false
 
+    ## Prometheus exporter port
+    ##
     port: 6060
 
-    # Extra flags to pass for collecting metrics
+    ## Extra flags to pass for collecting metrics
+    ##
     flags:
       - "--metrics"
       - "--pprof"
@@ -155,33 +168,40 @@ geth:
       ##
       rules: []
 
-  # Configure session affinity for to hit the same geth node
-  # for the period specified in `timeoutSeconds`
-  # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ## Configure session affinity for to hit the same geth node
+  ## for the period specified in `timeoutSeconds`
+  ## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
   sessionAffinity:
-    # Whether to enable session affinity or not
+    ## Whether to enable session affinity or not
+    ##
     enabled: false
-    # The session duration in seconds
+    ## The session duration in seconds
+    ##
     timeoutSeconds: 86400
 
-  # Vertical Pod Autoscaler config
-  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ## Vertical Pod Autoscaler config
+  ## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
   verticalAutoscaler:
     # If true a VPA object will be created for the StatefulSet
     enabled: false
     updateMode: Off
     containerPolicies: { }
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources: { }
 
-  # If false, data ownership will not be reset at startup
-  # This allows the geth node to be run with an arbitrary user
+  ## If false, data ownership will not be reset at startup
+  ## This allows the geth node to be run with an arbitrary user
+  ##
   initChownData: true
 
-  # Whether or not to allocate persistent volume disk for the data directory.
-  # In case of node failure, the node data directory will still persist.
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of node failure, the node data directory will still persist.
+  ##
   persistence:
     enabled: true
     storageClassName: ""
@@ -191,7 +211,7 @@ geth:
 
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  #
+  ##
   nodeSelector: {}
 
   ## Tolerations for pod assignment
@@ -204,8 +224,9 @@ geth:
   ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
 
@@ -217,13 +238,15 @@ openethereum:
 
   ## Openethereum image version
   ## ref: https://hub.docker.com/r/openethereum/openethereum
+  ##
   image:
     repository: openethereum/openethereum
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v3.2.6"
 
-  # How many geth nodes to run simultaneously
+  ## How many geth nodes to run simultaneously
+  ##
   replicas: 2
 
   ## Configure pod disruption budgets for Alertmanager
@@ -235,16 +258,18 @@ openethereum:
     enabled: false
     maxUnavailable: 1
 
-  # which network should the node join
+  ## Which network should the node join
+  ##
   chain: mainnet
 
-  # chain-dependend configurations
+  ## Chain-dependend configurations
+  ##
   chains:
-    # configurations values for the mainnet chain
+    # Configurations values for the mainnet chain
     mainnet:
-    # configurations values for the ropsten chain
+    # Configurations values for the ropsten chain
     ropsten:
-    # configurations values for the goerli chain
+    # Configurations values for the goerli chain
     goerli:
       # known available boot nodes (fetched from https://github.com/goerli/testnet/blob/master/bootnodes.txt)
       bootnodes:
@@ -253,13 +278,19 @@ openethereum:
         - "enode://46add44b9f13965f7b9875ac6b85f016f341012d84f975377573800a863526f4da19ae2c620ec73d11591fa9510e992ecc03ad0751f53cc02f7c7ed6d55c7291@94.237.54.114:30313"
         - "enode://b5948a2d3e9d486c4d75bf32713221c2bd6cf86463302339299bd227dc2e276cd5a1c7ca4f43a0e9122fe9af884efed563bd2a1fd28661f3b5f5ad7bf1de5949@18.218.250.66:30303"
   
-  # Extra flags to pass to the open ethereum node
+  ## Extra flags to pass to the open ethereum node
+  ##
   extraFlags: []
 
+  ## Monitoring
+  ##
   metrics:
-    # Whether to enable metrics collection or not
+    ## Whether to enable metrics collection or not
+    ##
     enabled: false
 
+    ## Prometheus exporter port
+    ##
     port: 3000
     
     ## Prometheus Service Monitor
@@ -318,33 +349,38 @@ openethereum:
       ##
       rules: []
 
-  # Configure session affinity for to hit the same geth node
-  # for the period specified in `timeoutSeconds`
-  # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ## Configure session affinity for to hit the same geth node
+  ## for the period specified in `timeoutSeconds`
+  ## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
   sessionAffinity:
     # Whether to enable session affinity or not
     enabled: false
     # The session duration in seconds
     timeoutSeconds: 86400
 
-  # Vertical Pod Autoscaler config
-  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ## Vertical Pod Autoscaler config
+  ## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
   verticalAutoscaler:
     # If true a VPA object will be created for the StatefulSet
     enabled: false
     updateMode: Off
     containerPolicies: { }
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources: { }
 
-  # If false, data ownership will not be reset at startup
-  # This allows the geth node to be run with an arbitrary user
+  ## If false, data ownership will not be reset at startup
+  ## This allows the geth node to be run with an arbitrary user
+  ##
   initChownData: true
 
-  # Whether or not to allocate persistent volume disk for the data directory.
-  # In case of node failure, the node data directory will still persist.
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of node failure, the node data directory will still persist.
+  ##
   persistence:
     enabled: true
     storageClassName: ""
@@ -354,7 +390,7 @@ openethereum:
 
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  #
+  ##
   nodeSelector: {}
 
   ## Tolerations for pod assignment
@@ -367,8 +403,9 @@ openethereum:
   ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## Used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
 
@@ -378,9 +415,35 @@ openethereum:
 prysm:
   enabled: false
 
+  ## How many beacon chain pods to run simultaneously
+  ##
+  replicas: 2
+
+  ## Prysm beacon node image version
+  ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
+  ##
+  image:
+    repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+    tag: "v2.0.1"
+    pullPolicy: IfNotPresent
+  
+  ## Whether to use prater testnet or not.
+  ##
+  prater: true
+
+  ## Extra flags for prysm beacon chain node
+  ##
+  extraFlags:
+    # Beacon chain options
+    - "--accept-terms-of-use"
+    - "--http-web3provider=<eth1 chain endpoint>"
+    # p2p options
+    - "--p2p-max-peers=100"
+    - "--enable-peer-scorer"
+
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  #
+  ##
   nodeSelector: {}
 
   ## Tolerations for pod assignment
@@ -393,341 +456,402 @@ prysm:
   ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## Used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
-  # Beacon chain is responsible for running a full Proof-of-Stake blockchain
-  beacon:
-    # Whether to deploy beacon chain or not.
+  ## Enable pod disruption budget
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ##
+  podDisruptionBudget:
     enabled: true
+    maxUnavailable: 1
 
-    # How many beacon chain pods to run simultaneously
-    replicas: 2
+  ## Vertical Pod Autoscaler config
+  ## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
+  verticalAutoscaler:
+    # If true a VPA object will be created for the StatefulSet
+    enabled: false
+    updateMode: Off
+    containerPolicies: { }
 
-    # Whether to use prater testnet or not.
-    prater: true
+  ## Monitoring
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: false
 
-    ### Prysm beacon node image version
-    ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
-    image:
-      repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-      tag: "v2.0.1"
-      pullPolicy: IfNotPresent
+    ## Prometheus exporter port
+    ##
+    port: 9090
 
-    # Enable pod disruption budget
-    # https://kubernetes.io/docs/tasks/run-application/configure-pdb
-    podDisruptionBudget:
-      enabled: true
-      maxUnavailable: 1
+    ## Extra flags to pass for collecting metrics
+    ##
+    flags:
+      - "--monitoring-port=9090"
+      - "--monitoring-host=0.0.0.0"
 
-    # Vertical Pod Autoscaler config
-    # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-    verticalAutoscaler:
-      # If true a VPA object will be created for the StatefulSet
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
       enabled: false
-      updateMode: Off
-      containerPolicies: { }
-
-    extraFlags:
-      # Beacon chain options
-      - "--accept-terms-of-use"
-      - "--http-web3provider=<eth1 chain endpoint>"
-      # p2p options
-      - "--p2p-max-peers=100"
-      - "--enable-peer-scorer"
-
-    metrics:
-      # Whether to enable metrics collection or not
+      ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+      ##
+      interval: 30s
+      ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+      ##
+      relabellings: []
+      ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+      ##
+      additionalLabels: {}
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
       enabled: false
+      ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+      ##
+      namespace: ""
+      ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+      ##
+      additionalLabels: {}
+      ## @param metrics.prometheusRule.rules Custom Prometheus rules
+      ## e.g:
+      ## rules:
+      ##   - alert: GethNodeDown
+      ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
+      ##     for: 5m
+      ##     labels:
+      ##       severity: error
+      ##     annotations:
+      ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
+      ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
+      ##
+      rules:
+        - alert: PrysmBeaconNodeDown
+          expr: up{job="{{ include "node-operator.fullname" . }}-prysm-beacon"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node is down
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+        - alert: Prysm50SlotsBehind
+          expr: beacon_clock_time_slot-beacon_head_slot > 50
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node is out of sync
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+        - alert: PrysmParticipationRateLessThen66Percent
+          expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node participation rate less then 66%
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+        - alert: PrysmBeaconNodeRestarted
+          expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-prysm-beacon"})/3600 < 0.1
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prysm beacon node was restarted
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+
+  ## Defines whether the service must be headless
+  ##
+  svcHeadless: false
+
+  ## Configure session affinity for validator clients to hit the same beacon node
+  ## for the period specified in `timeoutSeconds`
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
+
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources: { }
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before genesis
+  ##
+  readinessProbe:
+    initialDelaySeconds: 180
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /healthz
       port: 9090
-      # Extra flags to pass for collecting metrics
-      flags:
-        - "--monitoring-port=9090"
-        - "--monitoring-host=0.0.0.0"
+      scheme: HTTP
+  livenessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 60
+    successThreshold: 1
+    httpGet:
+      path: /healthz
+      port: 9090
+      scheme: HTTP
 
-      ## Prometheus Service Monitor
-      ## ref: https://github.com/coreos/prometheus-operator
-      ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-      ##
-      serviceMonitor:
-        ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-        ##
-        enabled: false
-        ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
-        ##
-        namespace: ""
-        ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
-        ##
-        interval: 30s
-        ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
-        ##
-        scrapeTimeout: ""
-        ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
-        ##
-        relabellings: []
-        ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
-        ##
-        metricRelabelings: []
-        ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
-        ##
-        honorLabels: false
-        ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-        ##
-        additionalLabels: {}
-      ## Custom PrometheusRule to be defined
-      ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-      ##
-      prometheusRule:
-        ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-        ##
-        enabled: false
-        ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
-        ##
-        namespace: ""
-        ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
-        ##
-        additionalLabels: {}
-        ## @param metrics.prometheusRule.rules Custom Prometheus rules
-        ## e.g:
-        ## rules:
-        ##   - alert: GethNodeDown
-        ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
-        ##     for: 5m
-        ##     labels:
-        ##       severity: error
-        ##     annotations:
-        ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
-        ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
-        ##
-        rules: []
+  ## If false, data ownership will not be reset at startup
+  ## This allows the geth node to be run with an arbitrary user
+  ##
+  initChownData: true
 
-    # defines whether the service must be headless
-    svcHeadless: false
-
-    # Configure session affinity for validator clients to hit the same beacon node
-    # for the period specified in `timeoutSeconds`
-    # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-    sessionAffinity:
-      # Whether to enable session affinity or not
-      enabled: false
-      # The session duration in seconds
-      timeoutSeconds: 86400
-
-    # Configure resource requests and limits.
-    # http://kubernetes.io/docs/user-guide/compute-resources/
-    resources: { }
-
-    # Configure liveness and readiness probes
-    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    # NB! readinessProbe and livenessProbe must be disabled before genesis
-    readinessProbe:
-      initialDelaySeconds: 180
-      timeoutSeconds: 1
-      periodSeconds: 60
-      failureThreshold: 3
-      successThreshold: 1
-      httpGet:
-        path: /healthz
-        port: 9090
-        scheme: HTTP
-    livenessProbe:
-      initialDelaySeconds: 60
-      timeoutSeconds: 1
-      periodSeconds: 60
-      failureThreshold: 60
-      successThreshold: 1
-      httpGet:
-        path: /healthz
-        port: 9090
-        scheme: HTTP
-
-    # Whether or not to allocate persistent volume disk for the data directory.
-    # In case of pod failure, the pod data directory will still persist.
-    persistence:
-      enabled: true
-      storageClassName: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 350Gi
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of pod failure, the pod data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 350Gi
 
 
 ## Configuration for lighthouse eth v2 beacon chain node
 ## ref: https://lighthouse-book.sigmaprime.io/
 ##
 lighthouse:
-  beacon:
+  enabled: false
+
+  ## How many beacon chain pods to run simultaneously
+  ##
+  replicas: 2
+
+  ## Lighthouse beacon node image version
+  ## ref: https://hub.docker.com/r/sigp/lighthouse
+  image:
+    repository: "sigp/lighthouse"
+    tag: "v2.0.0"
+    pullPolicy: IfNotPresent
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+
+  ## Used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
+  priorityClassName: ""
+
+  ## Enable pod disruption budget
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ##
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
+  ## Vertical Pod Autoscaler config
+  ## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
+  verticalAutoscaler:
+    # If true a VPA object will be created for the StatefulSet
+    enabled: false
+    updateMode: Off
+    containerPolicies: { }
+
+  ## Extra flags for lighthouse beacon chain node
+  extraFlags:
+    - "--network=mainnet"
+
+  ## Ethereum 1 node endpoints.
+  ##
+  eth1Endpoints:
+    - http://127.0.0.1:8545
+    - http://127.0.0.1:8546
+
+  ## Monitoring
+  ##
+  metrics:
+    # Whether to enable metrics collection or not
     enabled: false
 
-    # How many beacon chain pods to run simultaneously
-    replicas: 2
+    # Prometheus exporter port
+    port: 5054
 
-    ### Lighthouse beacon node image version
-    ## ref: https://hub.docker.com/r/sigp/lighthouse
-    image:
-      repository: "sigp/lighthouse"
-      tag: "v2.0.0"
-      pullPolicy: IfNotPresent
+    # Extra flags to pass for collecting metrics
+    flags:
+      - "--metrics"
+      - "--metrics-address=0.0.0.0"
 
-    ## Node labels for pod assignment
-    ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-    #
-    nodeSelector: {}
+    # Metrics collection annotations to add to service
+    svcAnnotations:
+      prometheus.io/scrape: "true"
 
-    ## Tolerations for pod assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
     ##
-    tolerations: []
-
-    ## Affinity for pod assignment
-    ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+      ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+      ##
+      namespace: ""
+      ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+      ##
+      interval: 30s
+      ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+      ##
+      scrapeTimeout: ""
+      ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+      ##
+      relabellings: []
+      ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+      ##
+      metricRelabelings: []
+      ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+      ##
+      honorLabels: false
+      ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+      ##
+      additionalLabels: {}
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
     ##
-    affinity: {}
-
-    # used to assign priority to pods
-    # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-    priorityClassName: ""
-
-    # Enable pod disruption budget
-    # https://kubernetes.io/docs/tasks/run-application/configure-pdb
-    podDisruptionBudget:
-      enabled: true
-      maxUnavailable: 1
-
-    # Vertical Pod Autoscaler config
-    # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-    verticalAutoscaler:
-      # If true a VPA object will be created for the StatefulSet
-      enabled: false
-      updateMode: Off
-      containerPolicies: { }
-
-    extraFlags:
-      - "--network=mainnet"
-
-     # Ethereum 1 node endpoints.
-    eth1Endpoints:
-      - http://127.0.0.1:8545
-      - http://127.0.0.1:8546
-
-    metrics:
-      # Whether to enable metrics collection or not
-      enabled: false
-
-      port: 5054
-
-      # Extra flags to pass for collecting metrics
-      flags:
-        - "--metrics"
-        - "--metrics-address=0.0.0.0"
-
-      # Metrics collection annotations to add to service
-      svcAnnotations:
-        prometheus.io/scrape: "true"
-
-      ## Prometheus Service Monitor
-      ## ref: https://github.com/coreos/prometheus-operator
-      ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    prometheusRule:
+      ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
-      serviceMonitor:
-        ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-        ##
-        enabled: false
-        ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
-        ##
-        namespace: ""
-        ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
-        ##
-        interval: 30s
-        ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
-        ##
-        scrapeTimeout: ""
-        ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
-        ##
-        relabellings: []
-        ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
-        ##
-        metricRelabelings: []
-        ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
-        ##
-        honorLabels: false
-        ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-        ##
-        additionalLabels: {}
-      ## Custom PrometheusRule to be defined
-      ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-      ##
-      prometheusRule:
-        ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-        ##
-        enabled: false
-        ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
-        ##
-        namespace: ""
-        ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
-        ##
-        additionalLabels: {}
-        ## @param metrics.prometheusRule.rules Custom Prometheus rules
-        ## e.g:
-        ## rules:
-        ##   - alert: LighthouseNodeDown
-        ##     expr: up{job="{{ include "node-operator.fullname" . }}-lighthouse"} == 0
-        ##     for: 1m
-        ##     labels:
-        ##       severity: critical
-        ##     annotations:
-        ##       summary: Lighthouse Node {{ "{{ $labels.instance }}" }} down
-        ##       description: Lighthouse Node {{ "{{ $labels.instance }}" }} is down
-        ##
-        rules: []
-
-    # defines whether the service must be headless
-    svcHeadless: false
-
-    # Configure session affinity for validator clients to hit the same beacon node
-    # for the period specified in `timeoutSeconds`
-    # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-    sessionAffinity:
-      # Whether to enable session affinity or not
       enabled: false
-      # The session duration in seconds
-      timeoutSeconds: 86400
+      ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+      ##
+      namespace: ""
+      ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+      ##
+      additionalLabels: {}
+      ## @param metrics.prometheusRule.rules Custom Prometheus rules
+      ## e.g:
+      ## rules:
+      ##   - alert: LighthouseNodeDown
+      ##     expr: up{job="{{ include "node-operator.fullname" . }}-lighthouse"} == 0
+      ##     for: 1m
+      ##     labels:
+      ##       severity: critical
+      ##     annotations:
+      ##       summary: Lighthouse Node {{ "{{ $labels.instance }}" }} down
+      ##       description: Lighthouse Node {{ "{{ $labels.instance }}" }} is down
+      ##
+      rules:
+        - alert: LighthouseBeaconNodeDown
+          expr: up{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lighthouse beacon node is down
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+        - alert: LighthouseBeaconNodeRestarted
+          expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: Lighthouse beacon node was restarted
+            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
 
-    # Configure resource requests and limits.
-    # http://kubernetes.io/docs/user-guide/compute-resources/
-    resources: { }
+  ## Defines whether the service must be headless
+  ##
+  svcHeadless: false
 
-    # Configure liveness and readiness probes
-    # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    readinessProbe:
-      initialDelaySeconds: 180
-      timeoutSeconds: 1
-      periodSeconds: 60
-      failureThreshold: 3
-      successThreshold: 1
-      httpGet:
-        path: /lighthouse/health
-        port: 5052
-        scheme: HTTP
-    livenessProbe:
-      initialDelaySeconds: 60
-      timeoutSeconds: 1
-      periodSeconds: 60
-      failureThreshold: 60
-      successThreshold: 1
-      httpGet:
-        path: /lighthouse/health
-        port: 5052
-        scheme: HTTP
+  ## Configure session affinity for validator clients to hit the same beacon node
+  ## for the period specified in `timeoutSeconds`
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
 
-    # Whether or not to allocate persistent volume disk for the data directory.
-    # In case of pod failure, the pod data directory will still persist.
-    persistence:
-      enabled: true
-      storageClassName: ""
-      accessModes:
-        - ReadWriteOnce
-      size: 350Gi
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources: { }
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ##
+  readinessProbe:
+    initialDelaySeconds: 180
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /lighthouse/health
+      port: 5052
+      scheme: HTTP
+  livenessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 60
+    successThreshold: 1
+    httpGet:
+      path: /lighthouse/health
+      port: 5052
+      scheme: HTTP
+
+  ## If false, data ownership will not be reset at startup
+  ## This allows the geth node to be run with an arbitrary user
+  ##
+  initChownData: true
+
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of pod failure, the pod data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 350Gi
 
 
 ## Configuration for validators
@@ -737,14 +861,18 @@ lighthouse:
 validator:
   enabled: false
 
-  # What type of validator to use.
-  # Options: prysm, lighthouse
+  ## What type of validator to use.
+  ## Options: prysm, lighthouse
+  ##
   type: prysm
 
-  # How many validators to run simultaneously
+  ## How many validators to run simultaneously
+  ##
   replicas: 1
 
-  # Docker image
+  ## Validators image version
+  ## ref: https://gcr.io/prysmaticlabs/prysm/validator
+  ## ref: https://hub.docker.com/r/sigp/lighthouse
   image:
     pullPolicy: IfNotPresent
     prysm:
@@ -754,11 +882,11 @@ validator:
       repository: "sigp/lighthouse"
       tag: "v2.0.0"
   
-  terminationGracePeriodSeconds: 30
+  terminationGracePeriodSeconds: 900
   
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  #
+  ##
   nodeSelector: {}
 
   ## Tolerations for pod assignment
@@ -771,24 +899,29 @@ validator:
   ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
-  # Enable pod disruption budget
-  # https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ## Enable pod disruption budget
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ##
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
 
-  # Vertical Pod Autoscaler config
-  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ## Vertical Pod Autoscaler config
+  ## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
   verticalAutoscaler:
     # If true a VPA object will be created for the StatefulSet
     enabled: false
     updateMode: Off
     containerPolicies: { }
   
+  ## Validators flags
+  ##
   flags:
     prysm:
       - "--datadir=/data/prysm"
@@ -804,18 +937,25 @@ validator:
       - "vc"
       - "--datadir=/data/lighthouse"
   
+  ## Validators extra flags
+  ##
   extraFlags:
     prysm: []
     lighthouse: []
 
-  # Beacon Chain node address
+  ## Beacon Chain node address
+  ##
   beaconChainRpcEndpoint: ""
 
-  # You can use the graffiti to add a string to your proposed blocks,
-  # which will be seen on the block explorer.
-  # Ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
+  ## You can use the graffiti to add a string to your proposed blocks,
+  ## which will be seen on the block explorer.
+  ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
+  ##
   graffiti: ""
   
+  ## Keystore/Password for validators
+  ## Used when vault.enabled=false
+  ##
   secrets:
     prysm:
       # Wallet password
@@ -828,10 +968,13 @@ validator:
         password: ""
         publicKey: ""
 
+  ## Monitoring
+  ##
   metrics:
     # Whether to enable metrics collection or not
     enabled: false
 
+    # Prometheus exporter port
     port: 9090
 
     # Extra flags to pass for collecting metrics
@@ -909,16 +1052,33 @@ validator:
       ##         description: Lighthouse validator {{ "{{ $labels.instance }}" }} is down
       ##
       rules:
-        prysm: []
+        prysm:
+          - alert: PrysmValidatorHourlyEarningLessOrEqual0
+            expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: Prysm validator hourly earning <= 0
+              description: Check validators immediately. Pod - {{ "{{ $labels.pod }}" }}. Namespace - {{ "{{ $labels.namespace }}" }}
+          - alert: PrysmValidatorAlotOfErrorsLastHour
+            expr: sum(delta(log_entries_total{job="{{ include "node-operator.fullname" . }}-validator", level="error"}[1h]) > 0) 
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: Many validator errors or warnings last hour
+              description: Check validator {{ "{{ $labels.pod }}" }}. Namespace - {{ "{{ $labels.namespace }}" }}
         lighthouse: []
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources: { }
 
-  # Configure liveness and readiness probes
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  # NB! readinessProbe and livenessProbe must be disabled before genesis
+  ## Configure liveness and readiness probes
+  ## https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ##
   readinessProbe:
     prysm:
       initialDelaySeconds: 180
@@ -962,12 +1122,14 @@ validator:
         port: metrics
         scheme: HTTP
 
-  # If false, data ownership will not be reset at startup
-  # This allows the geth node to be run with an arbitrary user
+  ## If false, data ownership will not be reset at startup
+  ## This allows the geth node to be run with an arbitrary user
+  ##
   initChownData: true
 
-  # Whether or not to allocate persistent volume disk for the data directory.
-  # In case of pod failure, the pod data directory will still persist.
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of pod failure, the pod data directory will still persist.
+  ##
   persistence:
     enabled: true
     storageClassName: ""

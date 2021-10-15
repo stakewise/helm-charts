@@ -1,4 +1,4 @@
-{{- if and .Values.lighthouse.beacon.enabled .Values.lighthouse.beacon.verticalAutoscaler.enabled }}
+{{- if and .Values.lighthouse.enabled .Values.lighthouse.verticalAutoscaler.enabled }}
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
@@ -12,10 +12,10 @@ spec:
     kind: StatefulSet
     name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
   updatePolicy:
-    updateMode: {{ .Values.lighthouse.beacon.verticalAutoscaler.updateMode | default "Off" | quote }}
-  {{- if .Values.lighthouse.beacon.verticalAutoscaler.containerPolicies }}
+    updateMode: {{ .Values.lighthouse.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.lighthouse.verticalAutoscaler.containerPolicies }}
   resourcePolicy:
     containerPolicies:
-      {{ tpl .Values.lighthouse.beacon.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+      {{ tpl .Values.lighthouse.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
   {{- end }}
 {{- end }}

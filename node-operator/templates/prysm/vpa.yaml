@@ -1,4 +1,4 @@
-{{- if and .Values.prysm.enabled .Values.prysm.beacon.enabled .Values.prysm.beacon.verticalAutoscaler.enabled }}
+{{- if and .Values.prysm.enabled .Values.prysm.enabled .Values.prysm.verticalAutoscaler.enabled }}
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
@@ -12,10 +12,10 @@ spec:
     kind: StatefulSet
     name: {{ template "beacon.fullname" . }}
   updatePolicy:
-    updateMode: {{ .Values.prysm.beacon.verticalAutoscaler.updateMode | default "Off" | quote }}
-  {{- if .Values.prysm.beacon.verticalAutoscaler.containerPolicies }}
+    updateMode: {{ .Values.prysm.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.prysm.verticalAutoscaler.containerPolicies }}
   resourcePolicy:
     containerPolicies:
-      {{ tpl .Values.prysm.beacon.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+      {{ tpl .Values.prysm.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
   {{- end }}
 {{- end }}

@@ -45,4 +45,14 @@ data:
     cp /mnt/secrets/voting-keystore.json /data/lighthouse/validators/${VALIDATOR_PUBLICKEY}/voting-keystore.json
     cp /mnt/secrets/validator_definitions.yaml /data/lighthouse/validators/validator_definitions.yaml
     {{- end }}
+  slashing.sh: |
+    #!/bin/sh
+    if [ ! -f /data/slashing_protection.json ]; then
+      exit 0
+    fi
+    {{- if eq $.Values.validator.type "prysm" }}
+    validator slashing-protection import --datadir=/data/prysm --slashing-protection-json-file=/data/slashing_protection.json
+    {{- else }}
+    lighthouse account validator slashing-protection import /data/slashing_protection.json --datadir=/data/lighthouse
+    {{- end }}
 {{ end }}

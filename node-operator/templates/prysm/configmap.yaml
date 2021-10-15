@@ -1,4 +1,4 @@
-{{- if and .Values.prysm.beacon.enabled .Values.prysm.beacon.prater -}}
+{{- if and .Values.prysm.enabled .Values.prysm.prater -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

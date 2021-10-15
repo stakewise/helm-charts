@@ -1,4 +1,4 @@
-{{- if and .Values.lighthouse.beacon.enabled .Values.lighthouse.beacon.podDisruptionBudget.enabled }}
+{{- if and .Values.lighthouse.enabled .Values.lighthouse.podDisruptionBudget.enabled }}
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
@@ -7,11 +7,11 @@ metadata:
     {{- include "node-operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
 spec:
-{{- if .Values.lighthouse.beacon.podDisruptionBudget.minAvailable }}
-  minAvailable: {{ .Values.lighthouse.beacon.podDisruptionBudget.minAvailable }}
+{{- if .Values.lighthouse.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.lighthouse.podDisruptionBudget.minAvailable }}
 {{- end }}
-{{- if .Values.lighthouse.beacon.podDisruptionBudget.maxUnavailable }}
-  maxUnavailable: {{ .Values.lighthouse.beacon.podDisruptionBudget.maxUnavailable }}
+{{- if .Values.lighthouse.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.lighthouse.podDisruptionBudget.maxUnavailable }}
 {{- end }}
   selector:
     matchLabels:

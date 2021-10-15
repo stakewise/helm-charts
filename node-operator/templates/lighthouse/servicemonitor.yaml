@@ -1,37 +1,37 @@
-{{- if and .Values.lighthouse.beacon.enabled .Values.lighthouse.beacon.metrics.enabled .Values.lighthouse.beacon.metrics.serviceMonitor.enabled }}
+{{- if and .Values.lighthouse.enabled .Values.lighthouse.metrics.enabled .Values.lighthouse.metrics.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
-  {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.namespace }}
-  namespace: {{ .Values.lighthouse.beacon.metrics.serviceMonitor.namespace }}
+  {{- if .Values.lighthouse.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.lighthouse.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
     {{- include "node-operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
-    {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.additionalLabels }}
-    {{- toYaml .Values.lighthouse.beacon.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- if .Values.lighthouse.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.lighthouse.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
     - port: metrics
       path: /metrics
-      {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.interval }}
-      interval: {{ .Values.lighthouse.beacon.metrics.serviceMonitor.interval }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.lighthouse.metrics.serviceMonitor.interval }}
       {{- end }}
-      {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.scrapeTimeout }}
-      scrapeTimeout: {{ .Values.lighthouse.beacon.metrics.serviceMonitor.scrapeTimeout }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.lighthouse.metrics.serviceMonitor.scrapeTimeout }}
       {{- end }}
-      {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.honorLabels }}
-      honorLabels: {{ .Values.lighthouse.beacon.metrics.serviceMonitor.honorLabels }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.lighthouse.metrics.serviceMonitor.honorLabels }}
       {{- end }}
-      {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.relabellings }}
-      relabelings: {{- toYaml .Values.lighthouse.beacon.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.lighthouse.metrics.serviceMonitor.relabellings | nindent 6 }}
       {{- end }}
-      {{- if .Values.lighthouse.beacon.metrics.serviceMonitor.metricRelabelings }}
-      metricRelabelings: {{- toYaml .Values.lighthouse.beacon.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.lighthouse.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
       {{- end }}
   namespaceSelector:
     matchNames:

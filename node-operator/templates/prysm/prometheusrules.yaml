@@ -1,21 +1,21 @@
-{{- if and .Values.prysm.enabled .Values.prysm.beacon.enabled .Values.prysm.beacon.metrics.enabled .Values.prysm.beacon.metrics.prometheusRule.enabled }}
+{{- if and .Values.prysm.enabled .Values.prysm.enabled .Values.prysm.metrics.enabled .Values.prysm.metrics.prometheusRule.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
   name: {{ template "node-operator.fullname" . }}-prysm-beacon
-  {{- if .Values.prysm.beacon.metrics.prometheusRule.namespace }}
-  namespace: {{ .Values.prysm.beacon.metrics.prometheusRule.namespace }}
+  {{- if .Values.prysm.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.prysm.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
     {{- include "node-operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
-    {{- if .Values.prysm.beacon.metrics.prometheusRule.additionalLabels }}
-    {{- toYaml .Values.prysm.beacon.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- if .Values.prysm.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.prysm.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
-  {{- with .Values.prysm.beacon.metrics.prometheusRule.rules }}
+  {{- with .Values.prysm.metrics.prometheusRule.rules }}
   groups:
     - name: {{ template "beacon.fullname" $ }}-prysm-beacon
       rules: {{- tpl (toYaml .) $ | nindent 8 }}

@@ -7,11 +7,6 @@ metadata:
     {{- include "node-operator.labels" . | nindent 4 }}
     {{- include "common.labels" . | nindent 4 }}
 rules:
-  - apiGroups: ["extensions"]
-    resources: ["podsecuritypolicies"]
-    verbs: ["use"]
-    resourceNames:
-      - {{ template "node-operator.fullname" . }}
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get"]

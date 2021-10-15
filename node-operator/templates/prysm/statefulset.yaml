@@ -1,4 +1,4 @@
-{{- if .Values.prysm.beacon.enabled }}
+{{- if .Values.prysm.enabled }}
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
@@ -12,7 +12,7 @@ spec:
       {{- include "node-operator.selectorLabels" . | nindent 6 }}
       {{- include "prysm-beacon.labels" . | nindent 6 }}
   serviceName: {{ template "node-operator.fullname" . }}
-  replicas: {{ .Values.prysm.beacon.replicas }}
+  replicas: {{ .Values.prysm.replicas }}
   template:
     metadata:
       labels:
@@ -38,10 +38,10 @@ spec:
       serviceAccountName: {{ template "node-operator.fullname" . }}
       priorityClassName: {{ .Values.prysm.priorityClassName | quote }}
       initContainers:
-      {{- if and .Values.prysm.beacon.persistence.enabled .Values.prysm.beacon.initChownData }}
+      {{- if and .Values.prysm.persistence.enabled .Values.prysm.initChownData }}
         {{- include "init-chown" . | nindent 8 }}
       {{- end }}
-      {{- if .Values.prysm.beacon.persistence.enabled }}
+      {{- if .Values.prysm.persistence.enabled }}
         - name: cleanup-network-keys
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -52,7 +52,7 @@ spec:
             - name: data
               mountPath: /data
       {{- end }}
-      {{- if .Values.prysm.beacon.prater }}
+      {{- if .Values.prysm.prater }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -65,23 +65,23 @@ spec:
       {{- end }}
       containers:
         - name: node
-          image: "{{ .Values.prysm.beacon.image.repository }}:{{ .Values.prysm.beacon.image.tag }}"
-          imagePullPolicy: {{ .Values.prysm.beacon.image.pullPolicy }}
+          image: "{{ .Values.prysm.image.repository }}:{{ .Values.prysm.image.tag }}"
+          imagePullPolicy: {{ .Values.prysm.image.pullPolicy }}
           args:
             - "--datadir=/data"
             - "--rpc-host=0.0.0.0"
             - "--rpc-port=4000"
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
-          {{- if .Values.prysm.beacon.prater }}
+          {{- if .Values.prysm.prater }}
             - "--prater"
             - "--genesis-state=/data/gensis.ssz"
           {{- end }}
-          {{- range .Values.prysm.beacon.extraFlags }}
+          {{- range .Values.prysm.extraFlags }}
             - {{ . | quote }}
           {{- end }}
-          {{- if .Values.prysm.beacon.metrics.enabled }}
-          {{- range .Values.prysm.beacon.metrics.flags }}
+          {{- if .Values.prysm.metrics.enabled }}
+          {{- range .Values.prysm.metrics.flags }}
             - {{ . | quote }}
           {{- end }}
           {{- end }}
@@ -100,33 +100,33 @@ spec:
             - containerPort: 12000
               name: p2p-udp
               protocol: UDP
-          {{- if .Values.prysm.beacon.metrics.enabled }}
-            - containerPort: {{ .Values.prysm.beacon.metrics.port }}
+          {{- if .Values.prysm.metrics.enabled }}
+            - containerPort: {{ .Values.prysm.metrics.port }}
               name: metrics
               protocol: TCP
           {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
-        {{- with .Values.prysm.beacon.readinessProbe }}
+        {{- with .Values.prysm.readinessProbe }}
           readinessProbe:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        {{- with .Values.prysm.beacon.livenessProbe }}
+        {{- with .Values.prysm.livenessProbe }}
           livenessProbe:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        {{- with .Values.prysm.beacon.resources }}
+        {{- with .Values.prysm.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
       volumes:
-      {{- if .Values.prysm.beacon.prater }}
+      {{- if .Values.prysm.prater }}
         - name: scripts
           configMap:
             name: {{ include "node-operator.fullname" . }}-prysm-prater
       {{- end }}
-{{- if (not .Values.prysm.beacon.persistence.enabled) }}
+{{- if (not .Values.prysm.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}
@@ -137,10 +137,10 @@ spec:
           {{- include "node-operator.labels" . | nindent 10 }}
           {{- include "prysm-beacon.labels" . | nindent 10 }}
       spec:
-        accessModes: {{ .Values.prysm.beacon.persistence.accessModes }}
-        storageClassName: {{ .Values.prysm.beacon.persistence.storageClassName }}
+        accessModes: {{ .Values.prysm.persistence.accessModes }}
+        storageClassName: {{ .Values.prysm.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.prysm.beacon.persistence.size | quote }}
+            storage: {{ .Values.prysm.persistence.size | quote }}
 {{- end }}
 {{- end }}
