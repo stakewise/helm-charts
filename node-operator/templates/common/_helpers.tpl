@@ -49,9 +49,8 @@ Additional components labels
 {{- define "geth.labels" -}}              component: geth                 {{- end }}
 {{- define "openethereum.labels" -}}      component: openethereum         {{- end }}
 {{- define "prysm-beacon.labels" -}}      component: prysm-beacon         {{- end }}
-{{- define "prysm-bootnode.labels" -}}    component: prysm-bootnode       {{- end }}
 {{- define "lighthouse-beacon.labels" -}} component: lighthouse-beacon    {{- end }}
-{{- define "validator.labels" -}}         component: validator {{- end }}
+{{- define "validator.labels" -}}         component: validator            {{- end }}
 
 {{/*
 Selector labels

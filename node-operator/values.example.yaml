@@ -90,7 +90,7 @@ prysm:
     serviceMonitor:
       enabled: true
     prometheusRule:
-      enabled: true
+      enabled: false
 
   persistence:
     enabled: true
@@ -116,7 +116,7 @@ lighthouse:
     serviceMonitor:
       enabled: true
     prometheusRule:
-      enabled: true
+      enabled: false
 
   persistence:
     enabled: true

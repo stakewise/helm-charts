@@ -35,7 +35,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": 28,
-      "iteration": 1634220042764,
+      "iteration": 1634743486616,
       "links": [],
       "panels": [
         {
@@ -1786,7 +1786,7 @@ data:
               "instant": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{ printf "{{ pubkey }}" }}",
+              "legendFormat": "{{ printf "{{pubkey}}" }}",
               "refId": "A"
             }
           ],
@@ -1912,200 +1912,153 @@ data:
           "type": "stat"
         },
         {
-          "cacheTimeout": null,
+          "aliasColors": {
+            "CPU beacon node": "red",
+            "CPU validator": "purple",
+            "beacon node": "rgb(68, 218, 252)",
+            "memory beacon node": "rgb(96, 252, 255)",
+            "memory validator": "rgb(255, 255, 160)",
+            "validator": "yellow"
+          },
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
           "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
-              "decimals": 1,
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "red",
-                    "value": null
-                  },
-                  {
-                    "color": "#FADE2A",
-                    "value": 0.17
-                  },
-                  {
-                    "color": "#299c46",
-                    "value": 11.9
-                  }
-                ]
-              },
-              "unit": "h"
+              "links": []
             },
             "overrides": []
           },
+          "fill": 5,
+          "fillGradient": 0,
           "gridPos": {
-            "h": 2,
-            "w": 3,
+            "h": 10,
+            "w": 10,
             "x": 0,
             "y": 25
           },
-          "id": 56,
-          "links": [],
-          "options": {
-            "colorMode": "background",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "text": {},
-            "textMode": "auto"
+          "hiddenSeries": false,
+          "id": 32,
+          "legend": {
+            "alignAsTable": true,
+            "avg": false,
+            "current": true,
+            "hideEmpty": false,
+            "hideZero": false,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
           },
+          "lines": true,
+          "linewidth": 1,
+          "nullPointMode": "null",
+          "options": {
+            "alertThreshold": true
+          },
+          "percentage": true,
           "pluginVersion": "8.1.5",
+          "pointradius": 2,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [
+            {
+              "alias": "CPU beacon node",
+              "fill": 0,
+              "linewidth": 1,
+              "yaxis": 2
+            },
+            {
+              "alias": "CPU validator",
+              "fill": 0,
+              "linewidth": 1,
+              "nullPointMode": "null as zero",
+              "yaxis": 2
+            }
+          ],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
           "targets": [
             {
-              "expr": "(time()-process_start_time_seconds{job=\"$node_job\"})/3600",
-              "instant": true,
+              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$node_job\"}[1m:5s])",
+              "interval": "",
+              "legendFormat": "memory {{ printf "{{job}}" }}",
+              "refId": "A"
+            },
+            {
+              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$validator_job\"}[1m:5s])",
+              "interval": "",
+              "legendFormat": "memory {{ printf "{{job}}" }}",
+              "refId": "C"
+            },
+            {
+              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$slasher_job\"}[1m:5s])",
               "interval": "",
               "legendFormat": "",
-              "refId": "A"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Node process started",
-          "type": "stat"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "red",
-                    "value": null
-                  },
-                  {
-                    "color": "#F2CC0C",
-                    "value": 5
-                  },
-                  {
-                    "color": "#299c46",
-                    "value": 10
-                  }
-                ]
-              },
-              "unit": "none"
+              "refId": "D"
             },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 2,
-            "w": 3,
-            "x": 3,
-            "y": 25
-          },
-          "id": 34,
-          "links": [],
-          "options": {
-            "colorMode": "background",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "text": {},
-            "textMode": "auto"
-          },
-          "pluginVersion": "8.1.5",
-          "targets": [
             {
-              "expr": "p2p_peer_count{state=\"Connected\"}",
-              "instant": true,
+              "expr": "((process_cpu_seconds_total - process_cpu_seconds_total offset 2m) > 0)*100/120/go_maxprocs",
               "interval": "",
-              "legendFormat": "",
-              "refId": "A"
+              "legendFormat": "CPU {{ printf "{{job}}" }}",
+              "refId": "B"
             }
           ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Peers connected",
-          "type": "stat"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "Prometheus",
-          "fieldConfig": {
-            "defaults": {
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "#299c46",
-                    "value": null
-                  },
-                  {
-                    "color": "#eab839",
-                    "value": 5
-                  },
-                  {
-                    "color": "red",
-                    "value": 20
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 2,
-            "w": 3,
-            "x": 6,
-            "y": 25
-          },
-          "id": 26,
-          "links": [],
-          "options": {
-            "colorMode": "background",
-            "graphMode": "none",
-            "justifyMode": "auto",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "text": {},
-            "textMode": "auto"
-          },
-          "pluginVersion": "8.1.5",
-          "targets": [
+          "thresholds": [
             {
-              "expr": "beacon_clock_time_slot-beacon_head_slot",
-              "instant": true,
-              "interval": "",
-              "legendFormat": "Slots behind",
-              "refId": "A"
+              "colorMode": "critical",
+              "fill": true,
+              "line": true,
+              "op": "gt",
+              "value": 4000000000,
+              "yaxis": "left"
             }
           ],
           "timeFrom": null,
+          "timeRegions": [],
           "timeShift": null,
-          "title": "Slots behind",
-          "type": "stat"
+          "title": "Hardware usage",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "cumulative"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": null,
+              "format": "decbytes",
+              "label": "mem usage",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "decimals": 1,
+              "format": "percent",
+              "label": "CPU usage rate",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ],
+          "yaxis": {
+            "align": false,
+            "alignLevel": null
+          }
         },
         {
           "aliasColors": {
@@ -2128,9 +2081,9 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 9,
-            "w": 15,
-            "x": 9,
+            "h": 10,
+            "w": 11,
+            "x": 10,
             "y": 25
           },
           "hiddenSeries": false,
@@ -2239,153 +2192,284 @@ data:
           }
         },
         {
-          "aliasColors": {
-            "CPU beacon node": "red",
-            "CPU validator": "purple",
-            "beacon node": "rgb(68, 218, 252)",
-            "memory beacon node": "rgb(96, 252, 255)",
-            "memory validator": "rgb(255, 255, 160)",
-            "validator": "yellow"
-          },
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
+          "cacheTimeout": null,
           "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
-              "links": []
+              "decimals": 1,
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "#FADE2A",
+                    "value": 0.17
+                  },
+                  {
+                    "color": "#299c46",
+                    "value": 11.9
+                  }
+                ]
+              },
+              "unit": "h"
             },
             "overrides": []
           },
-          "fill": 5,
-          "fillGradient": 0,
           "gridPos": {
-            "h": 7,
-            "w": 9,
-            "x": 0,
-            "y": 27
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 25
           },
-          "hiddenSeries": false,
-          "id": 32,
-          "legend": {
-            "alignAsTable": true,
-            "avg": false,
-            "current": true,
-            "hideEmpty": false,
-            "hideZero": false,
-            "max": false,
-            "min": false,
-            "rightSide": false,
-            "show": true,
-            "total": false,
-            "values": true
-          },
-          "lines": true,
-          "linewidth": 1,
-          "nullPointMode": "null",
+          "id": 56,
+          "links": [],
           "options": {
-            "alertThreshold": true
-          },
-          "percentage": true,
-          "pluginVersion": "8.1.5",
-          "pointradius": 2,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [
-            {
-              "alias": "CPU beacon node",
-              "fill": 0,
-              "linewidth": 1,
-              "yaxis": 2
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
             },
-            {
-              "alias": "CPU validator",
-              "fill": 0,
-              "linewidth": 1,
-              "nullPointMode": "null as zero",
-              "yaxis": 2
-            }
-          ],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
+            "text": {},
+            "textMode": "auto"
+          },
+          "pluginVersion": "8.1.5",
           "targets": [
             {
-              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$node_job\"}[1m:5s])",
-              "interval": "",
-              "legendFormat": "memory {{ printf "{{ job }}" }}",
-              "refId": "A"
-            },
-            {
-              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$validator_job\"}[1m:5s])",
-              "interval": "",
-              "legendFormat": "memory {{ printf "{{ job }}" }}",
-              "refId": "C"
-            },
-            {
-              "expr": "avg_over_time(process_resident_memory_bytes{job=\"$slasher_job\"}[1m:5s])",
+              "expr": "(time()-process_start_time_seconds{job=\"$node_job\"})/3600",
+              "instant": true,
               "interval": "",
               "legendFormat": "",
-              "refId": "D"
-            },
-            {
-              "expr": "((process_cpu_seconds_total - process_cpu_seconds_total offset 2m) > 0)*100/120/go_maxprocs",
-              "interval": "",
-              "legendFormat": "CPU {{ printf "{{ job }}" }}",
-              "refId": "B"
-            }
-          ],
-          "thresholds": [
-            {
-              "colorMode": "critical",
-              "fill": true,
-              "line": true,
-              "op": "gt",
-              "value": 4000000000,
-              "yaxis": "left"
+              "refId": "A"
             }
           ],
           "timeFrom": null,
-          "timeRegions": [],
           "timeShift": null,
-          "title": "Hardware usage",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "cumulative"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": null,
-              "format": "decbytes",
-              "label": "mem usage",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+          "title": "Node process started",
+          "type": "stat"
+        },
+        {
+          "cacheTimeout": null,
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "#299c46",
+                    "value": null
+                  },
+                  {
+                    "color": "#eab839",
+                    "value": 5
+                  },
+                  {
+                    "color": "red",
+                    "value": 20
+                  }
+                ]
+              },
+              "unit": "none"
             },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 27
+          },
+          "id": 26,
+          "links": [],
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "text": {},
+            "textMode": "auto"
+          },
+          "pluginVersion": "8.1.5",
+          "targets": [
             {
-              "decimals": 1,
-              "format": "percent",
-              "label": "CPU usage rate",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
+              "expr": "beacon_clock_time_slot-beacon_head_slot",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "Slots behind",
+              "refId": "A"
             }
           ],
-          "yaxis": {
-            "align": false,
-            "alignLevel": null
-          }
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Slots behind",
+          "type": "stat"
+        },
+        {
+          "cacheTimeout": null,
+          "datasource": "Prometheus",
+          "fieldConfig": {
+            "defaults": {
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "red",
+                    "value": null
+                  },
+                  {
+                    "color": "#F2CC0C",
+                    "value": 5
+                  },
+                  {
+                    "color": "#299c46",
+                    "value": 10
+                  }
+                ]
+              },
+              "unit": "none"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 2,
+            "w": 3,
+            "x": 21,
+            "y": 29
+          },
+          "id": 34,
+          "links": [],
+          "options": {
+            "colorMode": "background",
+            "graphMode": "none",
+            "justifyMode": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "text": {},
+            "textMode": "auto"
+          },
+          "pluginVersion": "8.1.5",
+          "targets": [
+            {
+              "expr": "p2p_peer_count{state=\"Connected\"}",
+              "instant": true,
+              "interval": "",
+              "legendFormat": "",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Peers connected",
+          "type": "stat"
+        },
+        {
+          "datasource": "Prometheus",
+          "description": "This panel won't have consistant values during the first hour of the node started process",
+          "fieldConfig": {
+            "defaults": {
+              "decimals": 0,
+              "displayName": "",
+              "mappings": [
+                {
+                  "options": {
+                    "match": "null",
+                    "result": {
+                      "color": "green",
+                      "text": "0"
+                    }
+                  },
+                  "type": "special"
+                }
+              ],
+              "max": 100,
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "#EAB839",
+                    "value": 25
+                  },
+                  {
+                    "color": "red",
+                    "value": 50
+                  }
+                ]
+              },
+              "unit": "short"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 4,
+            "w": 3,
+            "x": 21,
+            "y": 31
+          },
+          "id": 40,
+          "options": {
+            "displayMode": "lcd",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [
+                "last"
+              ],
+              "fields": "",
+              "values": false
+            },
+            "showUnfilled": true,
+            "text": {}
+          },
+          "pluginVersion": "8.1.5",
+          "targets": [
+            {
+              "expr": "sum(delta(log_entries_total{job=\"$node_job\", level=\"error\"}[1h]) > 0)",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "error",
+              "refId": "A"
+            },
+            {
+              "expr": "sum(delta(log_entries_total{job=\"$node_job\", level=\"warning\"}[1h]) > 0)",
+              "instant": false,
+              "interval": "",
+              "legendFormat": "warning",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Hourly log type counter",
+          "type": "bargauge"
         }
       ],
       "refresh": "1m",
@@ -2447,7 +2531,7 @@ data:
         ]
       },
       "time": {
-        "from": "now-12h",
+        "from": "now-6h",
         "to": "now"
       },
       "timepicker": {
@@ -2465,7 +2549,7 @@ data:
       },
       "timezone": "",
       "title": "Node Operator / Prysm",
-      "uid": "t2yHaa3Zz3lot810174761add4fe16be33857193431a3",
-      "version": 1
+      "uid": "t2yHaa3Zz3lot",
+      "version": 3
     }
 {{ end }}

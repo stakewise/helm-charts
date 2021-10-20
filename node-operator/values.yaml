@@ -338,14 +338,14 @@ openethereum:
       ## @param metrics.prometheusRule.rules Custom Prometheus rules
       ## e.g:
       ## rules:
-      ##   - alert: GethNodeDown
+      ##   - alert: OpenEthereumNodeDown
       ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
       ##     for: 5m
       ##     labels:
       ##       severity: error
       ##     annotations:
-      ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
-      ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
+      ##       summary: OpenEthereum Node {{ "{{ $labels.instance }}" }} down
+      ##       description: OpenEthereum Node {{ "{{ $labels.instance }}" }} is down
       ##
       rules: []
 
@@ -539,48 +539,40 @@ prysm:
       ## @param metrics.prometheusRule.rules Custom Prometheus rules
       ## e.g:
       ## rules:
-      ##   - alert: GethNodeDown
-      ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
+      ##   - alert: PrysmBeaconNodeDown
+      ##     expr: up{job='{{ include "node-operator.fullname" . }}-prysm-beacon'} == 0
+      ##     for: 1m
+      ##     labels:
+      ##       severity: critical
+      ##     annotations:
+      ##       summary: Prysm beacon node is down
+      ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      ##   - alert: Prysm50SlotsBehind
+      ##     expr: beacon_clock_time_slot-beacon_head_slot > 50
+      ##     for: 2m
+      ##     labels:
+      ##       severity: critical
+      ##     annotations:
+      ##       summary: Prysm beacon node is out of sync
+      ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      ##   - alert: PrysmParticipationRateLessThen66Percent
+      ##     expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
       ##     for: 5m
       ##     labels:
-      ##       severity: error
+      ##       severity: critical
       ##     annotations:
-      ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
-      ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
+      ##       summary: Prysm beacon node participation rate less then 66%
+      ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      ##   - alert: PrysmBeaconNodeRestarted
+      ##     expr: (time()-process_start_time_seconds{job='{{ include "node-operator.fullname" . }}-prysm-beacon'})/3600 < 0.1
+      ##     for: 1m
+      ##     labels:
+      ##       severity: warning
+      ##     annotations:
+      ##       summary: Prysm beacon node was restarted
+      ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
       ##
-      rules:
-        - alert: PrysmBeaconNodeDown
-          expr: up{job='{{ include "node-operator.fullname" . }}-prysm-beacon'} == 0
-          for: 1m
-          labels:
-            severity: critical
-          annotations:
-            summary: Prysm beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: Prysm50SlotsBehind
-          expr: beacon_clock_time_slot-beacon_head_slot > 50
-          for: 2m
-          labels:
-            severity: critical
-          annotations:
-            summary: Prysm beacon node is out of sync
-            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: PrysmParticipationRateLessThen66Percent
-          expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
-          for: 5m
-          labels:
-            severity: critical
-          annotations:
-            summary: Prysm beacon node participation rate less then 66%
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: PrysmBeaconNodeRestarted
-          expr: (time()-process_start_time_seconds{job='{{ include "node-operator.fullname" . }}-prysm-beacon'})/3600 < 0.1
-          for: 1m
-          labels:
-            severity: warning
-          annotations:
-            summary: Prysm beacon node was restarted
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      rules: []
 
   ## Defines whether the service must be headless
   ##
@@ -768,32 +760,24 @@ lighthouse:
       ## @param metrics.prometheusRule.rules Custom Prometheus rules
       ## e.g:
       ## rules:
-      ##   - alert: LighthouseNodeDown
-      ##     expr: up{job="{{ include "node-operator.fullname" . }}-lighthouse"} == 0
+      ##   - alert: LighthouseBeaconNodeDown
+      ##     expr: up{job='{{ include "node-operator.fullname" . }}-lighthouse-beacon'} == 0
       ##     for: 1m
       ##     labels:
       ##       severity: critical
       ##     annotations:
-      ##       summary: Lighthouse Node {{ "{{ $labels.instance }}" }} down
-      ##       description: Lighthouse Node {{ "{{ $labels.instance }}" }} is down
+      ##       summary: Lighthouse beacon node is down
+      ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      ##   - alert: LighthouseBeaconNodeRestarted
+      ##     expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
+      ##     for: 1m
+      ##     labels:
+      ##       severity: warning
+      ##     annotations:
+      ##       summary: Lighthouse beacon node was restarted
+      ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
       ##
-      rules:
-        - alert: LighthouseBeaconNodeDown
-          expr: up{job='{{ include "node-operator.fullname" . }}-lighthouse-beacon'} == 0
-          for: 1m
-          labels:
-            severity: critical
-          annotations:
-            summary: Lighthouse beacon node is down
-            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-        - alert: LighthouseBeaconNodeRestarted
-          expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
-          for: 1m
-          labels:
-            severity: warning
-          annotations:
-            summary: Lighthouse beacon node was restarted
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+      rules: []
 
   ## Defines whether the service must be headless
   ##
@@ -1030,43 +1014,25 @@ validator:
       ## e.g:
       ## rules:
       ##   prysm:
-      ##     - alert: PrysmValidatorAlert
-      ##       expr: up{job="{{ include "node-operator.fullname" . }}-validator"} == 0
-      ##       for: 1m
+      ##     - alert: PrysmValidatorHourlyEarningLessOrEqual0
+      ##       expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+      ##       for: 5m
       ##       labels:
       ##         severity: critical
       ##       annotations:
-      ##         summary: Prysm validator {{ "{{ $labels.instance }}" }} down
-      ##         description: Prysm validator {{ "{{ $labels.instance }}" }} is down
-      ##   lighthouse:
-      ##     - alert: LighthouseValidatorAlert
-      ##       expr:up{job="{{ include "node-operator.fullname" . }}-validator"} == 0
-      ##       for: 1m
+      ##         summary: Prysm validator hourly earning <= 0
+      ##         description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+      ##     - alert: PrysmValidatorAlotOfErrorsLastHour
+      ##       expr: sum(delta(log_entries_total{job='{{ include "node-operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
+      ##       for: 5m
       ##       labels:
-      ##         severity: critical
+      ##         severity: warning
       ##       annotations:
-      ##         summary: Lighthouse validator {{ "{{ $labels.instance }}" }} down
-      ##         description: Lighthouse validator {{ "{{ $labels.instance }}" }} is down
+      ##         summary: Many validator errors or warnings last hour
+      ##         description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+      ##   lighthouse: []
       ##
-      rules:
-        prysm:
-          - alert: PrysmValidatorHourlyEarningLessOrEqual0
-            expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
-            for: 5m
-            labels:
-              severity: critical
-            annotations:
-              summary: Prysm validator hourly earning <= 0
-              description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-          - alert: PrysmValidatorAlotOfErrorsLastHour
-            expr: sum(delta(log_entries_total{job='{{ include "node-operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
-            for: 5m
-            labels:
-              severity: warning
-            annotations:
-              summary: Many validator errors or warnings last hour
-              description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-        lighthouse: []
+      rules: []
 
   ## Configure resource requests and limits.
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
@@ -1193,6 +1159,5 @@ vault:
     #   - mountPath: /usr/local/libexec/vault
     #     name: plugins
     #     readOnly: true
-
   ui:
     enabled: true

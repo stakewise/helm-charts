@@ -105,16 +105,9 @@ spec:
                 ]
                 {{- else if eq $root.Values.validator.type "lighthouse" }}
                 command: [
-                  "lighthouse",
-                  "account",
-                  "validator",
-                  "slashing-protection",
-                  "export",
-                  "/data/slashing_protection.json",
-                  "--datadir=/data/lighthouse",
-                  {{- if eq $root.Values.validator.networkID "prater" }}
-                  "--network prater"
-                  {{- end }}
+                  "/bin/sh",
+                  "-c",
+                  "sleep 10 && lighthouse account validator slashing-protection export /data/slashing_protection.json --datadir=/data/lighthouse"
                 ]
                 {{- end }}
         {{- if $root.Values.validator.metrics.enabled }}
