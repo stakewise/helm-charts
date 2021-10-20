@@ -29,30 +29,122 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-5"
 data:
-  entrypoint.sh: |
-    #!/bin/sh
-    mkdir -p /data/prysm/.eth2validators/prysm-wallet-v2/direct/accounts
-    mkdir -p /data/lighthouse/validators
-    cp /mnt/configs/keymanageropts.json /data/prysm/.eth2validators/prysm-wallet-v2/direct/keymanageropts.json
-    {{- if $.Values.vault.enabled }}
-    cp /mnt/vault/prysm_keystore /data/prysm/.eth2validators/prysm-wallet-v2/direct/accounts/
-    cp /mnt/vault/prysm_password /data/prysm/.eth2validators/password.txt
-    cp /mnt/vault/lighthouse_keystore /data/lighthouse/validators/${VALIDATOR_PUBLICKEY}/voting-keystore.json
-    cp /mnt/vault/lighthouse_password /data/lighthouse/validators/validator_definitions.yaml
-    {{- else }}
-    cp /mnt/secrets/all-accounts.keystore.json /data/prysm/.eth2validators/prysm-wallet-v2/direct/accounts/
-    cp /mnt/secrets/password.txt /data/prysm/.eth2validators/password.txt
-    cp /mnt/secrets/voting-keystore.json /data/lighthouse/validators/${VALIDATOR_PUBLICKEY}/voting-keystore.json
-    cp /mnt/secrets/validator_definitions.yaml /data/lighthouse/validators/validator_definitions.yaml
-    {{- end }}
-  slashing.sh: |
-    #!/bin/sh
-    if [ ! -f /data/slashing_protection.json ]; then
-      exit 0
-    fi
-    {{- if eq $.Values.validator.type "prysm" }}
-    validator slashing-protection import --datadir=/data/prysm --slashing-protection-json-file=/data/slashing_protection.json
-    {{- else }}
-    lighthouse account validator slashing-protection import /data/slashing_protection.json --datadir=/data/lighthouse
-    {{- end }}
+  validator-init.py: |
+    #!/usr/bin/env python3
+    import os
+    import shutil
+    import subprocess
+    import hvac
+    from pathlib import Path as path
+
+    ## Vault init
+    ##
+    f = open('/var/run/secrets/kubernetes.io/serviceaccount/token')
+    token = f.read()
+    client   = hvac.Client(url=os.getenv("VAULT_ADDR"))
+    response = client.auth.kubernetes.login(role='{{ template "node-operator.fullname" . }}', jwt=token, )
+
+    vault_base = "/vault/"
+    vault_keystores = vault_base + "keystores"
+    vault_keystores_password = vault_base + "password"
+    data_base = "/data/"
+    data_prysm = data_base + "prysm"
+    data_prysm_validators = data_prysm + "/validators"
+    data_lighthouse = data_base + "lighthouse"
+    slashing_protection_file = "/data/slashing_protection.json"
+    secret_path = "validators/validator" + os.getenv("VALIDATOR_ID")
+
+    def secrets_init():
+        # Write kyestores and password
+        keystores_data = client.secrets.kv.v1.read_secret(path="keystore", mount_point=secret_path)
+        keystores_password = client.secrets.kv.v1.read_secret(path="password", mount_point=secret_path)
+        try:
+            if os.path.isdir(vault_base):
+                shutil.rmtree(vault_base)
+            path(vault_base).mkdir(exist_ok=True, mode=0o750, parents=True)
+            path(vault_keystores).mkdir(exist_ok=True, mode=0o750, parents=True)
+            path(vault_keystores_password).mkdir(exist_ok=True, mode=0o750, parents=True)
+        except OSError as error:
+            print(error)
+            print("Directory '%s' can not be removed" %vault_keystores)
+        for k in keystores_data["data"]:
+            with open(vault_keystores + "/" + k, "w") as file:
+                file.write(keystores_data["data"][k])
+        print("Keys written on disk successfully")
+        with open(vault_keystores_password + "/password.txt", "w") as file:
+                file.write(keystores_password["data"]["password.txt"])
+        print("Password written on disk successfully")
+
+    def validator_init(validator):
+        try:
+            if os.path.isdir(data_prysm):
+                shutil.rmtree(data_prysm)
+            if os.path.isdir(data_lighthouse):
+                shutil.rmtree(data_lighthouse)
+            path(data_prysm).mkdir(exist_ok=True, mode=0o750, parents=True)
+            path(data_lighthouse).mkdir(exist_ok=True, mode=0o750, parents=True)
+        except OSError as error:
+            print(error)
+            print("Directory '%s' '%s' can not be removed" %vault_keystores %vault_keystores_password)
+
+        if validator == "prysm":
+            subprocess.run([
+                "prysm-validator",
+                "accounts",
+                "import",
+                "--keys-dir=" + vault_keystores,
+                "--account-password-file=" + vault_keystores_password + "/password.txt",
+                "--wallet-dir=" + data_prysm_validators,
+                "--wallet-password-file=" + vault_keystores_password + "/password.txt",
+                "--accept-terms-of-use",
+                "--"+os.getenv("NETWORK_ID", "mainnet"),
+            ])
+            shutil.copyfile(vault_keystores_password + "/password.txt", data_prysm_validators + "/password.txt")
+        elif validator == "lighthouse":
+            subprocess.run([
+                "lighthouse-validator",
+                "--network",
+                os.getenv("NETWORK_ID", "mainnet"),
+                "account",
+                "validator",
+                "import",
+                "--datadir="+data_lighthouse,
+                "--reuse-password",
+                "--password-file="+vault_keystores_password+"/password.txt",
+                "--directory="+vault_keystores
+            ])
+
+    def slashing_init(validator):
+        slashing_protection = path(slashing_protection_file)
+        if slashing_protection.is_file():
+            if validator == "prysm":
+                subprocess.run([
+                    "prysm-validator",
+                    "slashing-protection",
+                    "import",
+                    "--datadir=" + data_prysm,
+                    "--slashing-protection-json-file=" + slashing_protection_file,
+                    "--" + os.getenv("NETWORK_ID", "mainnet")
+                ])
+            elif validator == "lighthouse":
+                subprocess.run([
+                    "lighthouse-validator",
+                    "account_manager",
+                    "validator",
+                    "slashing-protection",
+                    "import", 
+                    slashing_protection_file,
+                    "--datadir=" + data_lighthouse,
+                    "--network=" + os.getenv("NETWORK_ID", "mainnet")
+                ])
+            print("Slashing history successfully imported.")
+        else:
+            print("Slashing history didn't find. Nothing to import.")
+
+
+    if __name__ == "__main__":
+        secrets_init()
+        validator_init(os.getenv("VALIDATOR_TYPE"))
+        slashing_init(os.getenv("VALIDATOR_TYPE"))
+
 {{ end }}

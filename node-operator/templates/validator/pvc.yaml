@@ -1,0 +1,19 @@
+{{- if and .Values.validator.enabled .Values.validator.persistence.enabled }}
+{{- $root := . -}}
+{{- range (untilStep 0 (int .Values.validator.replicas) 1) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-{{ template "node-operator.fullname" $root }}-validator{{.}}
+  labels:
+    {{- include "node-operator.labels" $root | nindent 4 }}
+    {{- include "validator.labels" $root | nindent 4 }}
+spec:
+  accessModes: {{ $root.Values.validator.persistence.accessModes }}
+  storageClassName: {{ $root.Values.validator.persistence.storageClassName }}
+  resources:
+    requests:
+      storage: {{ $root.Values.validator.persistence.size | quote }}
+{{- end }}
+{{- end }}

@@ -181,13 +181,8 @@ Success! Enabled kubernetes auth method at: kubernetes/
 
 Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.
 
-> **Google Cloud Platform issuer example:**
-> 
-> `issuer="https://container.googleapis.com/v1/projects/PROJECT_ID/locations/REGION_NAME/clusters/CLUSTER_NAME"`
-
 ```console
 $ vault write auth/kubernetes/config \
-  issuer="https://kubernetes.default.svc.cluster.local" \
   token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
   kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt

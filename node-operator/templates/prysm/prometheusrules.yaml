@@ -17,7 +17,7 @@ metadata:
 spec:
   {{- with .Values.prysm.metrics.prometheusRule.rules }}
   groups:
-    - name: {{ template "beacon.fullname" $ }}-prysm-beacon
+    - name: {{ template "node-operator.fullname" $ }}-prysm-beacon
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
 {{- end }}

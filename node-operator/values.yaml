@@ -91,7 +91,7 @@ geth:
   ## Extra flags to pass to the node
   ##
   extraFlags:
-    - "--syncmode=light"
+    - "--syncmode=snap"
 
   ## Monitoring
   ##
@@ -207,7 +207,7 @@ geth:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 20Gi
+    size: 50Gi
 
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -550,13 +550,13 @@ prysm:
       ##
       rules:
         - alert: PrysmBeaconNodeDown
-          expr: up{job="{{ include "node-operator.fullname" . }}-prysm-beacon"} == 0
+          expr: up{job='{{ include "node-operator.fullname" . }}-prysm-beacon'} == 0
           for: 1m
           labels:
             severity: critical
           annotations:
             summary: Prysm beacon node is down
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: Prysm50SlotsBehind
           expr: beacon_clock_time_slot-beacon_head_slot > 50
           for: 2m
@@ -564,7 +564,7 @@ prysm:
             severity: critical
           annotations:
             summary: Prysm beacon node is out of sync
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: PrysmParticipationRateLessThen66Percent
           expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
           for: 5m
@@ -572,15 +572,15 @@ prysm:
             severity: critical
           annotations:
             summary: Prysm beacon node participation rate less then 66%
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: PrysmBeaconNodeRestarted
-          expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-prysm-beacon"})/3600 < 0.1
+          expr: (time()-process_start_time_seconds{job='{{ include "node-operator.fullname" . }}-prysm-beacon'})/3600 < 0.1
           for: 1m
           labels:
             severity: warning
           annotations:
             summary: Prysm beacon node was restarted
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
 
   ## Defines whether the service must be headless
   ##
@@ -656,7 +656,7 @@ lighthouse:
   ## ref: https://hub.docker.com/r/sigp/lighthouse
   image:
     repository: "sigp/lighthouse"
-    tag: "v2.0.0"
+    tag: "v2.0.1"
     pullPolicy: IfNotPresent
 
   ## Node labels for pod assignment
@@ -779,13 +779,13 @@ lighthouse:
       ##
       rules:
         - alert: LighthouseBeaconNodeDown
-          expr: up{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"} == 0
+          expr: up{job='{{ include "node-operator.fullname" . }}-lighthouse-beacon'} == 0
           for: 1m
           labels:
             severity: critical
           annotations:
             summary: Lighthouse beacon node is down
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: LighthouseBeaconNodeRestarted
           expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
           for: 1m
@@ -793,7 +793,7 @@ lighthouse:
             severity: warning
           annotations:
             summary: Lighthouse beacon node was restarted
-            description: Check {{ "{{ $labels.pod }}" }} beacon node in namespace {{ "{{ $labels.namespace }}" }}
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
 
   ## Defines whether the service must be headless
   ##
@@ -880,7 +880,14 @@ validator:
       tag: "v2.0.1"
     lighthouse:
       repository: "sigp/lighthouse"
-      tag: "v2.0.0"
+      tag: "v2.0.1"
+  
+  ## Init image is used to initialise validators
+  ##
+  initImage:
+    repository: "unxnn/validator-init"
+    tag: "v2.0.1"
+    pullPolicy: IfNotPresent
   
   terminationGracePeriodSeconds: 900
   
@@ -920,13 +927,18 @@ validator:
     updateMode: Off
     containerPolicies: { }
   
+  ## Network ID
+  ## Options: mainnet, prater
+  ##
+  networkID: "mainnet"
+
   ## Validators flags
   ##
   flags:
     prysm:
       - "--datadir=/data/prysm"
-      - "--wallet-dir=/data/prysm/.eth2validators/prysm-wallet-v2"
-      - "--wallet-password-file=/data/prysm/.eth2validators/password.txt"
+      - "--wallet-dir=/data/prysm/validators"
+      - "--wallet-password-file=/data/prysm/validators/password.txt"
       - "--accept-terms-of-use"
       - "--disable-rewards-penalties-logging"
       - "--disable-account-metrics"
@@ -952,21 +964,6 @@ validator:
   ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
   ##
   graffiti: ""
-  
-  ## Keystore/Password for validators
-  ## Used when vault.enabled=false
-  ##
-  secrets:
-    prysm:
-      # Wallet password
-      password: ""
-      # Keystore file content
-      keystore: ""
-    lighthouse:
-      keystore:
-        data: ""
-        password: ""
-        publicKey: ""
 
   ## Monitoring
   ##
@@ -1060,15 +1057,15 @@ validator:
               severity: critical
             annotations:
               summary: Prysm validator hourly earning <= 0
-              description: Check validators immediately. Pod - {{ "{{ $labels.pod }}" }}. Namespace - {{ "{{ $labels.namespace }}" }}
+              description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
           - alert: PrysmValidatorAlotOfErrorsLastHour
-            expr: sum(delta(log_entries_total{job="{{ include "node-operator.fullname" . }}-validator", level="error"}[1h]) > 0) 
+            expr: sum(delta(log_entries_total{job='{{ include "node-operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
             for: 5m
             labels:
               severity: warning
             annotations:
               summary: Many validator errors or warnings last hour
-              description: Check validator {{ "{{ $labels.pod }}" }}. Namespace - {{ "{{ $labels.namespace }}" }}
+              description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
         lighthouse: []
 
   ## Configure resource requests and limits.
@@ -1081,7 +1078,7 @@ validator:
   ##
   readinessProbe:
     prysm:
-      initialDelaySeconds: 180
+      initialDelaySeconds: 60
       timeoutSeconds: 1
       periodSeconds: 60
       failureThreshold: 3
@@ -1091,7 +1088,7 @@ validator:
         port: metrics
         scheme: HTTP
     lighthouse:
-      initialDelaySeconds: 180
+      initialDelaySeconds: 60
       timeoutSeconds: 1
       periodSeconds: 60
       failureThreshold: 3
@@ -1105,7 +1102,7 @@ validator:
       initialDelaySeconds: 60
       timeoutSeconds: 1
       periodSeconds: 60
-      failureThreshold: 60
+      failureThreshold: 3
       successThreshold: 1
       httpGet:
         path: /healthz
@@ -1115,7 +1112,7 @@ validator:
       initialDelaySeconds: 60
       timeoutSeconds: 1
       periodSeconds: 60
-      failureThreshold: 60
+      failureThreshold: 3
       successThreshold: 1
       httpGet:
         path: /metrics
@@ -1199,11 +1196,3 @@ vault:
 
   ui:
     enabled: true
-  csi:
-    enabled: true
-
-## Configuration for secrets store CSI driver
-## ref: https://github.com/kubernetes-sigs/secrets-store-csi-driver/tree/v0.3.0/charts/secrets-store-csi-driver
-##
-csi:
-  enabled: false

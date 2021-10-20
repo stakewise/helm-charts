@@ -36,10 +36,6 @@ keywords:
 home: https://stakewise.io/
 
 dependencies:
-  - name: secrets-store-csi-driver
-    repository: https://raw.githubusercontent.com/kubernetes-sigs/secrets-store-csi-driver/master/charts
-    version: 0.2.0
-    condition: csi.enabled
   - name: vault
     repository: https://helm.releases.hashicorp.com
     version: 0.16.1

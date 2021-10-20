@@ -22,7 +22,6 @@ spec:
         {{- include "node-operator.selectorLabels" $root | nindent 8 }}
         {{- include "validator.labels" $root | nindent 8 }}
       annotations:
-        checksum/secret: {{ include (print $root.Template.BasePath "/validator/secret.yaml") $root | sha256sum }}
         checksum/configmap: {{ include (print $root.Template.BasePath "/validator/configmap.yaml") $root | sha256sum }}
     spec:
     {{- with $root.Values.validator.terminationGracePeriodSeconds }}
@@ -47,7 +46,31 @@ spec:
       serviceAccountName: {{ template "node-operator.fullname" $root }}
       priorityClassName: {{ $root.Values.validator.priorityClassName | quote }}
       initContainers:
-        {{- include "init-validator" $root | nindent 8 }}
+        - name: init-validator
+          image: "{{ $root.Values.validator.initImage.repository }}:{{ $root.Values.validator.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.validator.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: [
+            '/usr/bin/python3',
+            '/data/scripts/validator-init.py'
+          ]
+          env:
+            - name: VAULT_ADDR
+              value: "http://{{ template "node-operator.fullname" $ }}-vault:8200"
+            - name: NETWORK_ID
+              value: {{ $root.Values.validator.networkID }}
+            - name: VALIDATOR_ID
+              value: {{ . | quote }}
+            - name: VALIDATOR_TYPE
+              value: {{ $root.Values.validator.type }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: configs
+              mountPath: "/mnt/configs"
+            - name: validator-init
+              mountPath: /data/scripts
       {{- if and $.Values.validator.persistence.enabled $.Values.validator.initChownData }}
         {{- include "init-chown" $root | nindent 8 }}
       {{- end }}
@@ -73,9 +96,26 @@ spec:
             preStop:
               exec:
                 {{- if eq $root.Values.validator.type "prysm" }}
-                command: ["validator", "slashing-protection", "export", "--datadir=/data/prysm", "--slashing-protection-export-dir=/data"]
+                command: [
+                  "validator",
+                  "slashing-protection",
+                  "export",
+                  "--datadir=/data/prysm",
+                  "--slashing-protection-export-dir=/data"
+                ]
                 {{- else if eq $root.Values.validator.type "lighthouse" }}
-                command: ["lighthouse", "account", "validator", "slashing-protection", "export", "/data/slashing_protection.json", "--datadir=/data/lighthouse"]
+                command: [
+                  "lighthouse",
+                  "account",
+                  "validator",
+                  "slashing-protection",
+                  "export",
+                  "/data/slashing_protection.json",
+                  "--datadir=/data/lighthouse",
+                  {{- if eq $root.Values.validator.networkID "prater" }}
+                  "--network prater"
+                  {{- end }}
+                ]
                 {{- end }}
         {{- if $root.Values.validator.metrics.enabled }}
           ports:
@@ -92,10 +132,6 @@ spec:
               mountPath: /data
             - name: configs
               mountPath: "/mnt/configs"
-            - name: secrets
-              mountPath: "/mnt/secrets"
-            - name: vault-secrets
-              mountPath: "/mnt/vault"
         {{- with (pluck $root.Values.validator.type $root.Values.validator.readinessProbe | first) }}
           readinessProbe:
             {{- toYaml . | nindent 12 }}
@@ -108,33 +144,16 @@ spec:
         - name: configs
           configMap:
             name: {{ template "node-operator.fullname" $root }}-validator-configs
-        - name: secrets
-          secret:
-            secretName: {{ template "node-operator.fullname" $root }}-validator-secrets
         - name: validator-init
           configMap:
             name: {{ template "node-operator.fullname" $root }}-validator-init
-        - name: vault-secrets
-          csi:
-            driver: secrets-store.csi.k8s.io
-            readOnly: true
-            volumeAttributes:
-              secretProviderClass: "{{ template "node-operator.fullname" $root }}-validator-secrets"
 {{- if (not $root.Values.validator.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}
-  volumeClaimTemplates:
-    - metadata:
-        name: data
-        labels:
-          {{- include "validator.labels" $root | nindent 10 }}
-      spec:
-        accessModes: {{ $root.Values.validator.persistence.accessModes }}
-        storageClassName: {{ $root.Values.validator.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ $root.Values.validator.persistence.size | quote }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: data-{{ template "node-operator.fullname" $root }}-validator{{.}}
 {{- end }}
 
 {{- end }}

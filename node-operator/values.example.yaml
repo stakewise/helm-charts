@@ -15,7 +15,7 @@ geth:
   ws:
     enabled: true
   extraFlags:
-    - "--syncmode=light"
+    - "--syncmode=snap"
     - "--goerli"
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
@@ -24,7 +24,7 @@ geth:
     serviceMonitor:
       enabled: true
     prometheusRule:
-      enabled: true
+      enabled: false
 
 ## Openethereum node configuration
 ##
@@ -35,12 +35,15 @@ openethereum:
   extraFlags:
     - " --pruning-memory"
     - "1024"
+    - "--no-warp"
+    - "--pruning"
+    - "fast"
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
     prometheusRule:
-      enabled: true
+      enabled: false
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
   
@@ -77,7 +80,7 @@ prysm:
   extraFlags:
     # Beacon chain options
     - "--accept-terms-of-use"
-    - "--http-web3provider=http://node-operator-openethereum:8545"
+    - "--http-web3provider=http://node-operator-geth:8545"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
@@ -106,7 +109,7 @@ lighthouse:
     - "--network=prater"
 
   eth1Endpoints:
-    - http://node-operator-openethereum:8545
+    - http://node-operator-geth:8545
 
   metrics:
     enabled: true
@@ -128,7 +131,7 @@ lighthouse:
 ## Validators configuration
 ##
 validator:
-  enabled: false
+  enabled: true
   verticalAutoscaler:
     enabled: true
   replicas: 1
@@ -136,6 +139,7 @@ validator:
   prater: true
   graffiti: "StakeWise"
   publicKey: ""
+  networkID: "prater"
   extraFlags:
     prysm:
       - "--prater"
@@ -146,12 +150,18 @@ validator:
     serviceMonitor:
       enabled: true
     prometheusRule:
-      enabled: true
+      enabled: false
+  persistence:
+    enabled: true
+    storageClassName: "standard"
+    accessModes:
+      - ReadWriteOnce
+    size: 10Gi
 
 ## CSI driver configuration
 ##
 csi:
-  enabled: true
+  enabled: false
 
 ## Hashicorp Vault configurations
 ##

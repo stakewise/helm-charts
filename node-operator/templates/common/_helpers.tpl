@@ -88,41 +88,6 @@ Update permissions on files inside /data directory
 {{- end }}
 
 {{/*
-Initialize validator configs
-*/}}
-{{- define "init-validator" -}}
-- name: init-validator
-  image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-  securityContext:
-    runAsUser: 0
-  command: ['/bin/sh', '/data/scripts/entrypoint.sh']
-  env:
-    - name: VALIDATOR_PUBLICKEY
-      value: {{ .Values.validator.publicKey }}
-  volumeMounts:
-    - name: data
-      mountPath: /data
-    - name: configs
-      mountPath: "/mnt/configs"
-    - name: secrets
-      mountPath: "/mnt/secrets"
-    - name: vault-secrets
-      mountPath: "/mnt/vault"
-    - name: validator-init
-      mountPath: /data/scripts
-- name: init-slashing
-  image: "{{ (pluck .Values.validator.type .Values.validator.image | first ).repository }}:{{ (pluck .Values.validator.type .Values.validator.image | first ).tag }}"
-  imagePullPolicy: {{ .Values.validator.image.pullPolicy }}
-  command: ['/bin/sh', '/data/scripts/slashing.sh']
-  volumeMounts:
-    - name: data
-      mountPath: /data
-    - name: validator-init
-      mountPath: /data/scripts
-{{- end }}
-
-{{/*
 Validator beacon node
 */}}
 {{- define "beacon-rpc-node" -}}
