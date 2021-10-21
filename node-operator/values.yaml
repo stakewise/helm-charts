@@ -58,7 +58,7 @@ geth:
 
   ## How many geth nodes to run simultaneously
   ##
-  replicas: 2
+  replicas: 3
 
   ## Configure pod disruption budgets for Alertmanager
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -76,10 +76,10 @@ geth:
   ## RPC configuration.
   ##
   rpc:
-    enabled: false
+    enabled: true
     api: "web3,eth,net"
     corsDomain: ""
-    vhosts: ""
+    vhosts: "*"
 
   ## WebSocket configuration.
   ##
@@ -584,7 +584,7 @@ prysm:
   ##
   sessionAffinity:
     # Whether to enable session affinity or not
-    enabled: false
+    enabled: true
     # The session duration in seconds
     timeoutSeconds: 86400
 
@@ -789,7 +789,7 @@ lighthouse:
   ##
   sessionAffinity:
     # Whether to enable session affinity or not
-    enabled: false
+    enabled: true
     # The session duration in seconds
     timeoutSeconds: 86400
 
@@ -874,6 +874,15 @@ validator:
     pullPolicy: IfNotPresent
   
   terminationGracePeriodSeconds: 900
+
+  ## Spearate service account per validator.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
   
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/

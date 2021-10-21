@@ -38,9 +38,16 @@ $ helm upgrade --install node-operator ./operator/node-operator \
   --set key=value... 
 ```
 
-Please see the many options supported in the `values.yaml` file.
+**Please see the many options supported in the `values.yaml` file.**
 
-### Vault usage
+## How to
+
+1. Install helm chart with eth1 nodes `geth` and `openethereum` enabled. Wait until eth1 nodes fully synced.
+1. Upgrade installation with eth2 nodes `prysm` and `lighthouse` enabled. Wait until eth2 nodes fully synced.
+1. Upgrade installation with vault enabled and configured (instruction below).
+1. Upgrade installation with validators enabled;
+
+## Vault usage
 
 After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 

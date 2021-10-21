@@ -42,7 +42,7 @@ data:
     f = open('/var/run/secrets/kubernetes.io/serviceaccount/token')
     token = f.read()
     client   = hvac.Client(url=os.getenv("VAULT_ADDR"))
-    response = client.auth.kubernetes.login(role='{{ template "node-operator.fullname" . }}', jwt=token, )
+    response = client.auth.kubernetes.login(role="node-operator", jwt=token, )
 
     vault_base = "/vault/"
     vault_keystores = vault_base + "keystores"

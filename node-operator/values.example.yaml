@@ -7,13 +7,6 @@
 geth:
   enabled: true
   replicas: 1
-  rpc:
-    enabled: true
-    api: "web3,eth,net"
-    corsDomain: ""
-    vhosts: "*"
-  ws:
-    enabled: true
   extraFlags:
     - "--syncmode=snap"
     - "--goerli"
