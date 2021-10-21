@@ -23,7 +23,7 @@ The versions required are:
 
 ## How it works
 
-![StakeWise Node Operator](http://url/to/img.png)
+![StakeWise Node Operator](https://github.com/stakewise/helm-charts/raw/operator-package/node-operator/img/scheme.png)
 
 ## Usage
 
