@@ -25,6 +25,12 @@ The versions required are:
 
 ![StakeWise Node Operator](https://github.com/stakewise/helm-charts/raw/operator-package/node-operator/img/scheme.png)
 
+**Explanation of the schema**
+
+`node-operator` chart deploys two types of eth1 nodes and two types of eth2 beacon nodes to allow migration between different types of validators. Depending on the parameters which you specify in the `values.yaml` eth2 beacon nodes can work with either geth or openethereum eth1 nodes, but validators always should point to only own type of beacon node, if validator have `type: prysm` it should point to Prysm beacon node and to Lighthouse beacon node if `type: lighthouse`.
+
+The validator's statefulset, in addition to the validator pod, contains several init containers in which all the "magic" takes place to ensure the normal operation of the validator. In the init containers, the validator's keystors and passwords are received from HashiCorp Vault and imported into the validator's wallet, as well as the slashing history import if necessary.
+
 ## Usage
 
 To install the latest version of this chart, add dependent helm repositories
@@ -202,34 +208,6 @@ Success! Data written to: auth/kubernetes/config
 ```
 
 The `token_reviewer_jwt` and `kubernetes_ca_cert` files written to the container by Kubernetes. The variable `{{ KUBERNETES_PORT_443_TCP_ADDR }}` references the internal network address of the Kubernetes host and should be manually updated in the command above.
-
-For the Kubernetes-Secrets-Store-CSI-Driver to read the secrets requires that it has read permissions of all mounts and access to the secret itself.
-
-Write out the policy named `internal-app`.
-
-```console
-$ vault policy write internal-app - <<EOF
-path "validators/*" {
-  capabilities = ["read"]
-}
-EOF
-```
-
-The data of `kv-v2` requires that an additional path element of data is included after its mount path (in this case, validators/data).
-
-Finally, create a Kubernetes authentication role named node-operator that binds this policy with a Kubernetes service account named `node-operator`.
-
-```console
-$ vault write auth/kubernetes/role/node-operator \
-    bound_service_account_names=node-operator \
-    bound_service_account_namespaces=${VAULT_K8S_NAMESPACE} \
-    policies=internal-app \
-    ttl=20m
-
-Success! Data written to: auth/kubernetes/role/node-operator
-```
-
-The role connects the Kubernetes service account, `node-operator`, in the namespace, `node-operator`, with the Vault policy, `internal-app`. The tokens returned after authentication are valid for 20 minutes. This Kubernetes service account name, `node-operator`, will be created below.
 
 Lastly, exit the `node-operator-vault-0` pod.
 
