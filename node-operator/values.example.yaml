@@ -39,7 +39,6 @@ openethereum:
       enabled: false
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
-  
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -68,8 +67,7 @@ prysm:
               - lighthouse-beacon
           topologyKey: kubernetes.io/hostname
   replicas: 1
-  prater: true
-
+  networkID: prater
   extraFlags:
     # Beacon chain options
     - "--accept-terms-of-use"
@@ -77,14 +75,12 @@ prysm:
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
-
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
     prometheusRule:
       enabled: false
-
   persistence:
     enabled: true
     storageClassName: "ssd-storage"
@@ -97,27 +93,21 @@ prysm:
 lighthouse:
   enabled: true
   replicas: 1
-
-  extraFlags:
-    - "--network=prater"
-
+  networkID: prater
   eth1Endpoints:
     - http://node-operator-geth:8545
-
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
     prometheusRule:
       enabled: false
-
   persistence:
     enabled: true
     storageClassName: "ssd-storage"
     accessModes:
       - ReadWriteOnce
     size: 300Gi
-
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
 
@@ -127,17 +117,11 @@ validator:
   enabled: true
   verticalAutoscaler:
     enabled: true
-  replicas: 1
+  validatorsCount: 1
   type: lighthouse
-  prater: true
   graffiti: "StakeWise"
   publicKey: ""
   networkID: "prater"
-  extraFlags:
-    prysm:
-      - "--prater"
-    lighthouse:
-      - "--network=prater"
   metrics:
     enabled: true
     serviceMonitor:

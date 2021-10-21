@@ -1,6 +1,6 @@
 {{- if and .Values.validator.enabled .Values.validator.verticalAutoscaler.enabled }}
 {{- $root := . -}}
-{{- range (untilStep 0 (int .Values.validator.replicas) 1) }}
+{{- range (untilStep 0 (int .Values.validator.validatorsCount) 1) }}
 ---
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler

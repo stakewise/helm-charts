@@ -66,7 +66,7 @@ geth:
   ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
-    enabled: false
+    enabled: true
     maxUnavailable: 1
 
   ## Network (chain) ID
@@ -175,7 +175,7 @@ geth:
   sessionAffinity:
     ## Whether to enable session affinity or not
     ##
-    enabled: false
+    enabled: true
     ## The session duration in seconds
     ##
     timeoutSeconds: 86400
@@ -247,7 +247,7 @@ openethereum:
 
   ## How many geth nodes to run simultaneously
   ##
-  replicas: 2
+  replicas: 3
 
   ## Configure pod disruption budgets for Alertmanager
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -255,7 +255,7 @@ openethereum:
   ## https://github.com/kubernetes/kubernetes/issues/45398
   ##
   podDisruptionBudget:
-    enabled: false
+    enabled: true
     maxUnavailable: 1
 
   ## Which network should the node join
@@ -355,7 +355,7 @@ openethereum:
   ##
   sessionAffinity:
     # Whether to enable session affinity or not
-    enabled: false
+    enabled: true
     # The session duration in seconds
     timeoutSeconds: 86400
 
@@ -417,26 +417,29 @@ prysm:
 
   ## How many beacon chain pods to run simultaneously
   ##
-  replicas: 2
+  replicas: 3
 
   ## Prysm beacon node image version
   ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
   ##
   image:
     repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    tag: "v2.0.1"
+    tag: "v2.0.2"
     pullPolicy: IfNotPresent
   
-  ## Whether to use prater testnet or not.
+  ## Eth2 network ID
   ##
-  prater: true
+  networkID: mainnet
+
+  ## Ethereum 1 node endpoints.
+  ##
+  eth1Endpoint: []
 
   ## Extra flags for prysm beacon chain node
   ##
   extraFlags:
     # Beacon chain options
     - "--accept-terms-of-use"
-    - "--http-web3provider=<eth1 chain endpoint>"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
@@ -642,7 +645,7 @@ lighthouse:
 
   ## How many beacon chain pods to run simultaneously
   ##
-  replicas: 2
+  replicas: 3
 
   ## Lighthouse beacon node image version
   ## ref: https://hub.docker.com/r/sigp/lighthouse
@@ -687,15 +690,17 @@ lighthouse:
     updateMode: Off
     containerPolicies: { }
 
+  ## Eth2 network ID
+  ##
+  networkID: mainnet
+
   ## Extra flags for lighthouse beacon chain node
-  extraFlags:
-    - "--network=mainnet"
+  ##
+  extraFlags: []
 
   ## Ethereum 1 node endpoints.
   ##
-  eth1Endpoints:
-    - http://127.0.0.1:8545
-    - http://127.0.0.1:8546
+  eth1Endpoints: []
 
   ## Monitoring
   ##
@@ -710,10 +715,6 @@ lighthouse:
     flags:
       - "--metrics"
       - "--metrics-address=0.0.0.0"
-
-    # Metrics collection annotations to add to service
-    svcAnnotations:
-      prometheus.io/scrape: "true"
 
     ## Prometheus Service Monitor
     ## ref: https://github.com/coreos/prometheus-operator
@@ -796,7 +797,7 @@ lighthouse:
   ## Configure resource requests and limits.
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: { }
+  resources: {}
 
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
@@ -850,9 +851,9 @@ validator:
   ##
   type: prysm
 
-  ## How many validators to run simultaneously
+  ## How many validators to run
   ##
-  replicas: 1
+  validatorsCount: 1
 
   ## Validators image version
   ## ref: https://gcr.io/prysmaticlabs/prysm/validator
@@ -904,13 +905,6 @@ validator:
   ##
   priorityClassName: ""
 
-  ## Enable pod disruption budget
-  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
-  ##
-  podDisruptionBudget:
-    enabled: true
-    maxUnavailable: 1
-
   ## Vertical Pod Autoscaler config
   ## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
   ##
@@ -949,7 +943,8 @@ validator:
     lighthouse: []
 
   ## Beacon Chain node address
-  ##
+  ## If not specified, will connect to prysm/lighthouse beacon nodes
+  ## deployed with this helm chart
   beaconChainRpcEndpoint: ""
 
   ## You can use the graffiti to add a string to your proposed blocks,
@@ -1046,7 +1041,7 @@ validator:
   ## Configure resource requests and limits.
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
-  resources: { }
+  resources: {}
 
   ## Configure liveness and readiness probes
   ## https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/

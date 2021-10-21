@@ -1,6 +1,6 @@
 {{- if .Values.validator.enabled }}
 {{- $root := . -}}
-{{- range (untilStep 0 (int .Values.validator.replicas) 1) }}
+{{- range (untilStep 0 (int .Values.validator.validatorsCount) 1) }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -90,6 +90,13 @@ spec:
           {{- if $root.Values.validator.metrics.enabled }}
             {{- range (pluck $root.Values.validator.type $root.Values.validator.metrics.flags | first) }}
             - {{ . | quote }}
+            {{- end }}
+          {{- end }}
+          {{- if eq $root.Values.validator.networkID "prater" }}
+            {{- if eq $root.Values.validator.type "prysm" }}
+            - "--prater"
+            {{- else if eq $root.Values.validator.type "lighthouse" }}
+            - "--network=prater"
             {{- end }}
           {{- end }}
           lifecycle:

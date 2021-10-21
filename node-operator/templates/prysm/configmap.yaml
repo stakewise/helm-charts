@@ -1,4 +1,4 @@
-{{- if and .Values.prysm.enabled .Values.prysm.prater -}}
+{{- if and .Values.prysm.enabled (eq .Values.prysm.networkID "prater") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

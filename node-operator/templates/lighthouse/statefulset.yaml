@@ -52,6 +52,7 @@ spec:
             - --http-address=0.0.0.0
             - --eth1-endpoints={{ .Values.lighthouse.eth1Endpoints | join "," }}
             - --datadir=/data
+            - --network={{ .Values.lighthouse.networkID }}
           {{- range .Values.lighthouse.extraFlags }}
             - {{ . | quote }}
           {{- end }}
