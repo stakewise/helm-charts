@@ -21,6 +21,10 @@ The versions required are:
     It is possible that this chart works with earlier versions but it is
     untested.
 
+## How it works
+
+![StakeWise Node Operator](http://url/to/img.png)
+
 ## Usage
 
 To install the latest version of this chart, add dependent helm repositories
@@ -38,7 +42,7 @@ $ helm upgrade --install node-operator ./operator/node-operator \
   --set key=value... 
 ```
 
-**Please see the many options supported in the `values.yaml` file.**
+**Please see the many options supported in the `values.yaml` file. And the prater testnet example configuration in the `values.example.yaml`**
 
 ## How to
 
