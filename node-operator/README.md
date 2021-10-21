@@ -215,6 +215,20 @@ Lastly, exit the `node-operator-vault-0` pod.
 $ exit
 ```
 
+## High Availability and Security Recommendations
+
+To ensure high availability and security of the operator's node infrastructure, we recommend the following things:
+
+1. Deploy at least 3 replicas of eth1 and eth2 nodes. Always use persistent storage for your eth1/eth2 nodes as re-syncing takes too long.
+1. Use a vault cluster of at least 3 nodes to ensure that keystors are available in the event of a validator restart. We also recommend setting up auto-unseal.
+1. **NEVER** share your vault token with anyone else, keep it as safe as possible.
+1. **NEVER** run 2 replicas of validators with the same keystores as you risk to be slashed.
+1. Always keep Kubernetes API in a private network and do not expose it outside.
+1. If possible, use a separate Kuberenetes cluster for the infrastructure of the operator's nodes.
+1. If possible, do not keep more than 1000 keystores in one Kubernetes cluster, use different regions / accounts for every 1000 keystore, thus improving security, resiliency and decentralization.
+1. Limit access to the Kubernetes cluster as much as possible for everyone except those who really need it.
+1. Do not use spot instances, because with frequent restarts of validators there is a risk of missing attestations.
+
 ## Documentation
 
 - https://geth.ethereum.org/docs/
