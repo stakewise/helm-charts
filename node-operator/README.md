@@ -5,7 +5,7 @@ you believe you have found a security issue in StakeWise Helm charts, _please re
 by contacting us at [security@stakewise.io](mailto:security@stakewise.io).
 
 This repository contains the official StakeWise Helm charts for installing
-and configuring Node Operator infrastructure on Kubernetes.
+and configuring large scale ETH staking infrastructure on top of the Kubernetes
 
 ## Prerequisites
 
