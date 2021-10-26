@@ -4,7 +4,6 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "operator.fullname" . }}-prysm-beacon
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
 spec:
   selector:

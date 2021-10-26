@@ -4,7 +4,6 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "operator.fullname" . }}-lighthouse-beacon
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
 spec:
   selector:

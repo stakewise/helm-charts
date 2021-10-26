@@ -4,7 +4,6 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "operator.fullname" . }}-geth
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
 spec:
   selector:

@@ -39,7 +39,7 @@ data:
 
     ## Vault init
     ##
-    with open('/var/run/secrets/kubernetes.io/serviceaccount/token', 'r'):
+    with open('/var/run/secrets/kubernetes.io/serviceaccount/token', 'r') as f:
         token = f.read()
     client   = hvac.Client(url=os.getenv("VAULT_ADDR"))
     response = client.auth.kubernetes.login(role=os.getenv("SERVICE_ACCOUNT"), jwt=token, )
