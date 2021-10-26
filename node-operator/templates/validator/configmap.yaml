@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "node-operator.fullname" . }}-validator-configs
+  name: {{ template "operator.fullname" . }}-validator-configs
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "validator.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep
@@ -20,9 +20,9 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "node-operator.fullname" . }}-validator-init
+  name: {{ template "operator.fullname" . }}-validator-init
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "validator.labels" . | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep

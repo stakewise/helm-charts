@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "node-operator.fullname" . }}-prysm-dashboard
+  name: {{ include "operator.fullname" . }}-prysm-dashboard
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
     grafana_dashboard: "1"
 data:

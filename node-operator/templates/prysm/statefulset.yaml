@@ -2,21 +2,21 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "node-operator.fullname" . }}-prysm-beacon
+  name: {{ template "operator.fullname" . }}-prysm-beacon
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "prysm-beacon.labels" . | nindent 6 }}
-  serviceName: {{ template "node-operator.fullname" . }}
+  serviceName: {{ template "operator.fullname" . }}
   replicas: {{ .Values.prysm.replicas }}
   template:
     metadata:
       labels:
-        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "operator.selectorLabels" . | nindent 8 }}
         {{- include "prysm-beacon.labels" . | nindent 8 }}
     spec:
     {{- with .Values.prysm.affinity }}
@@ -35,7 +35,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "node-operator.fullname" . }}
+      serviceAccountName: {{ template "operator.fullname" . }}
       priorityClassName: {{ .Values.prysm.priorityClassName | quote }}
       initContainers:
       {{- if and .Values.prysm.persistence.enabled .Values.prysm.initChownData }}
@@ -125,7 +125,7 @@ spec:
       {{- if eq .Values.prysm.networkID "prater" }}
         - name: scripts
           configMap:
-            name: {{ include "node-operator.fullname" . }}-prysm-prater
+            name: {{ include "operator.fullname" . }}-prysm-prater
       {{- end }}
 {{- if (not .Values.prysm.persistence.enabled) }}
         - name: data
@@ -135,7 +135,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "operator.labels" . | nindent 10 }}
           {{- include "prysm-beacon.labels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.prysm.persistence.accessModes }}

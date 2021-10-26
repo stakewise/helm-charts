@@ -1,8 +1,8 @@
-# Default values for node-operator.
+# Default values for operator.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Provide a name in place of node-operator for `app:` labels
+## Provide a name in place of operator for `app:` labels
 ##
 nameOverride: ""
 
@@ -543,7 +543,7 @@ prysm:
       ## e.g:
       ## rules:
       ##   - alert: PrysmBeaconNodeDown
-      ##     expr: up{job='{{ include "node-operator.fullname" . }}-prysm-beacon'} == 0
+      ##     expr: up{job='{{ include "operator.fullname" . }}-prysm-beacon'} == 0
       ##     for: 1m
       ##     labels:
       ##       severity: critical
@@ -567,7 +567,7 @@ prysm:
       ##       summary: Prysm beacon node participation rate less then 66%
       ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
       ##   - alert: PrysmBeaconNodeRestarted
-      ##     expr: (time()-process_start_time_seconds{job='{{ include "node-operator.fullname" . }}-prysm-beacon'})/3600 < 0.1
+      ##     expr: (time()-process_start_time_seconds{job='{{ include "operator.fullname" . }}-prysm-beacon'})/3600 < 0.1
       ##     for: 1m
       ##     labels:
       ##       severity: warning
@@ -762,7 +762,7 @@ lighthouse:
       ## e.g:
       ## rules:
       ##   - alert: LighthouseBeaconNodeDown
-      ##     expr: up{job='{{ include "node-operator.fullname" . }}-lighthouse-beacon'} == 0
+      ##     expr: up{job='{{ include "operator.fullname" . }}-lighthouse-beacon'} == 0
       ##     for: 1m
       ##     labels:
       ##       severity: critical
@@ -770,7 +770,7 @@ lighthouse:
       ##       summary: Lighthouse beacon node is down
       ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
       ##   - alert: LighthouseBeaconNodeRestarted
-      ##     expr: (time()-process_start_time_seconds{job="{{ include "node-operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
+      ##     expr: (time()-process_start_time_seconds{job="{{ include "operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
       ##     for: 1m
       ##     labels:
       ##       severity: warning
@@ -1027,7 +1027,7 @@ validator:
       ##         summary: Prysm validator hourly earning <= 0
       ##         description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
       ##     - alert: PrysmValidatorAlotOfErrorsLastHour
-      ##       expr: sum(delta(log_entries_total{job='{{ include "node-operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
+      ##       expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
       ##       for: 5m
       ##       labels:
       ##         severity: warning

@@ -2,21 +2,21 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "node-operator.fullname" . }}-geth
+  name: {{ template "operator.fullname" . }}-geth
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "geth.labels" . | nindent 6 }}
-  serviceName: {{ template "node-operator.fullname" . }}
+  serviceName: {{ template "operator.fullname" . }}
   replicas: {{ .Values.geth.replicas }}
   template:
     metadata:
       labels:
-        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "operator.selectorLabels" . | nindent 8 }}
         {{- include "geth.labels" . | nindent 8 }}
     spec:
     {{- with .Values.geth.affinity }}
@@ -35,7 +35,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "node-operator.fullname" . }}
+      serviceAccountName: {{ template "operator.fullname" . }}
       priorityClassName: {{ .Values.geth.priorityClassName | quote }}
       {{- if and .Values.geth.persistence.enabled .Values.geth.initChownData }}
       initContainers:
@@ -124,7 +124,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "operator.labels" . | nindent 10 }}
           {{- include "geth.labels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.geth.persistence.accessModes }}

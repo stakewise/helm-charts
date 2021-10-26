@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "node-operator.fullname" . }}-validator
+  name: {{ template "operator.fullname" . }}-validator
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "validator.labels" . | nindent 4 }}
 spec:
   selector:
-    {{- include "node-operator.selectorLabels" . | nindent 4 }}
+    {{- include "operator.selectorLabels" . | nindent 4 }}
     {{- include "validator.labels" . | nindent 4 }}
   type: ClusterIP
   ports:

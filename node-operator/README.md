@@ -42,8 +42,8 @@ $ helm repo add hashicorp https://helm.releases.hashicorp.com
 
 $ helm dependency update
 
-$ helm upgrade --install node-operator ./operator/node-operator \
-  --namepsace node-operator \
+$ helm upgrade --install operator ./node-operator \
+  --namepsace operator \
   --set geth.enabled=true \
   --set key=value... 
 ```
@@ -61,35 +61,35 @@ $ helm upgrade --install node-operator ./operator/node-operator \
 
 After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 
-Initialize and unseal `node-operator-vault-0` pod:
+Initialize and unseal `operator-vault-0` pod:
 
 ```console
-$ kubectl exec -ti node-operator-vault-0 -- vault operator init
-$ kubectl exec -ti node-operator-vault-0 -- vault operator unseal
+$ kubectl exec -ti operator-vault-0 -- vault operator init
+$ kubectl exec -ti operator-vault-0 -- vault operator unseal
 ```
 
 Join the remaining pods to the Raft cluster and unseal them. The pods will need to communicate directly so we'll configure the pods to use the internal service provided by the Helm chart:
 
 ```console
-$ kubectl exec -ti node-operator-vault-1 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
-$ kubectl exec -ti node-operator-vault-1 -- vault operator unseal
+$ kubectl exec -ti operator-vault-1 -- vault operator raft join http://operator-vault-0.operator-vault-internal:8200
+$ kubectl exec -ti operator-vault-1 -- vault operator unseal
 
-$ kubectl exec -ti node-operator-vault-2 -- vault operator raft join http://node-operator-vault-0.node-operator-vault-internal:8200
-$ kubectl exec -ti node-operator-vault-2 -- vault operator unseal
+$ kubectl exec -ti operator-vault-2 -- vault operator raft join http://operator-vault-0.operator-vault-internal:8200
+$ kubectl exec -ti operator-vault-2 -- vault operator unseal
 ```
 
 To verify if the Raft cluster has successfully been initialized, run the following.
 
-First, login using the root token on the `node-operator-vault-0` pod:
+First, login using the root token on the `operator-vault-0` pod:
 
 ```console
-$ kubectl exec -ti node-operator-vault-0 -- vault login
+$ kubectl exec -ti operator-vault-0 -- vault login
 ```
 
 Next, list all the raft peers:
 
 ```console
-$ kubectl exec -ti node-operator-vault-0 -- vault operator raft list-peers
+$ kubectl exec -ti operator-vault-0 -- vault operator raft list-peers
 
 Node                                    Address                        State       Voter
 ----                                    -------                        -----       -----
@@ -117,7 +117,7 @@ $ gcloud iam service-accounts keys create key-file \
 ```console
 $ kubectl create secret generic gcp-creds \
   --from-file=gcp-creds.json=./google-project-ID.json \
-  --namespace node-operator
+  --namespace operator
 ```
 
 3. Create keyring
@@ -182,10 +182,10 @@ vault:
 
 Vault provides a Kubernetes authentication method that enables clients to authenticate with a Kubernetes Service Account Token. The Kubernetes resources that access the secret and create the volume authenticate through this method through a role.
 
-First, start an interactive shell session on the `node-operator-vault-0` pod.
+First, start an interactive shell session on the `operator-vault-0` pod.
 
 ```console
-$ kubectl exec -ti node-operator-vault-0 -- sh
+$ kubectl exec -ti operator-vault-0 -- sh
 export VAULT_TOKEN=token
 ```
 
@@ -209,7 +209,7 @@ Success! Data written to: auth/kubernetes/config
 
 The `token_reviewer_jwt` and `kubernetes_ca_cert` files written to the container by Kubernetes. The variable `{{ KUBERNETES_PORT_443_TCP_ADDR }}` references the internal network address of the Kubernetes host and should be manually updated in the command above.
 
-Lastly, exit the `node-operator-vault-0` pod.
+Lastly, exit the `operator-vault-0` pod.
 
 ```console
 $ exit

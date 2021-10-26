@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "node-operator.fullname" . }}-geth-dashboard
+  name: {{ template "operator.fullname" . }}-geth-dashboard
   namespace: {{ .Release.Namespace | quote }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
     grafana_dashboard: "1"
 data:

@@ -2,15 +2,15 @@
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ template "node-operator.fullname" . }}-geth
+  name: {{ template "operator.fullname" . }}-geth
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
 spec:
   targetRef:
     apiVersion: "apps/v1"
     kind: StatefulSet
-    name: {{ template "node-operator.fullname" . }}-geth
+    name: {{ template "operator.fullname" . }}-geth
   updatePolicy:
     updateMode: {{ .Values.geth.verticalAutoscaler.updateMode | default "Off" | quote }}
   {{- if .Values.geth.verticalAutoscaler.containerPolicies }}

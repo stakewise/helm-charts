@@ -1,16 +1,16 @@
-{{- if and .Values.prysm.enabled .Values.prysm.enabled .Values.prysm.verticalAutoscaler.enabled }}
+{{- if and .Values.prysm.enabled .Values.prysm.verticalAutoscaler.enabled }}
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ template "beacon.fullname" . }}
-  namespace: {{ .Release.Namespace }}
+  name: {{ template "operator.fullname" . }}-prysm-beacon
   labels:
-    {{- include "beacon.labels" . | nindent 4 }}
+    {{- include "common.labels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
 spec:
   targetRef:
     apiVersion: "apps/v1"
     kind: StatefulSet
-    name: {{ template "beacon.fullname" . }}
+    name: {{ template "operator.fullname" . }}-prysm-beacon
   updatePolicy:
     updateMode: {{ .Values.prysm.verticalAutoscaler.updateMode | default "Off" | quote }}
   {{- if .Values.prysm.verticalAutoscaler.containerPolicies }}

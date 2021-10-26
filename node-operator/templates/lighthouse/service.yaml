@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  name: {{ template "operator.fullname" . }}-lighthouse-beacon
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
 {{- if and .Values.lighthouse.metrics.enabled .Values.lighthouse.metrics.svcAnnotations }}
   annotations:
@@ -12,7 +12,7 @@ metadata:
 {{- end }}
 spec:
   selector:
-    {{- include "node-operator.selectorLabels" . | nindent 4 }}
+    {{- include "operator.selectorLabels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
 {{- if .Values.lighthouse.sessionAffinity.enabled }}
   sessionAffinity: ClientIP

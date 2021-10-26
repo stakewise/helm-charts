@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "node-operator.fullname" . }}-validator
+  name: {{ template "operator.fullname" . }}-validator
   {{- if .Values.validator.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.validator.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "validator.labels" . | nindent 4 }}
     {{- if .Values.validator.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.validator.metrics.serviceMonitor.additionalLabels | nindent 4 }}
@@ -38,6 +38,6 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "validator.labels" . | nindent 6 }}
 {{- end }}

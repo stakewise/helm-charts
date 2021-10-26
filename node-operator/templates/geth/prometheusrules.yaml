@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "node-operator.fullname" . }}-geth
+  name: {{ include "operator.fullname" . }}-geth
   {{- if .Values.geth.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.geth.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
     {{- if .Values.geth.metrics.prometheusRule.additionalLabels }}
     {{- toYaml .Values.geth.metrics.prometheusRule.additionalLabels | nindent 4 }}
@@ -17,7 +17,7 @@ metadata:
 spec:
   {{- with .Values.geth.metrics.prometheusRule.rules }}
   groups:
-    - name: {{ template "node-operator.fullname" $ }}-geth
+    - name: {{ template "operator.fullname" $ }}-geth
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
 {{- end }}

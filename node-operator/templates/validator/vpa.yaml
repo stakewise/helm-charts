@@ -5,15 +5,15 @@
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ template "node-operator.fullname" $root }}-validator{{.}}
+  name: {{ template "operator.fullname" $root }}-validator{{.}}
   labels:
-    {{- include "node-operator.labels" $root | nindent 4 }}
+    {{- include "operator.labels" $root | nindent 4 }}
     {{- include "validator.labels" $root | nindent 4 }}
 spec:
   targetRef:
     apiVersion: "apps/v1"
     kind: StatefulSet
-    name: {{ template "node-operator.fullname" $root }}-validator-{{.}}
+    name: {{ template "operator.fullname" $root }}-validator-{{.}}
   updatePolicy:
     updateMode: {{ $root.Values.validator.verticalAutoscaler.updateMode | default "Off" | quote }}
   {{- if $root.Values.validator.verticalAutoscaler.containerPolicies }}

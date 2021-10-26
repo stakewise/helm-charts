@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  name: {{ template "operator.fullname" . }}-lighthouse-beacon
   {{- if .Values.lighthouse.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.lighthouse.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
     {{- if .Values.lighthouse.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.lighthouse.metrics.serviceMonitor.additionalLabels | nindent 4 }}
@@ -38,6 +38,6 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "lighthouse-beacon.labels" . | nindent 6 }}
 {{- end }}

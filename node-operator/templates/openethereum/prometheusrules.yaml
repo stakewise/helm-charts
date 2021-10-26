@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "node-operator.fullname" . }}-openethereum
+  name: {{ include "operator.fullname" . }}-openethereum
   {{- if .Values.openethereum.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.openethereum.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "openethereum.labels" . | nindent 4 }}
     {{- if .Values.openethereum.metrics.prometheusRule.additionalLabels }}
     {{- toYaml .Values.openethereum.metrics.prometheusRule.additionalLabels | nindent 4 }}
@@ -17,7 +17,7 @@ metadata:
 spec:
   {{- with .Values.openethereum.metrics.prometheusRule.rules }}
   groups:
-    - name: {{ template "node-operator.fullname" $ }}-openethereum
+    - name: {{ template "operator.fullname" $ }}-openethereum
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
 {{- end }}

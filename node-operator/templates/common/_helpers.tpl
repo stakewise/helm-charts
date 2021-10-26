@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "node-operator.name" -}}
+{{- define "operator.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "node-operator.fullname" -}}
+{{- define "operator.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "node-operator.chart" -}}
+{{- define "operator.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "node-operator.labels" -}}
-helm.sh/chart: {{ include "node-operator.chart" . }}
-{{ include "node-operator.selectorLabels" . }}
+{{- define "operator.labels" -}}
+helm.sh/chart: {{ include "operator.chart" . }}
+{{ include "operator.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -55,17 +55,17 @@ Additional components labels
 {{/*
 Selector labels
 */}}
-{{- define "node-operator.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "node-operator.name" . }}
+{{- define "operator.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "operator.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "node-operator.serviceAccountName" -}}
+{{- define "operator.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "node-operator.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "operator.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -98,9 +98,9 @@ Validator beacon node
 {{- end }}
 {{- else }}
 {{- if eq $.Values.validator.type "prysm" }}
-- "--beacon-rpc-provider={{ template "node-operator.fullname" $ }}-prysm-beacon:4000"
+- "--beacon-rpc-provider={{ template "operator.fullname" $ }}-prysm-beacon:4000"
 {{- else if eq $.Values.validator.type "lighthouse" }}
-- "--beacon-nodes=http://{{ template "node-operator.fullname" $ }}-lighthouse-beacon:5052"
+- "--beacon-nodes=http://{{ template "operator.fullname" $ }}-lighthouse-beacon:5052"
 {{- end }}
 {{- end }}
 {{- end }}

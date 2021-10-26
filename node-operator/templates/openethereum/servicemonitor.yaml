@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "node-operator.fullname" . }}-openethereum
+  name: {{ include "operator.fullname" . }}-openethereum
   {{- if .Values.openethereum.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.openethereum.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "openethereum.labels" . | nindent 4 }}
     {{- if .Values.openethereum.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.openethereum.metrics.serviceMonitor.additionalLabels | nindent 4 }}
@@ -38,6 +38,6 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "openethereum.labels" . | nindent 6 }}
 {{- end }}

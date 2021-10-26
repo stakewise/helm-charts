@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ template "node-operator.fullname" . }}-prysm-beacon
+  name: {{ template "operator.fullname" . }}-prysm-beacon
   {{- if .Values.prysm.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.prysm.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "prysm-beacon.labels" . | nindent 4 }}
     {{- if .Values.prysm.metrics.prometheusRule.additionalLabels }}
     {{- toYaml .Values.prysm.metrics.prometheusRule.additionalLabels | nindent 4 }}
@@ -17,7 +17,7 @@ metadata:
 spec:
   {{- with .Values.prysm.metrics.prometheusRule.rules }}
   groups:
-    - name: {{ template "node-operator.fullname" $ }}-prysm-beacon
+    - name: {{ template "operator.fullname" $ }}-prysm-beacon
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
 {{- end }}

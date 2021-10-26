@@ -2,9 +2,9 @@
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "node-operator.fullname" . }}-geth
+  name: {{ template "operator.fullname" . }}-geth
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "geth.labels" . | nindent 4 }}
 spec:
 {{- if .Values.geth.podDisruptionBudget.minAvailable }}
@@ -15,6 +15,6 @@ spec:
 {{- end }}
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "geth.labels" . | nindent 6 }}
 {{- end }}

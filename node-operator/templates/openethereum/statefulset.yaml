@@ -3,21 +3,21 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "node-operator.fullname" . }}-openethereum
+  name: {{ template "operator.fullname" . }}-openethereum
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "openethereum.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "openethereum.labels" . | nindent 6 }}
-  serviceName: {{ template "node-operator.fullname" . }}
+  serviceName: {{ template "operator.fullname" . }}
   replicas: {{ .Values.openethereum.replicas }}
   template:
     metadata:
       labels:
-        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "operator.selectorLabels" . | nindent 8 }}
         {{- include "openethereum.labels" . | nindent 8 }}
     spec:
     {{- with .Values.openethereum.affinity }}
@@ -36,7 +36,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "node-operator.fullname" . }}
+      serviceAccountName: {{ template "operator.fullname" . }}
       priorityClassName: {{ .Values.openethereum.priorityClassName | quote }}
       {{- if and .Values.openethereum.persistence.enabled .Values.openethereum.initChownData }}
       initContainers:
@@ -127,7 +127,7 @@ spec:
       volumes:
         - name: scripts
           configMap:
-            name: {{ include "node-operator.fullname" . }}-openethereum
+            name: {{ include "operator.fullname" . }}-openethereum
 {{- if (not .Values.openethereum.persistence.enabled) }}
         - name: data
           emptyDir: {}
@@ -136,7 +136,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "operator.labels" . | nindent 10 }}
           {{- include "openethereum.labels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.openethereum.persistence.accessModes }}

@@ -2,21 +2,21 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "node-operator.fullname" . }}-lighthouse-beacon
+  name: {{ template "operator.fullname" . }}-lighthouse-beacon
   labels:
-    {{- include "node-operator.labels" . | nindent 4 }}
+    {{- include "operator.labels" . | nindent 4 }}
     {{- include "lighthouse-beacon.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "node-operator.selectorLabels" . | nindent 6 }}
+      {{- include "operator.selectorLabels" . | nindent 6 }}
       {{- include "lighthouse-beacon.labels" . | nindent 6 }}
-  serviceName: {{ template "node-operator.fullname" . }}
+  serviceName: {{ template "operator.fullname" . }}
   replicas: {{ .Values.lighthouse.replicas }}
   template:
     metadata:
       labels:
-        {{- include "node-operator.selectorLabels" . | nindent 8 }}
+        {{- include "operator.selectorLabels" . | nindent 8 }}
         {{- include "lighthouse-beacon.labels" . | nindent 8 }}
     spec:
     {{- with .Values.lighthouse.affinity }}
@@ -35,7 +35,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "node-operator.fullname" . }}
+      serviceAccountName: {{ template "operator.fullname" . }}
       priorityClassName: {{ .Values.lighthouse.priorityClassName | quote }}
       {{- if and .Values.lighthouse.persistence.enabled .Values.lighthouse.initChownData }}
       initContainers:
@@ -102,7 +102,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "node-operator.labels" . | nindent 10 }}
+          {{- include "operator.labels" . | nindent 10 }}
           {{- include "lighthouse-beacon.labels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.lighthouse.persistence.accessModes }}
