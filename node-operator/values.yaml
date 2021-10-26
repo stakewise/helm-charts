@@ -46,7 +46,7 @@ initImage:
 ## ref: https://geth.ethereum.org/docs/
 ##
 geth:
-  enabled: false
+  enabled: true
 
   ## Geth image version
   ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
@@ -234,7 +234,7 @@ geth:
 ## ref: https://openethereum.github.io/
 ##
 openethereum:
-  enabled: false
+  enabled: true
 
   ## Openethereum image version
   ## ref: https://hub.docker.com/r/openethereum/openethereum
@@ -247,7 +247,7 @@ openethereum:
 
   ## How many geth nodes to run simultaneously
   ##
-  replicas: 3
+  replicas: 1
 
   ## Configure pod disruption budgets for Alertmanager
   ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -413,7 +413,7 @@ openethereum:
 ## ref: https://docs.prylabs.network/docs/getting-started/
 ##
 prysm:
-  enabled: false
+  enabled: true
 
   ## How many beacon chain pods to run simultaneously
   ##
@@ -641,11 +641,11 @@ prysm:
 ## ref: https://lighthouse-book.sigmaprime.io/
 ##
 lighthouse:
-  enabled: false
+  enabled: true
 
   ## How many beacon chain pods to run simultaneously
   ##
-  replicas: 3
+  replicas: 1
 
   ## Lighthouse beacon node image version
   ## ref: https://hub.docker.com/r/sigp/lighthouse
