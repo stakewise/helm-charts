@@ -72,6 +72,7 @@ prysm:
     # Beacon chain options
     - "--accept-terms-of-use"
     - "--http-web3provider=http://operator-geth:8545"
+    - "--fallback-web3provider=http://operator-openethereum:8545"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
