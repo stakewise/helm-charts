@@ -43,7 +43,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "node-operator.fullname" $root }}
+      serviceAccountName: "validator{{.}}"
       priorityClassName: {{ $root.Values.validator.priorityClassName | quote }}
       initContainers:
         - name: init-validator
@@ -59,11 +59,13 @@ spec:
             - name: VAULT_ADDR
               value: "http://{{ template "node-operator.fullname" $ }}-vault:8200"
             - name: NETWORK_ID
-              value: {{ $root.Values.validator.networkID }}
+              value: {{ $root.Values.validator.networkID | quote }}
             - name: VALIDATOR_ID
               value: {{ . | quote }}
             - name: VALIDATOR_TYPE
-              value: {{ $root.Values.validator.type }}
+              value: {{ $root.Values.validator.type | quote }}
+            - name: SERVICE_ACCOUNT
+              value: "validator{{.}}"
           volumeMounts:
             - name: data
               mountPath: /data

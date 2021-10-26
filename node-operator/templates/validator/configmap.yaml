@@ -42,7 +42,7 @@ data:
     f = open('/var/run/secrets/kubernetes.io/serviceaccount/token')
     token = f.read()
     client   = hvac.Client(url=os.getenv("VAULT_ADDR"))
-    response = client.auth.kubernetes.login(role="node-operator", jwt=token, )
+    response = client.auth.kubernetes.login(role=os.getenv("SERVICE_ACCOUNT"), jwt=token, )
 
     vault_base = "/vault/"
     vault_keystores = vault_base + "keystores"
@@ -56,7 +56,7 @@ data:
 
     def secrets_init():
         # Write kyestores and password
-        keystores_data = client.secrets.kv.v1.read_secret(path="keystore", mount_point=secret_path)
+        keystores_data = client.secrets.kv.v1.read_secret(path="keystores", mount_point=secret_path)
         keystores_password = client.secrets.kv.v1.read_secret(path="password", mount_point=secret_path)
         try:
             if os.path.isdir(vault_base):
@@ -96,8 +96,8 @@ data:
                 "--account-password-file=" + vault_keystores_password + "/password.txt",
                 "--wallet-dir=" + data_prysm_validators,
                 "--wallet-password-file=" + vault_keystores_password + "/password.txt",
-                "--accept-terms-of-use",
                 "--"+os.getenv("NETWORK_ID", "mainnet"),
+                "--accept-terms-of-use"
             ])
             shutil.copyfile(vault_keystores_password + "/password.txt", data_prysm_validators + "/password.txt")
         elif validator == "lighthouse":

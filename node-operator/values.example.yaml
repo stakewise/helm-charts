@@ -118,7 +118,7 @@ validator:
   verticalAutoscaler:
     enabled: true
   validatorsCount: 1
-  type: lighthouse
+  type: prysm
   graffiti: "StakeWise"
   publicKey: ""
   networkID: "prater"
