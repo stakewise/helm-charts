@@ -136,11 +136,6 @@ validator:
       - ReadWriteOnce
     size: 10Gi
 
-## CSI driver configuration
-##
-csi:
-  enabled: false
-
 ## Hashicorp Vault configurations
 ##
 vault:
