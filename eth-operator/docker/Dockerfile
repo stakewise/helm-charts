@@ -6,7 +6,7 @@ ENV LIGHTHOUSE_VALIDATOR_VERSION=2.0.1
 ENV HVAC_VERSION=0.11.2
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install curl unzip python3-pip -y && rm -rf /var/apt/cache && pip3 install hvac==${HVAC_VERSION}}
+RUN apt update && apt install curl unzip python3-pip -y && rm -rf /var/apt/cache && pip3 install hvac==${HVAC_VERSION}
 
 RUN echo " ---> Install vault CLI" && \
     curl -sSLO "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip" && \
@@ -28,4 +28,8 @@ RUN echo " ---> Install lighthouse validator" && \
     rm -f lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-x86_64-unknown-linux-gnu-portable.tar.gz && \
     chmod +x /usr/local/bin/lighthouse-validator
 
-CMD ["/bin/sh"]
+RUN rm -f /usr/bin/*sh* /usr/bin/*cat* /usr/bin/*less* /usr/bin/*grep* \
+          /usr/bin/*more* /usr/bin/*sed* /usr/bin/*ls* /usr/bin/*head* \
+          /usr/bin/*diff* /usr/bin/awk /usr/bin/*apt*
+
+CMD ["/usr/bin/python3.9", "/data/scripts/validator-init.py"]

@@ -50,10 +50,6 @@ spec:
           imagePullPolicy: {{ $root.Values.validator.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
-          command: [
-            '/usr/bin/python3',
-            '/data/scripts/validator-init.py'
-          ]
           env:
             - name: VAULT_ADDR
               value: "http://{{ template "operator.fullname" $ }}-vault:8200"
