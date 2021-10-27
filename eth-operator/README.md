@@ -23,11 +23,11 @@ The versions required are:
 
 ## How it works
 
-![StakeWise Node Operator](https://github.com/stakewise/helm-charts/raw/operator-package/node-operator/img/scheme.png)
+![StakeWise Eth Operator](https://github.com/stakewise/helm-charts/raw/operator-package/eth-operator/img/scheme.png)
 
 **Explanation of the schema**
 
-`node-operator` chart deploys two types of eth1 nodes and two types of eth2 beacon nodes to allow migration between different types of validators. Depending on the parameters which you specify in the `values.yaml` eth2 beacon nodes can work with either geth or openethereum eth1 nodes, but validators always should point to only own type of beacon node, if validator have `type: prysm` it should point to Prysm beacon node and to Lighthouse beacon node if `type: lighthouse`.
+`eth-operator` chart deploys two types of eth1 nodes and two types of eth2 beacon nodes to allow migration between different types of validators. By default, the working pair of the beacon node / validator is Prysm, so 3 prysm beacon nodes are deployed and 1 lighthouse beacon node which will serve as a hot standby. Depending on the parameters which you specify in the `values.yaml` eth2 beacon nodes can work with either geth or openethereum eth1 nodes (default = geth), but validators always should point to only own type of beacon node, if validator have `type: prysm` it should point to Prysm beacon node and to Lighthouse beacon node if `type: lighthouse`.
 
 The validator's statefulset, in addition to the validator pod, contains several init containers in which all the "magic" takes place to ensure the normal operation of the validator. In the init containers, the validator's keystors and passwords are received from HashiCorp Vault and imported into the validator's wallet, as well as the slashing history import if necessary.
 
@@ -42,7 +42,7 @@ $ helm repo add hashicorp https://helm.releases.hashicorp.com
 
 $ helm dependency update
 
-$ helm upgrade --install operator ./node-operator \
+$ helm upgrade --install operator ./eth-operator \
   --namepsace operator \
   --set geth.enabled=true \
   --set key=value... 
