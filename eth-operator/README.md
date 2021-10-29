@@ -58,7 +58,7 @@ $ helm upgrade --install operator ./operator \
 
 ## How to
 
-1. Install helm chart with eth1 nodes `geth` and `openethereum` enabled. Wait until eth1 nodes fully synced.
+1. Install helm chart with only ETH1 nodes enabled (`geth` and `openethereum` sections in the `values.yaml` file). Wait until ETH1 nodes are fully synced.
 1. Upgrade installation with eth2 nodes `prysm` and `lighthouse` enabled. Wait until eth2 nodes fully synced.
 1. Upgrade installation with vault enabled and configured (instruction below).
 1. Upgrade installation with validators enabled;
