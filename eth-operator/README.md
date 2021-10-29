@@ -27,7 +27,11 @@ The versions required are:
 
 **Explanation of the schema**
 
-`eth-operator` chart deploys two types of eth1 nodes and two types of eth2 beacon nodes to allow migration between different types of validators. By default, the working pair of the beacon node / validator is Prysm, so 3 prysm beacon nodes are deployed and 1 lighthouse beacon node which will serve as a hot standby. Depending on the parameters which you specify in the `values.yaml` eth2 beacon nodes can work with either geth or openethereum eth1 nodes (default = geth), but validators always should point to only own type of beacon node, if validator have `type: prysm` it should point to Prysm beacon node and to Lighthouse beacon node if `type: lighthouse`.
+`operator` chart is capable of deploying different ETH1 and ETH2 clients and allows seamless migration of the validators from one client to another while preserving the slashing database. By default, the chart deploys three instances of Prysm ETH2 nodes and one instance of Lighthouse ETH2 node which will serve as hot standby so that Prysm validators can migrate to Lighthouse without waiting for the ETH2 node to sync the chain. 
+
+As the ETH2 node requires connection to the ETH1 node, the chart deploys by default two instances of the Geth clients and one instance of the OpenEthereum client that will also serve as a hot standby in case of the Geth client failure.
+
+It's also possible to choose the ETH1 client. Currently, Geth (default) and OpenEthereum are supported. 
 
 The validator's statefulset, in addition to the validator pod, contains several init containers in which all the "magic" takes place to ensure the normal operation of the validator. In the init containers, the validator's keystors and passwords are received from HashiCorp Vault and imported into the validator's wallet, as well as the slashing history import if necessary.
 
