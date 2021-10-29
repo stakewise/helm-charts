@@ -33,7 +33,9 @@ As the ETH2 node requires connection to the ETH1 node, the chart deploys by defa
 
 It's also possible to choose the ETH1 client. Currently, Geth (default) and OpenEthereum are supported. 
 
-The validator's statefulset, in addition to the validator pod, contains several init containers in which all the "magic" takes place to ensure the normal operation of the validator. In the init containers, the validator's keystors and passwords are received from HashiCorp Vault and imported into the validator's wallet, as well as the slashing history import if necessary.
+The validator's POD contains several init containers that take care of the slashing database migration to the right format and ensuring the keys can be read by the validator client.
+
+The validator keys are stored in the HashiCorp Vault and every validator client can only fetch the keys that are supposed to be hosted by it.
 
 ## Usage
 
