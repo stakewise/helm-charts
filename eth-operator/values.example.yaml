@@ -168,7 +168,7 @@ vault:
           }
           service_registration "kubernetes" {}
           seal "gcpckms" {
-             project     = "stakewise-staing"
+             project     = "stakewise-staging"
              region      = "global"
              key_ring    = "operator"
              crypto_key  = "vault"
