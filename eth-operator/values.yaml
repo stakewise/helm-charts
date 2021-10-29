@@ -929,7 +929,6 @@ validator:
       - "--accept-terms-of-use"
       - "--disable-rewards-penalties-logging"
       - "--disable-account-metrics"
-      - "--attest-timely"
       - "--enable-doppelganger"
     lighthouse:
       - "lighthouse"
