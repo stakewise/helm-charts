@@ -106,7 +106,7 @@ e6876c97-aaaa-a92e-b99a-0aafab105745    vault-1.vault-internal:8201    follower 
 
 Vault with integrated storage (Raft) is now ready to use!
 
-### Vault Auto Unseal
+### Vault Auto Unseal (GCP)
 
 1. Create Google Service Account and Download JSON
 
