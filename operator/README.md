@@ -23,11 +23,11 @@ The versions required are:
 
 ## How it works
 
-![StakeWise Eth Operator](https://github.com/stakewise/helm-charts/raw/operator-package/eth-operator/img/scheme.png)
+![operator architecture](https://github.com/stakewise/helm-charts/raw/operator-package/operator/img/scheme.png)
 
 **Explanation of the schema**
 
-`operator` chart is capable of deploying different ETH1 and ETH2 clients and allows seamless migration of the validators from one client to another while preserving the slashing database. By default, the chart deploys three instances of Prysm ETH2 nodes and one instance of Lighthouse ETH2 node which will serve as hot standby so that Prysm validators can migrate to Lighthouse without waiting for the ETH2 node to sync the chain. 
+`operator` chart is capable of deploying different ETH1 and ETH2 clients and allows seamless migration of the validators from one client to another while preserving the slashing database. By default, the chart deploys three instances of Prysm ETH2 nodes and one instance of Lighthouse ETH2 node which will serve as hot standby so that Prysm validators can migrate to Lighthouse without waiting for the ETH2 node to sync the chain.  
 
 As the ETH2 node requires connection to the ETH1 node, the chart deploys by default two instances of the Geth clients and one instance of the OpenEthereum client that will also serve as a hot standby in case of the Geth client failure.
 
@@ -59,7 +59,7 @@ $ helm upgrade --install operator ./operator \
 ## How to
 
 1. Install helm chart with only ETH1 nodes enabled (`geth` and `openethereum` sections in the `values.yaml` file). Wait until ETH1 nodes are fully synced.
-1. Upgrade installation with eth2 nodes `prysm` and `lighthouse` enabled. Wait until eth2 nodes fully synced.
+1. Upgrade installation with ETH2 nodes enabled (`prysm` and `lighthouse`). Wait until ETH2 nodes are fully synced.
 1. Upgrade installation with vault enabled and configured (instruction below).
 1. Upgrade installation with validators enabled;
 
