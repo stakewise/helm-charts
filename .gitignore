@@ -6,4 +6,3 @@
 # ignore testing files
 **/override.yaml
 
-!operator/charts
