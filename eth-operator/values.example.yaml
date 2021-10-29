@@ -170,7 +170,7 @@ vault:
           seal "gcpckms" {
              project     = "stakewise-staing"
              region      = "global"
-             key_ring    = "node-operator"
+             key_ring    = "operator"
              crypto_key  = "vault"
           }
     extraEnvironmentVars:
