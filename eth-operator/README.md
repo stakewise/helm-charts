@@ -52,7 +52,7 @@ $ helm upgrade --install operator ./operator \
   --set key=value... 
 ```
 
-**Please see the many options supported in the `values.yaml` file. And the prater testnet example configuration in the `values.example.yaml`**
+**Please see the options supported in the `values.yaml` file. And the prater testnet example configuration in the `values.example.yaml`**
 
 ## How to
 
