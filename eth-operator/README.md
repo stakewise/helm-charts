@@ -46,7 +46,7 @@ $ helm repo add hashicorp https://helm.releases.hashicorp.com
 
 $ helm dependency update
 
-$ helm upgrade --install operator ./eth-operator \
+$ helm upgrade --install operator ./operator \
   --namepsace operator \
   --set geth.enabled=true \
   --set key=value... 
