@@ -863,6 +863,7 @@ validator:
     prysm:
       repository: "gcr.io/prysmaticlabs/prysm/validator"
       tag: "v2.0.1"
+      tagDebug: "HEAD-6b7b30-debug"
     lighthouse:
       repository: "sigp/lighthouse"
       tag: "v2.0.1"
@@ -871,7 +872,7 @@ validator:
   ##
   initImage:
     repository: "unxnn/validator-init"
-    tag: "v2.0.1"
+    tag: "stable"
     pullPolicy: IfNotPresent
   
   terminationGracePeriodSeconds: 900
@@ -913,6 +914,14 @@ validator:
     enabled: false
     updateMode: Off
     containerPolicies: { }
+  
+  ## Base directories and files
+  ##
+  paths:
+    vaultBase: /data/vault/
+    vaultKeystores: /data/vault/keystores
+    vaultPassword: /data/vault/password
+    slashingProtectionFile: /data/slashing_protection.json
   
   ## Network ID
   ## Options: mainnet, prater

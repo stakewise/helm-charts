@@ -53,6 +53,12 @@ spec:
           env:
             - name: VAULT_ADDR
               value: "http://{{ template "operator.fullname" $ }}-vault:8200"
+            - name: VAULT_BASE
+              value: {{ $root.Values.validator.paths.vaultBase | quote }}
+            - name: VAULT_KEYSTORES
+              value: {{ $root.Values.validator.paths.vaultKeystores | quote }}
+            - name: VAULT_PASSWORD
+              value: {{ $root.Values.validator.paths.vaultPassword | quote }}
             - name: NETWORK_ID
               value: {{ $root.Values.validator.networkID | quote }}
             - name: VALIDATOR_ID
@@ -68,6 +74,36 @@ spec:
               mountPath: "/mnt/configs"
             - name: validator-init
               mountPath: /data/scripts
+        - name: init-validator-import
+          {{- if eq $root.Values.validator.type "prysm" }}
+          image: "{{ (pluck $root.Values.validator.type $root.Values.validator.image | first ).repository }}:{{ $root.Values.validator.image.prysm.tagDebug }}"
+          {{- else if  eq $root.Values.validator.type "lighthouse" }}
+          image: "{{ (pluck $root.Values.validator.type $root.Values.validator.image | first ).repository }}:{{ (pluck $root.Values.validator.type $root.Values.validator.image | first ).tag }}"
+          {{- end }}
+          imagePullPolicy: {{ $root.Values.validator.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["sh"]
+          args:
+            - -c
+            {{- if eq $root.Values.validator.type "prysm" }}
+            - >-
+                /app/cmd/validator/validator.runfiles/prysm/cmd/validator/validator_/validator accounts import --keys-dir={{ $root.Values.validator.paths.vaultKeystores }} --account-password-file={{ $root.Values.validator.paths.vaultPassword }}/password.txt --wallet-dir=/data/prysm/validators --wallet-password-file={{ $root.Values.validator.paths.vaultPassword }}/password.txt --${NETWORK_ID:-mainnet} --accept-terms-of-use &&
+                cp {{ $root.Values.validator.paths.vaultPassword }}/password.txt /data/prysm/validators/ &&
+                rm -rf /data/vault &&
+                test -f {{ $root.Values.validator.paths.slashingProtectionFile }} && touch /data/prysm/validator.db && /app/cmd/validator/validator.runfiles/prysm/cmd/validator/validator_/validator slashing-protection import --datadir=/data/prysm --slashing-protection-json-file={{ $root.Values.validator.paths.slashingProtectionFile }} --${NETWORK_ID:-mainnet} || true
+            {{- else if  eq $root.Values.validator.type "lighthouse" }}
+            - >-
+                /usr/local/bin/lighthouse --network ${NETWORK_ID:-mainnet} account validator import --datadir=/data/lighthouse --reuse-password  --password-file={{ $root.Values.validator.paths.vaultPassword }}/password.txt --directory={{ $root.Values.validator.paths.vaultKeystores }} &&
+                rm -rf /data/vault &&
+                test -f {{ $root.Values.validator.paths.slashingProtectionFile }} && /usr/local/bin/lighthouse account validator slashing-protection import {{ $root.Values.validator.paths.slashingProtectionFile }} --accept-terms-of-use --datadir=/data/lighthouse --network=${NETWORK_ID:-mainnet} || true
+            {{- end }}
+          env:
+            - name: NETWORK_ID
+              value: {{ $root.Values.validator.networkID | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
       {{- if and $.Values.validator.persistence.enabled $.Values.validator.initChownData }}
         {{- include "init-chown" $root | nindent 8 }}
       {{- end }}
@@ -111,7 +147,7 @@ spec:
                 command: [
                   "/bin/sh",
                   "-c",
-                  "sleep 10 && lighthouse account validator slashing-protection export /data/slashing_protection.json --datadir=/data/lighthouse"
+                  "sleep 10 && lighthouse account validator slashing-protection export {{ $root.Values.validator.paths.slashingProtectionFile }} --datadir=/data/lighthouse"
                 ]
                 {{- end }}
         {{- if $root.Values.validator.metrics.enabled }}
