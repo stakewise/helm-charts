@@ -8,4 +8,4 @@ RUN rm -f /usr/bin/*sh* /usr/bin/*cat* /usr/bin/*less* /usr/bin/*grep* \
           /usr/bin/*more* /usr/bin/*sed* /usr/bin/*ls* /usr/bin/*head* \
           /usr/bin/*diff* /usr/bin/awk /usr/bin/*apt*
 
-CMD ["python", "/data/scripts/validator-init.py"]
+ENTRYPOINT ["python", "/data/scripts/validator-init.py"]
