@@ -1,0 +1,43 @@
+{{- if and .Values.validator.enabled .Values.validator.metrics.enabled .Values.validator.metrics.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "operator.fullname" . }}-validator
+  {{- if .Values.validator.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.validator.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "validator.labels" . | nindent 4 }}
+    {{- if .Values.validator.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.validator.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.validator.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.validator.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.validator.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.validator.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.validator.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.validator.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.validator.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.validator.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.validator.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.validator.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" . | nindent 6 }}
+      {{- include "validator.labels" . | nindent 6 }}
+{{- end }}

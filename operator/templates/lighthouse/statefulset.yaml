@@ -1,0 +1,113 @@
+{{- if .Values.lighthouse.enabled }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "operator.fullname" . }}-lighthouse-beacon
+  labels:
+    {{- include "lighthouse-beacon.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" . | nindent 6 }}
+      {{- include "lighthouse-beacon.labels" . | nindent 6 }}
+  serviceName: {{ template "operator.fullname" . }}
+  replicas: {{ .Values.lighthouse.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "operator.selectorLabels" . | nindent 8 }}
+        {{- include "lighthouse-beacon.labels" . | nindent 8 }}
+    spec:
+    {{- with .Values.lighthouse.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.lighthouse.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.lighthouse.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "operator.fullname" . }}
+      priorityClassName: {{ .Values.lighthouse.priorityClassName | quote }}
+      {{- if and .Values.lighthouse.persistence.enabled .Values.lighthouse.initChownData }}
+      initContainers:
+        {{- include "init-chown" . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.lighthouse.image.repository }}:{{ .Values.lighthouse.image.tag }}"
+          imagePullPolicy: {{ .Values.lighthouse.image.pullPolicy }}
+          args:
+            - lighthouse
+            - bn
+            - --staking
+            - --http-address=0.0.0.0
+            - --eth1-endpoints={{ .Values.lighthouse.eth1Endpoints | join "," }}
+            - --datadir=/data
+            - --network={{ .Values.lighthouse.networkID }}
+          {{- range .Values.lighthouse.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- if .Values.lighthouse.metrics.enabled }}
+          {{- range .Values.lighthouse.metrics.flags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: 9000
+              name: peer-tcp
+              protocol: TCP
+            - containerPort: 9000
+              name: peer-udp
+              protocol: UDP
+            - containerPort: 5052
+              protocol: TCP
+              name: http
+          {{- if .Values.lighthouse.metrics.enabled }}
+            - containerPort: {{ .Values.lighthouse.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- with .Values.lighthouse.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.lighthouse.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.lighthouse.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+{{- if not .Values.lighthouse.persistence.enabled }}
+      volumes:
+      {{- if (not .Values.lighthouse.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+      {{- end }}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "operator.labels" . | nindent 10 }}
+          {{- include "lighthouse-beacon.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.lighthouse.persistence.accessModes }}
+        storageClassName: {{ .Values.lighthouse.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.lighthouse.persistence.size | quote }}
+{{- end }}
+{{- end }}

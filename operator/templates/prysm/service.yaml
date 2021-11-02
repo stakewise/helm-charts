@@ -1,0 +1,36 @@
+{{- if and .Values.prysm.enabled .Values.prysm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "operator.fullname" . }}-prysm-beacon
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
+{{- if and .Values.prysm.metrics.enabled .Values.prysm.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.prysm.metrics.svcAnnotations | nindent 4 | trim }}
+{{- end }}
+spec:
+  selector:
+    {{- include "operator.selectorLabels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
+{{- if .Values.prysm.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.prysm.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+{{- if .Values.prysm.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  ports:
+    - name: grpc
+      port: 4000
+      targetPort: grpc
+  {{- if .Values.prysm.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.prysm.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}

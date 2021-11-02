@@ -1,0 +1,37 @@
+{{- if and .Values.geth.enabled (or .Values.geth.rpc.enabled .Values.geth.ws.enabled) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "operator.fullname" . }}-geth
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "geth.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "operator.selectorLabels" . | nindent 4 }}
+    {{- include "geth.labels" . | nindent 4 }}
+{{- if .Values.geth.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.geth.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+  ports:
+  {{- if .Values.geth.rpc.enabled }}
+    - name: rpc
+      port: 8545
+      targetPort: rpc
+  {{- end }}
+  {{- if .Values.geth.ws.enabled }}
+    - name: ws
+      port: 8546
+      targetPort: ws
+  {{- end }}
+  {{- if .Values.geth.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.geth.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}
+

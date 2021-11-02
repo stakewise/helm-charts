@@ -1,0 +1,21 @@
+{{- if and .Values.openethereum.enabled .Values.openethereum.verticalAutoscaler.enabled }}
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "operator.fullname" . }}-openethereum
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "openethereum.labels" . | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "operator.fullname" . }}-openethereum
+  updatePolicy:
+    updateMode: {{ .Values.openethereum.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if .Values.openethereum.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl .Values.openethereum.verticalAutoscaler.containerPolicies . | nindent 6 | trim }}
+  {{- end }}
+{{- end }}

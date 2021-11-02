@@ -2,3 +2,7 @@
 
 # ignore fetched subcharts
 **/charts
+
+# ignore testing files
+**/override.yaml
+

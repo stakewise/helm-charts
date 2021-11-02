@@ -1,0 +1,140 @@
+{{- if .Values.validator.enabled }}
+{{- $root := . -}}
+{{- range (untilStep 0 (int .Values.validator.validatorsCount) 1) }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "operator.fullname" $root }}-validator{{.}}
+  labels:
+    {{- include "validator.labels" $root | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" $root | nindent 6 }}
+      {{- include "validator.labels" $root | nindent 6 }}
+  serviceName: {{ template "operator.fullname" $root }}
+  template:
+    metadata:
+      labels:
+        {{- include "operator.selectorLabels" $root | nindent 8 }}
+        {{- include "validator.labels" $root | nindent 8 }}
+      annotations:
+        checksum/configmap: {{ include (print $root.Template.BasePath "/validator/configmap.yaml") $root | sha256sum }}
+    spec:
+    {{- with $root.Values.validator.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+    {{- end }}
+    {{- with $root.Values.validator.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.validator.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.validator.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: "validator{{.}}"
+      priorityClassName: {{ $root.Values.validator.priorityClassName | quote }}
+      initContainers:
+        - name: init-validator
+          image: "{{ $root.Values.validator.initImage.repository }}:{{ $root.Values.validator.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.validator.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: VAULT_ADDR
+              value: "http://{{ template "operator.fullname" $ }}-vault:8200"
+            - name: NETWORK_ID
+              value: {{ $root.Values.validator.networkID | quote }}
+            - name: VALIDATOR_TYPE
+              value: {{ $root.Values.validator.type | quote }}
+            - name: SERVICE_ACCOUNT
+              value: "validator{{.}}"
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: configs
+              mountPath: "/mnt/configs"
+            - name: validator-init
+              mountPath: /data/scripts
+      {{- if $.Values.validator.persistence.enabled }}
+        {{- include "init-validator-info" $root | nindent 8 }}
+      {{- end }}
+      {{- if and $.Values.validator.persistence.enabled $.Values.validator.initChownData }}
+        {{- include "init-chown" $root | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: validator
+          image: "{{ (pluck $root.Values.validator.type $root.Values.validator.image | first ).repository }}:{{ (pluck $root.Values.validator.type $root.Values.validator.image | first ).tag }}"
+          imagePullPolicy: {{ $root.Values.validator.image.pullPolicy }}
+          args:  
+          {{- range (pluck $root.Values.validator.type $root.Values.validator.flags | first) }}
+            - {{ . | quote }}
+          {{- end -}}
+          {{- range (pluck $root.Values.validator.type $root.Values.validator.extraFlags | first) }}
+            - {{ . | quote }}
+          {{- end -}}
+          {{- include "beacon-rpc-node" $ | nindent 12 }}
+          {{- include "validator-graffiti" $ | nindent 12 }}
+          {{- if $root.Values.validator.metrics.enabled }}
+            {{- range (pluck $root.Values.validator.type $root.Values.validator.metrics.flags | first) }}
+            - {{ . | quote }}
+            {{- end }}
+          {{- end }}
+          {{- if eq $root.Values.validator.networkID "prater" }}
+            {{- if eq $root.Values.validator.type "prysm" }}
+            - "--prater"
+            {{- else if eq $root.Values.validator.type "lighthouse" }}
+            - "--network=prater"
+            {{- end }}
+          {{- end }}
+        {{- if $root.Values.validator.metrics.enabled }}
+          ports:
+            - containerPort: {{ $root.Values.validator.metrics.port }}
+              name: metrics
+              protocol: TCP
+        {{- end }}
+        {{- with $root.Values.validator.resources }}
+          resources:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: configs
+              mountPath: "/mnt/configs"
+        {{- with (pluck $root.Values.validator.type $root.Values.validator.readinessProbe | first) }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with (pluck $root.Values.validator.type $root.Values.validator.livenessProbe | first) }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+      volumes:
+        - name: configs
+          configMap:
+            name: {{ template "operator.fullname" $root }}-validator-configs
+        - name: validator-init
+          configMap:
+            name: {{ template "operator.fullname" $root }}-validator-init
+{{- if (not $root.Values.validator.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: data-validator{{.}}
+{{- end }}
+
+{{- end }}
+{{- end }}

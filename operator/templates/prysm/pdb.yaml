@@ -1,0 +1,20 @@
+{{- if and .Values.prysm.enabled .Values.prysm.enabled .Values.prysm.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "operator.fullname" . }}-prysm-beacon
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "prysm-beacon.labels" . | nindent 4 }}
+spec:
+{{- if .Values.prysm.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.prysm.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.prysm.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.prysm.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" . | nindent 6 }}
+      {{- include "prysm-beacon.labels" . | nindent 6 }}
+{{- end }}

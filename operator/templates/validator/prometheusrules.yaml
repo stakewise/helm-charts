@@ -1,0 +1,23 @@
+{{- if and .Values.validator.enabled .Values.validator.metrics.enabled .Values.validator.metrics.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ template "operator.fullname" . }}-validator
+  {{- if .Values.validator.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.validator.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "validator.labels" . | nindent 4 }}
+  {{- if .Values.validator.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.validator.metrics.prometheusRule.additionalLabels | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with (pluck .Values.validator.type .Values.validator.metrics.prometheusRule.rules | first) }}
+  groups:
+    - name: {{ template "operator.fullname" $ }}-validator
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+{{- end }}

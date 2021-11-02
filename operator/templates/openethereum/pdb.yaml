@@ -1,0 +1,20 @@
+{{- if and .Values.openethereum.enabled .Values.openethereum.enabled .Values.openethereum.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "operator.fullname" . }}-openethereum
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "openethereum.labels" . | nindent 4 }}
+spec:
+{{- if .Values.openethereum.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.openethereum.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.openethereum.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.openethereum.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" . | nindent 6 }}
+      {{- include "openethereum.labels" . | nindent 6 }}
+{{- end }}

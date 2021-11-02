@@ -1,0 +1,20 @@
+{{- if and .Values.lighthouse.enabled .Values.lighthouse.podDisruptionBudget.enabled }}
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "operator.fullname" . }}-lighthouse-beacon
+  labels:
+    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "lighthouse-beacon.labels" . | nindent 4 }}
+spec:
+{{- if .Values.lighthouse.podDisruptionBudget.minAvailable }}
+  minAvailable: {{ .Values.lighthouse.podDisruptionBudget.minAvailable }}
+{{- end }}
+{{- if .Values.lighthouse.podDisruptionBudget.maxUnavailable }}
+  maxUnavailable: {{ .Values.lighthouse.podDisruptionBudget.maxUnavailable }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "operator.selectorLabels" . | nindent 6 }}
+      {{- include "lighthouse-beacon.labels" . | nindent 6 }}
+{{- end }}
