@@ -61,7 +61,7 @@ $ helm upgrade --install operator ./operator \
 1. Install helm chart with only ETH1 nodes enabled (`geth` and `openethereum` sections in the `values.yaml` file). Wait until ETH1 nodes are fully synced.
 1. Upgrade installation with ETH2 nodes enabled (`prysm` and `lighthouse`). Wait until ETH2 nodes are fully synced.
 1. Upgrade installation with vault enabled and configured (instruction below).
-1. Upgrade installation with validators enabled;
+1. Upgrade installation with validators enabled.
 
 ## Vault usage
 
@@ -84,7 +84,7 @@ $ kubectl exec -ti operator-vault-2 -- vault operator raft join http://operator-
 $ kubectl exec -ti operator-vault-2 -- vault operator unseal
 ```
 
-To verify if the Raft cluster has successfully been initialized, run the following.
+To verify if the Raft cluster has successfully been initialized, run the following:
 
 First, login using the root token on the `operator-vault-0` pod:
 
