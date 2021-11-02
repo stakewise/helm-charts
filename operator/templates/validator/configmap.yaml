@@ -29,65 +29,103 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-5"
 data:
-  validator-init.py: |
-    #!/usr/bin/env python3
-    import os
-    import shutil
-    import subprocess
-    import hvac
-    from pathlib import Path as path
+  validator-init.sh: |
+    #!/bin/bash
+    export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
+    export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
 
-    ## Vault init
-    ##
-    with open('/var/run/secrets/kubernetes.io/serviceaccount/token', 'r') as f:
-        token = f.read()
-    client   = hvac.Client(url=os.getenv("VAULT_ADDR"))
-    response = client.auth.kubernetes.login(role=os.getenv("SERVICE_ACCOUNT"), jwt=token, )
+    VAULT="/vault"
+    VAULT_KEYSTORES="${VAULT}/keystores"
+    VAULT_PASSWORD="${VAULT}/password.txt"
+    DATA="/data"
+    DATA_PRYSM="${DATA}/prysm"
+    DATA_LIGHTHOUSE="${DATA}/lighthouse"
+    SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
 
-    vault_base = os.getenv("VAULT_BASE")
-    vault_keystores = os.getenv("VAULT_KEYSTORES")
-    vault_keystores_password = os.getenv("VAULT_PASSWORD")
-    data_base = "/data/"
-    data_prysm = data_base + "prysm"
-    data_prysm_validators = data_prysm + "/validators"
-    data_lighthouse = data_base + "lighthouse"
-    secret_path = "validators/validator" + os.getenv("VALIDATOR_ID")
+    # Get keystores password
+    rm -rf ${VAULT} || true
+    mkdir -p ${VAULT_KEYSTORES}
+    PASSWORD=$(vault kv get -field=password.txt -version=1 validators/${SERVICE_ACCOUNT}/password)
+    echo ${PASSWORD} > ${VAULT_PASSWORD}
 
-    def secrets_init():
-        # Write kyestores and password
-        keystores_data = client.secrets.kv.v1.read_secret(path="keystores", mount_point=secret_path)
-        keystores_password = client.secrets.kv.v1.read_secret(path="password", mount_point=secret_path)
-        try:
-            if os.path.isdir(vault_base):
-                shutil.rmtree(vault_base)
-            path(vault_base).mkdir(exist_ok=True, mode=0o750, parents=True)
-            path(vault_keystores).mkdir(exist_ok=True, mode=0o750, parents=True)
-            path(vault_keystores_password).mkdir(exist_ok=True, mode=0o750, parents=True)
-        except OSError as error:
-            print(error)
-            print("Directory '%s' can not be removed" %vault_keystores)
-        for k in keystores_data["data"]:
-            with open(vault_keystores + "/" + k, "w") as file:
-                file.write(keystores_data["data"][k])
-        print("Keys written on disk successfully")
-        with open(vault_keystores_password + "/password.txt", "w") as file:
-                file.write(keystores_password["data"]["password.txt"])
-        print("Password written on disk successfully")
+    echo "$(vault kv get -version=1 validators/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
+    while read line; do
+        if [[ "$line" =~ ^keystore.* ]]; then
+            echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
+        fi
+    done <${VAULT}/keystores.txt
+    rm -f ${VAULT}/keystores.txt
+    rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
+           ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
+           ${DATA_PRYSM}/validators || true
 
-    def validator_init(validator):
-        try:
-            if os.path.isdir(data_prysm):
-                shutil.rmtree(data_prysm)
-            if os.path.isdir(data_lighthouse):
-                shutil.rmtree(data_lighthouse)
-            path(data_prysm).mkdir(exist_ok=True, mode=0o750, parents=True)
-            path(data_lighthouse).mkdir(exist_ok=True, mode=0o750, parents=True)
-        except OSError as error:
-            print(error)
-            print("Directory '%s' '%s' can not be removed" %vault_keystores %vault_keystores_password)
+    if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
+        touch ${DATA_PRYSM}/tosaccepted
+        prysm-validator \
+            accounts \
+            import \
+            --keys-dir=${VAULT_KEYSTORES} \
+            --account-password-file=${VAULT_PASSWORD} \
+            --wallet-dir=${DATA_PRYSM}/validators \
+            --wallet-password-file=${VAULT_PASSWORD} \
+            --${NETWORK_ID:-"mainnet"} \
+            --accept-terms-of-use
+        cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
+        rm ${VAULT_PASSWORD}
+    elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+        lighthouse-validator \
+            --network=${NETWORK_ID:-"mainnet"} \
+            account \
+            validator \
+            import \
+            --datadir=${DATA_LIGHTHOUSE} \
+            --reuse-password \
+            --password-file=${VAULT_PASSWORD} \
+            --directory=${VAULT_KEYSTORES}
+        rm ${VAULT_PASSWORD}
+    fi
 
-    if __name__ == "__main__":
-        secrets_init()
-        validator_init(os.getenv("VALIDATOR_TYPE"))
+    if [[ "$VALIDATOR_TYPE" != "`cat /data/validator.type`" ]]; then
+        if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
+            touch ${DATA_PRYSM}/tosaccepted
+            lighthouse-validator account validator slashing-protection \
+                export ${SLASHING_PROTECTION_FILE} \
+                --datadir=${DATA_LIGHTHOUSE} \
+                --network=${NETWORK_ID:-"mainnet"}
+            if [ $? -eq 0 ]; then
+                test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
+                prysm-validator slashing-protection import \
+                    --datadir=${DATA_PRYSM} \
+                    --slashing-protection-json-file=${SLASHING_PROTECTION_FILE} \
+                    --${NETWORK_ID:-"mainnet"}
+            else
+                echo "Slashing history export failed"
+            fi
+        elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+            test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
+            prysm-validator \
+                --${NETWORK_ID:-"mainnet"} \
+                slashing-protection \
+                export \
+                --datadir=${DATA_PRYSM} \
+                --slashing-protection-export-dir=${DATA}
+            if [ $? -eq 0 ]; then
+                test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
+                lighthouse-validator \
+                    account \
+                    validator \
+                    slashing-protection \
+                    import \
+                    ${SLASHING_PROTECTION_FILE} \
+                    --datadir=${DATA_LIGHTHOUSE} \
+                    --network=${NETWORK_ID:-"mainnet"}
+            else
+                echo "Slashing history export failed"
+            fi
+        fi
+    fi
+
+    rm -rf ${VAULT} || true
 
 {{ end }}
