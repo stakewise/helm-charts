@@ -23,7 +23,7 @@ The versions required are:
 
 ## How it works
 
-![operator architecture](https://github.com/stakewise/helm-charts/raw/operator-package/operator/img/scheme.png)
+![operator architecture](https://github.com/stakewise/helm-charts/raw/main/operator/img/scheme.png)
 
 **Explanation of the schema**
 
