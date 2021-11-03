@@ -386,7 +386,7 @@ openethereum:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 350Gi
+    size: 50Gi
 
   ## Node labels for pod assignment
   ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -634,7 +634,7 @@ prysm:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 350Gi
+    size: 100Gi
 
 
 ## Configuration for lighthouse eth v2 beacon chain node
@@ -836,7 +836,7 @@ lighthouse:
     storageClassName: ""
     accessModes:
       - ReadWriteOnce
-    size: 350Gi
+    size: 100Gi
 
 
 ## Configuration for validators
