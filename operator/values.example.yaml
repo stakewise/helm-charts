@@ -87,7 +87,7 @@ prysm:
     storageClassName: "ssd-storage"
     accessModes:
       - ReadWriteOnce
-    size: 300Gi
+    size: 100Gi
 
 ## Lighthouse beacon chain node configuration
 ##
@@ -108,7 +108,7 @@ lighthouse:
     storageClassName: "ssd-storage"
     accessModes:
       - ReadWriteOnce
-    size: 300Gi
+    size: 100Gi
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
 
