@@ -48,7 +48,7 @@ The command removes all the Kubernetes components associated with the chart and 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release ./keeper --set settings.web3WsEndpoint="ws://eth1-node.chain.svc.cluster.local:8546"
+$ helm install my-release ./keeper --set settings.web3Endpoint="ws://eth1-node.chain.svc.cluster.local:8546"
 ```
 
 The above command specifies the web3 endpoint.

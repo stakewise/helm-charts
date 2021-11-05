@@ -40,9 +40,8 @@ priorityClassName: ""
 settings:
   network: "mainnet"
   ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
-  web3HttpEndpoint: ""
+  web3Endpoint: ""
   enableHealthServer: "True"
-  healthServerHost: "127.0.0.1"
   healthServerPort: "8080"
 
   # credentials
