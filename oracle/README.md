@@ -49,7 +49,7 @@ The command removes all the Kubernetes components associated with the chart and 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release ./prysm --set settings.web3WsEndpoint="ws://eth1-node.chain.svc.cluster.local:8546"
+$ helm install my-release ./oracle --set settings.web3WsEndpoint="ws://eth1-node.chain.svc.cluster.local:8546"
 ```
 
 The above command specifies the web3 endpoint.
@@ -57,7 +57,7 @@ The above command specifies the web3 endpoint.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release ./prysm -f values.yaml
+$ helm install my-release ./oracle -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)
