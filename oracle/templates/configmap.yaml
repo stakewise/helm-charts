@@ -5,52 +5,10 @@ metadata:
   labels:
     {{- include "oracle.labels" . | nindent 4 }}
 data:
-  # https://github.com/notifiers/notifiers/issues/328
-  USERNAME: user
-
-  # telegram
-  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifications | quote }}
-
-  # connections
-  WEB3_WS_ENDPOINT: {{ .Values.settings.web3WsEndpoint | quote }}
-  WEB3_WS_ENDPOINT_TIMEOUT: {{ .Values.settings.web3WsEndpointTimeout | quote }}
-  WEB3_HTTP_ENDPOINT: {{ .Values.settings.web3HttpEndpoint | quote }}
-  BEACON_CHAIN_RPC_ENDPOINT: {{ .Values.settings.beaconChainRpcEndpoint | quote }}
-  ETHERSCAN_ADDRESS_BASE_URL: {{ .Values.settings.etherscanAddressBaseUrl | quote }}
-
-  # middlewares
-  INJECT_POA_MIDDLEWARE: {{ .Values.settings.injectPOAMiddleware | quote }}
-  INJECT_STALE_CHECK_MIDDLEWARE: {{ .Values.settings.injectStaleCheckMiddleware | quote }}
-  STALE_CHECK_MIDDLEWARE_ALLOWABLE_DELAY: {{ .Values.settings.staleCheckMiddlewareAllowableDelay | quote }}
-  INJECT_RETRY_REQUEST_MIDDLEWARE: {{ .Values.settings.injectRetryRequestMiddleware | quote }}
-  INJECT_LOCAL_FILTER_MIDDLEWARE: {{ .Values.settings.injectLocalFilterMiddleware | quote }}
-  APPLY_GAS_PRICE_STRATEGY: {{ .Values.settings.applyGasPriceStrategy | quote }}
-  MAX_TX_WAIT_SECONDS: {{ .Values.settings.maxTxWaitSeconds | quote }}
-  ORACLE_VOTE_GAS_LIMIT: {{ .Values.settings.oracleVoteGasLimit | quote }}
-
-  # oracle balance
-  BALANCE_WARNING_THRESHOLD: {{ .Values.settings.balanceWarningThreshold | quote }}
-  BALANCE_ERROR_THRESHOLD: {{ .Values.settings.balanceErrorThreshold | quote }}
-
-  # transactions
-  TRANSACTION_TIMEOUT: {{ .Values.settings.transactionTimeout | quote }}
-
-  # processing interval
-  PROCESS_INTERVAL: {{ .Values.settings.processInterval | quote }}
-
-  # contracts
-  POOL_CONTRACT_ADDRESS: {{ .Values.settings.poolContractAddress | quote }}
-  REWARD_ETH_CONTRACT_ADDRESS: {{ .Values.settings.rewardEthContractAddress | quote }}
-  STAKED_ETH_CONTRACT_ADDRESS: {{ .Values.settings.stakedEthContractAddress | quote }}
-  ORACLES_CONTRACT_ADDRESS: {{ .Values.settings.oraclesContractAddress | quote }}
-  DAO_ADDRESS: {{ .Values.settings.daoAddress | quote }}
-  MULTICALL_CONTRACT_ADDRESS: {{ .Values.settings.multicallContractAddress | quote }}
-  MERKLE_DISTRIBUTOR_CONTRACT_ADDRESS: {{ .Values.settings.merkleDistributorContractAddress | quote }}
-  BALANCER_VAULT_CONTRACT_ADDRESS: {{ .Values.settings.balancerVaultContractAddress | quote }}
-  ENS_RESOLVER_CONTRACT_ADDRESS: {{ .Values.settings.ensResolverContractAddress | quote }}
-  DAO_ENS_DOMAIN: {{ .Values.settings.daoEnsDomain | quote }}
-  ORACLES_ENS_TEXT_RECORD: {{ .Values.settings.oracleEnsTextRecord | quote }}
-  BALANCER_SUBGRAPH_URL: {{ .Values.settings.balancerSubgraphUrl | quote }}
-  UNISWAP_V2_SUBGRAPH_URL: {{ .Values.settings.uniswapV2subgraphUrl | quote }}
-  UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3subgraphUrl | quote }}
+  NETWORK: {{ .Values.settings.network | quote }}
   IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}
+  ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
+  WEB3_ENDPOINT: { { .Values.settings.web3Endpoint | quote } }
+  ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
+  HEALTH_SERVER_HOST: "0.0.0.0"
+  HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}

@@ -7,7 +7,7 @@ metadata:
 data:
   NETOWORK: {{ .Values.settings.network | quote }}
   IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}
-  WEB3_ENDPOINT: {{ .Values.settings.web3HttpEndpoint | quote }}
+  WEB3_ENDPOINT: {{ .Values.settings.web3Endpoint | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
-  HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
+  HEALTH_SERVER_HOST: "0.0.0.0"
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
