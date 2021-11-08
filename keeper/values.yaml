@@ -22,8 +22,8 @@ tolerations: [ ]
 
 # Docker image
 image:
-  repository: "stakewiselabs/keeper"
-  tag: "1.3.5"
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/keeper"
+  tag: "implement-keeper"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
