@@ -1,17 +1,17 @@
 apiVersion: v2
-name: prysm
+name: lighthouse
 version: 0.1.0
 kubeVersion: "^1.14.0-0"
-description: Go implementation of Ethereum proof of stake.
+description: Rust Ethereum 2.0 Client.
 type: application
 keywords:
   - ethereum
   - blockchain
-  - prysm
+  - lighthouse
   - p2p
 home: https://www.ethereum.org/
 sources:
-  - https://github.com/prysmaticlabs/prysm
+  - https://github.com/sigp/lighthouse
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io

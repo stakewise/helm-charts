@@ -2,5 +2,17 @@ dependencies:
 - name: vault
   repository: https://helm.releases.hashicorp.com
   version: 0.16.1
-digest: sha256:dee791e55ea7be51096491e8dc5866137e9d02d2441d666edfa7605b534efaf5
-generated: "2021-10-20T16:26:49.686614+03:00"
+- name: geth
+  repository: file://../geth
+  version: 0.1.0
+- name: openethereum
+  repository: file://../openethereum
+  version: 0.1.0
+- name: prysm
+  repository: file://../prysm
+  version: 0.1.0
+- name: lighthouse
+  repository: file://../lighthouse
+  version: 0.1.0
+digest: sha256:be57157435cb523a155f20fffb9058409e4be38fd5e882464a50aec20641a1ef
+generated: "2021-11-09T18:10:11.01041+03:00"

@@ -40,3 +40,19 @@ dependencies:
     repository: https://helm.releases.hashicorp.com
     version: 0.16.1
     condition: vault.enabled
+  - name: geth
+    repository: "file://../geth"
+    version: "0.1.0"
+    condition: geth.enabled
+  - name: openethereum
+    repository: "file://../openethereum"
+    version: "0.1.0"
+    condition: openethereum.enabled
+  - name: prysm
+    repository: "file://../prysm"
+    version: "0.1.0"
+    condition: prysm.enabled
+  - name: lighthouse
+    repository: "file://../lighthouse"
+    version: "0.1.0"
+    condition: lighthouse.enabled
