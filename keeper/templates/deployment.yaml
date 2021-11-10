@@ -40,6 +40,8 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["python"]
+          args: ["keeper/main.py"]
           envFrom:
             - configMapRef:
                 name: {{ template "keeper.fullname" . }}

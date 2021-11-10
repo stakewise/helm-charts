@@ -22,7 +22,7 @@ tolerations: [ ]
 
 # Docker image
 image:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/keeper"
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
   tag: "implement-keeper"
   pullPolicy: IfNotPresent
 
