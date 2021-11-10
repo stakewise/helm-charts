@@ -1,0 +1,150 @@
+{{ $chainConfig := index $.Values.chains $.Values.chain }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "openethereum.fullname" . }}
+  labels:
+    {{- include "openethereum.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "openethereum.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "openethereum.fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "openethereum.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "openethereum.fullname" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- if and .Values.persistence.enabled .Values.initChownData }}
+      initContainers:
+        - name: init-chown
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        - name: node
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ['/bin/sh', '/data/scripts/entrypoint.sh']
+          args:
+            {{- if $chainConfig.bootnodes }}
+            - "--bootnodes"
+            - "{{ join "," $chainConfig.bootnodes }}"
+            {{- end }}
+            - "-d"
+            - "/data/openethereum"
+            - "--chain"
+            - "{{ $.Values.chain }}"
+            - "--jsonrpc-interface"
+            - "all"
+            - "--jsonrpc-hosts"
+            - "all"
+            - "--jsonrpc-port"
+            - "{{ $.Values.rpc.port }}"
+            - "--ws-interface"
+            - "all"
+            - "--ws-hosts"
+            - "all"
+            - "--ws-port"
+            - "{{ $.Values.ws.port }}"
+            - "--min-peers"
+            - "50"
+            - "--max-peers"
+            - "100"
+            {{- if .Values.metrics.enabled }}
+            - "--metrics"
+            - "--metrics-port"
+            - {{ .Values.metrics.port | quote }}
+            - "--metrics-interface"
+            - "all"
+            {{- end }}
+            {{- with .Values.extraFlags }}
+              {{- toYaml . | nindent 12 }}
+            {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: {{ $.Values.rpc.port }}
+              name: rpc
+              protocol: TCP
+            - containerPort: {{ $.Values.ws.port }}
+              name: ws
+              protocol: TCP
+          {{- if .Values.metrics.enabled }}
+            - containerPort: {{ .Values.metrics.port }}
+              name: metrics
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data/openethereum
+            - name: scripts
+              mountPath: /data/scripts
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 15
+            periodSeconds: 20
+            successThreshold: 1
+            tcpSocket:
+              port: {{ $.Values.rpc.port }}
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: {{ $.Values.rpc.port }}
+            timeoutSeconds: 1
+        {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      volumes:
+        - name: scripts
+          configMap:
+            name: {{ include "openethereum.fullname" . }}
+{{- if (not .Values.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "openethereum.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+{{- end }}

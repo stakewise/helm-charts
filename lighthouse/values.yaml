@@ -1,8 +1,8 @@
-# Default values for geth.
+# Default values for lighthouse.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Provide a name in place of geth for `app:` labels
+## Provide a name in place of lighthouse for `app:` labels
 ##
 nameOverride: ""
 
@@ -36,72 +36,88 @@ initImage:
   tag: "1.34"
   pullPolicy: IfNotPresent
 
-## Geth image version
-## ref: https://hub.docker.com/r/ethereum/client-go/tags/
+## Configuration for lighthouse eth v2 beacon chain node
+## ref: https://lighthouse-book.sigmaprime.io/
 ##
+
+## How many beacon chain pods to run simultaneously
+##
+replicas: 1
+
+## Lighthouse beacon node image version
+## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
-  repository: "ethereum/client-go"
-  tag: "v1.10.9"
+  repository: "sigp/lighthouse"
+  tag: "v2.0.1"
   pullPolicy: IfNotPresent
 
-## How many geth nodes to run simultaneously
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
-replicas: 3
+nodeSelector: {}
 
-## Configure pod disruption budgets for Alertmanager
-## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
-## This configuration is immutable once created and will require the PDB to be deleted to be changed
-## https://github.com/kubernetes/kubernetes/issues/45398
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Enable pod disruption budget
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
 ##
 podDisruptionBudget:
   enabled: true
   maxUnavailable: 1
 
-## Network (chain) ID
+## Vertical Pod Autoscaler config
+## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
 ##
-networkId: "mainnet"
+verticalAutoscaler:
+  # If true a VPA object will be created for the StatefulSet
+  enabled: false
+  updateMode: Off
+  containerPolicies: { }
 
-## RPC configuration.
+## Eth2 network ID
+##
+networkID: mainnet
+
+## RPC Port
 ##
 rpc:
-  enabled: true
-  port: "8545"
-  api: "web3,eth,net"
-  corsDomain: ""
-  vhosts: "*"
+  port: "5052"
 
-## WebSocket configuration.
+## Extra flags for lighthouse beacon chain node
 ##
-ws:
-  enabled: false
-  port: "8546"
-  api: "web3,eth,net"
-  origins: ""
+extraFlags: []
 
-## Extra flags to pass to the node
+## Ethereum 1 node endpoints.
 ##
-extraFlags:
-  - "--syncmode=snap"
+eth1Endpoints: []
 
 ## Monitoring
 ##
 metrics:
-  ## Whether to enable metrics collection or not
-  ##
+  # Whether to enable metrics collection or not
   enabled: false
 
-  ## Prometheus exporter port
-  ##
-  port: 6060
+  # Prometheus exporter port
+  port: 5054
 
-  ## Extra flags to pass for collecting metrics
-  ##
+  # Extra flags to pass for collecting metrics
   flags:
     - "--metrics"
-    - "--pprof"
-    - "--pprof.addr=0.0.0.0"
-    - "--pprof.port=6060"
-    
+    - "--metrics-address=0.0.0.0"
+
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -147,42 +163,67 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ## e.g:
     ## rules:
-    ##   - alert: GethNodeDown
-    ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
-    ##     for: 5m
+    ##   - alert: LighthouseBeaconNodeDown
+    ##     expr: up{job='{{ include "lighthouse.fullname" . }}-lighthouse-beacon'} == 0
+    ##     for: 1m
     ##     labels:
-    ##       severity: error
+    ##       severity: critical
     ##     annotations:
-    ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
-    ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
+    ##       summary: Lighthouse beacon node is down
+    ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: LighthouseBeaconNodeRestarted
+    ##     expr: (time()-process_start_time_seconds{job="{{ include "lighthouse.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
+    ##     for: 1m
+    ##     labels:
+    ##       severity: warning
+    ##     annotations:
+    ##       summary: Lighthouse beacon node was restarted
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
     rules: []
 
-## Configure session affinity for to hit the same geth node
+## Defines whether the service must be headless
+##
+svcHeadless: false
+
+## Configure session affinity for validator clients to hit the same beacon node
 ## for the period specified in `timeoutSeconds`
-## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
 ##
 sessionAffinity:
-  ## Whether to enable session affinity or not
-  ##
+  # Whether to enable session affinity or not
   enabled: true
-  ## The session duration in seconds
-  ##
+  # The session duration in seconds
   timeoutSeconds: 86400
 
-## Vertical Pod Autoscaler config
-## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: { }
-
 ## Configure resource requests and limits.
-## http://kubernetes.io/docs/user-guide/compute-resources/
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: { }
+resources: {}
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+##
+readinessProbe:
+  initialDelaySeconds: 180
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /lighthouse/health
+    port: 5052
+    scheme: HTTP
+livenessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 60
+  successThreshold: 1
+  httpGet:
+    path: /lighthouse/health
+    port: 5052
+    scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
@@ -190,31 +231,11 @@ resources: { }
 initChownData: true
 
 ## Whether or not to allocate persistent volume disk for the data directory.
-## In case of node failure, the node data directory will still persist.
+## In case of pod failure, the pod data directory will still persist.
 ##
 persistence:
   enabled: true
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 50Gi
-
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
-nodeSelector: {}
-
-## Tolerations for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
-tolerations: []
-
-## Affinity for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-##
-affinity: {}
-
-## used to assign priority to pods
-## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-##
-priorityClassName: ""
+  size: 100Gi

@@ -2,227 +2,266 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Pod Security Context
-# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+## Provide a name in place of prysm for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
 securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
-# A node which implements the DiscoveryV5 protocol for peer
-# discovery. The purpose of this service is to provide a starting point for
-# newly connected services to find other peers outside of their network.
-bootnode:
-  # Whether to deploy bootnode or not.
-  enabled: false
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  create: true
 
-  # Service Cluster IP
-  clusterIP: ""
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
 
-  # Docker image
-  image:
-    repository: "gcr.io/prysmaticlabs/prysm/bootnode"
-    tag: "HEAD-9fd557"
-    pullPolicy: IfNotPresent
+## Configuration for prysm eth v2 beacon chain node
+## ref: https://docs.prylabs.network/docs/getting-started/
+##
 
-  # Optional private key used for identity
-  privateKey: ""
+## How many beacon chain pods to run simultaneously
+##
+replicas: 3
 
-  # Extra flags to pass to the bootnode
-  extraFlags:
-    - "--external-ip=$(POD_IP)"
+## Prysm beacon node image version
+## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
+##
+image:
+  repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+  tag: "v2.0.2"
+  pullPolicy: IfNotPresent
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources:
-    requests:
-      cpu: 2m
-      memory: 25Mi
+## RPC Port
+##
+rpc:
+  port: "4000"
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  priorityClassName: "high-priority"
+## Eth2 network ID
+##
+networkID: mainnet
 
-# A slasher listens for all broadcasted messages using a running beacon node
-# in order to detect slashable attestations and block proposals. It is attached to the beacon Pod.
-slasher:
-  # Whether to deploy slasher or not.
-  enabled: false
+## Ethereum 1 node endpoints.
+##
+eth1Endpoint: ""
 
-  # Docker image
-  image:
-    repository: "gcr.io/prysmaticlabs/prysm/slasher"
-    tag: "v1.3.11"
-    pullPolicy: IfNotPresent
+## Extra flags for prysm beacon chain node
+##
+extraFlags:
+  # Beacon chain options
+  - "--accept-terms-of-use"
+  # p2p options
+  - "--p2p-max-peers=100"
+  - "--enable-peer-scorer"
 
-  extraFlags:
-    - "--accept-terms-of-use"
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources: { }
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
 
-  # Configure liveness and readiness probes
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  readinessProbe:
-    initialDelaySeconds: 30
-    timeoutSeconds: 30
-    periodSeconds: 10
-    failureThreshold: 3
-    successThreshold: 1
-    httpGet:
-      path: /healthz
-      port: 9090
-      scheme: HTTP
-  livenessProbe:
-    initialDelaySeconds: 30
-    timeoutSeconds: 30
-    periodSeconds: 15
-    failureThreshold: 3
-    successThreshold: 1
-    httpGet:
-      path: /healthz
-      port: 9090
-      scheme: HTTP
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
 
-  # If false, data ownership will not be reset at startup
-  # This allows the beacon node to be run with an arbitrary user
-  initChownData:
-    enabled: true
-    # initChownData container image
-    image:
-      repository: "busybox"
-      tag: "1.33"
-      pullPolicy: IfNotPresent
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
 
-  # Whether or not to allocate persistent volume disk for the data directory.
-  # In case of pod failure, the pod data directory will still persist.
-  persistence:
-    enabled: true
-    storageClassName: ""
-    accessModes:
-      - ReadWriteOnce
-    size: 30Gi
-
-
-# Beacon chain is responsible for running a full Proof-of-Stake blockchain
-beacon:
-  # Whether to deploy beacon chain or not.
+## Enable pod disruption budget
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+##
+podDisruptionBudget:
   enabled: true
+  maxUnavailable: 1
 
-  # How many beacon chain pods to run simultaneously
-  replicas: 2
+## Vertical Pod Autoscaler config
+## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+##
+verticalAutoscaler:
+  # If true a VPA object will be created for the StatefulSet
+  enabled: false
+  updateMode: Off
+  containerPolicies: { }
 
-  # Docker image
-  image:
-    repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-    tag: "v2.0.2"
-    pullPolicy: IfNotPresent
+## Monitoring
+##
+metrics:
+  ## Whether to enable metrics collection or not
+  ##
+  enabled: false
 
-  # Enable pod disruption budget
-  # https://kubernetes.io/docs/tasks/run-application/configure-pdb
-  podDisruptionBudget:
-    enabled: true
-    maxUnavailable: 1
+  ## Prometheus exporter port
+  ##
+  port: 9090
 
-  # Vertical Pod Autoscaler config
-  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-  verticalAutoscaler:
-    # If true a VPA object will be created for the StatefulSet
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ##
     enabled: false
-    updateMode: Off
-    containerPolicies: { }
-
-  extraFlags:
-    # Beacon chain options
-    - "--accept-terms-of-use"
-    - "--http-web3provider=<eth1 chain endpoint>"
-
-    # p2p options
-    - "--p2p-max-peers=100"
-    - "--enable-peer-scorer"
-
-  metrics:
-    # Whether to enable metrics collection or not
+    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    ##
     enabled: false
+    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## e.g:
+    ## rules:
+    ##   - alert: PrysmBeaconNodeDown
+    ##     expr: up{job='{{ include "prysm.fullname" . }}-prysm-beacon'} == 0
+    ##     for: 1m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node is down
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: Prysm50SlotsBehind
+    ##     expr: beacon_clock_time_slot-beacon_head_slot > 50
+    ##     for: 2m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node is out of sync
+    ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmParticipationRateLessThen66Percent
+    ##     expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
+    ##     for: 5m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node participation rate less then 66%
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmBeaconNodeRestarted
+    ##     expr: (time()-process_start_time_seconds{job='{{ include "prysm.fullname" . }}-prysm-beacon'})/3600 < 0.1
+    ##     for: 1m
+    ##     labels:
+    ##       severity: warning
+    ##     annotations:
+    ##       summary: Prysm beacon node was restarted
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##
+    rules: []
 
+## Defines whether the service must be headless
+##
+svcHeadless: false
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: true
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: { }
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before genesis
+##
+readinessProbe:
+  initialDelaySeconds: 180
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /healthz
     port: 9090
+    scheme: HTTP
+livenessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 60
+  successThreshold: 1
+  httpGet:
+    path: /healthz
+    port: 9090
+    scheme: HTTP
 
-    # Extra flags to pass for collecting metrics
-    flags:
-      - "--monitoring-port=9090"
-      - "--monitoring-host=0.0.0.0"
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
 
-    # Metrics collection annotations to add to service
-    svcAnnotations:
-      prometheus.io/scrape: "true"
-
-  # defines whether the service must be headless
-  svcHeadless: false
-
-  # Configure session affinity for validator clients to hit the same beacon node
-  # for the period specified in `timeoutSeconds`
-  # https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-  sessionAffinity:
-    # Whether to enable session affinity or not
-    enabled: false
-    # The session duration in seconds
-    timeoutSeconds: 86400
-
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources: { }
-
-  # Configure liveness and readiness probes
-  # https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  # NB! readinessProbe and livenessProbe must be disabled before genesis
-  readinessProbe:
-    initialDelaySeconds: 180
-    timeoutSeconds: 1
-    periodSeconds: 60
-    failureThreshold: 3
-    successThreshold: 1
-    httpGet:
-      path: /healthz
-      port: 9090
-      scheme: HTTP
-  livenessProbe:
-    initialDelaySeconds: 60
-    timeoutSeconds: 1
-    periodSeconds: 60
-    failureThreshold: 60
-    successThreshold: 1
-    httpGet:
-      path: /healthz
-      port: 9090
-      scheme: HTTP
-
-  # If false, data ownership will not be reset at startup
-  # This allows the beacon node to be run with an arbitrary user
-  initChownData:
-    enabled: true
-    # initChownData container image
-    image:
-      repository: "busybox"
-      tag: "1.33"
-      pullPolicy: IfNotPresent
-
-  # Whether or not to allocate persistent volume disk for the data directory.
-  # In case of pod failure, the pod data directory will still persist.
-  persistence:
-    enabled: true
-    storageClassName: ""
-    accessModes:
-      - ReadWriteOnce
-    size: 300Gi
-
-  # Affinity Settings
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: { }
-
-  # Toleration Settings
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-  tolerations: [ ]
-
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  priorityClassName: ""
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 100Gi

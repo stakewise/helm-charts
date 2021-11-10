@@ -2,6 +2,28 @@
 ## Needed to test operator helm chart on test network
 ##
 
+## Validators configuration
+##
+verticalAutoscaler:
+  enabled: true
+validatorsCount: 1
+type: prysm
+graffiti: "StakeWise"
+publicKey: ""
+networkID: "prater"
+metrics:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+  prometheusRule:
+    enabled: false
+persistence:
+  enabled: true
+  storageClassName: "standard"
+  accessModes:
+    - ReadWriteOnce
+  size: 10Gi
+
 ## Geth node configuration
 ##
 geth:
@@ -71,8 +93,8 @@ prysm:
   extraFlags:
     # Beacon chain options
     - "--accept-terms-of-use"
-    - "--http-web3provider=http://operator-geth:8545"
-    - "--fallback-web3provider=http://operator-openethereum:8545"
+    - "--http-web3provider=http://geth:8545"
+    - "--fallback-web3provider=http://openethereum:8545"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
@@ -96,7 +118,7 @@ lighthouse:
   replicas: 1
   networkID: prater
   eth1Endpoints:
-    - http://operator-geth:8545
+    - http://geth:8545
   metrics:
     enabled: true
     serviceMonitor:
@@ -112,29 +134,6 @@ lighthouse:
   nodeSelector:
     cloud.google.com/gke-preemptible: "true"
 
-## Validators configuration
-##
-validator:
-  enabled: true
-  verticalAutoscaler:
-    enabled: true
-  validatorsCount: 1
-  type: prysm
-  graffiti: "StakeWise"
-  publicKey: ""
-  networkID: "prater"
-  metrics:
-    enabled: true
-    serviceMonitor:
-      enabled: true
-    prometheusRule:
-      enabled: false
-  persistence:
-    enabled: true
-    storageClassName: "standard"
-    accessModes:
-      - ReadWriteOnce
-    size: 10Gi
 
 ## Hashicorp Vault configurations
 ##

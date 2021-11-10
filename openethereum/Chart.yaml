@@ -1,17 +1,17 @@
 apiVersion: v2
-name: prysm
+name: openethereum
 version: 0.1.0
 kubeVersion: "^1.14.0-0"
-description: Go implementation of Ethereum proof of stake.
+description: The fast, light, and robust client for the Ethereum mainnet.
 type: application
 keywords:
   - ethereum
   - blockchain
-  - prysm
+  - openethereum
   - p2p
 home: https://www.ethereum.org/
 sources:
-  - https://github.com/prysmaticlabs/prysm
+  - https://github.com/openethereum/openethereum
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io

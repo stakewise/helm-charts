@@ -1,0 +1,19 @@
+{{- if .Values.rpc.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "geth.fullname" . }}-test-connection"
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      {{- if .Values.rpc.enabled }}
+      args: ['{{ include "geth.fullname" . }}:{{ .Values.rpc.port }}']
+      {{- end }}
+  restartPolicy: Never
+{{- end }}

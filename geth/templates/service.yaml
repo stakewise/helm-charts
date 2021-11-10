@@ -1,0 +1,35 @@
+{{- if or .Values.rpc.enabled .Values.ws.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "geth.fullname" . }}
+  labels:
+    {{- include "geth.labels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "geth.selectorLabels" . | nindent 4 }}
+{{- if .Values.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+  ports:
+  {{- if .Values.rpc.enabled }}
+    - name: rpc
+      port: {{ .Values.rpc.port }}
+      targetPort: rpc
+  {{- end }}
+  {{- if .Values.ws.enabled }}
+    - name: ws
+      port: {{ .Values.ws.port }}
+      targetPort: ws
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+  {{- end }}
+{{- end }}
+
