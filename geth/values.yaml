@@ -1,8 +1,8 @@
-# Default values for operator.
+# Default values for geth.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Provide a name in place of operator for `app:` labels
+## Provide a name in place of geth for `app:` labels
 ##
 nameOverride: ""
 
