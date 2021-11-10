@@ -164,7 +164,7 @@ metrics:
     ## e.g:
     ## rules:
     ##   - alert: LighthouseBeaconNodeDown
-    ##     expr: up{job='{{ include "operator.fullname" . }}-lighthouse-beacon'} == 0
+    ##     expr: up{job='{{ include "lighthouse.fullname" . }}-lighthouse-beacon'} == 0
     ##     for: 1m
     ##     labels:
     ##       severity: critical
@@ -172,7 +172,7 @@ metrics:
     ##       summary: Lighthouse beacon node is down
     ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##   - alert: LighthouseBeaconNodeRestarted
-    ##     expr: (time()-process_start_time_seconds{job="{{ include "operator.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
+    ##     expr: (time()-process_start_time_seconds{job="{{ include "lighthouse.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
     ##     for: 1m
     ##     labels:
     ##       severity: warning
