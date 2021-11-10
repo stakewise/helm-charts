@@ -10,7 +10,7 @@ nameOverride: ""
 ##
 fullnameOverride: ""
 
-## Service account for node operator.
+## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
 serviceAccount:
