@@ -69,7 +69,7 @@ networkID: mainnet
 
 ## Ethereum 1 node endpoints.
 ##
-eth1Endpoint: []
+eth1Endpoint: ""
 
 ## Extra flags for prysm beacon chain node
 ##
