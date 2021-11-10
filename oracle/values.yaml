@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "feature-oracle-v2-docker"
+  tag: "v2.0.0"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
