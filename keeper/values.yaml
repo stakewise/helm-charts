@@ -38,11 +38,15 @@ resources:
 priorityClassName: ""
 
 settings:
+  logLevel: "INFO"
   network: "mainnet"
-  ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
   web3Endpoint: ""
   enableHealthServer: "True"
+  healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
+  eth1ConfirmationBlocks: "15"
+  processInterval: "180"
+  transactionTimeout: "900"
 
   # credentials
   keeperPrivateKey: ""

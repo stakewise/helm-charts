@@ -5,10 +5,14 @@ metadata:
   labels:
     {{- include "oracle.labels" . | nindent 4 }}
 data:
+  LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
-  IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}
-  ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
-  WEB3_ENDPOINT: { { .Values.settings.web3Endpoint | quote } }
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
-  HEALTH_SERVER_HOST: "0.0.0.0"
+  HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
+  IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}
+  IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
+  IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
+  ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
+  ETH1_CONFIRMATION_BLOCKS: {{ .Values.settings.eth1ConfirmationBlocks | quote }}
+  PROCESS_INTERVAL: {{ .Values.settings.processInterval | quote }}
