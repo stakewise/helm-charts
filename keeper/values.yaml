@@ -40,21 +40,13 @@ priorityClassName: ""
 settings:
   logLevel: "INFO"
   network: "mainnet"
-  ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
-  ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
-  ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
-  eth2Endpoint: ""
-
+  web3Endpoint: ""
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
-
   eth1ConfirmationBlocks: "15"
   processInterval: "180"
+  transactionTimeout: "900"
 
   # credentials
   oraclePrivateKey: ""
-  ipfsPinataApiKey: ""
-  ipfsPinataSecretKey: ""
-  awsAccessKeyID: ""
-  awsSecretAccessKey: ""

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "keeper.fullname" . }}
+  labels:
+    {{- include "keeper.labels" . | nindent 4 }}
+data:
+  LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
+  NETOWORK: {{ .Values.settings.network | quote }}
+  ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
+  HEALTH_SERVER_HOST: {{ .Values.settings.helathServerHost | quote }}
+  HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
+  ETH1_CONFIRMATION_BLOCKS: {{ .Values.settings.eth1ConfirmationBlocks | quote }}
+  WEB3_ENDPOINT: {{ .Values.settings.web3Endpoint | quote }}
+  PROCESS_INTERVAL: {{ .Values.settings.processInterval | quote }}
+  TRANSACTION_TIMEOUT: {{ .Values.settings.transactionTimeout | quote }}

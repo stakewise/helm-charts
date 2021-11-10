@@ -1,23 +1,23 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{ template "oracle.fullname" . }}
+  name: {{ template "keeper.fullname" . }}
   labels:
-    {{- include "oracle.labels" . | nindent 4 }}
+    {{- include "keeper.labels" . | nindent 4 }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{- include "oracle.selectorLabels" . | nindent 6 }}
+      {{- include "keeper.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "oracle.selectorLabels" . | nindent 8 }}
+        {{- include "keeper.selectorLabels" . | nindent 8 }}
       annotations:
-        checksum/oracle-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        checksum/oracle-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/keeper-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/keeper-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
     {{- if .Values.tolerations }}
       tolerations:
@@ -31,7 +31,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "oracle.fullname" . }}
+      serviceAccountName: {{ template "keeper.fullname" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -41,12 +41,12 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["python"]
-          args: ["oracle/main.py"]
+          args: ["keeper/main.py"]
           envFrom:
             - configMapRef:
-                name: {{ template "oracle.fullname" . }}
+                name: {{ template "keeper.fullname" . }}
             - secretRef:
-                name: {{ template "oracle.fullname" . }}
+                name: {{ template "keeper.fullname" . }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}

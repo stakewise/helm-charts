@@ -2,7 +2,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "oracle.name" -}}
+{{- define "keeper.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
@@ -11,7 +11,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "oracle.fullname" -}}
+{{- define "keeper.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -24,16 +24,16 @@ If release name contains chart name it will be used as a full name.
 {{- end -}}
 {{- end -}}
 
-{{- define "oracle.chart" -}}
+{{- define "keeper.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{/*
 Common labels
 */}}
-{{- define "oracle.labels" -}}
-helm.sh/chart: {{ include "oracle.chart" . }}
-{{ include "oracle.selectorLabels" . }}
+{{- define "keeper.labels" -}}
+helm.sh/chart: {{ include "keeper.chart" . }}
+{{ include "keeper.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -43,7 +43,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "oracle.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "oracle.name" . }}
+{{- define "keeper.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "keeper.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
