@@ -235,6 +235,8 @@ To ensure high availability and security of the operator's node infrastructure, 
 1. Limit access to the Kubernetes cluster as much as possible for everyone except those who really need it.
 1. Do not use spot instances, because with frequent restarts of validators there is a risk of missing attestations.
 
+> :warning: **Please note** that adherence to the best practices mentioned above is highly recommended and increases your chance of being approved by the StakeWise DAO.
+
 ## Documentation
 
 - https://geth.ethereum.org/docs/
