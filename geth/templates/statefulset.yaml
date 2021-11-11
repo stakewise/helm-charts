@@ -68,6 +68,9 @@ spec:
             - "--datadir=/data/ethereum"
             - "--ethash.dagdir=/data/ethereum/.ethash"
             - "--ipcdisable"
+          {{- if eq .Values.networkId "goerli" }}
+            - "--goerli"
+          {{- end }}
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
