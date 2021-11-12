@@ -91,7 +91,7 @@ admin:
   # For GKE load balancer ingress to work, the service type must be NodePort
   # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
   serviceType: NodePort
-  servicePort: "80"
+  servicePort: "8000"
 
   # Configure ingress
   # https://kubernetes.io/docs/concepts/services-networking/ingress/
@@ -185,7 +185,7 @@ api:
   # For GKE load balancer ingress to work, the service type must be NodePort
   # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
   serviceType: NodePort
-  servicePort: "80"
+  servicePort: "8000"
 
   # Configure ingress
   # https://kubernetes.io/docs/concepts/services-networking/ingress/
