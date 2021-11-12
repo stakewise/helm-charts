@@ -1,0 +1,33 @@
+{{- if and .Values.api.enabled .Values.api.ingress.enabled }}
+{{ $fullName := include "api.fullname" . }}
+{{ $ingressPath := .Values.api.ingress.path }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: {{ template "api.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "api"
+  {{- with .Values.api.ingress.labels }}
+    {{ toYaml . | nindent 4 | trim }}
+  {{- end }}
+{{- with .Values.api.ingress.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 | trim }}
+{{- end }}
+spec:
+{{- with .Values.api.ingress.tls }}
+  tls:
+    {{ toYaml . | nindent 4 | trim }}
+{{- end }}
+  rules:
+  {{- range .Values.api.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - path: {{ $ingressPath }}
+            backend:
+              serviceName: {{ $fullName }}
+              servicePort: http
+  {{- end }}
+{{- end }}

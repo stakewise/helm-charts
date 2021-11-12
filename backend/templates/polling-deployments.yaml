@@ -1,0 +1,81 @@
+{{ range $deployment := .Values.polling.deployments }}
+{{- $name := $deployment.command | replace "_" "-" -}}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "backend.fullname" $ }}-{{ $name }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "{{ $name }}"
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+      component: "{{ $name }}"
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+        component: "{{ $name }}"
+      annotations:
+        checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") $ | sha256sum }}
+        checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") $ | sha256sum }}
+        checksum/polling-configmap: {{ include (print $.Template.BasePath "/polling-configmap.yaml") $ | sha256sum }}
+    spec:
+    {{- if $.Values.polling.tolerations }}
+      tolerations:
+        {{ tpl $.Values.polling.tolerations $ | nindent 8 | trim }}
+    {{- end }}
+    {{- if $.Values.polling.affinity }}
+      affinity:
+        {{ tpl $.Values.polling.affinity $ | nindent 8 | trim }}
+    {{- end }}
+    {{- with $.Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "polling.fullname" $ }}
+      priorityClassName: {{ $.Values.polling.priorityClassName | quote }}
+    {{- if $deployment.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ $deployment.terminationGracePeriodSeconds }}
+    {{- end }}
+      initContainers:
+        - name: migrate-db
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["python", "manage.py", "migrate", "--no-input"]
+          envFrom:
+            - secretRef:
+                name: {{ template "backend.fullname" $ }}
+            - configMapRef:
+                name: {{ template "backend.fullname" $ }}
+            - configMapRef:
+                name: {{ template "polling.fullname" $ }}
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "server.polling_conf"
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          command: ["python", "manage.py", "{{ $deployment.command }}"]
+          envFrom:
+            - secretRef:
+                name: {{ template "backend.fullname" $ }}
+            - configMapRef:
+                name: {{ template "backend.fullname" $ }}
+            - configMapRef:
+                name: {{ template "polling.fullname" $ }}
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "server.polling_conf"
+        {{- with $deployment.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+---
+{{- end }}

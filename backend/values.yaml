@@ -1,0 +1,379 @@
+# Common configuration for all the containers (server.common_conf)
+commonConf:
+  secretKey: ""
+  websiteName: "StakeWise"
+
+  djangoLogLevel: "INFO"
+
+  sendEmails: "True"
+  mailgunApiKey: ""
+  mailgunSenderDomain: ""
+  emailHost: "mail.example.com"
+  emailUser: "user@example.com"
+  emailPassword: "password"
+  managers: ""
+
+  sendTelegramNotifications: "True"
+  telegramToken: "token"
+  telegramChatId: "123"
+
+  poolPage: "https://stakewise.io/app/pool"
+  poolContractAddress: "0x0"
+
+  soloPage: "https://stakewise.io/app/solo"
+
+  daiContractAddress: "0x0"
+  swiseContractAddress: "0x0"
+
+  validatorMaxPenaltyCount: "5"
+
+  staticUrl: "https://static.stakewise.io/"
+
+  # DAO Module
+  daoModuleContractAddress: "0x0"
+  multisigOwnersTelegramToken: "token"
+  multisigOwnersTelegramChatId: "123"
+
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+image:
+  repository: "gcr.io/stakewiselabs/backend"
+  tag: "v1.3.4"
+  pullPolicy: IfNotPresent
+  pullSecrets: [ ]
+
+admin:
+  # Whether to deploy admin or not.
+  enabled: true
+
+  # Admin configuration parameters.
+  conf:
+    adminBaseUrl: "admin/"
+    allowedHosts: ""
+
+  # How many admin pods to run simultaneously.
+  replicas: 1
+
+  # Enable pod disruption budget.
+  # https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  podDisruptionBudget:
+    enabled: false
+    maxUnavailable: 1
+
+  # Create HorizontalPodAutoscaler object.
+  # https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  horizontalAutoscaler:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          targetAverageUtilization: 90
+      - type: Resource
+        resource:
+          name: memory
+          targetAverageUtilization: 90
+
+  # Create an admin user if needed.
+  user:
+    create: false
+    username: "username"
+    password: "password"
+    email: "user@example.com"
+
+  # "Host" Header value to pass with the request for Host verification.
+  probesHostHeader: ""
+
+  # For GKE load balancer ingress to work, the service type must be NodePort
+  # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
+  serviceType: NodePort
+  servicePort: "8000"
+
+  # Configure ingress
+  # https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: false
+    annotations: { }
+    tls: [ ]
+    path: "/admin/*"
+    hosts: [ ]
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  resources:
+    requests:
+      cpu: 10m
+      memory: 150Mi
+
+  # Affinity Settings
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: { }
+
+  # Toleration Settings
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [ ]
+
+  # used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  priorityClassName: ""
+
+api:
+  # Whether to deploy api or not.
+  enabled: true
+
+  # API configuration parameters.
+  conf:
+    allowedHosts: ""
+    corsOriginWhitelist: ""
+
+    skipRecaptchaVerification: "False"
+    recaptchaUrl: "https://www.google.com/recaptcha/api/siteverify"
+    recaptchaSecret: ""
+    recaptchaHostname: ""
+    recaptchaContactAction: "contact"
+    recaptchaContactScore: "0.5"
+    recaptchaProfileAction: "profile"
+    recaptchaProfileScore: "0.5"
+    recaptchaFaucetTransferAction: "faucetTransfer"
+    recaptchaFaucetTransferScore: "0.5"
+
+  # How many api pods to run simultaneously.
+  replicas: 2
+
+  # Enable pod disruption budget.
+  # https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
+  # Create HorizontalPodAutoscaler object.
+  # https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+  horizontalAutoscaler:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 3
+    metrics:
+      - type: Resource
+        resource:
+          name: cpu
+          targetAverageUtilization: 90
+      - type: Resource
+        resource:
+          name: memory
+          targetAverageUtilization: 90
+
+  # Vertical Pod Autoscaler config
+  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  verticalAutoscaler:
+    # If true a VPA object will be created for the Deployment
+    # NB! VPA must not be used together with HPA
+    enabled: true
+    updateMode: Auto
+    containerPolicies: |
+      - containerName: {{ .Chart.Name }}
+        maxAllowed:
+          cpu: "100m"
+          memory: "500m"
+
+  # "Host" Header value to pass with the request for Host verification.
+  probesHostHeader: "api.stakewise.io"
+
+  # For GKE load balancer ingress to work, the service type must be NodePort
+  # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
+  serviceType: NodePort
+  servicePort: "8000"
+
+  # Configure ingress
+  # https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ingress:
+    enabled: true
+    annotations: [ ]
+    tls: [ ]
+    path: "/*"
+    hosts:
+      - "api.stakewise.io"
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  resources: { }
+
+  # Affinity Settings
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: |
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          podAffinityTerm:
+            topologyKey: kubernetes.io/hostname
+            labelSelector:
+              matchLabels:
+                app: {{ template "backend.name" . }}
+                release: {{ .Release.Name | quote }}
+                component: "api"
+
+  # Toleration Settings
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [ ]
+
+  # used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  priorityClassName: ""
+
+polling:
+  priorityClassName: ""
+
+  # Affinity Settings
+  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: { }
+
+  # Toleration Settings
+  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+  tolerations: [ ]
+
+  deployments:
+    - command: "poll_payments"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+
+    - command: "poll_validator_bills"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+
+    - command: "poll_oracles"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 100m
+          memory: 100Mi
+    
+    - command: "poll_settings"
+      terminationGracePeriodSeconds: 300
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+    
+    - command: "poll_activations"
+      terminationGracePeriodSeconds: 300
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+
+    - command: "poll_tokens"
+      terminationGracePeriodSeconds: 300
+      resources:
+        requests:
+          cpu: 100m
+          memory: 200Mi
+
+    - command: "poll_balance_snapshots"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+
+    - command: "poll_validators"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+
+  conf:
+    # ETH Endpoints
+    eth1Endpoint: ""
+    eth2Endpoint: ""
+
+    # settings
+    pollSettingsPeriod: "120"
+
+    activatedDepositsNotifySeconds: "86400"
+
+    # polling periods
+    pollPaymentsPeriod: "15"
+    pollActivationsPeriod: "15"
+    pollValidatorsPeriod: "30"
+    pollOraclesPeriod: "15"
+    pollTokenTransfersPeriod: "15"
+
+    # payments
+    soloPaymentsRecipientAddress: "0x0"
+
+    # merkle distributor
+    ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
+
+postgresql:
+  volumePermissions:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 10-debian-10-r98
+      pullPolicy: Always
+    securityContext:
+      runAsUser: 0
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  serviceAccount:
+    enabled: true
+    name: postgresql
+  rbac:
+    create: false
+  replication:
+    enabled: true
+    user: repl_user
+    password: repl_password
+    readReplicas: 2
+    synchronousCommit: "on"
+    numSynchronousReplicas: 1
+    applicationName: backend_application
+  postgresqlUsername: "postgres"
+  postgresqlPassword: "postgres"
+  usePasswordFile: true
+  postgresqlDatabase: backend
+  postgresqlDataDir: /bitnami/postgresql/data
+  primaryAsStandBy:
+    enabled: false
+  postgresqlSharedPreloadLibraries: "pgaudit"
+  shmVolume:
+    enabled: true
+    chmod:
+      enabled: true
+  persistence:
+    enabled: true
+    mountPath: /bitnami/postgresql
+    subPath: ''
+    accessModes:
+      - ReadWriteOnce
+    size: 20Gi
+    annotations: { }
+    selector: { }
+  readReplicas:
+    persistence:
+      enabled: true
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+  networkPolicy:
+    enabled: false
+  tls:
+    enabled: false
+  metrics:
+    enabled: true

@@ -1,0 +1,19 @@
+{{- if .Values.api.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "api.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "api"
+spec:
+  type: {{ .Values.api.serviceType | default "ClusterIP" }}
+  ports:
+    - name: http
+      port: {{ .Values.api.servicePort }}
+      protocol: TCP
+      targetPort: http
+  selector:
+    {{- include "backend.selectorLabels" . | nindent 4 }}
+    component: "api"
+{{- end }}

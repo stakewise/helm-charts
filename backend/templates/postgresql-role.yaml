@@ -1,0 +1,15 @@
+{{- if .Values.postgresql.serviceAccount.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  name: {{ template "backend.fullname" . }}-postgresql
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "postgresql"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames:
+      - {{ template "backend.fullname" . }}-postgresql
+    verbs: ["get"]
+{{- end }}
