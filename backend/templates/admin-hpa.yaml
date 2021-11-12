@@ -1,0 +1,18 @@
+{{- if and .Values.admin.enabled .Values.admin.horizontalAutoscaler.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ template "admin.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "admin"
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ template "admin.fullname" . }}
+  minReplicas: {{ .Values.admin.horizontalAutoscaler.minReplicas }}
+  maxReplicas: {{ .Values.admin.horizontalAutoscaler.maxReplicas }}
+  metrics:
+    {{ toYaml .Values.admin.horizontalAutoscaler.metrics | nindent 4 | trim }}
+{{- end }}

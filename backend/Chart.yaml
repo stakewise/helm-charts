@@ -1,0 +1,21 @@
+apiVersion: v2
+name: backend
+version: 2.0.0
+appVersion: v2.0.0
+kubeVersion: "^1.14.0-0"
+description: The StakeWise backend application.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/tsudmi/backend/
+dependencies:
+  - name: postgresql
+    version: 10.4.9
+    repository: https://charts.bitnami.com/bitnami/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io

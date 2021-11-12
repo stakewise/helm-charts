@@ -1,0 +1,25 @@
+{{- if or .Values.admin.enabled .Values.api.enabled .Values.operator.enabled .Values.emailCronJobs .Values.polling.deployments }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "backend.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+data:
+  # https://github.com/notifiers/notifiers/issues/328
+  USERNAME: user
+  WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
+  MANAGERS: {{ .Values.commonConf.managers | quote }}
+  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
+  POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
+  POOL_CONTRACT_ADDRESS: {{ .Values.commonConf.poolContractAddress | quote }}
+  SWISE_CONTRACT_ADDRESS: {{ .Values.commonConf.swiseContractAddress | quote }}
+  DAI_CONTRACT_ADDRESS: {{ .Values.commonConf.daiContractAddress | quote }}
+  SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
+  VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
+  STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
+  DAO_MODULE_CONTRACT_ADDRESS: {{ .Values.commonConf.daoModuleContractAddress | quote }}
+  SEND_EMAILS: {{ .Values.commonConf.sendEmails | quote }}
+  MAILGUN_SENDER_DOMAIN: {{ .Values.commonConf.mailgunSenderDomain | quote }}
+  DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
+{{- end }}

@@ -1,0 +1,19 @@
+{{- if .Values.admin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "admin.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "admin"
+spec:
+  type: {{ .Values.admin.serviceType | default "ClusterIP" }}
+  ports:
+    - name: http
+      port: {{ .Values.admin.servicePort }}
+      protocol: TCP
+      targetPort: http
+  selector:
+    {{- include "backend.selectorLabels" . | nindent 4 }}
+    component: "admin"
+{{- end }}
