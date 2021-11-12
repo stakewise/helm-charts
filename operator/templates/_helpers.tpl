@@ -73,8 +73,8 @@ Update permissions on files inside /data directory
 */}}
 {{- define "init-chown" -}}
 - name: init-chown
-  image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-  imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+  image: "{{ .Values.initImageBusybox.repository }}:{{ .Values.initImageBusybox.tag }}"
+  imagePullPolicy: {{ .Values.initImageBusybox.pullPolicy }}
   securityContext:
     runAsUser: 0
   command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
