@@ -50,7 +50,11 @@ spec:
             runAsUser: 0
           env:
             - name: VAULT_ADDR
+              {{- if $root.Values.vaultAddr }}
+              value: {{ $root.Values.vaultAddr | quote }}
+              {{- else }}
               value: "http://{{ template "operator.fullname" $ }}-vault:8200"
+              {{- end }}
             - name: NETWORK_ID
               value: {{ $root.Values.networkID | quote }}
             - name: VALIDATOR_TYPE
