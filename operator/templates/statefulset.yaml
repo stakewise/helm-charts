@@ -125,10 +125,10 @@ spec:
       volumes:
         - name: configs
           configMap:
-            name: {{ template "operator.fullname" $root }}-validator-configs
+            name: {{ template "operator.fullname" $root }}-configs
         - name: validator-init
           configMap:
-            name: {{ template "operator.fullname" $root }}-validator-init
+            name: {{ template "operator.fullname" $root }}-init
 {{- if (not $root.Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
