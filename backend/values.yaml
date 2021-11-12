@@ -223,31 +223,6 @@ api:
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   priorityClassName: ""
 
-emailCronJobs:
-  # Whether to deploy cron jobs or not.
-  enabled: true
-
-  # Affinity Settings
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: { }
-
-  # Toleration Settings
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-  tolerations: [ ]
-
-  deployments:
-    - command: "send_mail"
-      schedule: "* * * * *" # every minute
-      priorityClassName: ""
-
-    - command: "retry_deferred"
-      schedule: "0/10 * * * *" # every 10th minute
-      priorityClassName: ""
-
-    - command: "purge_mailer_log"
-      schedule: "0 0 * * *" # every day at 00:00
-      priorityClassName: ""
-
 polling:
   priorityClassName: ""
 
@@ -272,13 +247,6 @@ polling:
       resources:
         requests:
           cpu: 100m
-          memory: 100Mi
-
-    - command: "poll_create_superuser"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 50m
           memory: 100Mi
 
     - command: "poll_oracles"

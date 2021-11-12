@@ -14,7 +14,7 @@ sources:
   - https://github.com/tsudmi/backend/
 dependencies:
   - name: postgresql
-    version: 10.4.9
+    version: 10.13.8
     repository: https://charts.bitnami.com/bitnami/
 maintainers:
   - name: Dmitri Tsumak
