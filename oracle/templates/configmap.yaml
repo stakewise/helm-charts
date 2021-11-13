@@ -10,9 +10,13 @@ data:
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  IPFS_ENDPOINT: {{ .Values.settings.ipfsEndpoint | quote }}
+  IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
   ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
+  ETH2_CLIENT: {{ .Values.settings.eth2Client | quote }}
   ETH1_CONFIRMATION_BLOCKS: {{ .Values.settings.eth1ConfirmationBlocks | quote }}
-  PROCESS_INTERVAL: {{ .Values.settings.processInterval | quote }}
+  ORACLE_PROCESS_INTERVAL: {{ .Values.settings.oracleProcessInterval | quote }}
+  STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl | quote }}
+  UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl | quote }}
+  ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl | quote }}

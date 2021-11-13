@@ -40,17 +40,25 @@ priorityClassName: ""
 settings:
   logLevel: "INFO"
   network: "mainnet"
-  ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
+
+  ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+
   eth2Endpoint: ""
+  eth2Client: "prysm"
 
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 
   eth1ConfirmationBlocks: "15"
-  processInterval: "180"
+  oracleProcessInterval: "180"
+
+  # Graph
+  stakewiseSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+  uniswapV3SubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+  ethereumSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
 
   # credentials
   oraclePrivateKey: ""
