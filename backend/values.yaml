@@ -1,38 +1,30 @@
 # Common configuration for all the containers (server.common_conf)
 commonConf:
   secretKey: ""
+  network: "mainnet"
+
+  oraclesSyncPeriodSeconds: "86400"
+  validatorMaxPenaltyCount: "5"
+
   websiteName: "StakeWise"
+  poolPage: "https://app.stakewise.io"
+  soloPage: "https://solo.stakewise.io"
 
   djangoLogLevel: "INFO"
 
   sendEmails: "True"
   mailgunApiKey: ""
-  mailgunSenderDomain: ""
-  emailHost: "mail.example.com"
-  emailUser: "user@example.com"
-  emailPassword: "password"
+  mailgunSenderDomain: "stakewise.io"
+  defaultFromEmail: '"StakeWise" <info@stakewise.io>'
   managers: ""
-
-  sendTelegramNotifications: "True"
-  telegramToken: "token"
-  telegramChatId: "123"
-
-  poolPage: "https://stakewise.io/app/pool"
-  poolContractAddress: "0x0"
-
-  soloPage: "https://stakewise.io/app/solo"
-
-  daiContractAddress: "0x0"
-  swiseContractAddress: "0x0"
-
-  validatorMaxPenaltyCount: "5"
 
   staticUrl: "https://static.stakewise.io/"
 
-  # DAO Module
-  daoModuleContractAddress: "0x0"
-  multisigOwnersTelegramToken: "token"
-  multisigOwnersTelegramChatId: "123"
+  sendTelegramNotifications: "True"
+  telegramToken: ""
+  telegramChatId: ""
+  multisigOwnersTelegramToken: ""
+  multisigOwnersTelegramChatId: ""
 
 securityContext:
   fsGroup: 1001
@@ -50,7 +42,6 @@ admin:
 
   # Admin configuration parameters.
   conf:
-    adminBaseUrl: "admin/"
     allowedHosts: ""
 
   # How many admin pods to run simultaneously.
@@ -129,6 +120,7 @@ api:
   conf:
     allowedHosts: ""
     corsOriginWhitelist: ""
+    corsAllowAllOrigins: "False"
 
     skipRecaptchaVerification: "False"
     recaptchaUrl: "https://www.google.com/recaptcha/api/siteverify"
@@ -138,8 +130,6 @@ api:
     recaptchaContactScore: "0.5"
     recaptchaProfileAction: "profile"
     recaptchaProfileScore: "0.5"
-    recaptchaFaucetTransferAction: "faucetTransfer"
-    recaptchaFaucetTransferScore: "0.5"
 
   # How many api pods to run simultaneously.
   replicas: 2
@@ -292,27 +282,25 @@ polling:
           memory: 100Mi
 
   conf:
-    # ETH Endpoints
+    # Endpoints
+    ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
     eth1Endpoint: ""
+    eth2Client: "prysm"
     eth2Endpoint: ""
-
-    # settings
-    pollSettingsPeriod: "120"
-
-    activatedDepositsNotifySeconds: "86400"
 
     # polling periods
     pollPaymentsPeriod: "15"
-    pollActivationsPeriod: "15"
-    pollValidatorsPeriod: "30"
+    unpaidValidatorsExitDelay: "864000"
     pollOraclesPeriod: "15"
+    pollSettingsPeriod: "120"
+
+    realityEthQuestionUrlTemplate: "https://reality.eth.link/app/#!/question/{question_id}"
+    votingPage: "https://vote.stakewise.io/"
+
+    pollActivationsPeriod: "15"
     pollTokenTransfersPeriod: "15"
-
-    # payments
-    soloPaymentsRecipientAddress: "0x0"
-
-    # merkle distributor
-    ipfsEndpoint: "/dns/ipfs.infura.io/tcp/5001/https"
+    activatedDepositsNotifySeconds: "86400"
+    pollValidatorsPeriod: "30"
 
 postgresql:
   volumePermissions:
@@ -335,14 +323,6 @@ postgresql:
     name: postgresql
   rbac:
     create: false
-  replication:
-    enabled: true
-    user: repl_user
-    password: repl_password
-    readReplicas: 2
-    synchronousCommit: "on"
-    numSynchronousReplicas: 1
-    applicationName: backend_application
   postgresqlUsername: "postgres"
   postgresqlPassword: "postgres"
   usePasswordFile: true
