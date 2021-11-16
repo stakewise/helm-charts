@@ -56,7 +56,7 @@ spec:
                 name: {{ template "api.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "server.api.conf"
+              value: "backend.settings.api_settings"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -70,7 +70,7 @@ spec:
                 name: {{ template "api.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "server.api.conf"
+              value: "backend.settings.api_settings"
         {{- with .Values.api.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
