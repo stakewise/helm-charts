@@ -44,22 +44,6 @@ If release name contains chart name it will be used as a full name.
 Common labels
 */}}
 {{- define "backend.labels" -}}
-app: {{ template "backend.name" . }}
-chart: {{ template "backend.chart" . }}
-release: {{ .Release.Name | quote }}
-heritage: {{ .Release.Service | quote }}
-{{- end -}}
-
-{{- define "backend.selectorLabels" -}}
-app: {{ template "backend.name" . }}
-release: {{ .Release.Name | quote }}
-component: "admin"
-{{- end -}}
-
-{{/*
-Common labels
-*/}}
-{{- define "backend.labels" -}}
 helm.sh/chart: {{ include "backend.chart" . }}
 {{ include "backend.selectorLabels" . }}
 {{- if .Chart.AppVersion }}

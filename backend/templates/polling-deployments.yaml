@@ -5,7 +5,7 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "backend.fullname" $ }}-{{ $name }}
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "backend.labels" $ | nindent 4 }}
     component: "{{ $name }}"
 spec:
   replicas: 1
@@ -14,12 +14,12 @@ spec:
   minReadySeconds: 10
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "backend.selectorLabels" $ | nindent 6 }}
       component: "{{ $name }}"
   template:
     metadata:
       labels:
-        {{- include "backend.selectorLabels" . | nindent 8 }}
+        {{- include "backend.selectorLabels" $ | nindent 8 }}
         component: "{{ $name }}"
       annotations:
         checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") $ | sha256sum }}

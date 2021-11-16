@@ -1,4 +1,4 @@
-{{- if or .Values.admin.enabled .Values.api.enabled .Values.operator.enabled .Values.polling.deployments }}
+{{- if or .Values.admin.enabled .Values.api.enabled .Values.polling.deployments }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

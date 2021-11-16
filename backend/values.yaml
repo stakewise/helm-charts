@@ -90,7 +90,7 @@ admin:
     enabled: false
     annotations: { }
     tls: [ ]
-    path: "/admin/*"
+    path: "/admin"
     hosts: [ ]
 
   # Configure resource requests and limits.
@@ -183,7 +183,7 @@ api:
     enabled: true
     annotations: [ ]
     tls: [ ]
-    path: "/*"
+    path: "/"
     hosts:
       - "api.stakewise.io"
 
