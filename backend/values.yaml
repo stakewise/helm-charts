@@ -34,7 +34,7 @@ image:
   repository: "gcr.io/stakewiselabs/backend"
   tag: "v1.3.4"
   pullPolicy: IfNotPresent
-  pullSecrets: [ ]
+  pullSecrets: {}
 
 admin:
   # Whether to deploy admin or not.
