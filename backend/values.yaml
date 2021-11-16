@@ -285,8 +285,7 @@ polling:
     # Endpoints
     ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
     eth1Endpoint: ""
-    eth2Client: "prysm"
-    eth2Endpoint: ""
+    prysmEndpoint: ""
 
     # polling periods
     pollPaymentsPeriod: "15"

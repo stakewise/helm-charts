@@ -9,8 +9,7 @@ metadata:
 data:
   IPFS_FETCH_ENDPOINTS: {{ .Values.polling.conf.ipfsFetchEndpoints }}
   ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint | quote }}
-  ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint | quote }}
-  ETH2_CLIENT: {{ .Values.polling.conf.eth2Client | quote }}
+  PRYSM_ENDPOINT: {{ .Values.polling.conf.prysmEndpoint | quote }}
   POLL_PAYMENTS_PERIOD: {{ .Values.polling.conf.pollPaymentsPeriod | quote }}
   UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.polling.conf.unpaidValidatorsExitDelay | quote }}
   POLL_ORACLES_PERIOD: {{ .Values.polling.conf.pollOraclesPeriod | quote }}
