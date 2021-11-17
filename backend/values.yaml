@@ -161,7 +161,7 @@ api:
   verticalAutoscaler:
     # If true a VPA object will be created for the Deployment
     # NB! VPA must not be used together with HPA
-    enabled: true
+    enabled: false
     updateMode: Off
     containerPolicies: |
       - containerName: {{ .Chart.Name }}
