@@ -25,7 +25,7 @@ spec:
     - host: {{ . }}
       http:
         paths:
-          - pathType: Prefix
+          - pathType: ImplementationSpecific
             path: {{ $ingressPath }}
             backend:
               service:

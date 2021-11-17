@@ -31,10 +31,10 @@ securityContext:
   runAsUser: 1001
 
 image:
-  repository: "gcr.io/stakewiselabs/backend"
-  tag: "v1.3.4"
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
+  tag: "v2.0.0"
   pullPolicy: IfNotPresent
-  pullSecrets: {}
+  pullSecrets: { }
 
 admin:
   # Whether to deploy admin or not.
@@ -90,7 +90,7 @@ admin:
     enabled: false
     annotations: { }
     tls: [ ]
-    path: "/admin"
+    path: "/admin/*"
     hosts: [ ]
 
   # Configure resource requests and limits.
@@ -162,7 +162,7 @@ api:
     # If true a VPA object will be created for the Deployment
     # NB! VPA must not be used together with HPA
     enabled: true
-    updateMode: Auto
+    updateMode: Off
     containerPolicies: |
       - containerName: {{ .Chart.Name }}
         maxAllowed:
@@ -183,9 +183,8 @@ api:
     enabled: true
     annotations: [ ]
     tls: [ ]
-    path: "/"
-    hosts:
-      - "api.stakewise.io"
+    path: "/*"
+    hosts: [ ]
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
@@ -245,14 +244,14 @@ polling:
         requests:
           cpu: 100m
           memory: 100Mi
-    
+
     - command: "poll_settings"
       terminationGracePeriodSeconds: 300
       resources:
         requests:
           cpu: 100m
           memory: 200Mi
-    
+
     - command: "poll_activations"
       terminationGracePeriodSeconds: 300
       resources:
