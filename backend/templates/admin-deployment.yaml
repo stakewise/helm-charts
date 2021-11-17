@@ -54,9 +54,7 @@ spec:
                 name: {{ template "backend.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "server.admin.conf"
-            - name: ADMIN_BASE_URL
-              value: {{ .Values.admin.conf.adminBaseUrl | quote }}
+              value: "backend.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
       {{- if .Values.admin.user.create }}
@@ -73,9 +71,7 @@ spec:
                 name: {{ template "admin.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "server.admin.conf"
-            - name: ADMIN_BASE_URL
-              value: {{ .Values.admin.conf.adminBaseUrl | quote }}
+              value: "backend.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
       {{- end }}
@@ -90,9 +86,7 @@ spec:
                 name: {{ template "backend.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "server.admin.conf"
-            - name: ADMIN_BASE_URL
-              value: {{ .Values.admin.conf.adminBaseUrl | quote }}
+              value: "backend.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
         {{- with .Values.admin.resources }}
@@ -105,7 +99,7 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: {{ printf "/%slogin/" .Values.admin.conf.adminBaseUrl }}
+              path: "/admin/login/"
               port: http
             {{- if .Values.admin.probesHostHeader }}
               httpHeaders:
@@ -118,7 +112,7 @@ spec:
             periodSeconds: 60
           readinessProbe:
             httpGet:
-              path: {{ printf "/%slogin/" .Values.admin.conf.adminBaseUrl }}
+              path: "/admin/login/"
               port: http
             {{- if .Values.admin.probesHostHeader }}
               httpHeaders:

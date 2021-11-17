@@ -1,4 +1,4 @@
-{{- if or .Values.admin.enabled .Values.api.enabled .Values.operator.enabled .Values.emailCronJobs .Values.polling.deployments }}
+{{- if or .Values.admin.enabled .Values.api.enabled .Values.polling.deployments }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,18 +8,17 @@ metadata:
 data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
-  WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
-  MANAGERS: {{ .Values.commonConf.managers | quote }}
-  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
-  POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
-  POOL_CONTRACT_ADDRESS: {{ .Values.commonConf.poolContractAddress | quote }}
-  SWISE_CONTRACT_ADDRESS: {{ .Values.commonConf.swiseContractAddress | quote }}
-  DAI_CONTRACT_ADDRESS: {{ .Values.commonConf.daiContractAddress | quote }}
-  SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
+  NETWORK: {{ .Values.commonConf.network | quote }}
+  ORACLES_SYNC_PERIOD_SECONDS: {{ .Values.commonConf.oraclesSyncPeriodSeconds | quote }}
   VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
-  STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
-  DAO_MODULE_CONTRACT_ADDRESS: {{ .Values.commonConf.daoModuleContractAddress | quote }}
+  WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
+  POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
+  SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
+  DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
   SEND_EMAILS: {{ .Values.commonConf.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.commonConf.mailgunSenderDomain | quote }}
-  DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
+  DEFAULT_FROM_EMAIL: {{ .Values.commonConf.defaultFromEmail | quote }}
+  MANAGERS: {{ .Values.commonConf.managers | quote }}
+  STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
+  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
 {{- end }}

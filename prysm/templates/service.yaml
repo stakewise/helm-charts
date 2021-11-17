@@ -25,6 +25,11 @@ spec:
     - name: rpc
       port: {{ .Values.rpc.port }}
       targetPort: rpc
+  {{- if .Values.http.enabled }}
+    - name: http
+      port: {{ .Values.http.port }}
+      targetPort: http
+  {{- end }}
   {{- if .Values.metrics.enabled }}
     - name: metrics
       port: {{ .Values.metrics.port }}

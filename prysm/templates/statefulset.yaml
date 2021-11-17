@@ -88,6 +88,14 @@ spec:
           {{- if .Values.metrics.enabled }}
             - "--monitoring-port={{ .Values.metrics.port }}"
             - "--monitoring-host=0.0.0.0"
+          {{- else }}
+            - "--disable-monitoring"
+          {{- end }}
+          {{- if .Values.http.enabled }}
+            - "--grpc-gateway-host=0.0.0.0"
+            - "--grpc-gateway-port={{ .Values.http.port }}"
+          {{- else }}
+            - "--disable-grpc-gateway"
           {{- end }}
           env:
             - name: POD_IP
@@ -104,6 +112,11 @@ spec:
             - containerPort: 12000
               name: p2p-udp
               protocol: UDP
+          {{- if .Values.http.enabled }}
+            - containerPort: {{ .Values.http.port }}
+              name: http
+              protocol: TCP
+          {{- end }}
           {{- if .Values.metrics.enabled }}
             - containerPort: {{ .Values.metrics.port }}
               name: metrics
