@@ -64,14 +64,14 @@ $ helm upgrade --install operator ./operator \
 2. Wait until all eth1 nodes fully synced. Choose what type of eth2 node (options: [prysm](https://github.com/stakewise/helm-charts/tree/main/prysm) / [lighthouse](https://github.com/stakewise/helm-charts/tree/main/lighthouse))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth2 node with 1 replica as hot reserve. Configuration tips: 
   * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes. 
   * Set `networkID` (options: `mainnet`, `prater`). 
-  * Set `eth1Endpoint` to the main eth1 node address (eg. `http://geth:8545`)
+  * Set `eth1Endpoint` to the main eth1 node address (e.g. `http://geth:8545`)
 3. Deploy and configure `vault`. [Instructions below](#vault).
 4. Use [`operator-cli`](https://github.com/stakewise/cli) to generate proposal and upload your's validators keys to the `vault`.
 5. Wait until all eth2 nodes fully synced. Deploy `operator` chart. Configuration tips (below points related to the `values.yaml` parameters):
   * Set `type` to one of the supported validators type (`prysm`, `lighthouse`) 
   * Set `networkID` (options: `mainnet`, `prater`).
   * Set `graffiti` (usually company name)
-  * Set `beaconChainRpcEndpoint` to the eth2 node address suitable for this validator. (eg. if `type=prysm` set `beaconChainRpcEndpoint: prysm.validators.svc.cluster.local:4000`)
+  * Set `beaconChainRpcEndpoint` to the eth2 node address suitable for this validator. (e.g. if `type=prysm` set `beaconChainRpcEndpoint: prysm.validators.svc.cluster.local:4000`)
   * Set `vaultAddr` to the address of `vault` service. (eg `vaultAddr: "http://vault.vault:8200"`)
 
 ## <a name="vault"></a>Vault usage
@@ -237,7 +237,7 @@ $ exit
 ## Hardware requirements
 
 1. At least 3 nodes in Kubernetes cluster with 8CPU/16G RAM configuration.
-1. 400-500G of Persistent Storage.
+1. 400-500G of Persistent Storage per node.
 
 ## High Availability and Security Recommendations
 
