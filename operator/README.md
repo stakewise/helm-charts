@@ -58,12 +58,25 @@ $ helm upgrade --install operator ./operator \
 
 ## How to
 
-1. Install helm chart with only ETH1 nodes enabled (`geth` and `openethereum` sections in the `values.yaml` file). Wait until ETH1 nodes are fully synced.
-1. Upgrade installation with ETH2 nodes enabled (`prysm` and `lighthouse`). Wait until ETH2 nodes are fully synced.
-1. Upgrade installation with vault enabled and configured (instruction below).
-1. Upgrade installation with validators enabled.
+1. Choose what type of eth1 node (options: [geth](https://github.com/stakewise/helm-charts/tree/main/geth) / [openethereum](https://github.com/stakewise/helm-charts/tree/main/openethereum))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth1 node with 1 replica as hot reserve. Configuration tips: 
+  * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes.
+  * Set `networkID` (options: `mainnet`, `prater`).
+2. Wait until all eth1 nodes fully synced. Choose what type of eth2 node (options: [prysm](https://github.com/stakewise/helm-charts/tree/main/prysm) / [lighthouse](https://github.com/stakewise/helm-charts/tree/main/lighthouse))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth2 node with 1 replica as hot reserve. Configuration tips: 
+  * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes. 
+  * Set `networkID` (options: `mainnet`, `prater`). 
+  * Set `eth1Endpoint` to the main eth1 node address (eg. `http://geth:8545`)
+3. Deploy and configure `vault`. [Instructions below](#vault).
+4. Use [`operator-cli`](https://github.com/stakewise/cli) to generate proposal and upload your's validators keys to the `vault`.
+5. Wait until all eth2 nodes fully synced. Deploy `operator` chart. Configuration tips (below points related to the `values.yaml` parameters):
+  * Set `type` to one of the supported validators type (`prysm`, `lighthouse`) 
+  * Set `networkID` (options: `mainnet`, `prater`).
+  * Set `graffiti` (usually company name)
+  * Set `beaconChainRpcEndpoint` to the eth2 node address suitable for this validator. (eg. if `type=prysm` set `beaconChainRpcEndpoint: prysm.validators.svc.cluster.local:4000`)
+  * Set `vaultAddr` to the address of `vault` service. (eg `vaultAddr: "http://vault.vault:8200"`)
 
-## Vault usage
+## <a name="vault"></a>Vault usage
+
+A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm). Please take a look at the example configuration in the file [`values.example.yaml`](https://github.com/stakewise/helm-charts/blob/main/operator/values.example.yaml)
 
 After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 
@@ -220,6 +233,11 @@ Lastly, exit the `operator-vault-0` pod.
 ```console
 $ exit
 ```
+
+## Hardware requirements
+
+1. At least 3 nodes in Kubernetes cluster with 8CPU/16G RAM configuration.
+1. 400-500G of Persistent Storage.
 
 ## High Availability and Security Recommendations
 
