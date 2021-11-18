@@ -41,18 +41,18 @@ dependencies:
     version: 0.16.1
     condition: vault.enabled
   - name: geth
-    repository: https://charts.stakewise.io
+    repository: "file://../geth"
     version: "0.1.0"
     condition: geth.enabled
   - name: openethereum
-    repository: https://charts.stakewise.io
+    repository: "file://../openethereum"
     version: "0.1.0"
     condition: openethereum.enabled
   - name: prysm
-    repository: https://charts.stakewise.io
+    repository: "file://../prysm"
     version: "0.1.0"
     condition: prysm.enabled
   - name: lighthouse
-    repository: https://charts.stakewise.io
+    repository: "file://../lighthouse"
     version: "0.1.0"
     condition: lighthouse.enabled
