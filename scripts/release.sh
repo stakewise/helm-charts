@@ -27,26 +27,17 @@ prev_rev=$(git rev-parse HEAD^)
 echo "Identifying changed charts since git rev ${prev_rev}"
 
 changed_charts=()
-# readarray -t changed_charts <<< "$(git diff --find-renames --diff-filter=d --name-only "$prev_rev" -- charts | cut -d '/' -f 2 | uniq)"
+readarray -t changed_charts <<< "$(git diff --find-renames --diff-filter=d --name-only "$prev_rev" -- charts | cut -d '/' -f 2 | uniq)"
 
-# if [[ -n "${changed_charts[*]}" ]]; then
-#     for chart in "${changed_charts[@]}"; do
-#         echo "Packaging chart '$chart'..."
-#         helm dependency update charts/$chart
-#         chart_file=$(helm package "charts/$chart" | awk '{print $NF}')
+if [[ -n "${changed_charts[*]}" ]]; then
+    for chart in "${changed_charts[@]}"; do
+        echo "Packaging chart '$chart'..."
+        helm dependency update charts/$chart
+        chart_file=$(helm package "charts/$chart" | awk '{print $NF}')
 
-#         echo "Pushing $chart_file..."
-#         helm gcs push "$chart_file" private
-#     done
-# else
-#     echo "No chart changes detected"
-# fi
-
-for chart in "charts/*"; do
-    echo "Packaging chart '$chart'..."
-    helm dependency update charts/$chart
-    chart_file=$(helm package "charts/$chart" | awk '{print $NF}')
-
-    echo "Pushing $chart_file..."
-    helm gcs push "$chart_file" private
-done
+        echo "Pushing $chart_file..."
+        helm gcs push "$chart_file" private
+    done
+else
+    echo "No chart changes detected"
+fi
