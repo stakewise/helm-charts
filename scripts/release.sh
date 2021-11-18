@@ -37,7 +37,7 @@ if [[ -n "${changed_charts[*]}" ]]; then
         chart_file=$(helm package "charts/$chart" | awk '{print $NF}')
 
         echo "Pushing $chart_file..."
-        helm gcs push "$chart_file" private
+        helm gcs push "$chart_file" private --bucketPath charts/ --force
     done
 else
     echo "No chart changes detected"
