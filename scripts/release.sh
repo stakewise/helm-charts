@@ -22,6 +22,7 @@ helm repo add private ${GCS_BUCKET_NAME}
 # add dependent helm repos
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo add hashicorp https://helm.releases.hashicorp.com
+helm repo add stakewise https://charts.stakewise.io
 
 prev_rev=$(git rev-parse HEAD^)
 echo "Identifying changed charts since git rev ${prev_rev}"
