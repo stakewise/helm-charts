@@ -1,6 +1,9 @@
 name: Helm Charts
 
-on: [pull_request, push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   release:
