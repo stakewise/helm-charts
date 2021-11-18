@@ -5,9 +5,8 @@ Kubernetes Helm chart for deploying StakeWise BLS Horcrux dispatcher.
 ## TL;DR;
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release --set dispatcher.authenticationKey="abcd1234" ./horcrux
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release --set dispatcher.authenticationKey="abcd1234" stakewise/horcrux
 ```
 
 ## Introduction
@@ -24,9 +23,8 @@ Can be used to deploy StakeWise BLS Horcrux dispatcher on a [Kubernetes](http://
 To install the chart with the release name `my-release`:
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release ./horcrux
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release stakewise/horcrux
 ```
 
 The command deploys Horcrux dispatcher on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists various ways to override default configuration during deployment.
@@ -54,7 +52,7 @@ The above command specifies the authentication key for the dispatcher.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release ./horcrux -f values.yaml
+$ helm install my-release stakewise/horcrux -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)

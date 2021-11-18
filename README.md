@@ -5,9 +5,8 @@ The curated list of StakeWise helm charts. Every chart is located in a separate 
 ## TL;DR
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release ./<chart-directory>
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release stakewise/<chart-name>
 ```
 
 ## Before you begin
@@ -40,5 +39,5 @@ to use the Helm client to manage packages on your Kubernetes cluster.
 
 Useful Helm Client Commands:
 
-* Install a chart: `helm install my-release ./<chart-name>`
+* Install a chart: `helm install my-release stakewise/<chart-name>`
 * Upgrade your application: `helm upgrade`
