@@ -6,9 +6,8 @@ it to the [Oracles](https://github.com/stakewise/contracts/blob/master/contracts
 ## TL;DR;
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release --set settings.web3Endpoint="ws://eth1-node.chain.svc.cluster.local:8546" --set settings.beaconChainRpcEndpoint="eth2-beacon.chain.svc.cluster.local:4000" ./oracle
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release --set settings.web3Endpoint="ws://eth1-node.chain.svc.cluster.local:8546" --set settings.beaconChainRpcEndpoint="eth2-beacon.chain.svc.cluster.local:4000" stakewise/oracle
 ```
 
 ## Introduction
@@ -25,9 +24,8 @@ Can be used to deploy StakeWise oracles on a [Kubernetes](http://kubernetes.io) 
 To install the chart with the release name `my-release`:
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release --set settings.awsAccessKeyID="XXXXXXXX" --set settings.awsSecretAccessKey="XXXXXXXX" ./oracle
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release --set settings.awsAccessKeyID="XXXXXXXX" --set settings.awsSecretAccessKey="XXXXXXXX" stakewise/oracle
 ```
 
 The command deploys oracle on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists various ways to override default configuration during deployment.
@@ -49,7 +47,7 @@ The command removes all the Kubernetes components associated with the chart and 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release ./oracle --set settings.awsAccessKeyID="XXXXXXXX" --set settings.awsSecretAccessKey="XXXXXXXX"
+$ helm install my-release stakewise/oracle --set settings.awsAccessKeyID="XXXXXXXX" --set settings.awsSecretAccessKey="XXXXXXXX"
 ```
 
 The above command specifies the web3 endpoint.
@@ -57,7 +55,7 @@ The above command specifies the web3 endpoint.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release ./oracle -f values.yaml
+$ helm install my-release stakewise/oracle -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)

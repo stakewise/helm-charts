@@ -45,10 +45,11 @@ and run `helm install`:
 ```console
 $ helm repo add hashicorp https://helm.releases.hashicorp.com
 "hashicorp" has been added to your repositories
+$ helm repo add stakewise https://charts.stakewise.io
 
 $ helm dependency update
 
-$ helm upgrade --install operator ./operator \
+$ helm upgrade --install operator stakewise/operator \
   --namepsace operator \
   --set geth.enabled=true \
   --set key=value... 

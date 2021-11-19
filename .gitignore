@@ -1,7 +1,7 @@
 .idea
 
 # ignore fetched subcharts
-**/charts
+**/charts/**/charts
 
 # ignore testing files
 **/override.yaml

@@ -5,9 +5,8 @@ Kubernetes Helm chart for deploying keeper
 ## TL;DR;
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release ./keeper
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release stakewise/keeper
 ```
 
 ## Introduction
@@ -24,9 +23,8 @@ Can be used to deploy StakeWise keeper on a [Kubernetes](http://kubernetes.io) c
 To install the chart with the release name `my-release`:
 
 ```bash
-$ git clone git@github.com:stakewise/helm-charts.git
-$ cd helm-charts
-$ helm install my-release ./keeper
+$ helm repo add stakewise https://charts.stakewise.io
+$ helm install my-release stakewise/keeper
 ```
 
 The command deploys keeper on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists various ways to override default configuration during deployment.
@@ -56,7 +54,7 @@ The above command specifies the web3 endpoint.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release ./keeper -f values.yaml
+$ helm install my-release stakewise/keeper -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)
