@@ -3,7 +3,9 @@ name: Helm Charts
 on:
   push:
     branches:
-      - master
+      - "!*"
+    tags:
+      - "v*"
 
 jobs:
   release:
