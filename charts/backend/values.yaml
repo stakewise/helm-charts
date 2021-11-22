@@ -88,6 +88,7 @@ admin:
   # https://kubernetes.io/docs/concepts/services-networking/ingress/
   ingress:
     enabled: false
+    className: ""
     annotations: { }
     tls: [ ]
     path: "/admin/*"
@@ -181,6 +182,7 @@ api:
   # https://kubernetes.io/docs/concepts/services-networking/ingress/
   ingress:
     enabled: true
+    className: ""
     annotations: [ ]
     tls: [ ]
     path: "/*"
