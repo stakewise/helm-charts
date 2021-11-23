@@ -1,11 +1,13 @@
 name: Helm Charts
 
-on:
-  push:
-    branches:
-      - "!*"
-    tags:
-      - "v*"
+on: [pull_request, push]
+
+# on:
+#   push:
+#     branches:
+#       - "!*"
+#     tags:
+#       - "v*"
 
 jobs:
   release:
