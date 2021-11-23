@@ -3,16 +3,16 @@ dependencies:
   repository: https://helm.releases.hashicorp.com
   version: 0.16.1
 - name: geth
-  repository: file://../geth
+  repository: https://charts.stakewise.io
   version: 0.1.0
 - name: openethereum
-  repository: file://../openethereum
+  repository: https://charts.stakewise.io
   version: 0.1.0
 - name: prysm
-  repository: file://../prysm
+  repository: https://charts.stakewise.io
   version: 0.1.0
 - name: lighthouse
-  repository: file://../lighthouse
+  repository: https://charts.stakewise.io
   version: 0.1.0
-digest: sha256:be57157435cb523a155f20fffb9058409e4be38fd5e882464a50aec20641a1ef
-generated: "2021-11-09T18:10:11.01041+03:00"
+digest: sha256:f1db40dc5f36ddfd72f3d233d03d92c6baf136a326e17c542718a5ce3458d076
+generated: "2021-11-23T10:00:21.88814+03:00"
