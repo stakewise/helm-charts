@@ -64,7 +64,7 @@ sync_repo() {
     mv -f "$sync_dir/index.yaml" "$index_dir/index.yaml"
 
     # Push all the local chart tarballs to the bucket.
-    gsutil -m rsync "$sync_dir" "$bucket/charts"
+    gsutil -m rsync "$sync_dir" "$bucket"
 
     # Make sure index.yaml is synced last
     gsutil cp "$index_dir/index.yaml" "$bucket"
