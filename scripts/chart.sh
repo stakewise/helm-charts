@@ -6,7 +6,7 @@ set -o pipefail
 
 readonly HELM_URL=https://get.helm.sh
 readonly HELM_TARBALL=helm-v3.7.1-linux-amd64.tar.gz
-readonly REPO_URL=https://charts.stakewise.io/charts/
+readonly REPO_URL=https://charts.stakewise.io/
 readonly GCS_BUCKET=gs://stakewise-charts
 
 main() {
@@ -74,7 +74,7 @@ sync_repo() {
     exit 1
   fi
 
-  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/charts/*.tgz
+  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/*.tgz
   gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/index.yaml
 
   ls -l "$sync_dir"
