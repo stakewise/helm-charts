@@ -60,6 +60,7 @@ enabled: true
 type: prysm
 
 ## How many validators to run
+## **NB! Every validators hosts up to 100 keys, so the number of validators must be >= (number of validator keys) / 100
 ##
 validatorsCount: 1
 
