@@ -25,14 +25,14 @@ setup_helm_client() {
   # add dependent helm repos
   helm repo add bitnami https://charts.bitnami.com/bitnami
   helm repo add hashicorp https://helm.releases.hashicorp.com
-  helm repo add stakewise https://charts.stakewise.io
+  helm repo add stakewise https://charts.stakewise.io/charts
 }
 
 sync_repo() {
   local repo_dir="${1?Specify repo dir}"
   local bucket="${2?Specify repo bucket}"
-  local repo_url="${3?Specify repo url}/charts"
-  local sync_dir="${repo_dir}-sync/charts"
+  local repo_url="${3?Specify repo url}"
+  local sync_dir="${repo_dir}-sync"
   local index_dir="${repo_dir}-index"
 
   echo "Syncing repo '$repo_dir'..."
@@ -64,7 +64,7 @@ sync_repo() {
     mv -f "$sync_dir/index.yaml" "$index_dir/index.yaml"
 
     # Push all the local chart tarballs to the bucket.
-    gsutil -m rsync "$sync_dir" "$bucket"
+    gsutil -m rsync "$sync_dir" "$bucket/charts"
 
     # Make sure index.yaml is synced last
     gsutil cp "$index_dir/index.yaml" "$bucket"
@@ -73,6 +73,9 @@ sync_repo() {
     log_error "Exiting because unable to update index. Not safe to push update."
     exit 1
   fi
+
+  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/*.tgz
+  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/index.yaml
 
   ls -l "$sync_dir"
 
