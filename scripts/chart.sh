@@ -31,8 +31,8 @@ setup_helm_client() {
 sync_repo() {
   local repo_dir="${1?Specify repo dir}"
   local bucket="${2?Specify repo bucket}"
-  local repo_url="${3?Specify repo url}"
-  local sync_dir="${repo_dir}-sync"
+  local repo_url="${3?Specify repo url}/charts"
+  local sync_dir="${repo_dir}-sync/charts"
   local index_dir="${repo_dir}-index"
 
   echo "Syncing repo '$repo_dir'..."
