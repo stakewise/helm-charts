@@ -6,7 +6,7 @@ set -o pipefail
 
 readonly HELM_URL=https://get.helm.sh
 readonly HELM_TARBALL=helm-v3.7.1-linux-amd64.tar.gz
-readonly REPO_URL=https://charts.stakewise.io/
+readonly REPO_URL=https://charts.stakewise.io/charts/
 readonly GCS_BUCKET=gs://stakewise-charts
 
 main() {
@@ -25,7 +25,7 @@ setup_helm_client() {
   # add dependent helm repos
   helm repo add bitnami https://charts.bitnami.com/bitnami
   helm repo add hashicorp https://helm.releases.hashicorp.com
-  helm repo add stakewise https://charts.stakewise.io/charts
+  helm repo add stakewise https://charts.stakewise.io
 }
 
 sync_repo() {
@@ -74,7 +74,7 @@ sync_repo() {
     exit 1
   fi
 
-  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/*.tgz
+  gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/charts/*.tgz
   gsutil -m setmeta -h "Cache-Control:no-cache" "$bucket"/index.yaml
 
   ls -l "$sync_dir"
