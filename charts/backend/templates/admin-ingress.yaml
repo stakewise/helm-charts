@@ -17,7 +17,7 @@ metadata:
 {{- end }}
 spec:
   {{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.ingress.className }}
+  ingressClassName: {{ .Values.admin.ingress.className }}
   {{- end }}
 {{- with .Values.admin.ingress.tls }}
   tls:
