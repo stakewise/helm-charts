@@ -13,6 +13,7 @@ main() {
   setup_helm_client
   if ! sync_repo charts "$GCS_BUCKET" "$REPO_URL"; then
       log_error "Not all charts could be packaged and synced!"
+      exit 1
   fi
 }
 
@@ -21,6 +22,10 @@ setup_helm_client() {
   curl --user-agent curl-ci-sync -sSL -o "$HELM_TARBALL" "$HELM_URL/$HELM_TARBALL"
   tar xzfv "$HELM_TARBALL"
   PATH="$(pwd)/linux-amd64/:$PATH"
+  # add dependent helm repos
+  helm repo add bitnami https://charts.bitnami.com/bitnami
+  helm repo add hashicorp https://helm.releases.hashicorp.com
+  helm repo add stakewise https://charts.stakewise.io
 }
 
 sync_repo() {
