@@ -71,7 +71,7 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.0.1"
+    tag: "v2.0.3"
   lighthouse:
     repository: "sigp/lighthouse"
     tag: "v2.0.1"

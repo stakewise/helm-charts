@@ -1,6 +1,6 @@
 apiVersion: v2
 name: prysm
-version: 0.1.0
+version: 1.0.4
 kubeVersion: "^1.14.0-0"
 description: Go implementation of Ethereum proof of stake.
 type: application
@@ -16,4 +16,5 @@ maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
-appVersion: v1.10.6
+appVersion: v2.0.3
+
