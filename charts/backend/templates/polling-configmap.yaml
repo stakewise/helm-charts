@@ -11,7 +11,6 @@ data:
   ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint | quote }}
   PRYSM_ENDPOINT: {{ .Values.polling.conf.prysmEndpoint | quote }}
   POLL_PAYMENTS_PERIOD: {{ .Values.polling.conf.pollPaymentsPeriod | quote }}
-  UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.polling.conf.unpaidValidatorsExitDelay | quote }}
   POLL_ORACLES_PERIOD: {{ .Values.polling.conf.pollOraclesPeriod | quote }}
   POLL_SETTINGS_PERIOD: {{ .Values.polling.conf.pollSettingsPeriod | quote }}
   REALITY_ETH_QUESTION_URL_TEMPLATE: {{ .Values.polling.conf.realityEthQuestionUrlTemplate | quote }}
