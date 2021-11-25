@@ -5,6 +5,7 @@ commonConf:
 
   oraclesSyncPeriodSeconds: "86400"
   validatorMaxPenaltyCount: "5"
+  unpaidValidatorsExitDelay: "864000"
 
   websiteName: "StakeWise"
   poolPage: "https://app.stakewise.io"
@@ -297,7 +298,6 @@ polling:
 
     # polling periods
     pollPaymentsPeriod: "15"
-    unpaidValidatorsExitDelay: "864000"
     pollOraclesPeriod: "15"
     pollSettingsPeriod: "120"
 
