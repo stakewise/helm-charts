@@ -282,6 +282,13 @@ polling:
           cpu: 50m
           memory: 100Mi
 
+    - command: "poll_uniswap"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+
   conf:
     # Endpoints
     ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
@@ -301,6 +308,7 @@ polling:
     pollTokenTransfersPeriod: "15"
     activatedDepositsNotifySeconds: "86400"
     pollValidatorsPeriod: "30"
+    pollUniswapPeriod: "60"
 
 postgresql:
   volumePermissions:

@@ -20,4 +20,5 @@ data:
   POLL_TOKEN_TRANSFERS_PERIOD: {{ .Values.polling.conf.pollTokenTransfersPeriod | quote }}
   ACTIVATED_DEPOSITS_NOTIFY_SECONDS: {{ .Values.polling.conf.activatedDepositsNotifySeconds | quote }}
   POLL_VALIDATORS_PERIOD: {{ .Values.polling.conf.pollValidatorsPeriod | quote }}
+  POLL_UNISWAP_PERIOD: {{ .Values.polling.conf.pollUniswapPeriod | quote }}
 {{- end }}
