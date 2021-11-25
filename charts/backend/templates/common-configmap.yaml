@@ -11,7 +11,7 @@ data:
   NETWORK: {{ .Values.commonConf.network | quote }}
   ORACLES_SYNC_PERIOD_SECONDS: {{ .Values.commonConf.oraclesSyncPeriodSeconds | quote }}
   VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
-  UNPAID_VALIDATORS_EXIT_DELAY: { { .Values.commonConf.conf.unpaidValidatorsExitDelay | quote } }
+  UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.commonConf.unpaidValidatorsExitDelay | quote }}
   WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
   POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
   SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
