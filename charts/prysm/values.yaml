@@ -270,4 +270,4 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 100Gi
+  size: 200Gi
