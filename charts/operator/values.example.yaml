@@ -41,18 +41,12 @@ geth:
     prometheusRule:
       enabled: false
 
-## Openethereum node configuration
+## Erigon node configuration
 ##
-openethereum:
+erigon:
   enabled: true
   replicas: 1
   chain: goerli
-  extraFlags:
-    - " --pruning-memory"
-    - "1024"
-    - "--no-warp"
-    - "--pruning"
-    - "fast"
   metrics:
     enabled: true
     serviceMonitor:

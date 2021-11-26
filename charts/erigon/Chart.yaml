@@ -1,6 +1,7 @@
 apiVersion: v2
-name: operator
-description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
+name: erigon
+description: Ethereum implementation on the efficiency frontier
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -12,47 +13,21 @@ description: A Helm chart for installing and configuring large scale ETH staking
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
 
+keywords:
+  - ethereum
+  - blockchain
+  - erigon
+  - p2p
+sources:
+  - https://github.com/ledgerwatch/erigon
+
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.0.3
+version: 1.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v2.0.3"
-
-keywords:
-  - ethereum
-  - blockchain
-  - lighthouse
-  - prysm
-  - geth
-  - erigon
-  - stakewise
-  - p2p
-
-home: https://stakewise.io/
-
-dependencies:
-  - name: vault
-    repository: https://helm.releases.hashicorp.com
-    version: 0.16.1
-    condition: vault.enabled
-  - name: geth
-    repository: https://charts.stakewise.io
-    version: "0.1.0"
-    condition: geth.enabled
-  - name: erigon
-    repository: https://charts.stakewise.io
-    version: "1.0.1"
-    condition: erigon.enabled
-  - name: prysm
-    repository: https://charts.stakewise.io
-    version: "1.0.4"
-    condition: prysm.enabled
-  - name: lighthouse
-    repository: https://charts.stakewise.io
-    version: "0.1.0"
-    condition: lighthouse.enabled
+appVersion: "v2021.11.03"
