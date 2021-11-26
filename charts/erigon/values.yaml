@@ -185,7 +185,7 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 50Gi
+  size: 800Gi
 
 ## Monitoring
 ##
