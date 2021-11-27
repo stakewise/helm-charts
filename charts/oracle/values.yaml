@@ -66,3 +66,4 @@ settings:
   ipfsPinataSecretKey: ""
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
+  awsRegion: "eu-central-1"

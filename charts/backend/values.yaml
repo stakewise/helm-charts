@@ -35,7 +35,7 @@ image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
   tag: "v2.0.0"
   pullPolicy: IfNotPresent
-  pullSecrets: { }
+  pullSecrets: [ ]
 
 admin:
   # Whether to deploy admin or not.
