@@ -20,3 +20,4 @@ data:
   STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl | quote }}
   UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl | quote }}
   ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl | quote }}
+  AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
