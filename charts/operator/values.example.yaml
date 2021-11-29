@@ -60,10 +60,10 @@ erigon:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchExpressions:
-            - key: component
+            - key: app.kubernetes.io/name
               operator: In
               values:
-              - lighthouse-beacon
+              - lighthouse
           topologyKey: kubernetes.io/hostname
 
 ## Prysm beacon chain node configuration
@@ -77,10 +77,10 @@ prysm:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchExpressions:
-            - key: component
+            - key: app.kubernetes.io/name
               operator: In
               values:
-              - lighthouse-beacon
+              - lighthouse
           topologyKey: kubernetes.io/hostname
   replicas: 1
   networkID: prater
