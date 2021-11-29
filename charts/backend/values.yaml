@@ -92,7 +92,7 @@ admin:
     className: ""
     annotations: {}
     tls: {}
-    path: "/admin/*"
+    path: "/admin/"
     hosts: {}
 
   # Configure resource requests and limits.
@@ -186,7 +186,7 @@ api:
     className: ""
     annotations: {}
     tls: {}
-    path: "/*"
+    path: "/"
     hosts: {}
 
   # Configure resource requests and limits.
