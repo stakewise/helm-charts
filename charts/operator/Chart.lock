@@ -5,14 +5,14 @@ dependencies:
 - name: geth
   repository: https://charts.stakewise.io
   version: 0.1.0
-- name: openethereum
+- name: erigon
   repository: https://charts.stakewise.io
-  version: 0.1.0
+  version: 1.0.1
 - name: prysm
   repository: https://charts.stakewise.io
   version: 1.0.4
 - name: lighthouse
   repository: https://charts.stakewise.io
   version: 0.1.0
-digest: sha256:576bf66b2b3ef69ead26948d9ff8de9cbbb152616423f0cf92ad90f5c7469370
-generated: "2021-11-24T12:36:31.472756+03:00"
+digest: sha256:0610ada4cafff635a02d6ceacb6df38d75cdb4ef1bb98f0767f4a6cc804e8e20
+generated: "2021-11-29T09:47:35.208883+03:00"
