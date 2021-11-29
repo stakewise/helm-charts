@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "erigon.fullname" . }}-test-connection"
+  labels:
+    {{- include "erigon.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "erigon.fullname" . }}:{{ .Values.service.port.rpc }}']
+  restartPolicy: Never

@@ -41,18 +41,12 @@ geth:
     prometheusRule:
       enabled: false
 
-## Openethereum node configuration
+## Erigon node configuration
 ##
-openethereum:
-  enabled: true
+erigon:
+  enabled: false
   replicas: 1
   chain: goerli
-  extraFlags:
-    - " --pruning-memory"
-    - "1024"
-    - "--no-warp"
-    - "--pruning"
-    - "fast"
   metrics:
     enabled: true
     serviceMonitor:
@@ -94,7 +88,7 @@ prysm:
     # Beacon chain options
     - "--accept-terms-of-use"
     - "--http-web3provider=http://geth:8545"
-    - "--fallback-web3provider=http://openethereum:8545"
+    # - "--fallback-web3provider=http://erigon:8545"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"

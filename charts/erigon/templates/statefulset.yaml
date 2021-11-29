@@ -1,0 +1,156 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "erigon.fullname" . }}
+  labels:
+    {{- include "erigon.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "erigon.selectorLabels" . | nindent 6 }}
+  serviceName: {{ include "erigon.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "erigon.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      serviceAccountName: {{ include "erigon.serviceAccountName" . }}
+      {{- if and .Values.persistence.enabled .Values.initChownData }}
+      initContainers:
+        - name: init-chown
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["erigon"]
+          args:
+            - --datadir={{ .Values.erigon.dataDir }}
+            - --ethash.dagdir={{ .Values.erigon.ethHashDagDir }}
+            - --batchSize={{ .Values.erigon.batchSize }}
+            - --blockDownloaderWindow={{ .Values.erigon.blockDownloaderWindow }}
+            - --database.verbosity={{ .Values.erigon.databaseVerbosity }}
+            - --private.api.addr={{ .Values.erigon.privateApiAddr }}
+            - --private.api.ratelimit={{ .Values.erigon.privateApiRateLimit }}
+            - --etl.bufferSize={{ .Values.erigon.etlBufferSize }}
+            - --port={{ .Values.erigon.port }}
+            - --p2p.eth65.port={{ .Values.erigon.p2pEth65Port }}
+            - --nat={{ .Values.erigon.nat }}
+            - --maxpeers={{ .Values.erigon.maxPeers }}
+            - --chain={{ .Values.erigon.chain }}
+        {{- if .Values.erigon.nodeKey }}
+            - --nodekey={{ .Values.erigon.nodeKey }}
+        {{- end }}
+        {{- if .Values.erigon.nodeKeyHex }}
+            - --nodekeyhex={{ .Values.erigon.nodeKeyHex }}
+        {{- end }}
+        {{- if .Values.erigon.staticPeers }}
+            - --staticpeers={{ .Values.erigon.staticPeers }}
+        {{- end }}
+        {{- if .Values.erigon.trustedPeers }}
+            - --trustedpeers={{ .Values.erigon.trustedPeers }}
+        {{- end }}
+        {{- if .Values.erigon.mine }}
+            - --mine
+            - --miner.notify={{ .Values.erigon.minerNotify }}
+            - --miner.gastarget={{ .Values.erigon.gasTarget }}
+            - --miner.gaslimit={{ .Values.erigon.gasLimit }}
+            - --miner.etherbase={{ .Values.erigon.etherBase }}
+            - --miner.extradata={{ .Values.erigon.extraData }}
+            {{- if .Values.erigon.minerNoVerify }}
+            - --miner.noverify
+            {{- end }}
+        {{- end }}
+        {{- if .Values.metrics.enabled }}
+            - --metrics
+            - --metrics.addr={{ .Values.metrics.addr }}
+            - --metrics.port={{ .Values.metrics.port }}
+        {{- end }}
+          ports:
+            - name: rpc
+              protocol: TCP
+              containerPort: {{ .Values.service.port.rpc }}
+            - name: grpc
+              protocol: TCP
+              containerPort: {{ .Values.service.port.grpc }}
+          {{- if .Values.metrics.enabled }}
+            - name: metrics
+              protocol: TCP
+              containerPort: {{ .Values.metrics.port }}
+          {{- end }}
+            - name: p2p-tcp
+              protocol: TCP
+              containerPort: {{ .Values.erigon.port }}
+            - name: p2p-udp
+              protocol: UDP
+              containerPort: {{ .Values.erigon.port }}
+            - name: p2p-tcp2
+              protocol: TCP
+              containerPort: {{ .Values.erigon.p2pEth65Port }}
+            - name: p2p-udp2
+              protocol: UDP
+              containerPort: {{ .Values.erigon.p2pEth65Port }}
+        {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+{{- if (not .Values.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "erigon.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+{{- end }}

@@ -1,18 +1,26 @@
-# Default values for prysm.
+# Default values for erigon.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-## Provide a name in place of prysm for `app:` labels
-##
-nameOverride: ""
+replicaCount: 1
 
-## Provide a name to substitute for the full names of resources
+## Init image is used to chown data volume, initialise genesis, etc.
 ##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+image:
+  repository: thorax/erigon
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v2021.11.03"
+
+imagePullSecrets: []
+nameOverride: ""
 fullnameOverride: ""
 
-## Service account
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
@@ -22,69 +30,127 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-securityContext:
+podAnnotations: {}
+
+podSecurityContext:
   fsGroup: 1001
   runAsUser: 1001
 
-## RBAC configuration.
-## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-##
-rbac:
-  create: true
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
 
-## Init image is used to chown data volume, initialise genesis, etc.
+## Erigon configuration
 ##
-initImage:
-  repository: "busybox"
-  tag: "1.34"
-  pullPolicy: IfNotPresent
+erigon:
+  # Data directory for the databases
+  dataDir: "/data/erigon"
+  # Name of the testnet to join
+  chain: mainnet
+  # Directory to store the ethash mining DAGs
+  ethHashDagDir: "/data/erigon-ethhash"
+  # Batch size for the execution stage
+  batchSize: "512M"
+  # Outstanding limit of block bodies being downloaded
+  blockDownloaderWindow: "32768"
+  # Enabling internal db logs. Very high verbosity levels may require recompile db
+  databaseVerbosity: "2"
+  # private api network address, for example: 127.0.0.1:9090,
+  # empty string means not to start the listener.
+  # Do not expose to public network.
+  # Serves remote database interface (default: "127.0.0.1:9090")
+  privateApiAddr: 127.0.0.1:9090
+  # Amount of requests server handle simultaneously - requests
+  # over this limit will wait.
+  # Increase it - if clients see 'request timeout' while server
+  # load is low - it means your 'hot data' is small or have much RAM.
+  privateApiRateLimit: "31872"
+  # Buffer size for ETL operations.
+  etlBufferSize: "256MB"
+  # Network listening port
+  port: "30303"
+  # ETH65 Network listening port
+  p2pEth65Port: "30304"
+  # NAT port mapping mechanism (any|none|upnp|pmp|extip:<IP>)
+  #     "" or "none"         default - do not nat
+  #     "extip:77.12.33.4"   will assume the local machine is reachable on the given IP
+  #     "any"                uses the first auto-detected mechanism
+  #     "upnp"               uses the Universal Plug and Play protocol
+  #     "pmp"                uses NAT-PMP with an auto-detected gateway address
+  #     "pmp:192.168.0.1"    uses NAT-PMP with the given gateway address
+  nat: ""
+  # P2P node key file
+  nodeKey: ""
+  # P2P node key as hex (for testing)
+  nodeKeyHex: ""
+  # Comma separated enode URLs to connect to
+  staticPeers: ""
+  # Comma separated enode URLs which are always allowed to connect, even above the peer limit
+  trustedPeers: ""
+  # Maximum number of network peers (network disabled if set to 0)
+  maxPeers: "100"
 
-## Configuration for prysm eth v2 beacon chain node
-## ref: https://docs.prylabs.network/docs/getting-started/
-##
+  # Enable mining
+  mine: false
+  # Comma separated HTTP URL list to notify of new work packages
+  minerNotify: ""
+  # Target gas floor for mined blocks
+  minerGasTarget: "8000000"
+  # Target gas ceiling for mined blocks
+  minerGasLimit: "8000000"
+  # Public address for block mining rewards
+  minerEtherBase: "0"
+  # Block extra data set by the miner
+  minerExtraData: ""
+  # Disable remote sealing verification
+  minerNoVerify: false
 
-## How many beacon chain pods to run simultaneously
-##
-replicas: 3
+service:
+  type: ClusterIP
+  port:
+    rpc: 8545
+    grpc: 9090
 
-## Prysm beacon node image version
-## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
-##
-image:
-  repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.0.3"
-  pullPolicy: IfNotPresent
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
-## RPC Port
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
 ##
-rpc:
-  port: "4000"
-
-## HTTP Port
-##
-http:
-  enabled: false
-  port: "8080"
-
-## Eth2 network ID
-##
-networkID: mainnet
-
-## Ethereum 1 node endpoints.
-##
-eth1Endpoint: ""
-
-## Extra flags for prysm beacon chain node
-##
-extraFlags:
-  # Beacon chain options
-  - "--accept-terms-of-use"
-  # p2p options
-  - "--p2p-max-peers=100"
-  - "--enable-peer-scorer"
+readinessProbe:
+  initialDelaySeconds: 180
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /health
+    port: 8545
+    scheme: HTTP
+livenessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 1
+  periodSeconds: 60
+  failureThreshold: 60
+  successThreshold: 1
+  httpGet:
+    path: /health
+    port: 8545
+    scheme: HTTP
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -106,21 +172,20 @@ affinity: {}
 ##
 priorityClassName: ""
 
-## Enable pod disruption budget
-## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
 ##
-podDisruptionBudget:
-  enabled: true
-  maxUnavailable: 1
+initChownData: true
 
-## Vertical Pod Autoscaler config
-## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
 ##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: { }
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 800Gi
 
 ## Monitoring
 ##
@@ -129,9 +194,10 @@ metrics:
   ##
   enabled: false
 
-  ## Prometheus exporter port
-  ##
-  port: 9090
+  # Enable stand-alone metrics HTTP server listening interface
+  addr: "0.0.0.0"
+  # Metrics HTTP server listening port
+  port: "6060"
 
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
@@ -212,62 +278,3 @@ metrics:
     ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
     rules: []
-
-## Defines whether the service must be headless
-##
-svcHeadless: false
-
-## Configure session affinity for validator clients to hit the same beacon node
-## for the period specified in `timeoutSeconds`
-## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-##
-sessionAffinity:
-  # Whether to enable session affinity or not
-  enabled: true
-  # The session duration in seconds
-  timeoutSeconds: 86400
-
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-##
-resources: { }
-
-## Configure liveness and readiness probes
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-## NB! readinessProbe and livenessProbe must be disabled before genesis
-##
-readinessProbe:
-  initialDelaySeconds: 180
-  timeoutSeconds: 1
-  periodSeconds: 60
-  failureThreshold: 3
-  successThreshold: 1
-  httpGet:
-    path: /healthz
-    port: 9090
-    scheme: HTTP
-livenessProbe:
-  initialDelaySeconds: 60
-  timeoutSeconds: 1
-  periodSeconds: 60
-  failureThreshold: 60
-  successThreshold: 1
-  httpGet:
-    path: /healthz
-    port: 9090
-    scheme: HTTP
-
-## If false, data ownership will not be reset at startup
-## This allows the geth node to be run with an arbitrary user
-##
-initChownData: true
-
-## Whether or not to allocate persistent volume disk for the data directory.
-## In case of pod failure, the pod data directory will still persist.
-##
-persistence:
-  enabled: true
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  size: 950Gi

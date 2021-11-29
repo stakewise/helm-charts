@@ -23,15 +23,11 @@ The versions required are:
 
 ## How it works
 
-![operator architecture](https://github.com/stakewise/helm-charts/raw/main/charts/operator/img/scheme.png)
-
-**Explanation of the schema**
-
 `operator` chart is capable of deploying different ETH1 and ETH2 clients and allows seamless migration of the validators from one client to another while preserving the slashing database. By default, the chart deploys three instances of Prysm ETH2 nodes and one instance of Lighthouse ETH2 node which will serve as hot standby so that Prysm validators can migrate to Lighthouse without waiting for the ETH2 node to sync the chain.  
 
-As the ETH2 node requires connection to the ETH1 node, the chart deploys by default two instances of the Geth clients and one instance of the OpenEthereum client that will also serve as a hot standby in case of the Geth client failure.
+As the ETH2 node requires connection to the ETH1 node, the chart deploys by default two instances of the Geth clients and one instance of the Erigon client that will also serve as a hot standby in case of the Geth client failure.
 
-It's also possible to choose the ETH1 client. Currently, Geth (default) and OpenEthereum are supported. 
+It's also possible to choose the ETH1 client. Currently, Geth (default) and Erigon are supported. 
 
 The validator's POD contains several init containers that take care of the slashing database migration to the right format and ensuring the keys can be read by the validator client.
 
@@ -59,10 +55,10 @@ $ helm upgrade --install operator stakewise/operator \
 
 ## How to
 
-1. Choose what type of eth1 node (options: [geth](https://github.com/stakewise/helm-charts/tree/main/geth) / [openethereum](https://github.com/stakewise/helm-charts/tree/main/openethereum))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth1 node with 1 replica as hot reserve. Configuration tips: 
+1. Choose what type of eth1 node (options: [geth](https://github.com/stakewise/helm-charts/tree/main/charts/geth) / [erigon](https://github.com/stakewise/helm-charts/tree/main/charts/erigon))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth1 node with 1 replica as hot reserve (if needed, otherwise have on hand one of the  alchemy/infura/quicknode eth1 node). Configuration tips: 
   * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes.
   * Set `networkID` (options: `mainnet`, `prater`).
-2. Wait until all eth1 nodes fully synced. Choose what type of eth2 node (options: [prysm](https://github.com/stakewise/helm-charts/tree/main/prysm) / [lighthouse](https://github.com/stakewise/helm-charts/tree/main/lighthouse))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth2 node with 1 replica as hot reserve. Configuration tips: 
+2. Wait until all eth1 nodes fully synced. Choose what type of eth2 node (options: [prysm](https://github.com/stakewise/helm-charts/tree/main/charts/prysm) / [lighthouse](https://github.com/stakewise/helm-charts/tree/main/charts/lighthouse))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth2 node with 1 replica as hot reserve. Configuration tips: 
   * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes. 
   * Set `networkID` (options: `mainnet`, `prater`). 
   * Set `eth1Endpoint` to the main eth1 node address (e.g. `http://geth:8545`)
@@ -259,7 +255,7 @@ To ensure high availability and security of the operator's node infrastructure, 
 ## Documentation
 
 - https://geth.ethereum.org/docs/
-- https://openethereum.github.io/
+- https://github.com/ledgerwatch/erigon
 - https://docs.prylabs.network/docs/getting-started/
 - https://lighthouse-book.sigmaprime.io/
 - https://www.coincashew.com/coins/overview-eth/guide-or-how-to-setup-a-validator-on-eth2-mainnet
