@@ -90,10 +90,10 @@ admin:
   ingress:
     enabled: false
     className: ""
-    annotations: { }
-    tls: [ ]
-    path: "/admin/*"
-    hosts: [ ]
+    annotations: {}
+    tls: {}
+    path: "/admin/"
+    hosts: {}
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
@@ -184,10 +184,10 @@ api:
   ingress:
     enabled: true
     className: ""
-    annotations: [ ]
-    tls: [ ]
-    path: "/*"
-    hosts: [ ]
+    annotations: {}
+    tls: {}
+    path: "/"
+    hosts: {}
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
