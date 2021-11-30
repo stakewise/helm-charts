@@ -15,11 +15,9 @@ metrics:
   enabled: true
   serviceMonitor:
     enabled: true
-  prometheusRule:
-    enabled: false
 persistence:
   enabled: true
-  storageClassName: "standard"
+  storageClassName: "ssd-storage"
   accessModes:
     - ReadWriteOnce
   size: 10Gi
@@ -32,17 +30,20 @@ geth:
   extraFlags:
     - "--syncmode=snap"
     - "--goerli"
-  nodeSelector:
-    cloud.google.com/gke-preemptible: "true"
   metrics:
     enabled: true
     serviceMonitor:
       enabled: true
-    prometheusRule:
-      enabled: false
 
 ## Erigon node configuration
 ##
+## Erigon can be used as an execution-layer for beacon chain consensus clients (Eth2).
+## Default configuration is ok.
+## Once the JSON-RPC daemon is running, all you need to do is point your
+## beacon chain client to erigon:8545, where is either localhost
+## or the IP address of the device running the JSON-RPC daemon.
+## Erigon has been tested with Lighthouse however all other clients that
+## support JSON-RPC should also work.
 erigon:
   enabled: false
   replicas: 1
@@ -51,44 +52,17 @@ erigon:
     enabled: true
     serviceMonitor:
       enabled: true
-    prometheusRule:
-      enabled: false
-  nodeSelector:
-    cloud.google.com/gke-preemptible: "true"
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - lighthouse
-          topologyKey: kubernetes.io/hostname
 
 ## Prysm beacon chain node configuration
 ##
 prysm:
   enabled: true
-  nodeSelector:
-    cloud.google.com/gke-preemptible: "true"
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/name
-              operator: In
-              values:
-              - lighthouse
-          topologyKey: kubernetes.io/hostname
   replicas: 1
   networkID: prater
+  eth1Endpoint: "http://geth:8545"
   extraFlags:
     # Beacon chain options
     - "--accept-terms-of-use"
-    - "--http-web3provider=http://geth:8545"
-    # - "--fallback-web3provider=http://erigon:8545"
     # p2p options
     - "--p2p-max-peers=100"
     - "--enable-peer-scorer"
@@ -96,8 +70,6 @@ prysm:
     enabled: true
     serviceMonitor:
       enabled: true
-    prometheusRule:
-      enabled: false
   persistence:
     enabled: true
     storageClassName: "ssd-storage"
@@ -108,7 +80,7 @@ prysm:
 ## Lighthouse beacon chain node configuration
 ##
 lighthouse:
-  enabled: true
+  enabled: false
   replicas: 1
   networkID: prater
   eth1Endpoints:
@@ -117,16 +89,12 @@ lighthouse:
     enabled: true
     serviceMonitor:
       enabled: true
-    prometheusRule:
-      enabled: false
   persistence:
     enabled: true
     storageClassName: "ssd-storage"
     accessModes:
       - ReadWriteOnce
     size: 100Gi
-  nodeSelector:
-    cloud.google.com/gke-preemptible: "true"
 
 
 ## Hashicorp Vault configurations
@@ -161,15 +129,15 @@ vault:
           }
           service_registration "kubernetes" {}
           seal "gcpckms" {
-             project     = "stakewise-staging"
+             project     = "project-id"
              region      = "global"
              key_ring    = "operator"
              crypto_key  = "vault"
           }
     extraEnvironmentVars:
       GOOGLE_REGION: global
-      GOOGLE_PROJECT: stakewise-staging
-      GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/stakewise/gcp-creds.json
+      GOOGLE_PROJECT: project-id
+      GOOGLE_APPLICATION_CREDENTIALS: /vault/userconfig/project-id/gcp-creds.json
 
     # volumes is a list of volumes made available to all containers. These are rendered
     # via toYaml rather than pre-processed like the extraVolumes value.
@@ -187,7 +155,7 @@ vault:
     # The purpose is to make it easy to share volumes between containers.
     volumeMounts:
       - name: gcp-creds
-        mountPath: "/vault/userconfig/stakewise/gcp-creds.json"
+        mountPath: "/vault/userconfig/project-id/gcp-creds.json"
         subPath: gcp-creds.json
         readOnly: true
    

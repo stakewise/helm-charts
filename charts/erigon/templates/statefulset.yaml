@@ -89,9 +89,6 @@ spec:
             - --metrics.port={{ .Values.metrics.port }}
         {{- end }}
           ports:
-            - name: rpc
-              protocol: TCP
-              containerPort: {{ .Values.service.port.rpc }}
             - name: grpc
               protocol: TCP
               containerPort: {{ .Values.service.port.grpc }}
@@ -120,6 +117,29 @@ spec:
           livenessProbe:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - name: {{ .Chart.Name }}-rpc-daemon
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["rpcdaemon"]
+          args:
+            - --datadir={{ .Values.erigon.dataDir }}
+            - --private.api.addr={{ .Values.erigon.privateApiAddr }}
+            - --http.addr={{ .Values.erigon.httpAddr }}
+            - --http.vhosts={{ .Values.erigon.httpVhosts }}
+            - --http.corsdomain={{ .Values.erigon.httpCorsDomain }}
+            - --http.api={{ .Values.erigon.httpApi }}
+            - --http.port={{ .Values.service.port.rpc }}
+          ports:
+            - name: rpc
+              protocol: TCP
+              containerPort: {{ .Values.service.port.rpc }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:

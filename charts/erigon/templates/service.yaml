@@ -8,7 +8,7 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port.rpc }}
-      targetPort: grpc
+      targetPort: rpc
       protocol: TCP
       name: rpc
     - port: {{ .Values.service.port.grpc }}

@@ -64,6 +64,16 @@ erigon:
   # Do not expose to public network.
   # Serves remote database interface (default: "127.0.0.1:9090")
   privateApiAddr: 127.0.0.1:9090
+  # HTTP-RPC server listening interface
+  httpAddr: 0.0.0.0
+  # Comma separated list of virtual hostnames from which to accept requests (server enforced).
+  # Accepts '*' wildcard
+  httpVhosts: "*"
+  # Comma separated list of domains from which to accept cross origin requests (browser enforced)
+  httpCorsDomain: "*"
+  # API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
+  # Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
+  httpApi: "eth,web3,erigon,net"
   # Amount of requests server handle simultaneously - requests
   # over this limit will wait.
   # Increase it - if clients see 'request timeout' while server
