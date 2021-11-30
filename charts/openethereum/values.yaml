@@ -161,8 +161,8 @@ metrics:
     ##     labels:
     ##       severity: error
     ##     annotations:
-    ##       summary: OpenEthereum Node {{ "{{ $labels.instance }}" }} down
-    ##       description: OpenEthereum Node {{ "{{ $labels.instance }}" }} is down
+    ##       summary: OpenEthereum Node {{ printf "{{ $labels.instance }}" }} down
+    ##       description: OpenEthereum Node {{ printf "{{ $labels.instance }}" }} is down
     ##
     rules: []
 

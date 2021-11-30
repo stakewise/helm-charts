@@ -51,7 +51,7 @@ $ helm upgrade --install operator stakewise/operator \
   --set key=value... 
 ```
 
-**Please see the options supported in the `values.yaml` file. And the prater testnet example configuration in the `values.example.yaml`**
+**Please see the options supported in the `values.yaml` file.**
 
 ## How to
 
@@ -73,7 +73,7 @@ $ helm upgrade --install operator stakewise/operator \
 
 ## <a name="vault"></a>Vault usage
 
-A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm). Please take a look at the example configuration in the file [`values.example.yaml`](https://github.com/stakewise/helm-charts/blob/main/operator/values.example.yaml)
+A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm).
 
 After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 

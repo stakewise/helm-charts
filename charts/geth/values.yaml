@@ -148,13 +148,13 @@ metrics:
     ## e.g:
     ## rules:
     ##   - alert: GethNodeDown
-    ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
+    ##     expr: up{job="{{ include "geth.fullname" . }}-node"} == 0
     ##     for: 5m
     ##     labels:
     ##       severity: error
     ##     annotations:
-    ##       summary: Geth Node {{ "{{ $labels.instance }}" }} down
-    ##       description: Geth Node {{ "{{ $labels.instance }}" }} is down
+    ##       summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
+    ##       description: Geth Node {{ printf "{{ $labels.instance }}" }} is down
     ##
     rules: []
 

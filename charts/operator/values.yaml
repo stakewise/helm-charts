@@ -40,7 +40,7 @@ initImageBusybox:
 ## Can be used to temporarily disable validators 
 ## until synchronization of eth1/eth2 nodes is complete
 ##
-enabled: true
+enabled: false
 
 ## What type of validator to use.
 ## Options: prysm, lighthouse
@@ -295,7 +295,7 @@ initChownData: true
 ##
 persistence:
   enabled: true
-  storageClassName: ""
+  storageClassName: "standard"
   accessModes:
     - ReadWriteOnce
   size: 10Gi
@@ -336,7 +336,7 @@ vault:
             path = "/vault/data"
           }
           service_registration "kubernetes" {}
-          # Example configuration for using auto-unseal, using Google Cloud KMS. The
+          # Example configuration for using auto-unseal, using ogle Cloud KMS. The
           # GKMS keys must already exist, and the cluster must have a service account
           # that is authorized to access GCP KMS.
           #seal "gcpckms" {
@@ -368,3 +368,39 @@ vault:
     #     readOnly: true
   ui:
     enabled: true
+
+## Geth node configuration
+##
+geth:
+  enabled: true
+  replicas: 3
+
+## Erigon node configuration
+##
+## Erigon can be used as an execution-layer for beacon chain consensus clients (Eth2).
+## Default configuration is ok.
+## Once the JSON-RPC daemon is running, all you need to do is point your
+## beacon chain client to erigon:8545, where is either localhost
+## or the IP address of the device running the JSON-RPC daemon.
+## Erigon has been tested with Lighthouse however all other clients that
+## support JSON-RPC should also work.
+erigon:
+  enabled: false
+  replicas: 1
+  chain: mainnet
+
+## Prysm beacon chain node configuration
+##
+prysm:
+  enabled: true
+  replicas: 3
+  eth1Endpoint: "http://operator-geth:8545"
+
+## Lighthouse beacon chain node configuration
+##
+lighthouse:
+  enabled: false
+  replicas: 1
+  networkID: mainnet
+  eth1Endpoints:
+    - http://operator-geth:8545
