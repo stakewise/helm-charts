@@ -91,9 +91,9 @@ admin:
     enabled: false
     className: ""
     annotations: {}
-    tls: {}
+    tls: []
     path: "/admin/"
-    hosts: {}
+    hosts: []
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
@@ -185,9 +185,9 @@ api:
     enabled: true
     className: ""
     annotations: {}
-    tls: {}
+    tls: []
     path: "/"
-    hosts: {}
+    hosts: []
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
