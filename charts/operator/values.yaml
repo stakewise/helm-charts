@@ -336,7 +336,7 @@ vault:
             path = "/vault/data"
           }
           service_registration "kubernetes" {}
-          # Example configuration for using auto-unseal, using ogle Cloud KMS. The
+          # Example configuration for using auto-unseal, using Google Cloud KMS. The
           # GKMS keys must already exist, and the cluster must have a service account
           # that is authorized to access GCP KMS.
           #seal "gcpckms" {
