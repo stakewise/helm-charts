@@ -1,8 +1,8 @@
 apiVersion: v2
 name: backend
-version: 2.0.4
+version: 2.0.5
 appVersion: v2.0.0
-kubeVersion: "^1.14.0-0"
+kubeVersion: "^1.18.0-0"
 description: The StakeWise backend application.
 type: application
 keywords:
@@ -16,6 +16,7 @@ dependencies:
   - name: postgresql
     version: 10.13.8
     repository: https://charts.bitnami.com/bitnami/
+    condition: postgresql.enabled
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io

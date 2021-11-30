@@ -311,6 +311,7 @@ polling:
     pollUniswapPeriod: "60"
 
 postgresql:
+  enabled: false
   volumePermissions:
     enabled: true
     image:
@@ -331,6 +332,8 @@ postgresql:
     name: postgresql
   rbac:
     create: false
+  postgresqlHost: "postgres"
+  postgresqlPort: "5432"
   postgresqlUsername: "postgres"
   postgresqlPassword: "postgres"
   usePasswordFile: true
