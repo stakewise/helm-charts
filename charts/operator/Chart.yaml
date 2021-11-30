@@ -46,7 +46,7 @@ dependencies:
     condition: geth.enabled
   - name: erigon
     repository: https://charts.stakewise.io
-    version: "1.0.1"
+    version: "1.0.2"
     condition: erigon.enabled
   - name: prysm
     repository: https://charts.stakewise.io
