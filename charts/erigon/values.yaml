@@ -73,7 +73,7 @@ erigon:
   httpCorsDomain: "*"
   # API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
   # Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
-  httpApi: "eth,web3,erigon,net"
+  httpApi: "eth,erigon,web3,net,txpool"
   # Amount of requests server handle simultaneously - requests
   # over this limit will wait.
   # Increase it - if clients see 'request timeout' while server

@@ -129,7 +129,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["rpcdaemon"]
           args:
-            - --datadir={{ .Values.erigon.dataDir }}
             - --private.api.addr={{ .Values.erigon.privateApiAddr }}
             - --http.addr={{ .Values.erigon.httpAddr }}
             - --http.vhosts={{ .Values.erigon.httpVhosts }}
@@ -142,9 +141,6 @@ spec:
               containerPort: {{ .Values.service.port.rpc }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: data
-              mountPath: /data
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

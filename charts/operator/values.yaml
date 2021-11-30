@@ -373,7 +373,7 @@ vault:
 ##
 geth:
   enabled: true
-  replicas: 3
+  replicas: 2
 
 ## Erigon node configuration
 ##
@@ -399,7 +399,7 @@ prysm:
 ## Lighthouse beacon chain node configuration
 ##
 lighthouse:
-  enabled: false
+  enabled: true
   replicas: 1
   networkID: mainnet
   eth1Endpoints:
