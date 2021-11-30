@@ -295,7 +295,7 @@ initChownData: true
 ##
 persistence:
   enabled: true
-  storageClassName: "standard"
+  storageClassName: ""
   accessModes:
     - ReadWriteOnce
   size: 10Gi
