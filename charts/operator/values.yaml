@@ -10,18 +10,6 @@ nameOverride: ""
 ##
 fullnameOverride: ""
 
-## Service account
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
@@ -52,7 +40,7 @@ initImageBusybox:
 ## Can be used to temporarily disable validators 
 ## until synchronization of eth1/eth2 nodes is complete
 ##
-enabled: true
+enabled: false
 
 ## What type of validator to use.
 ## Options: prysm, lighthouse
@@ -380,3 +368,39 @@ vault:
     #     readOnly: true
   ui:
     enabled: true
+
+## Geth node configuration
+##
+geth:
+  enabled: true
+  replicas: 2
+
+## Erigon node configuration
+##
+## Erigon can be used as an execution-layer for beacon chain consensus clients (Eth2).
+## Default configuration is ok.
+## Once the JSON-RPC daemon is running, all you need to do is point your
+## beacon chain client to erigon:8545, where is either localhost
+## or the IP address of the device running the JSON-RPC daemon.
+## Erigon has been tested with Lighthouse however all other clients that
+## support JSON-RPC should also work.
+erigon:
+  enabled: false
+  replicas: 1
+  chain: mainnet
+
+## Prysm beacon chain node configuration
+##
+prysm:
+  enabled: true
+  replicas: 3
+  eth1Endpoint: "http://operator-geth:8545"
+
+## Lighthouse beacon chain node configuration
+##
+lighthouse:
+  enabled: true
+  replicas: 1
+  networkID: mainnet
+  eth1Endpoints:
+    - http://operator-geth:8545

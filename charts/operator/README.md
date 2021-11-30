@@ -51,11 +51,11 @@ $ helm upgrade --install operator stakewise/operator \
   --set key=value... 
 ```
 
-**Please see the options supported in the `values.yaml` file. And the prater testnet example configuration in the `values.example.yaml`**
+**Please see the options supported in the `values.yaml` file.**
 
 ## How to
 
-1. Choose what type of eth1 node (options: [geth](https://github.com/stakewise/helm-charts/tree/main/charts/geth) / [erigon](https://github.com/stakewise/helm-charts/tree/main/charts/erigon))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth1 node with 1 replica as hot reserve (if needed, otherwise have on hand one of the  alchemy/infura/quicknode eth1 node). Configuration tips: 
+1. Choose what type of eth1 node (options: [geth](https://github.com/stakewise/helm-charts/tree/main/charts/geth) / [erigon](https://github.com/stakewise/helm-charts/tree/main/charts/erigon))  will be used as primary and deploy it with at least 2 replicas, deploy the second type of eth1 node with 1 replica as hot reserve (if needed, otherwise have on hand one of the  alchemy/infura/quicknode eth1 node). Configuration tips: 
   * Configure [anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) so that the pods are distributed across different nodes.
   * Set `networkID` (options: `mainnet`, `prater`).
 2. Wait until all eth1 nodes fully synced. Choose what type of eth2 node (options: [prysm](https://github.com/stakewise/helm-charts/tree/main/charts/prysm) / [lighthouse](https://github.com/stakewise/helm-charts/tree/main/charts/lighthouse))  will be used as primary and deploy it with at least 3 replicas, deploy the second type of eth2 node with 1 replica as hot reserve. Configuration tips: 
@@ -73,7 +73,7 @@ $ helm upgrade --install operator stakewise/operator \
 
 ## <a name="vault"></a>Vault usage
 
-A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm). Please take a look at the example configuration in the file [`values.example.yaml`](https://github.com/stakewise/helm-charts/blob/main/operator/values.example.yaml)
+A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm).
 
 After the Vault is installed one of the Vault servers need to be initialized. The initialization generates the credentials (keep it safe) necessary to unseal all the Vault servers.
 
