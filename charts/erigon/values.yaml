@@ -44,13 +44,16 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
+
 ## Erigon configuration
 ##
+
+# Name of the net to join
+network: mainnet
+
 erigon:
   # Data directory for the databases
   dataDir: "/data/erigon"
-  # Name of the testnet to join
-  network: mainnet
   # Directory to store the ethash mining DAGs
   ethHashDagDir: "/data/erigon-ethhash"
   # Batch size for the execution stage
@@ -118,6 +121,18 @@ erigon:
   minerExtraData: ""
   # Disable remote sealing verification
   minerNoVerify: false
+
+  ## Extra flags for mainnet node
+  ##
+  mainnetExtraFlags:
+    - "--prune.r.before=11184524"
+    - "--prune=htc"
+
+  ## Extra flags for goerli node
+  ##
+  goerliExtraFlags:
+  - "--prune.r.before=4367322"
+  - "--prune=htc"
 
 service:
   type: ClusterIP
