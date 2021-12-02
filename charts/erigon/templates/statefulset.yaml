@@ -59,7 +59,7 @@ spec:
             - --p2p.eth65.port={{ .Values.erigon.p2pEth65Port }}
             - --nat={{ .Values.erigon.nat }}
             - --maxpeers={{ .Values.erigon.maxPeers }}
-            - --chain={{ .Values.erigon.chain }}
+            - --chain={{ .Values.erigon.network }}
         {{- if .Values.erigon.nodeKey }}
             - --nodekey={{ .Values.erigon.nodeKey }}
         {{- end }}

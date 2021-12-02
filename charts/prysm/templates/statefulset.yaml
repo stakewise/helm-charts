@@ -56,7 +56,7 @@ spec:
             - name: data
               mountPath: /data
       {{- end }}
-      {{- if eq .Values.networkID "prater" }}
+      {{- if eq .Values.network "prater" }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -78,8 +78,8 @@ spec:
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
             - "--http-web3provider={{ .Values.eth1Endpoint }}"
-            - "--{{ .Values.networkID }}"
-          {{- if eq .Values.networkID "prater" }}
+            - "--{{ .Values.network }}"
+          {{- if eq .Values.network "prater" }}
             - "--genesis-state=/data/gensis.ssz"
           {{- end }}
           {{- range .Values.extraFlags }}
@@ -138,7 +138,7 @@ spec:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
       volumes:
-      {{- if eq .Values.networkID "prater" }}
+      {{- if eq .Values.network "prater" }}
         - name: scripts
           configMap:
             name: {{ include "prysm.fullname" . }}

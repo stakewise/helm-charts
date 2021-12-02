@@ -50,7 +50,7 @@ erigon:
   # Data directory for the databases
   dataDir: "/data/erigon"
   # Name of the testnet to join
-  chain: mainnet
+  network: mainnet
   # Directory to store the ethash mining DAGs
   ethHashDagDir: "/data/erigon-ethhash"
   # Batch size for the execution stage

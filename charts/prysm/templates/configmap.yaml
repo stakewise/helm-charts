@@ -1,4 +1,4 @@
-{{- if eq .Values.networkID "prater" -}}
+{{- if eq .Values.network "prater" -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
