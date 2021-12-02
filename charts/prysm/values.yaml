@@ -71,7 +71,7 @@ http:
 
 ## Eth2 network ID
 ##
-networkID: mainnet
+network: mainnet
 
 ## Ethereum 1 node endpoints.
 ##

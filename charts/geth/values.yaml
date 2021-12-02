@@ -59,7 +59,7 @@ podDisruptionBudget:
 
 ## Network (chain) ID
 ##
-networkId: "mainnet"
+network: "mainnet"
 
 ## RPC configuration.
 ##

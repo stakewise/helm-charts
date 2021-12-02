@@ -56,7 +56,7 @@ spec:
               value: "http://{{ template "operator.fullname" $ }}-vault:8200"
               {{- end }}
             - name: NETWORK_ID
-              value: {{ $root.Values.networkID | quote }}
+              value: {{ $root.Values.network | quote }}
             - name: VALIDATOR_TYPE
               value: {{ $root.Values.type | quote }}
             - name: SERVICE_ACCOUNT
@@ -92,7 +92,7 @@ spec:
             - {{ . | quote }}
             {{- end }}
           {{- end }}
-          {{- if eq $root.Values.networkID "prater" }}
+          {{- if eq $root.Values.network "prater" }}
             {{- if eq $root.Values.type "prysm" }}
             - "--prater"
             {{- else if eq $root.Values.type "lighthouse" }}

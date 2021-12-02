@@ -50,7 +50,7 @@ type: prysm
 ## How many validators to run
 ## **NB! Every validators hosts up to 100 keys, so the number of validators must be >= (number of validator keys) / 100
 ##
-validatorsCount: 1
+validatorsCount: 0
 
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
@@ -114,7 +114,7 @@ verticalAutoscaler:
 ## Network ID
 ## Options: mainnet, prater
 ##
-networkID: "mainnet"
+network: "mainnet"
 
 ## Validators flags
 ##
@@ -374,6 +374,7 @@ vault:
 geth:
   enabled: true
   replicas: 2
+  network: mainnet
 
 ## Erigon node configuration
 ##
@@ -387,13 +388,14 @@ geth:
 erigon:
   enabled: false
   replicas: 1
-  chain: mainnet
+  network: mainnet
 
 ## Prysm beacon chain node configuration
 ##
 prysm:
   enabled: true
   replicas: 3
+  network: mainnet
   eth1Endpoint: "http://operator-geth:8545"
 
 ## Lighthouse beacon chain node configuration
@@ -401,6 +403,6 @@ prysm:
 lighthouse:
   enabled: true
   replicas: 1
-  networkID: mainnet
+  network: mainnet
   eth1Endpoints:
     - http://operator-geth:8545

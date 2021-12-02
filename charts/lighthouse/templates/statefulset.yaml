@@ -56,7 +56,7 @@ spec:
             - --http-address=0.0.0.0
             - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
             - --datadir=/data
-            - --network={{ .Values.networkID }}
+            - --network={{ .Values.network }}
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
