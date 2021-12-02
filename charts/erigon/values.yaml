@@ -128,7 +128,7 @@ erigon:
     - "--prune.r.before=11184524"
     - "--prune=htc"
 
-  ## Extra flags for goerli node
+  ## Extra flags for goerli network
   ##
   goerliExtraFlags:
   - "--prune.r.before=4367322"
