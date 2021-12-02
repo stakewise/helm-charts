@@ -122,7 +122,7 @@ erigon:
   # Disable remote sealing verification
   minerNoVerify: false
 
-  ## Extra flags for mainnet node
+  ## Extra flags for mainnet network
   ##
   mainnetExtraFlags:
     - "--prune.r.before=11184524"
