@@ -1,4 +1,4 @@
-{{ $chainConfig := index $.Values.chains $.Values.chain }}
+{{ $networkConfig := index $.Values.networks $.Values.network }}
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
@@ -52,14 +52,14 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ['/bin/sh', '/data/scripts/entrypoint.sh']
           args:
-            {{- if $chainConfig.bootnodes }}
+            {{- if $networkConfig.bootnodes }}
             - "--bootnodes"
-            - "{{ join "," $chainConfig.bootnodes }}"
+            - "{{ join "," $networkConfig.bootnodes }}"
             {{- end }}
             - "-d"
             - "/data/openethereum"
             - "--chain"
-            - "{{ $.Values.chain }}"
+            - "{{ $.Values.network }}"
             - "--jsonrpc-interface"
             - "all"
             - "--jsonrpc-hosts"

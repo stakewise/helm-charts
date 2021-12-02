@@ -70,11 +70,11 @@ podDisruptionBudget:
 
 ## Which network should the node join
 ##
-chain: mainnet
+network: mainnet
 
 ## Chain-dependend configurations
 ##
-chains:
+networks:
   # Configurations values for the mainnet chain
   mainnet:
   # Configurations values for the ropsten chain
