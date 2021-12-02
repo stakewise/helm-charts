@@ -60,6 +60,15 @@ spec:
             - --nat={{ .Values.erigon.nat }}
             - --maxpeers={{ .Values.erigon.maxPeers }}
             - --chain={{ .Values.erigon.network }}
+        {{- if eq .Values.erigon.network "mainnet" }}
+            {{- range .Values.erigon.mainnetExtraFlags }}
+            - {{ . }}
+            {{- end }}
+        {{- else if eq .Values.erigon.network "goerli" }}
+            {{- range .Values.erigon.goerliExtraFlags }}
+            - {{ . }}
+            {{- end }}
+        {{- end }}
         {{- if .Values.erigon.nodeKey }}
             - --nodekey={{ .Values.erigon.nodeKey }}
         {{- end }}
