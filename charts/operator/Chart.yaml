@@ -42,15 +42,15 @@ dependencies:
     condition: vault.enabled
   - name: geth
     repository: https://charts.stakewise.io
-    version: "0.1.0"
+    version: "1.0.1"
     condition: geth.enabled
   - name: erigon
     repository: https://charts.stakewise.io
-    version: "1.0.2"
+    version: "1.0.3"
     condition: erigon.enabled
   - name: prysm
     repository: https://charts.stakewise.io
-    version: "1.0.4"
+    version: "1.0.5"
     condition: prysm.enabled
   - name: lighthouse
     repository: https://charts.stakewise.io

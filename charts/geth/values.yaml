@@ -41,7 +41,7 @@ initImage:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.9"
+  tag: "v1.10.13"
   pullPolicy: IfNotPresent
 
 ## How many geth nodes to run simultaneously
