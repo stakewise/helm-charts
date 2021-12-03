@@ -262,7 +262,7 @@ polling:
           cpu: 100m
           memory: 200Mi
 
-    - command: "poll_tokens"
+    - command: "poll_token_transfers"
       terminationGracePeriodSeconds: 300
       resources:
         requests:
@@ -283,7 +283,7 @@ polling:
           cpu: 50m
           memory: 100Mi
 
-    - command: "poll_uniswap"
+    - command: "poll_token_supplies"
       terminationGracePeriodSeconds: 180
       resources:
         requests:
