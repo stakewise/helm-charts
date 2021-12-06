@@ -60,11 +60,11 @@ spec:
             - --nat={{ .Values.erigon.nat }}
             - --maxpeers={{ .Values.erigon.maxPeers }}
             - --chain={{ .Values.erigon.network }}
-        {{- if eq .Values.erigon.network "mainnet" }}
+        {{- if eq .Values.network "mainnet" }}
             {{- range .Values.erigon.mainnetExtraFlags }}
             - {{ . }}
             {{- end }}
-        {{- else if eq .Values.erigon.network "goerli" }}
+        {{- else if eq .Values.network "goerli" }}
             {{- range .Values.erigon.goerliExtraFlags }}
             - {{ . }}
             {{- end }}
