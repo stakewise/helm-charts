@@ -283,7 +283,7 @@ polling:
           cpu: 50m
           memory: 100Mi
 
-    - command: "poll_token_supplies"
+    - command: "poll_token_stats"
       terminationGracePeriodSeconds: 180
       resources:
         requests:
@@ -294,7 +294,8 @@ polling:
     # Endpoints
     ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
     eth1Endpoint: ""
-    prysmEndpoint: ""
+    # NB! only prysm client currently works
+    eth2Endpoint: ""
 
     # polling periods
     pollPaymentsPeriod: "15"
