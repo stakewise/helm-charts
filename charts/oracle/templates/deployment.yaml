@@ -41,7 +41,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["python"]
-          args: ["oracle/main.py"]
+          args: ["oracle/oracle/main.py"]
           envFrom:
             - configMapRef:
                 name: {{ template "oracle.fullname" . }}
