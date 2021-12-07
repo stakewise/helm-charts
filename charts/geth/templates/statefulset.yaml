@@ -68,9 +68,7 @@ spec:
             - "--datadir=/data/ethereum"
             - "--ethash.dagdir=/data/ethereum/.ethash"
             - "--ipcdisable"
-          {{- if eq .Values.network "goerli" }}
-            - "--goerli"
-          {{- end }}
+            - "--{{ .Values.network }}"
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
@@ -106,19 +104,27 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-        {{- if .Values.rpc.enabled }}
+        {{- if .Values.livenessProbe.enabled }}
           livenessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.rpc.port }}
-            initialDelaySeconds: 15
-            timeoutSeconds: 5
+            {{- if and .Values.livenessProbe.exec (kindIs "string" .Values.livenessProbe.exec.command) }}
+            {{- omit .Values.livenessProbe "enabled" "exec" | toYaml | nindent 12 }}
+            exec:
+              command:
+                {{- tpl .Values.livenessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
+            {{- end }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
-            httpGet:
-              path: /
-              port: {{ .Values.rpc.port }}
-            initialDelaySeconds: 15
-            timeoutSeconds: 5
+            {{- if and .Values.readinessProbe.exec (kindIs "string" .Values.readinessProbe.exec.command) }}
+            {{- omit .Values.readinessProbe "enabled" "exec" | toYaml | nindent 12 }}
+            exec:
+              command:
+                {{- tpl .Values.readinessProbe.exec.command . | nindent 16 }}
+            {{- else }}
+            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
+            {{- end }}
         {{- end }}
         {{- with .Values.resources }}
           resources:

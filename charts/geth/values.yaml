@@ -73,10 +73,10 @@ rpc:
 ## WebSocket configuration.
 ##
 ws:
-  enabled: false
+  enabled: true
   port: "8546"
   api: "web3,eth,net"
-  origins: ""
+  origins: "*"
 
 ## Extra flags to pass to the node
 ##
@@ -218,3 +218,32 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 3
+  timeoutSeconds: 15
+  exec:
+    command: |
+      - sh
+      - -c
+      - "echo -e 'POST / HTTP/1.1\nHost: localhost:8545\nUser-Agent: curl/7.61.1\nAccept: */*\nContent-Type: application/json\nContent-Length: 60\n\n{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"params\":[],\"id\":67}' | nc localhost 8545 | grep -q 'HTTP/1.1 200 OK' && echo -e 'GET / HTTP/1.1\nHost: localhost:8546\nUpgrade: websocket\nConnection: Upgrade\nSec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\nSec-WebSocket-Version: 13\n' | nc localhost 8546 | grep -q 'HTTP/1.1 101'"
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  periodSeconds: 60
+  successThreshold: 1
+  failureThreshold: 30
+  timeoutSeconds: 10
+  exec:
+    command: |
+      - sh
+      - -c
+      - "geth --{{ .Values.network }} attach ws://localhost:8546 --exec '!eth.syncing || eth.syncing.highestBlock-eth.syncing.currentBlock < 100' | grep -q true && return 0 || return 1"
