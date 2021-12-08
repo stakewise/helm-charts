@@ -1,0 +1,44 @@
+{{- if or .Values.teku.p2p.enabled .Values.teku.restApi.enabled .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "teku.fullname" . }}
+  labels:
+    {{- include "teku.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+{{- if .Values.svcHeadless }}
+  clusterIP: None
+{{- end }}
+{{- if .Values.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  ports:
+  {{- if .Values.teku.p2p.enabled }}
+    - port: {{ .Values.teku.p2p.port }}
+      targetPort: p2p-tcp
+      protocol: TCP
+      name: p2p-tcp
+    - port: {{ .Values.teku.p2p.port }}
+      targetPort: p2p-udp
+      protocol: UDP
+      name: p2p-udp
+  {{- end }}
+  {{- if .Values.teku.restApi.enabled }}
+    - port: {{ .Values.teku.restApi.port }}
+      targetPort: rest-api
+      protocol: TCP
+      name: rest-api
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+    - port: {{ .Values.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  {{- end }}
+  selector:
+    {{- include "teku.selectorLabels" . | nindent 4 }}
+{{- end }}

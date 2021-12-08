@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "prysm.fullname" . }}
+  name: {{ template "teku.fullname" . }}
   {{- if .Values.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.metrics.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "prysm.labels" . | nindent 4 }}
+    {{- include "teku.labels" . | nindent 4 }}
     {{- if .Values.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
@@ -37,5 +37,5 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "prysm.selectorLabels" . | nindent 6 }}
+      {{- include "teku.selectorLabels" . | nindent 6 }}
 {{- end }}

@@ -1,0 +1,350 @@
+# Default values for teku.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+## Teku image
+##
+image:
+  repository: consensys/teku
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "21.11"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+
+## Defines whether the service must be headless
+##
+svcHeadless: false
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: true
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Enable pod disruption budget
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+##
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+## Vertical Pod Autoscaler config
+## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+##
+verticalAutoscaler:
+  # If true a VPA object will be created for the StatefulSet
+  enabled: false
+  updateMode: Off
+  containerPolicies: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before genesis
+##
+readinessProbe:
+  httpGet:
+    path: /eth/v1/node/health
+    port: rest-api
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+
+livenessProbe:
+  httpGet:
+    path: /teku/v1/admin/liveness
+    port: rest-api
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 300Gi
+
+
+## Teku is an open-source Ethereum 2.0 client written in Java.
+## Teku contains a full Beacon node implementation and a validator
+## client for participating in consensus.
+
+## Eth2 network ID
+##
+network: "mainnet"
+
+## Teku configuration
+teku:
+  # JAVA_OPTS
+  javaOpts: "-Xmx4g"
+  # Path to beacon node data
+  dataBeaconPath: /data/teku/beacon
+  # Path to the base directory for storage
+  dataPath: /data/teku
+  # Sets the frequency, in slots, at which to store
+  # finalized states to disk. This option is ignored
+  # if --data-storage-mode is set to PRUNE
+  dataStorageArchiveFrequency: "2048"
+  # Sets the strategy for handling historical chain data
+  # (Valid values: ARCHIVE, PRUNE)
+  dataStorageMode: PRUNE
+  # Store non-canonical blocks
+  dataStorageNonCanonicalBlocksEnabled: false
+  # URLs for Eth1 nodes
+  eth1Endpoints: []
+  # The initial state. This value should be a file or
+  # URL pointing to an SSZ-encoded finalized
+  # checkpoint state
+  initialState: ""
+  # Logging verbosity levels: OFF, FATAL, ERROR, WARN,
+  # INFO, DEBUG, TRACE, ALL
+  logging: INFO
+  # Whether Status and Event log messages include a
+  # console color display code
+  logColorEnabled: true
+  # Whether a logger is added for the console, the log
+  # file, or both (Valid values: BOTH, CONSOLE,
+  # DEFAULT_BOTH, FILE)
+  logDestination: CONSOLE
+  # Path containing the location (relative or
+  # absolute) and the log filename. If not set will
+  # default to <data-path>/logs/teku.log
+  logFile: ""
+  # Pattern for the filename to apply to rolled over
+  # log files. If not set will default to
+  # <data-path>/logs/teku_%d{yyyy-MM-dd}.log
+  logFileNamePattern: ""
+  # Whether frequent update events are logged (e.g.
+  # every slot and epoch event)
+  logIncludeEventsEnabled: true
+  # P2P Settings
+  p2p:
+    # Enable P2P
+    enabled: true
+    # P2P network interface
+    interface: "0.0.0.0"
+    # P2P port
+    port: "9000"
+    # Specify the NAT circumvention method to be used,
+    # possible values are UPNP, NONE. NONE will
+    # require manual router configuration.
+    natMethod: NONE
+    # Lower bound on the target number of peers
+    peerLowerBound: "64"
+    # Upper bound on the target number of peers
+    peerUpperBound: "74"
+    # Static peers
+    staticPeers: []
+    # Subscribe all subnets
+    subscribeAllSubnets: false
+    # P2P advertised IP
+    advertisedIP: "127.0.0.1"
+    # Enables discv5 discovery
+    discoveryEnabled: true
+    # List of ENRs of the bootnodes
+    discoveryBootNodes: []
+  # Rest API Settings
+  restApi:
+    # Enables Beacon Rest API
+    enabled: true
+    # Comma-separated list of hostnames to allow, or *
+    # to allow any host
+    hostAllowList:
+      - "*"
+    # Interface of Beacon Rest API
+    interface: "0.0.0.0"
+    # Port number of Beacon Rest API
+    port: "5051"
+    # Comma separated list of origins to allow, or * to
+    # allow any origin
+    corsOrigins:
+      - "*"
+    # Enable swagger-docs and swagger-ui endpoints
+    docsEnabled: false
+
+## Monitoring
+##
+metrics:
+  ## Whether to enable metrics collection or not
+  ##
+  enabled: false
+
+  # Metric categories to enable
+  categories:
+    - JVM
+    - PROCESS
+    - BEACON
+    - DISCOVERY
+    - EVENTBUS
+    - EXECUTOR
+    - LIBP2P
+    - NETWORK
+    - STORAGE
+    - STORAGE_HOT_DB
+    - STORAGE_FINALIZED_DB
+    - REMOTE_VALIDATOR
+    - VALIDATOR
+    - VALIDATOR_PERFORMANCE
+
+  # List of hostnames to allow, or * to allow any host
+  hostAllowList:
+    - "*"
+  
+  # Metrics network interface to expose metrics for Prometheus
+  interface: "0.0.0.0"
+
+  ## Metrics port to expose metrics for Prometheus
+  ##
+  port: 8008
+
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ##
+    enabled: false
+    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    ##
+    enabled: false
+    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## e.g:
+    ## rules:
+    ##   - alert: PrysmBeaconNodeDown
+    ##     expr: up{job='{{ include "prysm.fullname" . }}'} == 0
+    ##     for: 1m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node is down
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: Prysm50SlotsBehind
+    ##     expr: beacon_clock_time_slot-beacon_head_slot > 50
+    ##     for: 2m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node is out of sync
+    ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmParticipationRateLessThen66Percent
+    ##     expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
+    ##     for: 5m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm beacon node participation rate less then 66%
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmBeaconNodeRestarted
+    ##     expr: (time()-process_start_time_seconds{job='{{ include "prysm.fullname" . }}'})/3600 < 0.1
+    ##     for: 1m
+    ##     labels:
+    ##       severity: warning
+    ##     annotations:
+    ##       summary: Prysm beacon node was restarted
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##
+    rules: []
