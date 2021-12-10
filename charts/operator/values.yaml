@@ -59,10 +59,13 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.0.3"
+    tag: "v2.0.4"
   lighthouse:
     repository: "sigp/lighthouse"
     tag: "v2.0.1"
+  teku:
+    repository: "consensys/teku"
+    tag: "21.11"
   
 ## Init image is used to initialise validators
 ##
@@ -131,6 +134,10 @@ flags:
     - "lighthouse"
     - "vc"
     - "--datadir=/data/lighthouse"
+  teku:
+    - "validator-client"
+    - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"
+    - "--log-destination=CONSOLE"
   
 ## Validators extra flags
 ##
@@ -167,6 +174,12 @@ metrics:
       - "--metrics"
       - "--metrics-port=9090"
       - "--metrics-address=0.0.0.0"
+    teku:
+      - "--metrics-enabled=true"
+      - "--metrics-categories=JVM,PROCESS,BEACON,DISCOVERY,EVENTBUS,EXECUTOR,LIBP2P,NETWORK,STORAGE,STORAGE_HOT_DB,STORAGE_FINALIZED_DB,REMOTE_VALIDATOR,VALIDATOR,VALIDATOR_PERFORMANCE"
+      - "--metrics-host-allowlist=*"
+      - "--metrics-interface=0.0.0.0"
+      - "--metrics-port=9090"
     
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator

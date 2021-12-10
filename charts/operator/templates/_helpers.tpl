@@ -113,6 +113,8 @@ Validator beacon node
 - "--beacon-rpc-provider=operator-prysm:4000"
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes=http://operator-lighthouse:5052"
+{{- else if eq $.Values.type "teku" }}
+- "--beacon-node-api-endpoint=http://operator-teku:5051"
 {{- end }}
 {{- end }}
 {{- end }}
@@ -122,6 +124,10 @@ Validator graffiti
 */}}
 {{- define "validator-graffiti" -}}
 {{- if $.Values.graffiti }}
+{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") }}
 - "--graffiti={{ $.Values.graffiti }}"
+{{- else if eq $.Values.type "teku" }}
+- "--validators-graffiti={{ $.Values.graffiti }}"
+{{- end }}
 {{- end }}
 {{- end }}

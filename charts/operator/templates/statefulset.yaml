@@ -79,6 +79,11 @@ spec:
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           args:  
+          {{- if eq $root.Values.type "prysm" }}
+            - "--{{ $root.Values.network }}"
+          {{- else if or (eq $root.Values.type "lighthouse") (eq $root.Values.type "teku") }}
+            - "--network={{ $root.Values.network }}"
+          {{- end }}
           {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
           {{- end -}}
@@ -90,13 +95,6 @@ spec:
           {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
             - {{ . | quote }}
-            {{- end }}
-          {{- end }}
-          {{- if eq $root.Values.network "prater" }}
-            {{- if eq $root.Values.type "prysm" }}
-            - "--prater"
-            {{- else if eq $root.Values.type "lighthouse" }}
-            - "--network=prater"
             {{- end }}
           {{- end }}
         {{- if $root.Values.metrics.enabled }}

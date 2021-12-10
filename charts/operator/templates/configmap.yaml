@@ -38,6 +38,7 @@ data:
     DATA="/data"
     DATA_PRYSM="${DATA}/prysm"
     DATA_LIGHTHOUSE="${DATA}/lighthouse"
+    DATA_TEKU="${DATA}/teku"
     SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
 
     # Get keystores password
@@ -71,6 +72,17 @@ data:
         cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
         rm ${VAULT_PASSWORD}
     elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+        lighthouse-validator \
+            --network=${NETWORK_ID:-"mainnet"} \
+            account \
+            validator \
+            import \
+            --datadir=${DATA_LIGHTHOUSE} \
+            --reuse-password \
+            --password-file=${VAULT_PASSWORD} \
+            --directory=${VAULT_KEYSTORES}
+        rm ${VAULT_PASSWORD}
+    elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
         lighthouse-validator \
             --network=${NETWORK_ID:-"mainnet"} \
             account \
