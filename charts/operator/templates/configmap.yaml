@@ -56,7 +56,8 @@ data:
     rm -f ${VAULT}/keystores.txt
     rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
            ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
-           ${DATA_PRYSM}/validators || true
+           ${DATA_PRYSM}/validators \
+           ${DATA_TEKU}/validator || true
 
     if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
         touch ${DATA_PRYSM}/tosaccepted
@@ -83,35 +84,19 @@ data:
             --directory=${VAULT_KEYSTORES}
         rm ${VAULT_PASSWORD}
     elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
-        lighthouse-validator \
-            --network=${NETWORK_ID:-"mainnet"} \
-            account \
-            validator \
-            import \
-            --datadir=${DATA_LIGHTHOUSE} \
-            --reuse-password \
-            --password-file=${VAULT_PASSWORD} \
-            --directory=${VAULT_KEYSTORES}
+        mkdir -p /data/teku/validator/keys /data/teku/validator/passwords
+        cd ${VAULT_KEYSTORES}
+        for key in *; do
+            FILENAME=`echo ${key} | sed 's/.json//g'`
+            cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
+            cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
+        done
         rm ${VAULT_PASSWORD}
     fi
 
     if [[ "$VALIDATOR_TYPE" != "`cat /data/validator.type`" ]]; then
-        if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
-            touch ${DATA_PRYSM}/tosaccepted
-            lighthouse-validator account validator slashing-protection \
-                export ${SLASHING_PROTECTION_FILE} \
-                --datadir=${DATA_LIGHTHOUSE} \
-                --network=${NETWORK_ID:-"mainnet"}
-            if [ $? -eq 0 ]; then
-                test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
-                prysm-validator slashing-protection import \
-                    --datadir=${DATA_PRYSM} \
-                    --slashing-protection-json-file=${SLASHING_PROTECTION_FILE} \
-                    --${NETWORK_ID:-"mainnet"}
-            else
-                echo "Slashing history export failed"
-            fi
-        elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+        OLD_VALIDATOR=`cat /data/validator.type`
+        if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
             prysm-validator \
                 --${NETWORK_ID:-"mainnet"} \
@@ -120,15 +105,77 @@ data:
                 --datadir=${DATA_PRYSM} \
                 --slashing-protection-export-dir=${DATA}
             if [ $? -eq 0 ]; then
-                test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
-                lighthouse-validator \
-                    account \
-                    validator \
-                    slashing-protection \
-                    import \
-                    ${SLASHING_PROTECTION_FILE} \
-                    --datadir=${DATA_LIGHTHOUSE} \
-                    --network=${NETWORK_ID:-"mainnet"}
+                if [[ "$OLD_VALIDATOR" = "lighthouse" ]]; then
+                    test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
+                    lighthouse-validator \
+                        account \
+                        validator \
+                        slashing-protection \
+                        import \
+                        ${SLASHING_PROTECTION_FILE} \
+                        --datadir=${DATA_LIGHTHOUSE} \
+                        --network=${NETWORK_ID:-"mainnet"}
+                elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
+                    test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
+                    /opt/teku/bin/teku \
+                        slashing-protection \
+                        import \
+                        --data-path=${DATA_TEKU} \
+                        --from=${SLASHING_PROTECTION_FILE}
+                fi
+            else
+                echo "Slashing history export failed"
+            fi
+        elif [[ "$OLD_VALIDATOR" = "lighthouse" ]]; then
+            test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
+            lighthouse-validator account validator slashing-protection \
+                export ${SLASHING_PROTECTION_FILE} \
+                --datadir=${DATA_LIGHTHOUSE} \
+                --network=${NETWORK_ID:-"mainnet"}
+            if [ $? -eq 0 ]; then
+                if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
+                    test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
+                    touch ${DATA_PRYSM}/tosaccepted
+                    prysm-validator slashing-protection import \
+                        --datadir=${DATA_PRYSM} \
+                        --slashing-protection-json-file=${SLASHING_PROTECTION_FILE} \
+                        --${NETWORK_ID:-"mainnet"}
+                elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
+                    test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
+                    /opt/teku/bin/teku \
+                        slashing-protection \
+                        import \
+                        --data-path=${DATA_TEKU} \
+                        --from=${SLASHING_PROTECTION_FILE}
+                fi
+            else
+                echo "Slashing history export failed"
+            fi
+        elif [[ "$OLD_VALIDATOR" = "teku" ]]; then
+            test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
+            /opt/teku/bin/teku \
+                slashing-protection \
+                export \
+                --data-path=${DATA_TEKU} \
+                --to=${SLASHING_PROTECTION_FILE}
+            if [ $? -eq 0 ]; then
+                if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
+                    test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
+                    touch ${DATA_PRYSM}/tosaccepted
+                    prysm-validator slashing-protection import \
+                        --datadir=${DATA_PRYSM} \
+                        --slashing-protection-json-file=${SLASHING_PROTECTION_FILE} \
+                        --${NETWORK_ID:-"mainnet"}
+                elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+                    lighthouse-validator \
+                        account \
+                        validator \
+                        slashing-protection \
+                        import \
+                        ${SLASHING_PROTECTION_FILE} \
+                        --datadir=${DATA_LIGHTHOUSE} \
+                        --network=${NETWORK_ID:-"mainnet"}
+                fi
             else
                 echo "Slashing history export failed"
             fi

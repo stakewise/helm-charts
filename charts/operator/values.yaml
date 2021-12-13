@@ -65,13 +65,13 @@ image:
     tag: "v2.0.1"
   teku:
     repository: "consensys/teku"
-    tag: "21.11"
+    tag: "21.12.1"
   
 ## Init image is used to initialise validators
 ##
 initImage:
-  repository: "unxnn/validator-init"
-  tag: "stable"
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
+  tag: "v1.0.1"
   pullPolicy: IfNotPresent
   
 terminationGracePeriodSeconds: 900
