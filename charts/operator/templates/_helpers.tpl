@@ -107,7 +107,7 @@ Validator beacon node
 - "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoint }}"
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoint }}"
-{{- else if eq $.Values.type "lighthouse" }}
+{{- else if eq $.Values.type "teku" }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoint }}"
 {{- end }}
 {{- else }}
