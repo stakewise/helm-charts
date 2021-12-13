@@ -45,8 +45,8 @@ RUN echo " ---> Install lighthouse validator" && \
     rm -f lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-x86_64-unknown-linux-gnu-portable.tar.gz && \
     chmod +x /usr/local/bin/lighthouse-validator
 
-# RUN rm -f /usr/bin/sh /usr/bin/*less* /usr/bin/*grep* \
-#           /usr/bin/*more* /usr/bin/*sed* /usr/bin/*ls* /usr/bin/*head* \
-#           /usr/bin/*diff* /usr/bin/*apt*
+RUN rm -f /usr/bin/sh /usr/bin/*less* /usr/bin/*grep* \
+          /usr/bin/*more* /usr/bin/*sed* /usr/bin/*ls* /usr/bin/*head* \
+          /usr/bin/*diff* /usr/bin/*apt*
 
-# ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]
+ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]
