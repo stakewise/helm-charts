@@ -125,6 +125,7 @@ data:
                 fi
             else
                 echo "Slashing history export failed"
+                exit 1
             fi
         elif [[ "$OLD_VALIDATOR" = "lighthouse" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
@@ -150,6 +151,7 @@ data:
                 fi
             else
                 echo "Slashing history export failed"
+                exit 1
             fi
         elif [[ "$OLD_VALIDATOR" = "teku" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
@@ -178,6 +180,7 @@ data:
                 fi
             else
                 echo "Slashing history export failed"
+                exit 1
             fi
         fi
     fi
