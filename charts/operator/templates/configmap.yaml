@@ -105,7 +105,7 @@ data:
                 --datadir=${DATA_PRYSM} \
                 --slashing-protection-export-dir=${DATA}
             if [ $? -eq 0 ]; then
-                if [[ "$OLD_VALIDATOR" = "lighthouse" ]]; then
+                if [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
                     test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
                     lighthouse-validator \
                         account \
@@ -133,7 +133,7 @@ data:
                 --datadir=${DATA_LIGHTHOUSE} \
                 --network=${NETWORK_ID:-"mainnet"}
             if [ $? -eq 0 ]; then
-                if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
+                if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
                     prysm-validator slashing-protection import \
