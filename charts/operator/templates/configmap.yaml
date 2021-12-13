@@ -122,6 +122,9 @@ data:
                         import \
                         --data-path=${DATA_TEKU} \
                         --from=${SLASHING_PROTECTION_FILE}
+                else
+                    echo "Wrong VALIDATOR_TYPE"
+                    exit 1
                 fi
             else
                 echo "Slashing history export failed"
@@ -148,6 +151,9 @@ data:
                         import \
                         --data-path=${DATA_TEKU} \
                         --from=${SLASHING_PROTECTION_FILE}
+                else
+                    echo "Wrong VALIDATOR_TYPE"
+                    exit 1
                 fi
             else
                 echo "Slashing history export failed"
@@ -177,6 +183,9 @@ data:
                         ${SLASHING_PROTECTION_FILE} \
                         --datadir=${DATA_LIGHTHOUSE} \
                         --network=${NETWORK_ID:-"mainnet"}
+                else
+                    echo "Wrong VALIDATOR_TYPE"
+                    exit 1
                 fi
             else
                 echo "Slashing history export failed"
