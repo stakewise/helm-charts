@@ -419,3 +419,13 @@ lighthouse:
   network: mainnet
   eth1Endpoints:
     - http://operator-geth:8545
+
+## Teku beacon chain node configuration
+##
+teku:
+  enabled: false
+  replicas: 1
+  network: mainnet
+  teku:
+    eth1Endpoints:
+      - http://operator-geth:8545
