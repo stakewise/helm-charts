@@ -161,7 +161,7 @@ data:
                 --data-path=${DATA_TEKU} \
                 --to=${SLASHING_PROTECTION_FILE}
             if [ $? -eq 0 ]; then
-                if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
+                if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
                     prysm-validator slashing-protection import \
