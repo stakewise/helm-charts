@@ -56,7 +56,8 @@ dependencies:
     repository: https://charts.stakewise.io
     version: "0.1.0"
     condition: lighthouse.enabled
-  # - name: teku
-  #   repository: https://charts.stakewise.io
-  #   version: "0.1.0"
-  #   condition: teku.enabled
+  - name: teku
+    repository: https://charts.stakewise.io
+    version: "0.1.0"
+    condition: teku.enabled
+
