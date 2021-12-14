@@ -38,7 +38,7 @@ home: https://stakewise.io/
 dependencies:
   - name: vault
     repository: https://helm.releases.hashicorp.com
-    version: 0.16.1
+    version: 0.18.0
     condition: vault.enabled
   - name: geth
     repository: https://charts.stakewise.io
