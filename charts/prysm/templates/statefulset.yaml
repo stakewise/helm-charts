@@ -80,7 +80,7 @@ spec:
             - "--http-web3provider={{ .Values.eth1Endpoint }}"
             - "--{{ .Values.network }}"
           {{- if eq .Values.network "prater" }}
-            - "--genesis-state=/data/gensis.ssz"
+            - "--genesis-state=/data/genesis.ssz"
           {{- end }}
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
