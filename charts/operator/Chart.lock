@@ -14,5 +14,8 @@ dependencies:
 - name: lighthouse
   repository: https://charts.stakewise.io
   version: 0.1.0
-digest: sha256:688939cd732a8a02187ab4cf73348d641ffa161280466411e59352e08c80d0f2
-generated: "2021-12-02T14:39:20.940598+03:00"
+- name: teku
+  repository: https://charts.stakewise.io
+  version: 0.1.0
+digest: sha256:b35fbbe4578e1dce4a5795f85f2c5a7812a90f7e893bcf149bf406fb43ab0d07
+generated: "2021-12-14T08:52:40.145119+03:00"
