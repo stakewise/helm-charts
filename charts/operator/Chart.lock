@@ -1,7 +1,7 @@
 dependencies:
 - name: vault
   repository: https://helm.releases.hashicorp.com
-  version: 0.16.1
+  version: 0.18.0
 - name: geth
   repository: https://charts.stakewise.io
   version: 1.0.1
@@ -17,5 +17,5 @@ dependencies:
 - name: teku
   repository: https://charts.stakewise.io
   version: 0.1.0
-digest: sha256:b35fbbe4578e1dce4a5795f85f2c5a7812a90f7e893bcf149bf406fb43ab0d07
-generated: "2021-12-14T08:52:40.145119+03:00"
+digest: sha256:cd94712013c3a72df488f1d512b3803ac30e383ebc6099e27b0b052c4fcd9b0c
+generated: "2021-12-14T10:34:28.651259+03:00"
