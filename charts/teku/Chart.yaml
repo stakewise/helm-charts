@@ -1,6 +1,10 @@
 apiVersion: v2
-name: operator
-description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
+name: teku
+description: Teku is an open-source Ethereum 2.0 client written in Java.
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+home: https://stakewise.io/
+sources:
+  - https://github.com/ConsenSys/teku
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -15,48 +19,16 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.0.5
+version: 0.1.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v2.0.4"
+appVersion: "21.12.1"
 
 keywords:
   - ethereum
   - blockchain
-  - lighthouse
-  - prysm
-  - geth
-  - erigon
-  - stakewise
+  - teku
   - p2p
-
-home: https://stakewise.io/
-
-dependencies:
-  - name: vault
-    repository: https://helm.releases.hashicorp.com
-    version: 0.16.1
-    condition: vault.enabled
-  - name: geth
-    repository: https://charts.stakewise.io
-    version: "1.0.1"
-    condition: geth.enabled
-  - name: erigon
-    repository: https://charts.stakewise.io
-    version: "1.0.3"
-    condition: erigon.enabled
-  - name: prysm
-    repository: https://charts.stakewise.io
-    version: "1.0.5"
-    condition: prysm.enabled
-  - name: lighthouse
-    repository: https://charts.stakewise.io
-    version: "0.1.0"
-    condition: lighthouse.enabled
-  # - name: teku
-  #   repository: https://charts.stakewise.io
-  #   version: "0.1.0"
-  #   condition: teku.enabled

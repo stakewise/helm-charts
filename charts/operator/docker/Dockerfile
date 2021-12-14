@@ -1,11 +1,29 @@
+FROM eclipse-temurin:17 as jre-build
+
+# Create a custom Java runtime
+RUN JAVA_TOOL_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" $JAVA_HOME/bin/jlink \
+         --add-modules ALL-MODULE-PATH \
+         --strip-debug \
+         --no-man-pages \
+         --no-header-files \
+         --compress=2 \
+         --output /javaruntime
+
+FROM consensys/teku:21.12.1 as teku
+
 FROM ubuntu:21.04
 
+ENV JAVA_HOME=/opt/java/openjdk
+ENV PATH "${JAVA_HOME}/bin:${PATH}"
 ENV PRYSM_VALIDATOR_VERSION=2.0.1
 ENV LIGHTHOUSE_VALIDATOR_VERSION=2.0.1
 ENV VAULT_VERSION=1.8.4
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt update && apt install curl unzip jq -y && rm -rf /var/apt/cache
+COPY --from=jre-build /javaruntime $JAVA_HOME
+COPY --from=teku /opt/teku /opt/teku
+
+RUN apt update && apt install curl unzip jq -y && rm -rf /var/apt/cache /var/lib/api/lists/*
 
 RUN echo " ---> Install vault CLI" && \
     curl -sSLO "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip" && \

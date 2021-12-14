@@ -1,0 +1,17 @@
+{{ if .Values.teku.restApi.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "teku.fullname" . }}-test-connection"
+  labels:
+    {{- include "teku.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "teku.fullname" . }}:{{ .Values.teku.restApi.port }}']
+  restartPolicy: Never
+{{ end }}

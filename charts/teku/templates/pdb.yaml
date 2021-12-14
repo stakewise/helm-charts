@@ -2,9 +2,9 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "geth.fullname" . }}
+  name: {{ template "teku.fullname" . }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
+    {{- include "teku.labels" . | nindent 4 }}
 spec:
 {{- if .Values.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
@@ -14,5 +14,5 @@ spec:
 {{- end }}
   selector:
     matchLabels:
-      {{- include "geth.selectorLabels" . | nindent 6 }}
+      {{- include "teku.selectorLabels" . | nindent 6 }}
 {{- end }}
