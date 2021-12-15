@@ -246,4 +246,4 @@ readinessProbe:
     command: |
       - sh
       - -c
-      - "geth --{{ .Values.network }} attach ws://localhost:8546 --exec '!eth.syncing || eth.syncing.highestBlock-eth.syncing.currentBlock < 100' | grep -q true && return 0 || return 1"
+      - "geth --{{ .Values.network }} --datadir=/data/ethereum attach ws://localhost:8546 --exec '!eth.syncing || eth.syncing.highestBlock-eth.syncing.currentBlock < 100' | grep -q true && return 0 || return 1"
