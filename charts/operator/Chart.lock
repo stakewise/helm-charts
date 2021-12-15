@@ -4,7 +4,7 @@ dependencies:
   version: 0.18.0
 - name: geth
   repository: https://charts.stakewise.io
-  version: 1.0.1
+  version: 1.0.2
 - name: erigon
   repository: https://charts.stakewise.io
   version: 1.0.3
@@ -17,5 +17,5 @@ dependencies:
 - name: teku
   repository: https://charts.stakewise.io
   version: 0.1.0
-digest: sha256:cd94712013c3a72df488f1d512b3803ac30e383ebc6099e27b0b052c4fcd9b0c
-generated: "2021-12-14T10:34:28.651259+03:00"
+digest: sha256:63ee3d2a57b2ccb0eff0c4b687c58eb6064cd608d217857d136cfea7bb5fcb44
+generated: "2021-12-15T12:32:57.117273+03:00"
