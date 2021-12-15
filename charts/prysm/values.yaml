@@ -55,7 +55,7 @@ replicas: 3
 ##
 image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.0.4"
+  tag: "v2.0.5"
   pullPolicy: IfNotPresent
 
 ## RPC Port
