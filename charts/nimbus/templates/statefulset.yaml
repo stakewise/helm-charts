@@ -1,0 +1,157 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ include "nimbus.fullname" . }}
+  labels:
+    {{- include "nimbus.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "nimbus.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "nimbus.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "nimbus.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "nimbus.serviceAccountName" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+    {{- if and .Values.persistence.enabled .Values.initChownData }}
+      initContainers:
+        - name: init-chown
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - /bin/sh
+            - -c
+            - mkdir -p {{ .Values.nimbus.dataDir }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.nimbus.dataDir }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.nimbus.dataDir }}
+    {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - --network={{ .Values.network }}
+            - --data-dir={{ .Values.nimbus.dataDir }}
+            - --non-interactive
+            - --log-level={{ .Values.nimbus.logLevel }}
+          {{- range .Values.nimbus.web3Url }}
+            - --web3-url={{ . }}
+          {{- end }}
+            - --agent-string={{ .Values.nimbus.agentString }}
+            - --subscribe-all-subnets={{ .Values.nimbus.subscribeAllSubnets }}
+            - --num-threads={{ .Values.nimbus.numThreads }}
+            - --listen-address={{ .Values.nimbus.listenAddress }}
+            - --dump={{ .Values.nimbus.dump }}
+          {{- if .Values.nimbus.discv5.enabled }}
+            - --tcp-port={{ .Values.nimbus.discv5.tcpPort }}
+            - --udp-port={{ .Values.nimbus.discv5.udpPort }}
+          {{- end }}
+          {{- if .Values.nimbus.rpc.enabled }}
+            - --rpc
+            - --rpc-port={{ .Values.nimbus.rpc.port }}
+            - --rpc-address={{ .Values.nimbus.rpc.address }}
+          {{- end }}
+          {{- if .Values.nimbus.rest.enabled }}
+            - --rest
+            - --rest-port={{ .Values.nimbus.rest.port }}
+            - --rest-address={{ .Values.nimbus.rest.address }}
+          {{- end }}
+            - --max-peers={{ .Values.nimbus.maxPeers }}
+            - --nat={{ .Values.nimbus.nat }}
+            - --enr-auto-update={{ .Values.nimbus.enrAutoUpdate }}
+            - --node-name={{ .Values.nimbus.nodeName }}
+            - --stop-at-epoch={{ .Values.nimbus.stopAtEpoch }}
+          {{- if .Values.nimbus.bootstrapNode }}
+            - --bootstrap-node={{ .Values.nimbus.bootstrapNode | join "," }}
+          {{- end }}
+          {{- if .Values.nimbus.directPeer }}
+            - --direct-peer={{ .Values.nimbus.directPeer | join "," }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+            - --metrics
+            - --metrics-address={{ .Values.metrics.address }}
+            - --metrics-port={{ .Values.metrics.port }}
+          {{- end }}
+        {{- if or .Values.nimbus.discv5.enabled .Values.nimbus.rpc.enabled .Values.nimbus.rest.enabled .Values.metrics.enabled }}
+          ports:
+          {{- if .Values.nimbus.discv5.enabled }}
+            - name: p2p-tcp
+              containerPort: {{ .Values.nimbus.discv5.tcpPort }}
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: {{ .Values.nimbus.discv5.udpPort }}
+              protocol: UDP
+          {{- end }}
+          {{- if .Values.nimbus.rpc.enabled }}
+            - name: json-rpc
+              containerPort: {{ .Values.nimbus.rpc.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.nimbus.rest.enabled }}
+            - name: rest
+              containerPort: {{ .Values.nimbus.rest.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+          {{- end }}
+        {{- end }}
+      {{- if .Values.nimbus.rest.enabled }}
+        {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.nimbus.dataDir }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+  {{- if (not .Values.persistence.enabled) }}
+      volumes:
+        - name: data
+          emptyDir: {}
+  {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "nimbus.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+  {{- end }}
