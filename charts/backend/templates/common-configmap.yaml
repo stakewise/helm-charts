@@ -18,6 +18,7 @@ data:
   DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
   SEND_EMAILS: {{ .Values.commonConf.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.commonConf.mailgunSenderDomain | quote }}
+  MAILGUN_API_URL: {{ .Values.commonConf.mailgunApiUrl | quote }}
   DEFAULT_FROM_EMAIL: {{ .Values.commonConf.defaultFromEmail | quote }}
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
