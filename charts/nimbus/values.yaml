@@ -1,0 +1,287 @@
+# Default values for nimbus.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+image:
+  repository: statusim/nimbus-eth2
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "multiarch-v1.5.5"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
+service:
+  type: ClusterIP
+
+## Defines whether the service must be headless
+##
+svcHeadless: false
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: true
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Enable pod disruption budget
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+##
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+## Vertical Pod Autoscaler config
+## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+##
+verticalAutoscaler:
+  # If true a VPA object will be created for the StatefulSet
+  enabled: false
+  updateMode: Off
+  containerPolicies: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before genesis
+##
+readinessProbe:
+  httpGet:
+    path: /metrics
+    port: metrics
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+
+livenessProbe:
+  httpGet:
+    path: /metrics
+    port: metrics
+    scheme: HTTP
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  failureThreshold: 5
+  successThreshold: 1
+  timeoutSeconds: 1
+
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 300Gi
+
+
+## Nimbus: an Ethereum 1.0 and 2.0 Client for Resource-Restricted Devices
+##
+
+## Eth2 network ID
+##
+network: "mainnet"
+
+nimbus:
+  # The directory where nimbus will store all blockchain data.
+  dataDir: /data/nimbus
+  # Sets the log level for process and topics (e.g.
+  # "DEBUG; TRACE:discv5,libp2p; REQUIRED:none;
+  # DISABLED:none")
+  logLevel: INFO
+  # One or more Web3 provider URLs used for obtaining
+  # deposit contract data.
+  web3Url: []
+  # Node agent string which is used as identifier in network
+  agentString: nimbus
+  # Subscribe to all attestation subnet topics when gossiping
+  subscribeAllSubnets: false
+  # Number of worker threads (set this to 0 to use as
+  # many threads as there are CPU cores available)
+  numThreads: "1"
+  # Specifies one or more bootstrap nodes to use when
+  # connecting to the network
+  bootstrapNode: []
+  # Listening address for the Ethereum LibP2P and
+  # Discovery v5 traffic
+  listenAddress: 0.0.0.0
+  # Discovery settings
+  discv5:
+    enabled: true
+    # Listening TCP port for Ethereum LibP2P traffic
+    tcpPort: "9000"
+    # Listening UDP port for node discovery
+    udpPort: "9000"
+  # The maximum number of peers to connect to
+  maxPeers: "160"
+  # Specify method to use for determining public
+  # address. Must be one of: any, none, upnp, pmp,
+  # extip:<IP>
+  nat: any
+  # Discovery can automatically update its ENR with
+  # the IP address and UDP port as seen by other
+  # nodes it communicates with. This option allows to
+  # enable/disable this functionality
+  enrAutoUpdate: false
+  # A name for this node that will appear in the
+  # logs. If you set this to 'auto', a persistent
+  # automatically generated ID will be selected for
+  # each --data-dir folder.
+  nodeName: auto
+  # A positive epoch selects the epoch at which to stop
+  stopAtEpoch: "0"
+  # RPC Server settings
+  rpc:
+    enabled: true
+    # HTTP port for the JSON-RPC service
+    port: "9190"
+    # Listening address of the RPC server
+    address: 0.0.0.0
+  # REST Server settings
+  rest:
+    enabled: true
+    # Port for the REST server
+    port: "5052"
+    # Listening address of the REST server
+    address: 0.0.0.0
+  # Write SSZ dumps of blocks, attestations and
+  # states to data dir
+  dump: false
+  # The list of priviledged, secure and known peers
+  # to connect and maintain the connection to, this
+  # requires a not random netkey-file. In the
+  # complete multiaddress format like:/ip4/<address>
+  # /tcp/<port>/p2p/<peerId-public-key>. Peering
+  # agreements are established out of band and must
+  # be reciprocal.
+  directPeer: []
+
+## Monitoring
+##
+metrics:
+  ## Whether to enable metrics collection or not
+  ##
+  enabled: false
+  
+  # Listening address of the metrics server
+  address: "0.0.0.0"
+
+  ## Listening HTTP port of the metrics server
+  ##
+  port: 8008
+
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ##
+    enabled: false
+    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    ##
+    enabled: false
+    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## e.g:
+    ## rules:
+    ##   - alert: NimbusBeaconNodeDown
+    ##     expr: up{job='{{ include "nimbus.fullname" . }}'} == 0
+    ##     for: 1m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Nimbus beacon node is down
+    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+    ##
+    rules: []

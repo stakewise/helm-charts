@@ -80,7 +80,7 @@ data:
       "panels": [
         {
           "cacheTimeout": null,
-          "datasource": "Prometheus Stage",
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -828,7 +828,7 @@ data:
         },
         {
           "cacheTimeout": null,
-          "datasource": "Prometheus Stage",
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -1900,7 +1900,7 @@ data:
         },
         {
           "cacheTimeout": null,
-          "datasource": "Prometheus Stage",
+          "datasource": "Prometheus",
           "fieldConfig": {
             "defaults": {
               "color": {
@@ -2344,7 +2344,7 @@ data:
               "text": "All",
               "value": "$__all"
             },
-            "datasource": "Prometheus Stage",
+            "datasource": "Prometheus",
             "definition": "beacon_slot",
             "description": null,
             "error": null,
@@ -2356,7 +2356,7 @@ data:
             "options": [],
             "query": {
               "query": "beacon_slot",
-              "refId": "Prometheus Stage-system-Variable-Query"
+              "refId": "Prometheus-system-Variable-Query"
             },
             "refresh": 2,
             "regex": "/instance=\"([^\"]*)\"/",
