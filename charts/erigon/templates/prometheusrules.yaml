@@ -1,8 +1,8 @@
-{{- if .Values.metrics.prometheusRule.enabled }}
+{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ template "erigon.fullname" . }}
+  name: {{ include "erigon.fullname" . }}
   {{- if .Values.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}
@@ -14,9 +14,21 @@ metadata:
     {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
-  {{- with .Values.metrics.prometheusRule.rules }}
   groups:
+  {{- with .Values.metrics.prometheusRule.rules }}
     - name: {{ template "erigon.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.metrics.prometheusRule.default }}
+    - name: {{ template "erigon.fullname" $ }}-default
+      rules:
+        - alert: ErigonNodeDown
+          expr: up{job="{{ include "erigon.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: error
+          annotations:
+            summary: Erigon Node {{ printf "{{ $labels.instance }}" }} down
+            description: Erigon Node {{ printf "{{ $labels.instance }}" }} is down
   {{- end }}
 {{- end }}

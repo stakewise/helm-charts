@@ -305,6 +305,9 @@ metrics:
     ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
     ##
     enabled: false
+    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ##
+    default: true
     ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
     ##
     namespace: ""
@@ -312,15 +315,5 @@ metrics:
     ##
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: TekuBeaconNodeDown
-    ##     expr: up{job='{{ include "teku.fullname" . }}'} == 0
-    ##     for: 1m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Teku beacon node is down
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
-    rules: []
+    rules: {}
