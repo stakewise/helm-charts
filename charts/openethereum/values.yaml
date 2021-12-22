@@ -146,6 +146,9 @@ metrics:
     ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
     ##
     enabled: false
+    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ##
+    default: true
     ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
     ##
     namespace: ""
@@ -153,18 +156,8 @@ metrics:
     ##
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: OpenEthereumNodeDown
-    ##     expr: up{job="{{ include "openethereum.fullname" . }}-node"} == 0
-    ##     for: 5m
-    ##     labels:
-    ##       severity: error
-    ##     annotations:
-    ##       summary: OpenEthereum Node {{ printf "{{ $labels.instance }}" }} down
-    ##       description: OpenEthereum Node {{ printf "{{ $labels.instance }}" }} is down
     ##
-    rules: []
+    rules: {}
 
 ## Configure session affinity for to hit the same geth node
 ## for the period specified in `timeoutSeconds`

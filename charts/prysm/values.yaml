@@ -169,6 +169,9 @@ metrics:
     ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
     ##
     enabled: false
+    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ##
+    default: true
     ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
     ##
     namespace: ""
@@ -176,42 +179,8 @@ metrics:
     ##
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: PrysmBeaconNodeDown
-    ##     expr: up{job='{{ include "prysm.fullname" . }}'} == 0
-    ##     for: 1m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Prysm beacon node is down
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-    ##   - alert: Prysm50SlotsBehind
-    ##     expr: beacon_clock_time_slot-beacon_head_slot > 50
-    ##     for: 2m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Prysm beacon node is out of sync
-    ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-    ##   - alert: PrysmParticipationRateLessThen66Percent
-    ##     expr: beacon_prev_epoch_target_gwei/beacon_prev_epoch_active_gwei*100 < 66
-    ##     for: 5m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Prysm beacon node participation rate less then 66%
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-    ##   - alert: PrysmBeaconNodeRestarted
-    ##     expr: (time()-process_start_time_seconds{job='{{ include "prysm.fullname" . }}'})/3600 < 0.1
-    ##     for: 1m
-    ##     labels:
-    ##       severity: warning
-    ##     annotations:
-    ##       summary: Prysm beacon node was restarted
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
-    rules: []
+    rules: {}
 
 ## Defines whether the service must be headless
 ##

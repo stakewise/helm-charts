@@ -14,9 +14,21 @@ metadata:
     {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
-  {{- with .Values.metrics.prometheusRule.rules }}
   groups:
+  {{- with .Values.metrics.prometheusRule.rules }}
     - name: {{ template "geth.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.metrics.prometheusRule.default }}
+    - name: {{ template "geth.fullname" $ }}-default
+      rules:
+        - alert: GethNodeDown
+          expr: up{job="{{ include "geth.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: error
+          annotations:
+            summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
+            description: Geth Node {{ printf "{{ $labels.instance }}" }} is down
   {{- end }}
 {{- end }}

@@ -154,6 +154,9 @@ metrics:
     ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
     ##
     enabled: false
+    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ##
+    default: true
     ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
     ##
     namespace: ""
@@ -161,26 +164,8 @@ metrics:
     ##
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: LighthouseBeaconNodeDown
-    ##     expr: up{job='{{ include "lighthouse.fullname" . }}-lighthouse-beacon'} == 0
-    ##     for: 1m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Lighthouse beacon node is down
-    ##       description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-    ##   - alert: LighthouseBeaconNodeRestarted
-    ##     expr: (time()-process_start_time_seconds{job="{{ include "lighthouse.fullname" . }}-lighthouse-beacon"})/3600 < 0.1
-    ##     for: 1m
-    ##     labels:
-    ##       severity: warning
-    ##     annotations:
-    ##       summary: Lighthouse beacon node was restarted
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
-    rules: []
+    rules: {}
 
 ## Defines whether the service must be headless
 ##
