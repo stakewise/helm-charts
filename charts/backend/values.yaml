@@ -13,18 +13,18 @@ commonConf:
 
   djangoLogLevel: "INFO"
 
-  sendEmails: "True"
+  sendEmails: "False"
   # Change to https://api.mailgun.net/v3
   # if you are using Mailgun’s US region
   mailgunApiUrl: "https://api.eu.mailgun.net/v3"
   mailgunApiKey: ""
-  mailgunSenderDomain: "stakewise.io"
-  defaultFromEmail: '"StakeWise" <info@stakewise.io>'
+  mailgunSenderDomain: "mail.stakewise.io"
+  defaultFromEmail: '"Stakewise" <no-reply@mail.stakewise.io>'
   managers: ""
 
   staticUrl: "https://static.stakewise.io/"
 
-  sendTelegramNotifications: "True"
+  sendTelegramNotifications: "False"
   telegramToken: ""
   telegramChatId: ""
   multisigOwnersTelegramToken: ""
@@ -83,9 +83,7 @@ admin:
   # "Host" Header value to pass with the request for Host verification.
   probesHostHeader: ""
 
-  # For GKE load balancer ingress to work, the service type must be NodePort
-  # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
-  serviceType: NodePort
+  serviceType: ClusterIP
   servicePort: "8000"
 
   # Configure ingress
@@ -95,7 +93,7 @@ admin:
     className: ""
     annotations: {}
     tls: []
-    path: "/admin/"
+    path: "/admin"
     hosts: []
 
   # Configure resource requests and limits.
@@ -177,9 +175,7 @@ api:
   # "Host" Header value to pass with the request for Host verification.
   probesHostHeader: "api.stakewise.io"
 
-  # For GKE load balancer ingress to work, the service type must be NodePort
-  # https://cloud.google.com/kubernetes-engine/docs/concepts/ingress
-  serviceType: NodePort
+  serviceType: ClusterIP
   servicePort: "8000"
 
   # Configure ingress
