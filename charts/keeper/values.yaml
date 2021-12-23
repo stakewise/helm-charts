@@ -45,7 +45,7 @@ settings:
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
   eth1ConfirmationBlocks: "15"
-  keeperProcessInterval: "180"
+  keeperProcessInterval: "10"
   transactionTimeout: "900"
 
   # credentials

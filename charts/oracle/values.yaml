@@ -53,7 +53,7 @@ settings:
   healthServerPort: "8080"
 
   eth1ConfirmationBlocks: "15"
-  oracleProcessInterval: "180"
+  oracleProcessInterval: "10"
 
   # Graph
   stakewiseSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
