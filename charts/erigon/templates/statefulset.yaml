@@ -118,14 +118,6 @@ spec:
             - name: p2p-udp2
               protocol: UDP
               containerPort: {{ .Values.erigon.p2pEth65Port }}
-        {{- with .Values.readinessProbe }}
-          readinessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
-        {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
@@ -150,6 +142,42 @@ spec:
               containerPort: {{ .Values.service.port.rpc }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+        - name: sidecar
+          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.service.port.rpc | quote }}
+          ports:
+            - containerPort: {{ .Values.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

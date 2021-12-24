@@ -104,32 +104,48 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-        {{- if .Values.livenessProbe.enabled }}
-          livenessProbe:
-            {{- if and .Values.livenessProbe.exec (kindIs "string" .Values.livenessProbe.exec.command) }}
-            {{- omit .Values.livenessProbe "enabled" "exec" | toYaml | nindent 12 }}
-            exec:
-              command:
-                {{- tpl .Values.livenessProbe.exec.command . | nindent 16 }}
-            {{- else }}
-            {{- omit .Values.livenessProbe "enabled" | toYaml | nindent 12 }}
-            {{- end }}
-        {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
-          readinessProbe:
-            {{- if and .Values.readinessProbe.exec (kindIs "string" .Values.readinessProbe.exec.command) }}
-            {{- omit .Values.readinessProbe "enabled" "exec" | toYaml | nindent 12 }}
-            exec:
-              command:
-                {{- tpl .Values.readinessProbe.exec.command . | nindent 16 }}
-            {{- else }}
-            {{- omit .Values.readinessProbe "enabled" | toYaml | nindent 12 }}
-            {{- end }}
-        {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
+      {{- if .Values.rpc.enabled }}
+        - name: sidecar
+          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.rpc.port | quote }}
+          ports:
+            - containerPort: {{ .Values.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
 {{- if (not .Values.persistence.enabled) }}
       volumes:
         - name: data
