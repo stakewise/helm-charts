@@ -240,7 +240,7 @@ autoscaling:
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: { }
+resources: {}
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
