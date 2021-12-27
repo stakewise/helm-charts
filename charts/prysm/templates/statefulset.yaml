@@ -74,7 +74,7 @@ spec:
           args:
             - "--datadir=/data"
             - "--rpc-host=0.0.0.0"
-            - "--rpc-port=4000"
+            - "--rpc-port={{ .Values.rpc.port }}"
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
             - "--http-web3provider={{ .Values.eth1Endpoint }}"
@@ -125,18 +125,48 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-        {{- with .Values.readinessProbe }}
-          readinessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
-        {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
+      {{- if .Values.http.enabled }}
+        - name: sidecar
+          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.http.port | quote }}
+          ports:
+            - containerPort: {{ .Values.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
       volumes:
       {{- if eq .Values.network "prater" }}
         - name: scripts

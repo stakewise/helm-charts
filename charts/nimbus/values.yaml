@@ -11,6 +11,15 @@ initImage:
   tag: "1.34"
   pullPolicy: IfNotPresent
 
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  tag: "v1.0.2"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3000
+
 image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
@@ -97,27 +106,29 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
-readinessProbe:
-  httpGet:
-    path: /metrics
-    port: metrics
-    scheme: HTTP
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  failureThreshold: 5
-  successThreshold: 1
-  timeoutSeconds: 1
-
 livenessProbe:
-  httpGet:
-    path: /metrics
-    port: metrics
-    scheme: HTTP
-  initialDelaySeconds: 30
-  periodSeconds: 10
-  failureThreshold: 5
+  enabled: true
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 3
   successThreshold: 1
-  timeoutSeconds: 1
+  httpGet:
+    path: /eth2/liveness
+    port: sidecar
+    scheme: HTTP
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 60
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 2
+  httpGet:
+    path: /eth2/readiness
+    port: sidecar
+    scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
