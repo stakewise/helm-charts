@@ -31,7 +31,7 @@ graph:
   ethereumTraceStreamStepSize: 50
   # Set to true to disable block ingestion.
   # Leave unset or set to false to leave block ingestion enabled.
-  disableBlockIngestor: ""
+  disableBlockIngestor: true
   # Number of Ethereum blocks to request in parallel.
   # Also limits other parallel requests such such as trace_filter.
   ethereumBlockBatchSize: 10
@@ -39,9 +39,9 @@ graph:
   graphEthereumMaxBlockRangeSize: 1000
   # Maximum range size for eth.getLogs requests that dont
   # filter on contract address, only event signature.
-  graphEthereumMaxEventOnlyRange: ""
+  graphEthereumMaxEventOnlyRange: 500
   # Timeout for Ethereum JSON-RPC requests
-  graphEthereumJsonRpcTimeout: ""
+  graphEthereumJsonRpcTimeout: 180
   # Number of times to retry JSON-RPC requests made against Ethereum.
   # This is used for requests that will not fail the subgraph if the limit
   # is reached, but will simply restart the syncing step, so it can be low.
@@ -60,7 +60,7 @@ graph:
   # than one shard.
   graphEthereumCleanupBlocks: "false"
   # Amount of time a mapping handler is allowed to take (in seconds)
-  graphMappingHandlerTimeout: ""
+  graphMappingHandlerTimeout: 0
   # Timeout for IPFS, which includes requests for manifest files and
   # from mappings using ipfs.cat or ipfs.map (in seconds)
   graphIpfsTimeout: 30
@@ -75,7 +75,7 @@ graph:
   # Maximum number of files cached in the the ipfs.cat cache
   graphMaxIpfsCacheSize: 50
   # Maximum size of files that are cached in the ipfs.cat cache
-  graphMaxIpfsCacheFileSize: ""
+  graphMaxIpfsCacheFileSize: 1048576
   # Size of the entity cache, in kilobytes
   graphEntityCacheSize: 10000
   # How many recent blocks per network should be kept in the query cache.
@@ -113,7 +113,7 @@ graph:
   # Maximum value that can be used for the first argument in GraphQL queries.
   # If not provided, first defaults to 100.
   # The default value for GRAPH_GRAPHQL_MAX_FIRST is 1000.
-  graphGraphqlMaxFirst: ""
+  graphGraphqlMaxFirst: 1000
   # Maximum value that can be used for the skip argument in GraphQL queries. 
   graphGraphqlMaxSkip: ""
   # If a GraphQL result is larger than these sizes in bytes,
@@ -140,7 +140,7 @@ graph:
   graphNodeId: ""
   # Control log levels
   # values: debug, error, info, warn, or trace
-  graphLog: "error"
+  graphLog: "info"
   # Postgres instance used when running tests.
   # Set to postgresql://<DBUSER>:<DBPASSWORD>@<DBHOST>:<DBPORT>/<DBNAME>
   thegraphStorePostgresDieselUrl: ""
@@ -172,8 +172,8 @@ graph:
   # of GRAPH_LOAD_WINDOW_SIZE seconds exceed a threshold.
   # Measurements within each window are binned into bins of GRAPH_LOAD_BIN_SIZE seconds.
   # The variables default to 300s and 1s
-  graphLoadWindowSize: ""
-  graphLoadBinSize: ""
+  graphLoadWindowSize: 300
+  graphLoadBinSize: 1
   # If wait times for getting database connections go above this threshold,
   # throttle queries until the wait times fall below the threshold.
   # Value is in milliseconds, and defaults to 0 which turns throttling and
@@ -202,6 +202,10 @@ graph:
   # graph-node will wait at least this long before actually deleting the data
   # (value is in minutes, defaults to 360, i.e. 6 hours)
   graphRemoveUnusedInterval: 360
+  # IPFS URL
+  ipfsUrl: graph-node-ipfs:5001
+  # Ethereum Node Address
+  ethereumNode: mainnet:http://erigon.chain:8545
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -226,14 +230,12 @@ service:
     # Port for Prometheus Exporter
     metrics: 8040
 
-## Vertical Pod Autoscaler config
-## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
+autoscaling:
   enabled: false
-  updateMode: Off
-  containerPolicies: { }
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
 
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
@@ -259,3 +261,65 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
+
+## PostgreSQL Server
+#
+postgresql:
+  enabled: true
+  volumePermissions:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 10-debian-10-r98
+      pullPolicy: Always
+    securityContext:
+      runAsUser: 0
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  rbac:
+    create: false
+  postgresqlHost: graph-node-postgresql
+  postgresqlPort: "5432"
+  postgresqlUsername: "postgres"
+  postgresqlPassword: "graph"
+  usePasswordFile: true
+  postgresqlDatabase: graph
+  postgresqlDataDir: /bitnami/postgresql/data
+  primaryAsStandBy:
+    enabled: false
+  postgresqlSharedPreloadLibraries: "pgaudit,pg_stat_statements"
+  shmVolume:
+    enabled: true
+    chmod:
+      enabled: true
+  persistence:
+    enabled: true
+    mountPath: /bitnami/postgresql
+    subPath: ''
+    accessModes:
+      - ReadWriteOnce
+    size: 20Gi
+    annotations: { }
+    selector: { }
+  readReplicas:
+    persistence:
+      enabled: true
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+  networkPolicy:
+    enabled: false
+  tls:
+    enabled: false
+  metrics:
+    enabled: true
+
+# IPFS Server
+ipfs:
+  enabled: true

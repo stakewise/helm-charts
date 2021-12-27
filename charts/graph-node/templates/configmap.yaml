@@ -54,3 +54,10 @@ data:
   GRAPH_STORE_CONNECTION_TIMEOUT: {{ .Values.graph.graphStoreConnectionTimeout | quote }}
   EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
   GRAPH_REMOVE_UNUSED_INTERVAL: {{ .Values.graph.graphRemoveUnusedInterval | quote }}
+  {{- with .Values.postgresql }}
+  postgres_host: {{ .postgresqlHost | quote }}
+  postgres_user: {{ .postgresqlUsername | quote }}
+  postgres_db: {{ .postgresqlDatabase | quote }}
+  {{- end }}
+  ipfs: {{ .Values.graph.ipfsUrl | quote }}
+  ethereum: {{ .Values.graph.ethereumNode | quote }}
