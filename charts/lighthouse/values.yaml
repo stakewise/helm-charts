@@ -36,6 +36,15 @@ initImage:
   tag: "1.34"
   pullPolicy: IfNotPresent
 
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  tag: "v1.0.2"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3000
+
 ## Configuration for lighthouse eth v2 beacon chain node
 ## ref: https://lighthouse-book.sigmaprime.io/
 ##
@@ -189,25 +198,28 @@ resources: {}
 ## Configure liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ##
-readinessProbe:
-  initialDelaySeconds: 180
-  timeoutSeconds: 1
-  periodSeconds: 60
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
   failureThreshold: 3
   successThreshold: 1
   httpGet:
-    path: /lighthouse/health
-    port: 5052
+    path: /eth2/liveness
+    port: sidecar
     scheme: HTTP
-livenessProbe:
+
+readinessProbe:
+  enabled: true
   initialDelaySeconds: 60
-  timeoutSeconds: 1
-  periodSeconds: 60
-  failureThreshold: 60
-  successThreshold: 1
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 2
   httpGet:
-    path: /lighthouse/health
-    port: 5052
+    path: /eth2/readiness
+    port: sidecar
     scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
