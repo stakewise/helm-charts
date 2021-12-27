@@ -26,6 +26,9 @@ graph:
   ipfsUrl: graph-node-ipfs:5001
   # Ethereum Node Address
   ethereumNode: mainnet:http://erigon.chain:8545
+  # "instant" or "synced". Synced will only switch a named subgraph to a new deployment once it has synced,
+  # making the new deployment the "Pending" version
+  experimentalSubgraphVersionSwitchingMode: "synced"
 
 serviceAccount:
   # Specifies whether a service account should be created

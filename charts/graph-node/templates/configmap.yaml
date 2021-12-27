@@ -6,6 +6,7 @@ metadata:
     {{- include "graph-node.labels" . | nindent 4 }}
 data:
   ETHEREUM_POLLING_INTERVAL: {{ .Values.graph.ethereumPollingInterval | quote }}
+  EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
   GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
   {{- with .Values.postgresql }}
   postgres_host: {{ .postgresqlHost | quote }}
