@@ -1,0 +1,141 @@
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "ipfs.fullname" . }}
+  labels:
+    {{- include "ipfs.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "ipfs.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "ipfs.fullname" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        {{- include "ipfs.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "ipfs.fullname" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- if and .Values.persistence.enabled .Values.initChownData }}
+      initContainers:
+        - name: init-chown
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "{{ .Values.ipfs.path }}"]
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.ipfs.path }}
+      {{- end }}
+      containers:
+        - name: {{ template "ipfs.fullname" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ template "ipfs.fullname" . }}
+          ports:
+            - containerPort: {{ .Values.service.ports.p2p }}
+              name: p2p-tcp
+              protocol: TCP
+            - containerPort: {{ .Values.service.ports.p2p }}
+              name: p2p-udp
+              protocol: UDP
+            - containerPort: {{ .Values.service.ports.api }}
+              name: api
+              protocol: TCP
+            - containerPort: {{ .Values.service.ports.gateway }}
+              name: gateway
+              protocol: TCP
+            - containerPort: {{ .Values.service.ports.websocket }}
+              name: websocket
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: {{ .Values.ipfs.path }}
+            - name: fuse-ipfs
+              mountPath: /ipfs
+            - name: fuse-ipns
+              mountPath: /ipns
+            - name: entrypoint
+              subPath: start_ipfs
+              mountPath: /usr/local/bin/start_ipfs
+          livenessProbe:
+            httpGet:
+              path: /debug/metrics/prometheus
+              port: api
+            initialDelaySeconds: 15
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /debug/metrics/prometheus
+              port: api
+            initialDelaySeconds: 15
+            periodSeconds: 3
+        {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      volumes:
+        - name: entrypoint
+          configMap:
+            name: {{ template "ipfs.fullname" . }}-entrypoint
+            defaultMode: 0777
+{{- if (not .Values.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+        - name: fuse-ipfs
+          emptyDir: {}
+        - name: fuse-ipns
+          emptyDir: {}
+{{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "ipfs.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.dataSize | quote }}
+    - metadata:
+        name: fuse-ipfs
+        labels:
+          {{- include "ipfs.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.fuseIpfsSize | quote }}
+    - metadata:
+        name: fuse-ipns
+        labels:
+          {{- include "ipfs.labels" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.fuseIpnsSize | quote }}
+{{- end }}

@@ -1,0 +1,161 @@
+# Default values for ipfs.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+## How many ipfs instances to run simultaneously
+##
+replicas: 1
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+image:
+  repository: ipfs/go-ipfs
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v0.11.0"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# IPFS Configuration
+ipfs:
+  # Data Path
+  path: /data/ipfs
+  # The profile of your IPFS node allows you to specify which
+  # file-system or data-store you want to use.
+  # Changing these options will affect the performance of your node.
+  # For example, if you want to have a faster datastore for your node,
+  # you can use the badgerds profile. If you're running your node on
+  # a low-power device like a Raspberry Pi, you can use the lowpower profile.
+  # Profiles have been developed to customize your IPFS node to perform
+  # best under given conditions.
+  profile: server
+  # Sets the file descriptor limit for go-ipfs.
+  # If go-ipfs fails to set the file descriptor limit, it will log an error.
+  fdMax: "8192"
+  # go-ipfs tries to reuse the same source port for all connections
+  # to improve NAT traversal.
+  tcpReusePort: "true"
+  # Sets the log level for go-ipfs. It can be set to one of:
+  # CRITICAL, ERROR, WARNING, NOTICE, INFO, DEBUG
+  logging: error
+  # Sets the log message format. Can be one of:
+  # color, nocolor
+  loggingFmt: color
+  # Enables fuse debug logging.
+  fuseDebug: "false"
+  # Enables debug logging for the yamux stream muxer.
+  yamuxDebug: "false"
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+service:
+  type: ClusterIP
+  ports:
+    p2p: 4001
+    api: 5001
+    gateway: 8080
+    websocket: 8081
+
+ingress:
+  api:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+  gateway:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: chart-example.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+## Vertical Pod Autoscaler config
+## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+##
+verticalAutoscaler:
+  # If true a VPA object will be created for the StatefulSet
+  enabled: false
+  updateMode: Off
+  containerPolicies: { }
+
+## Configure resource requests and limits.
+## http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: { }
+
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  dataSize: 25Gi
+  fuseIpfsSize: 1Gi
+  fuseIpnsSize: 1Gi
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: []
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""

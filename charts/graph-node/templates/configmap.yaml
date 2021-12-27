@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "graph-node.fullname" . }}
+  labels:
+    {{- include "graph-node.labels" . | nindent 4 }}
+data:
+  ETHEREUM_POLLING_INTERVAL: {{ .Values.graph.ethereumPollingInterval | quote }}
+  GRAPH_ETHEREUM_TARGET_TRIGGERS_PER_BLOCK_RANGE: {{ .Values.graph.graphEthereumTargetTriggersPerBlockRange | quote }}
+  ETHEREUM_TRACE_STREAM_STEP_SIZE: {{ .Values.graph.ethereumTraceStreamStepSize | quote }}
+  DISABLE_BLOCK_INGESTOR: {{ .Values.graph.disableBlockIngestor | quote }}
+  ETHEREUM_BLOCK_BATCH_SIZE: {{ .Values.graph.ethereumBlockBatchSize | quote }}
+  GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: {{ .Values.graph.graphEthereumMaxBlockRangeSize | quote }}
+  GRAPH_ETHEREUM_MAX_EVENT_ONLY_RANGE: {{ .Values.graph.graphEthereumMaxEventOnlyRange | quote }}
+  GRAPH_ETHEREUM_JSON_RPC_TIMEOUT: {{ .Values.graph.graphEthereumJsonRpcTimeout | quote }}
+  GRAPH_ETHEREUM_REQUEST_RETRIES: {{ .Values.graph.graphEthereumRequestRetries | quote }}
+  GRAPH_ETHEREUM_BLOCK_INGESTOR_MAX_CONCURRENT_JSON_RPC_CALLS_FOR_TXN_RECEIPTS: {{ .Values.graph.graphEthereumBlockIngestorMaxConcurrentJsonRpcCallsForTxnReceipts | quote }}
+  GRAPH_ETHEREUM_CLEANUP_BLOCKS: {{ .Values.graph.graphEthereumCleanupBlocks | quote }}
+  GRAPH_MAPPING_HANDLER_TIMEOUT: {{ .Values.graph.graphMappingHandlerTimeout | quote }}
+  GRAPH_IPFS_TIMEOUT: {{ .Values.graph.graphIpfsTimeout | quote }}
+  GRAPH_MAX_IPFS_FILE_BYTES: {{ .Values.graph.graphMaxIpfsFileBytes | quote }}
+  GRAPH_MAX_IPFS_MAP_FILE_SIZE: {{ .Values.graph.graphMaxIpfsMapFileSize | quote }}
+  GRAPH_MAX_IPFS_CACHE_SIZE: {{ .Values.graph.graphMaxIpfsCacheSize | quote }}
+  GRAPH_MAX_IPFS_CACHE_FILE_SIZE: {{ .Values.graph.graphMaxIpfsCacheFileSize | quote }}
+  GRAPH_ENTITY_CACHE_SIZE: {{ .Values.graph.graphEntityCacheSize | quote }}
+  GRAPH_QUERY_CACHE_BLOCKS: {{ .Values.graph.graphQueryCacheBlocks | quote }}
+  GRAPH_QUERY_CACHE_MAX_MEM: {{ .Values.graph.graphQueryCacheMaxMem | quote }}
+  GRAPH_QUERY_CACHE_STALE_PERIOD: {{ .Values.graph.graphQueryCacheStalePeriod | quote }}
+  GRAPH_MAX_API_VERSION: {{ .Values.graph.graphMaxApiVersion | quote }}
+  GRAPH_RUNTIME_MAX_STACK_SIZE: {{ .Values.graph.graphRuntimeMaxStackSize | quote }}
+  GRAPH_GRAPHQL_QUERY_TIMEOUT: {{ .Values.graph.graphGraphqlQueryTimeout | quote }}
+  SUBSCRIPTION_THROTTLE_INTERVAL: {{ .Values.graph.subscriptionThrottleInterval | quote }}
+  GRAPH_GRAPHQL_MAX_COMPLEXITY: {{ .Values.graph.graphGraphqlMaxComplexity | quote }}
+  GRAPH_GRAPHQL_MAX_DEPTH: {{ .Values.graph.graphGraphqlMaxDepth | quote }}
+  GRAPH_GRAPHQL_MAX_FIRST: {{ .Values.graph.graphGraphqlMaxFirst | quote }}
+  GRAPH_GRAPHQL_MAX_SKIP: {{ .Values.graph.graphGraphqlMaxSkip | quote }}
+  GRAPH_GRAPHQL_WARN_RESULT_SIZE: {{ .Values.graph.graphGraphqlWarnResultSize | quote }}
+  GRAPH_GRAPHQL_ERROR_RESULT_SIZE: {{ .Values.graph.graphGraphqlErrorResultSize | quote }}
+  GRAPH_GRAPHQL_MAX_OPERATIONS_PER_CONNECTION: {{ .Values.graph.graphGraphqlMaxOperationsPerConnection | quote }}
+  GRAPH_SQL_STATEMENT_TIMEOUT: {{ .Values.graph.graphSqlStatementTimeout | quote }}
+  GRAPH_DISABLE_SUBSCRIPTION_NOTIFICATIONS: {{ .Values.graph.graphDisableSubscriptionNotifications | quote }}
+  GRAPH_NODE_ID: {{ .Values.graph.graphNodeId | quote }}
+  GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
+  THEGRAPH_STORE_POSTGRES_DIESEL_URL: {{ .Values.graph.thegraphStorePostgresDieselUrl | quote }}
+  GRAPH_KILL_IF_UNRESPONSIVE: {{ .Values.graph.graphKillIfUnresponsive | quote }}
+  GRAPH_LOG_QUERY_TIMING: {{ .Values.graph.graphLogQueryTiming | quote }}
+  STORE_CONNECTION_POOL_SIZE: {{ .Values.graph.storeConnectionPoolSize | quote }}
+  GRAPH_LOG_POI_EVENTS: {{ .Values.graph.graphLogPoiEvents | quote }}
+  GRAPH_LOAD_WINDOW_SIZE: {{ .Values.graph.graphLoadWindowSize | quote }}
+  GRAPH_LOAD_BIN_SIZE: {{ .Values.graph.graphLoadBinSize | quote }}
+  GRAPH_LOAD_THRESHOLD: {{ .Values.graph.graphLoadThreshold | quote }}
+  GRAPH_LOAD_JAIL_THRESHOLD: {{ .Values.graph.graphLoadJailThreshold | quote }}
+  GRAPH_LOAD_SIMULATE: {{ .Values.graph.graphLoadSimulate | quote }}
+  GRAPH_STORE_CONNECTION_TIMEOUT: {{ .Values.graph.graphStoreConnectionTimeout | quote }}
+  EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
+  GRAPH_REMOVE_UNUSED_INTERVAL: {{ .Values.graph.graphRemoveUnusedInterval | quote }}
+  {{- with .Values.postgresql }}
+  postgres_host: {{ .postgresqlHost | quote }}
+  postgres_user: {{ .postgresqlUsername | quote }}
+  postgres_db: {{ .postgresqlDatabase | quote }}
+  {{- end }}
+  ipfs: {{ .Values.graph.ipfsUrl | quote }}
+  ethereum: {{ .Values.graph.ethereumNode | quote }}
