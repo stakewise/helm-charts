@@ -18,10 +18,10 @@ data:
   GRAPH_ETHEREUM_CLEANUP_BLOCKS: {{ .Values.graph.graphEthereumCleanupBlocks | quote }}
   GRAPH_MAPPING_HANDLER_TIMEOUT: {{ .Values.graph.graphMappingHandlerTimeout | quote }}
   GRAPH_IPFS_TIMEOUT: {{ .Values.graph.graphIpfsTimeout | quote }}
-  GRAPH_MAX_IPFS_FILE_BYTES: {{ .Values.graph.graphMaxIpfsFileBytes | quote }}
-  GRAPH_MAX_IPFS_MAP_FILE_SIZE: {{ .Values.graph.graphMaxIpfsMapFileSize | quote }}
-  GRAPH_MAX_IPFS_CACHE_SIZE: {{ .Values.graph.graphMaxIpfsCacheSize | quote }}
-  GRAPH_MAX_IPFS_CACHE_FILE_SIZE: {{ .Values.graph.graphMaxIpfsCacheFileSize | quote }}
+  GRAPH_MAX_IPFS_FILE_BYTES: {{ .Values.graph.graphMaxIpfsFileBytes | int | quote }}
+  GRAPH_MAX_IPFS_MAP_FILE_SIZE: {{ .Values.graph.graphMaxIpfsMapFileSize | int | quote }}
+  GRAPH_MAX_IPFS_CACHE_SIZE: {{ .Values.graph.graphMaxIpfsCacheSize | int | quote }}
+  GRAPH_MAX_IPFS_CACHE_FILE_SIZE: {{ .Values.graph.graphMaxIpfsCacheFileSize | int | quote }}
   GRAPH_ENTITY_CACHE_SIZE: {{ .Values.graph.graphEntityCacheSize | quote }}
   GRAPH_QUERY_CACHE_BLOCKS: {{ .Values.graph.graphQueryCacheBlocks | quote }}
   GRAPH_QUERY_CACHE_MAX_MEM: {{ .Values.graph.graphQueryCacheMaxMem | quote }}

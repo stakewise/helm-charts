@@ -65,7 +65,7 @@ graph:
   # from mappings using ipfs.cat or ipfs.map (in seconds)
   graphIpfsTimeout: 30
   # Maximum size for a file that can be retrieved with ipfs.cat (in bytes)
-  graphMaxIpfsFileBytes: ""
+  graphMaxIpfsFileBytes: 268435456
   # maximum size of files that can be processed with ipfs.map.
   # When a file is processed through ipfs.map, the entities generated
   # from that are kept in memory until the entire file is done processing.
