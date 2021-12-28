@@ -233,7 +233,7 @@ livenessProbe:
   failureThreshold: 3
   successThreshold: 1
   httpGet:
-    path: /geth/liveness
+    path: /eth1/liveness
     port: sidecar
     scheme: HTTP
 
@@ -245,6 +245,6 @@ readinessProbe:
   failureThreshold: 30
   successThreshold: 1
   httpGet:
-    path: /geth/readiness
+    path: /eth1/readiness
     port: sidecar
     scheme: HTTP
