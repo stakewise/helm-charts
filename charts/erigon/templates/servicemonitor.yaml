@@ -16,7 +16,7 @@ metadata:
 spec:
   endpoints:
     - port: metrics
-      path: /metrics
+      path: /debug/metrics/prometheus
       {{- if .Values.metrics.serviceMonitor.interval }}
       interval: {{ .Values.metrics.serviceMonitor.interval }}
       {{- end }}
