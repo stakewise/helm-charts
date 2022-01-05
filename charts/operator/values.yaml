@@ -245,7 +245,7 @@ metrics:
     ##         description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
     ##   lighthouse: []
     ##
-    rules: []
+    rules: {}
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
