@@ -34,7 +34,7 @@ $ helm repo add stakewise https://charts.stakewise.io
 $ helm dependency update
 
 $ helm upgrade --install operator stakewise/operator \
-  --namepsace operator \
+  --namespace operator \
   --set geth.enabled=true \
   --set key=value... 
 ```
