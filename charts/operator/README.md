@@ -86,7 +86,46 @@ e6876c97-aaaa-a92e-b99a-0aafab105745    vault-1.vault-internal:8201    follower 
 
 Vault with integrated storage (Raft) is now ready to use!
 
-### Vault Auto Unseal (GCP)
+### Vault + Kubernetes authentication
+
+Vault provides a Kubernetes authentication method that enables clients to authenticate with a Kubernetes Service Account Token. The Kubernetes resources that access the secret and create the volume authenticate through this method through a role.
+
+First, start an interactive shell session on the `operator-vault-0` pod.
+
+```console
+$ kubectl exec -ti operator-vault-0 -- sh
+export VAULT_TOKEN=token
+```
+
+Enable the Kubernetes authentication method.
+
+```console
+$ vault auth enable kubernetes
+Success! Enabled kubernetes auth method at: kubernetes/
+```
+
+Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.
+
+```console
+$ vault write auth/kubernetes/config \
+  token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+  kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
+  kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+Success! Data written to: auth/kubernetes/config
+```
+
+The `token_reviewer_jwt` and `kubernetes_ca_cert` files written to the container by Kubernetes. The variable `{{ KUBERNETES_PORT_443_TCP_ADDR }}` references the internal network address of the Kubernetes host and should be manually updated in the command above.
+
+Lastly, exit the `operator-vault-0` pod.
+
+```console
+$ exit
+```
+
+### Vault Auto Unseal
+
+> :warning: The instruction below can be used to set up auto unsealing in Google cloud and is used here as a working example, if your infrastructure is located in another cloud or on dedicated servers, use the corresponding instruction from the Vault documentation: https://learn.hashicorp.com/collections/vault/auto-unseal
 
 1. Create Google Service Account and Download JSON
 
@@ -163,43 +202,6 @@ vault:
 ```
 
 5. Deploy chart with updated `values.yaml`
-
-### Configure Vault + Kubernetes authentication
-
-Vault provides a Kubernetes authentication method that enables clients to authenticate with a Kubernetes Service Account Token. The Kubernetes resources that access the secret and create the volume authenticate through this method through a role.
-
-First, start an interactive shell session on the `operator-vault-0` pod.
-
-```console
-$ kubectl exec -ti operator-vault-0 -- sh
-export VAULT_TOKEN=token
-```
-
-Enable the Kubernetes authentication method.
-
-```console
-$ vault auth enable kubernetes
-Success! Enabled kubernetes auth method at: kubernetes/
-```
-
-Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.
-
-```console
-$ vault write auth/kubernetes/config \
-  token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
-  kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
-  kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-
-Success! Data written to: auth/kubernetes/config
-```
-
-The `token_reviewer_jwt` and `kubernetes_ca_cert` files written to the container by Kubernetes. The variable `{{ KUBERNETES_PORT_443_TCP_ADDR }}` references the internal network address of the Kubernetes host and should be manually updated in the command above.
-
-Lastly, exit the `operator-vault-0` pod.
-
-```console
-$ exit
-```
 
 ## Documentation
 
