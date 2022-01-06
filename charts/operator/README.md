@@ -84,7 +84,7 @@ e6876c97-aaaa-a92e-b99a-0aafab105745    vault-1.vault-internal:8201    follower 
 4b5d7383-ff31-44df-e008-6a606828823b    vault-2.vault-internal:8201    follower    true
 ```
 
-Vault with integrated storage (Raft) is now ready to use!
+Vault with integrated storage (Raft) is now ready to use! **Next, set up Kubernetes authentication**
 
 ### Vault + Kubernetes authentication
 
@@ -97,6 +97,8 @@ $ kubectl exec -ti operator-vault-0 -- sh
 export VAULT_TOKEN=token
 ```
 
+Replace `export VAULT_TOKEN=token` with your Initial root token generated above.
+
 Enable the Kubernetes authentication method.
 
 ```console
@@ -104,13 +106,25 @@ $ vault auth enable kubernetes
 Success! Enabled kubernetes auth method at: kubernetes/
 ```
 
-Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.
+Configure the Kubernetes authentication method to use the service account token, the location of the Kubernetes host, and its certificate. **Replace `{{ KUBERNETES_PORT_443_TCP_ADDR }}` with Kubernetes cluster API endpoint.**
 
 ```console
 $ vault write auth/kubernetes/config \
   token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
   kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
   kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+
+Success! Data written to: auth/kubernetes/config
+```
+
+For AWS EKS:
+
+```console
+$ vault write auth/kubernetes/config \
+  token_reviewer_jwt="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+  kubernetes_host="https://{{ KUBERNETES_PORT_443_TCP_ADDR }}:443" \
+  kubernetes_ca_cert=@/var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+  issuer="https://kubernetes.default.svc.cluster.local"
 
 Success! Data written to: auth/kubernetes/config
 ```
