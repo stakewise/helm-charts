@@ -47,6 +47,13 @@ enabled: false
 ##
 type: prysm
 
+## Reimport Keystores
+## Set the value to true if you added new keystores
+## to the vault or you just need to re-sync the state.
+## Options: true, false
+##
+reimportKeystore: false
+
 ## How many validators to run
 ## **NB! Every validators hosts up to 100 keys, so the number of validators must be >= (number of validator keys) / 100
 ##

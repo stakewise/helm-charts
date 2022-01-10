@@ -28,11 +28,6 @@ metadata:
 data:
   validator-init.sh: |
     #!/bin/bash
-    bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
-    export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-    VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
-    export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
-
     VAULT="/vault"
     VAULT_KEYSTORES="${VAULT}/keystores"
     VAULT_PASSWORD="${VAULT}/password.txt"
@@ -42,61 +37,83 @@ data:
     DATA_TEKU="${DATA}/teku"
     SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
 
-    # Get keystores password
-    rm -rf ${VAULT} || true
-    mkdir -p ${VAULT_KEYSTORES}
-    PASSWORD=$(vault kv get -field=password.txt -version=1 validators/${SERVICE_ACCOUNT}/password)
-    echo ${PASSWORD} > ${VAULT_PASSWORD}
-
-    echo "$(vault kv get -version=1 validators/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
-    while read line; do
-        if [[ "$line" =~ ^keystore.* ]]; then
-            echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
-        fi
-    done <${VAULT}/keystores.txt
-    rm -f ${VAULT}/keystores.txt
-    if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
-      echo "No keys available to start. Check that Vault is running and there are keys in it"
-      exit 1
-    fi
-    rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
-           ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
-           ${DATA_PRYSM}/validators \
-           ${DATA_TEKU}/validator || true
-
     if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
-        touch ${DATA_PRYSM}/tosaccepted
-        prysm-validator \
-            accounts \
-            import \
-            --keys-dir=${VAULT_KEYSTORES} \
-            --account-password-file=${VAULT_PASSWORD} \
-            --wallet-dir=${DATA_PRYSM}/validators \
-            --wallet-password-file=${VAULT_PASSWORD} \
-            --${NETWORK_ID:-"mainnet"} \
-            --accept-terms-of-use
-        cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
-        rm ${VAULT_PASSWORD}
+        if [ -z "$(ls -A ${DATA_PRYSM}/validators)" ]; then
+          export REIMPORT=true
+        fi
     elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
-        lighthouse-validator \
-            --network=${NETWORK_ID:-"mainnet"} \
-            account \
-            validator \
-            import \
-            --datadir=${DATA_LIGHTHOUSE} \
-            --reuse-password \
-            --password-file=${VAULT_PASSWORD} \
-            --directory=${VAULT_KEYSTORES}
-        rm ${VAULT_PASSWORD}
+        if [ -z "$(ls -A ${DATA_LIGHTHOUSE}/validators)" ]; then
+          export REIMPORT=true
+        fi
     elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
-        mkdir -p /data/teku/validator/keys /data/teku/validator/passwords
-        cd ${VAULT_KEYSTORES}
-        for key in *; do
-            FILENAME=`echo ${key} | sed 's/.json//g'`
-            cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
-            cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
-        done
-        rm ${VAULT_PASSWORD}
+        if [ -z "$(ls -A ${DATA_TEKU}/validator)" ]; then
+          export REIMPORT=true
+        fi
+    fi
+    
+    if [[ "$REIMPORT" = "true" ]]; then
+        bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
+        export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+        VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
+        export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
+
+
+        # Get keystores password
+        rm -rf ${VAULT} || true
+        mkdir -p ${VAULT_KEYSTORES}
+        PASSWORD=$(vault kv get -field=password.txt -version=1 validators/${SERVICE_ACCOUNT}/password)
+        echo ${PASSWORD} > ${VAULT_PASSWORD}
+
+        echo "$(vault kv get -version=1 validators/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
+        while read line; do
+            if [[ "$line" =~ ^keystore.* ]]; then
+                echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
+            fi
+        done <${VAULT}/keystores.txt
+        rm -f ${VAULT}/keystores.txt
+        if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
+          echo "No keys available to start. Check that Vault is running and there are keys in it"
+          exit 1
+        fi
+        rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
+               ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
+               ${DATA_PRYSM}/validators \
+               ${DATA_TEKU}/validator || true
+
+        if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
+            touch ${DATA_PRYSM}/tosaccepted
+            prysm-validator \
+                accounts \
+                import \
+                --keys-dir=${VAULT_KEYSTORES} \
+                --account-password-file=${VAULT_PASSWORD} \
+                --wallet-dir=${DATA_PRYSM}/validators \
+                --wallet-password-file=${VAULT_PASSWORD} \
+                --${NETWORK_ID:-"mainnet"} \
+                --accept-terms-of-use
+            cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
+            rm ${VAULT_PASSWORD}
+        elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+            lighthouse-validator \
+                --network=${NETWORK_ID:-"mainnet"} \
+                account \
+                validator \
+                import \
+                --datadir=${DATA_LIGHTHOUSE} \
+                --reuse-password \
+                --password-file=${VAULT_PASSWORD} \
+                --directory=${VAULT_KEYSTORES}
+            rm ${VAULT_PASSWORD}
+        elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
+            mkdir -p /data/teku/validator/keys /data/teku/validator/passwords
+            cd ${VAULT_KEYSTORES}
+            for key in *; do
+                FILENAME=`echo ${key} | sed 's/.json//g'`
+                cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
+                cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
+            done
+            rm ${VAULT_PASSWORD}
+        fi
     fi
 
     if [[ "$VALIDATOR_TYPE" != "`cat /data/validator.type`" ]]; then

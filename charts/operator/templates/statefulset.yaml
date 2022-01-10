@@ -61,6 +61,8 @@ spec:
               value: {{ $root.Values.type | quote }}
             - name: SERVICE_ACCOUNT
               value: "validator{{.}}"
+            - name: REIMPORT
+              value: {{ $root.Values.reimportKeystore | quote }}
           volumeMounts:
             - name: data
               mountPath: /data
