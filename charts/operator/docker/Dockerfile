@@ -46,7 +46,7 @@ RUN echo " ---> Install lighthouse validator" && \
     chmod +x /usr/local/bin/lighthouse-validator
 
 RUN rm -f /usr/bin/sh /usr/bin/*less* /usr/bin/*grep* \
-          /usr/bin/*more* /usr/bin/*sed* /usr/bin/*ls* /usr/bin/*head* \
+          /usr/bin/*more* /usr/bin/*sed* /usr/bin/*head* \
           /usr/bin/*diff* /usr/bin/*apt*
 
 ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]

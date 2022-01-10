@@ -28,6 +28,7 @@ metadata:
 data:
   validator-init.sh: |
     #!/bin/bash
+    bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
     export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
     VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
     export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
@@ -54,6 +55,10 @@ data:
         fi
     done <${VAULT}/keystores.txt
     rm -f ${VAULT}/keystores.txt
+    if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
+      echo "No keys available to start. Check that Vault is running and there are keys in it"
+      exit 1
+    fi
     rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
            ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
            ${DATA_PRYSM}/validators \

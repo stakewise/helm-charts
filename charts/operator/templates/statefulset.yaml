@@ -43,7 +43,6 @@ spec:
       serviceAccountName: "validator{{.}}"
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
-        {{- include "vault-readiness" $root | nindent 8 }}
         - name: init-validator
           image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
           imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
