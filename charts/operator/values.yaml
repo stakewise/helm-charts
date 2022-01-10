@@ -47,6 +47,13 @@ enabled: false
 ##
 type: prysm
 
+## Reimport Keystores
+## Set the value to true if you added new keystores
+## to the vault or you just need to re-sync the state.
+## Options: true, false
+##
+reimportKeystores: false
+
 ## How many validators to run
 ## **NB! Every validators hosts up to 100 keys, so the number of validators must be >= (number of validator keys) / 100
 ##
@@ -71,7 +78,7 @@ image:
 ##
 initImage:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
-  tag: "v1.0.1"
+  tag: "v1.0.2"
   pullPolicy: IfNotPresent
   
 terminationGracePeriodSeconds: 900

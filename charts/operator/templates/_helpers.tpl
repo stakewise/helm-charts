@@ -69,25 +69,6 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Wait until vault is ready
-*/}}
-{{- define "vault-readiness" -}}
-- name: vault-readiness
-  image: "{{ $.Values.initImageBusybox.repository }}:{{ $.Values.initImageBusybox.tag }}"
-  imagePullPolicy: {{ $.Values.initImageBusybox.pullPolicy }}
-  securityContext:
-    runAsUser: 0
-  command:
-    - /bin/sh
-    - -c
-    {{- if $.Values.vaultAddr }}
-    - "until nc -vz -w 2 {{ $.Values.vaultAddr | replace ":8200" "" |  replace "http://" "" | replace "https://" "" }} 8200; do echo 'Waiting vault'; sleep 2; done"
-    {{- else }}
-    - "until nc -vz -w 2 {{ template "operator.fullname" $ }}-vault 8200; do echo 'Waiting vault'; sleep 2; done"
-    {{- end }}
-{{- end }}
-
-{{/*
 Update permissions on files inside /data directory
 */}}
 {{- define "init-chown" -}}
