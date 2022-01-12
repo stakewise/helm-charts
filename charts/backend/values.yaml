@@ -36,7 +36,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.0.2"
+  tag: "v2.0.3"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
