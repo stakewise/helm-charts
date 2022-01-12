@@ -54,6 +54,8 @@ $ kubectl exec -ti operator-vault-0 -- vault operator init
 $ kubectl exec -ti operator-vault-0 -- vault operator unseal
 ```
 
+> :warning: If you are not using auto-unseal, run the `vault operator unseal` command 3 times
+
 Join the remaining pods to the Raft cluster and unseal them. The pods will need to communicate directly so we'll configure the pods to use the internal service provided by the Helm chart:
 
 ```console
