@@ -1,27 +1,12 @@
-{{- if eq .Values.network "prater" -}}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "prysm.fullname" . }}
-  labels:
-    {{- include "prysm.labels" . | nindent 4 }}
-data:
-  entrypoint.sh: |
-    #!/bin/sh
-    if ! [ -f /data/genesis.ssz ]; then
-      curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth2-clients/eth2-networks/32dcce003694ea17e04bc17cc56de2f7909a1d95/shared/prater/genesis.ssz"
-    fi
-{{- end }}
-
 {{- if eq .Values.network "xdai" }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "prysm.fullname" . }}-gnosis
+  name: {{ include "lighthouse.fullname" . }}-gnosis
   labels:
-    {{- include "prysm.labels" . | nindent 4 }}
+    {{- include "lighthouse.labels" . | nindent 4 }}
 data:
-  bootnodes.yaml: |
+  boot_enr.yaml: |
     - "enr:-IS4QGmLwm7gFd0L0CEisllrb1op3v-wAGSc7_pwSMGgN3bOS9Fz7m1dWbwuuPHKqeETz9MbhjVuoWk0ohkyRv98kVoBgmlkgnY0gmlwhGjtlgaJc2VjcDI1NmsxoQLMdh0It9fJbuiLydZ9fpF6MRzgNle0vODaDiMqhbC7WIN1ZHCCIyg"
     - "enr:-IS4QFUVG3dvLPCUEI7ycRvFm0Ieg_ITa5tALmJ9LI7dJ6ieT3J4fF9xLRjOoB4ApV-Rjp7HeLKzyTWG1xRdbFBNZPQBgmlkgnY0gmlwhErP5weJc2VjcDI1NmsxoQOBbaJBvx0-w_pyZUhQl9A510Ho2T0grE0K8JevzES99IN1ZHCCIyg"
     - "enr:-Ku4QOQk8V-Hu2gxFzRXmLYIO4AvWDZhoMFwTf3n3DYm_mbsWv0ZitoqiN6JZUUj6Li6e1Jk1w2zFSVHKPMUP1g5tsgBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD5Jd3FAAAAZP__________gmlkgnY0gmlwhC1PTpmJc2VjcDI1NmsxoQL1Ynt5PoA0UOcHa1Rfn98rmnRlLzNuWTePPP4m4qHVroN1ZHCCKvg"
@@ -29,7 +14,7 @@ data:
   config.yaml: |
     CONFIG_NAME: gnosis
     PRESET_BASE: mainnet
-    
+
     # Misc
     # ---------------------------------------------------------------
     # 2**6 (= 64)
@@ -70,7 +55,7 @@ data:
     EPOCHS_PER_RANDOM_SUBNET_SUBSCRIPTION: 256
     # 6 (estimate from xDai mainnet)
     SECONDS_PER_ETH1_BLOCK: 6
-    
+
     # Deposit contract
     # ---------------------------------------------------------------
     # xDai Mainnet
@@ -117,7 +102,7 @@ data:
     SHARD_COMMITTEE_PERIOD: 256
     # 2**2 (= 4) epochs 7.47 minutes
     MIN_EPOCHS_TO_INACTIVITY_PENALTY: 4
-    
+
     # State vector lengths
     # ---------------------------------------------------------------
     # 2**16 (= 65,536) epochs ~85 days
@@ -166,17 +151,17 @@ data:
     DOMAIN_SYNC_COMMITTEE: 0x07000000
     DOMAIN_SYNC_COMMITTEE_SELECTION_PROOF: 0x08000000
     DOMAIN_CONTRIBUTION_AND_PROOF: 0x09000000
-    
+
     ALTAIR_FORK_VERSION: 0x01000064
     ALTAIR_FORK_EPOCH: 512
-    
+
     INACTIVITY_SCORE_BIAS: 4
     # 2**4 (= 16)
     INACTIVITY_SCORE_RECOVERY_RATE: 16
     INACTIVITY_PENALTY_QUOTIENT_ALTAIR: 50331648
     MIN_SLASHING_PENALTY_QUOTIENT_ALTAIR: 64
     PROPORTIONAL_SLASHING_MULTIPLIER_ALTAIR: 2
-    
+
     # Sync committee
     # ---------------------------------------------------------------
     # 2**9 (= 512)
@@ -184,4 +169,6 @@ data:
     # 2**9 (= 512)
     # assert EPOCHS_PER_SYNC_COMMITTEE_PERIOD * SLOTS_PER_EPOCH <= SLOTS_PER_HISTORICAL_ROOT
     EPOCHS_PER_SYNC_COMMITTEE_PERIOD: 512
+  deploy_block.txt: |
+    19469077
 {{- end }}

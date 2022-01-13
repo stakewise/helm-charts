@@ -59,6 +59,10 @@ image:
   repository: "sigp/lighthouse"
   tag: "v2.0.1"
   pullPolicy: IfNotPresent
+imageGnosis:
+  repository: "ghcr.io/gnosischain/gbc-lighthouse"
+  tag: "v2.0.1-gbc"
+  pullPolicy: IfNotPresent
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -97,7 +101,8 @@ verticalAutoscaler:
   containerPolicies: { }
 
 ## Eth2 network ID
-##
+## Options: mainnet, prater, xdai
+## 
 network: mainnet
 
 ## RPC Port
