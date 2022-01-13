@@ -197,7 +197,7 @@ nethermind:
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
 
   ## Metrics port to expose metrics for Prometheus
   ##

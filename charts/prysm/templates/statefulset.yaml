@@ -68,7 +68,7 @@ spec:
               mountPath: /data/scripts
       {{- end }}
       containers:
-        - name: node
+        - name: {{ template "prysm.fullname" . }}
         {{- if ne .Values.network "xdai" }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -83,16 +83,16 @@ spec:
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
             - "--http-web3provider={{ .Values.eth1Endpoint }}"
+          {{- if eq .Values.network "prater" }}
+            - "--genesis-state=/data/genesis.ssz"
+          {{- end }}
           {{- if ne .Values.network "xdai" }}
             - "--{{ .Values.network }}"
           {{- else }}
             - "--contract-deployment-block=19469077"
             - "--bootstrap-node=/data/gnosis-config/bootnodes.yaml"
-            - "--config-file=/data/gnosis-config/config.yml"
-            - "--chain-config-file=/data/gnosis-config/config.yml"
-          {{- end }}
-          {{- if eq .Values.network "prater" }}
-            - "--genesis-state=/data/genesis.ssz"
+            - "--config-file=/data/gnosis-config/config.yaml"
+            - "--chain-config-file=/data/gnosis-config/config.yaml"
           {{- end }}
           {{- range .Values.extraFlags }}
             - {{ . | quote }}

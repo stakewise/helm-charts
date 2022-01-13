@@ -104,7 +104,7 @@ extraFlags: []
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
 
   ## Prometheus exporter port
   ##

@@ -229,7 +229,7 @@ persistence:
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
 
   # Enable stand-alone metrics HTTP server listening interface
   addr: "0.0.0.0"

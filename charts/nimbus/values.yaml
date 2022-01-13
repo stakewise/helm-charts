@@ -232,7 +232,7 @@ nimbus:
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
   
   # Listening address of the metrics server
   address: "0.0.0.0"

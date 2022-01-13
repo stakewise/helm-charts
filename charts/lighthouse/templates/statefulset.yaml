@@ -74,13 +74,12 @@ spec:
             - {{ . | quote }}
           {{- end }}
           {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           ports:
-            - containerPort: 9000
-              name: peer-tcp
-              protocol: TCP
-            - containerPort: 9000
-              name: peer-udp
-              protocol: UDP
             - containerPort: {{ .Values.rpc.port }}
               protocol: TCP
               name: http
