@@ -14,6 +14,7 @@ data:
 {{- end }}
 
 {{- if eq .Values.network "xdai" }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
