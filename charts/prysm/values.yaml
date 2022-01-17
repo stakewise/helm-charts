@@ -83,7 +83,7 @@ http:
   port: "8080"
 
 ## Eth2 network ID
-##
+## Options: mainnet, prater, xdai
 network: mainnet
 
 ## Ethereum 1 node endpoints.

@@ -68,6 +68,12 @@ spec:
               mountPath: /data
             - name: configs
               mountPath: "/mnt/configs"
+            - name: configs-gnosis-prysm
+              mountPath: "/data/configs-gnosis-prysm"
+            - name: configs-gnosis-lighthouse
+              mountPath: "/data/configs-gnosis-lighthouse"
+            - name: configs
+              mountPath: "/mnt/configs"
             - name: validator-init
               mountPath: /data/scripts
       {{- if $.Values.persistence.enabled }}
@@ -126,6 +132,12 @@ spec:
         - name: configs
           configMap:
             name: {{ template "operator.fullname" $root }}-configs
+        - name: configs-gnosis-prysm
+          configMap:
+            name: {{ template "operator.fullname" . }}-configs-gnosis-prysm
+        - name: configs-gnosis-lighthouse
+          configMap:
+            name: {{ template "operator.fullname" . }}-configs-gnosis-lighthouse
         - name: validator-init
           configMap:
             name: {{ template "operator.fullname" $root }}-init
