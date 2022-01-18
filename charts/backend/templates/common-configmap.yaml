@@ -9,7 +9,6 @@ data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
   NETWORK: {{ .Values.commonConf.network | quote }}
-  ORACLES_SYNC_PERIOD_SECONDS: {{ .Values.commonConf.oraclesSyncPeriodSeconds | quote }}
   VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
   UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.commonConf.unpaidValidatorsExitDelay | quote }}
   WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
