@@ -35,7 +35,6 @@ Common labels
 */}}
 {{- define "operator.labels" -}}
 helm.sh/chart: {{ include "operator.chart" . }}
-{{ include "operator.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
