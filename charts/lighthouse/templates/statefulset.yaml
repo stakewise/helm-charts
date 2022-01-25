@@ -47,7 +47,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-        {{- if eq .Values.network "xdai" }}
+        {{- if eq .Values.network "gnosis" }}
           image: "{{ .Values.imageGnosis.repository }}:{{ .Values.imageGnosis.tag }}"
           imagePullPolicy: {{ .Values.imageGnosis.pullPolicy }}
         {{- else }}
@@ -61,7 +61,7 @@ spec:
             - --http-address=0.0.0.0
             - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
             - --datadir=/data
-          {{- if ne .Values.network "xdai" }}
+          {{- if ne .Values.network "gnosis" }}
             - --network={{ .Values.network }}
           {{- else }}
             - --testnet-dir=/data/gnosis-config
@@ -91,7 +91,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if eq .Values.network "xdai" }}
+          {{- if eq .Values.network "gnosis" }}
             - name: gnosis-config
               mountPath: /data/gnosis-config
           {{- end }}
@@ -136,7 +136,7 @@ spec:
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       volumes:
-      {{- if eq .Values.network "xdai" }}
+      {{- if eq .Values.network "gnosis" }}
         - name: gnosis-config
           configMap:
             name: {{ include "lighthouse.fullname" . }}-gnosis

@@ -101,7 +101,7 @@ verticalAutoscaler:
   containerPolicies: { }
 
 ## Eth2 network ID
-## Options: mainnet, prater, xdai
+## Options: mainnet, prater, gnosis
 ## 
 network: mainnet
 

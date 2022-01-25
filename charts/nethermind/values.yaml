@@ -152,7 +152,7 @@ persistence:
 ##
 
 ## Eth2 network ID
-## Options: mainnet, goerli, rinkeby, ropsten, xdai, poacore,
+## Options: mainnet, goerli, rinkeby, ropsten, gnosis, poacore,
 ##          sokol, energyweb, volta, kovan
 ##
 network: "mainnet"

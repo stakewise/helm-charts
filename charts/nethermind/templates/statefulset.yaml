@@ -57,7 +57,11 @@ spec:
           workingDir: {{ .Values.nethermind.dataDir }}
           command: ['/nethermind/Nethermind.Runner']
           args:
+          {{- if eq .Values.network "gnosis" }}
+            - --config=xdai
+          {{- else }}
             - --config={{ .Values.network }}
+          {{- end }}
             - --datadir={{ .Values.nethermind.dataDir }}
             - --Sync.FastSync={{ .Values.nethermind.fastSync }}
           {{- if .Values.nethermind.jsonrpc.enabled }}

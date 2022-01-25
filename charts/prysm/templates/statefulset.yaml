@@ -69,7 +69,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ template "prysm.fullname" . }}
-        {{- if ne .Values.network "xdai" }}
+        {{- if ne .Values.network "gnosis" }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- else }}
@@ -86,7 +86,7 @@ spec:
           {{- if eq .Values.network "prater" }}
             - "--genesis-state=/data/genesis.ssz"
           {{- end }}
-          {{- if ne .Values.network "xdai" }}
+          {{- if ne .Values.network "gnosis" }}
             - "--{{ .Values.network }}"
           {{- else }}
             - "--contract-deployment-block=19469077"
@@ -137,7 +137,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if eq .Values.network "xdai" }}
+          {{- if eq .Values.network "gnosis" }}
             - name: gnosis-config
               mountPath: /data/gnosis-config
           {{- end }}
@@ -184,7 +184,7 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-      {{- if eq .Values.network "xdai" }}
+      {{- if eq .Values.network "gnosis" }}
         - name: gnosis-config
           configMap:
             name: {{ include "prysm.fullname" . }}-gnosis
