@@ -3,13 +3,12 @@ commonConf:
   secretKey: ""
   network: "mainnet"
 
-  oraclesSyncPeriodSeconds: "86400"
   validatorMaxPenaltyCount: "5"
   unpaidValidatorsExitDelay: "864000"
 
   websiteName: "StakeWise"
   poolPage: "https://app.stakewise.io"
-  soloPage: "https://solo.stakewise.io"
+  soloPage: "https://app.stakewise.io/solo"
 
   djangoLogLevel: "INFO"
 
@@ -36,7 +35,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.0.3"
+  tag: "v2.0.5"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -289,12 +288,22 @@ polling:
           cpu: 50m
           memory: 100Mi
 
+    - command: "poll_stakers_rewards"
+      terminationGracePeriodSeconds: 180
+      resources:
+        requests:
+          cpu: 50m
+          memory: 100Mi
+
   conf:
     # Endpoints
     ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
     eth1Endpoint: ""
     # NB! only prysm client currently works
     eth2Endpoint: ""
+
+    # Needed for syncing validator balance snapshots
+    eth2ArchiveEndpoint: ""
 
     # polling periods
     pollPaymentsPeriod: "15"

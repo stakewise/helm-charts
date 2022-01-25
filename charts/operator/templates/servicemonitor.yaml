@@ -10,7 +10,6 @@ metadata:
   {{- end }}
   labels:
     {{- include "operator.labels" . | nindent 4 }}
-    {{- include "validator.labels" . | nindent 4 }}
     {{- if .Values.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}

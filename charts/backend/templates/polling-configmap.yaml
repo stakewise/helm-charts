@@ -10,6 +10,7 @@ data:
   IPFS_FETCH_ENDPOINTS: {{ .Values.polling.conf.ipfsFetchEndpoints }}
   ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint | quote }}
   ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint | quote }}
+  ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint | quote }}
   POLL_PAYMENTS_PERIOD: {{ .Values.polling.conf.pollPaymentsPeriod | quote }}
   POLL_ORACLES_PERIOD: {{ .Values.polling.conf.pollOraclesPeriod | quote }}
   POLL_SETTINGS_PERIOD: {{ .Values.polling.conf.pollSettingsPeriod | quote }}

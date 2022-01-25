@@ -30,27 +30,27 @@ COPY --from=lighthouse-gnosis /usr/local/bin/lighthouse /usr/local/bin/lighthous
 RUN apt update && apt install curl unzip jq -y && rm -rf /var/apt/cache /var/lib/api/lists/*
 
 RUN echo " ---> Install vault CLI" && \
-    curl -sSLO "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_amd64.zip" && \
-    unzip vault_${VAULT_VERSION}_linux_amd64.zip && \
+    curl -sSLO "https://releases.hashicorp.com/vault/${VAULT_VERSION}/vault_${VAULT_VERSION}_linux_$(dpkg --print-architecture).zip" && \
+    unzip vault_${VAULT_VERSION}_linux_$(dpkg --print-architecture).zip && \
     mv vault /usr/local/bin/vault && \
-    rm -rf vault_${VAULT_VERSION}_linux_amd64.zip && \
-    rm -rf vault_${VAULT_VERSION}_linux_amd64 && \
+    rm -rf vault_${VAULT_VERSION}_linux_$(dpkg --print-architecture).zip && \
+    rm -rf vault_${VAULT_VERSION}_linux_$(dpkg --print-architecture) && \
     chmod +x /usr/local/bin/vault
 
 RUN echo " ---> Install prysm validator" && \
-    curl -sSLO "https://github.com/prysmaticlabs/prysm/releases/download/v${PRYSM_VALIDATOR_VERSION}/validator-v${PRYSM_VALIDATOR_VERSION}-linux-amd64" && \
-    mv validator-v${PRYSM_VALIDATOR_VERSION}-linux-amd64 /usr/local/bin/prysm-validator && \
+    curl -sSLO "https://github.com/prysmaticlabs/prysm/releases/download/v${PRYSM_VALIDATOR_VERSION}/validator-v${PRYSM_VALIDATOR_VERSION}-linux-$(dpkg --print-architecture)" && \
+    mv validator-v${PRYSM_VALIDATOR_VERSION}-linux-$(dpkg --print-architecture) /usr/local/bin/prysm-validator && \
     chmod +x /usr/local/bin/prysm-validator
 
 RUN echo " ---> Install lighthouse validator" && \
-    curl -sSLO "https://github.com/sigp/lighthouse/releases/download/v${LIGHTHOUSE_VALIDATOR_VERSION}/lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-x86_64-unknown-linux-gnu-portable.tar.gz" && \
-    tar xzvf lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-x86_64-unknown-linux-gnu-portable.tar.gz && \
+    curl -sSLO "https://github.com/sigp/lighthouse/releases/download/v${LIGHTHOUSE_VALIDATOR_VERSION}/lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-$(uname -i)-unknown-linux-gnu-portable.tar.gz" && \
+    tar xzvf lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-$(uname -i)-unknown-linux-gnu-portable.tar.gz && \
     mv lighthouse /usr/local/bin/lighthouse-validator && \
-    rm -f lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-x86_64-unknown-linux-gnu-portable.tar.gz && \
+    rm -f lighthouse-v${LIGHTHOUSE_VALIDATOR_VERSION}-$(uname -i)-unknown-linux-gnu-portable.tar.gz && \
     chmod +x /usr/local/bin/lighthouse-validator
 
-RUN rm -f /usr/bin/sh /usr/bin/*less* /usr/bin/*grep* \
-          /usr/bin/*more* /usr/bin/*sed* /usr/bin/*head* \
+RUN rm -f /usr/bin/*less* /usr/bin/*grep* \
+          /usr/bin/*more* /usr/bin/*head* \
           /usr/bin/*diff* /usr/bin/*apt*
 
 ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]
