@@ -141,7 +141,9 @@ $ exit
 
 ### Vault Auto Unseal
 
-> :warning: The instruction below can be used to set up auto unsealing in Google cloud and is used here as a working example, if your infrastructure is located in another cloud or on dedicated servers, use the corresponding instruction from the Vault documentation: https://learn.hashicorp.com/collections/vault/auto-unseal
+> :warning: The instruction below can be used to set up auto unsealing in Google cloud and is used here as a working example, if your infrastructure is located in another cloud or on dedicated servers, use the corresponding instruction from the Vault documentation: https://learn.hashicorp.com/collections/vault/auto-unseal.
+> 
+> **For non-cloud deployments**, we recommend auto-unseal using transit secrets engine, for its implementation it is necessary to deploy a vault server outside the kubernetes cluster on a stable VM, this server will only be used to unseal the vault cluster inside kubernetes, detailed configuration instructions are on the official vault website: https://learn.hashicorp.com/tutorials/vault/autounseal-transit?in=vault/auto-unseal. Since access to the vault is required only at the moment the validator is launched or when it is restarted, this scheme is quite reliable.
 
 1. Create Google Service Account and Download JSON
 
