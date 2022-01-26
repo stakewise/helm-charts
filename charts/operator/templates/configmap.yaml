@@ -37,6 +37,21 @@ data:
     DATA_LIGHTHOUSE="${DATA}/lighthouse"
     DATA_TEKU="${DATA}/teku"
     SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
+    if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
+        PRYSM_EXECUTOR="prysm-gnosis-validator"
+        PRYSM_EXTRA_FLAGS="--config-file /data/configs-gnosis-prysm/config.yaml --chain-config-file /data/configs-gnosis-prysm/config.yaml"
+    else
+        PRYSM_EXECUTOR="prysm-validator"
+        PRYSM_EXTRA_FLAGS="--${NETWORK_ID:-"mainnet"}"
+    fi
+    if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
+        LIGHTHOUSE_EXECUTOR="lighthouse-gnosis-validator"
+        LIGHTHOUSE_EXTRA_FLAGS="--testnet-dir /data/configs-gnosis-lighthouse"
+    else
+        LIGHTHOUSE_EXECUTOR="lighthouse-validator"
+        LIGHTHOUSE_EXTRA_FLAGS="--network=${NETWORK_ID:-"mainnet"}"
+    fi
+
 
     if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
         if [ -z "$(ls -A ${DATA_PRYSM}/validators)" ]; then
@@ -83,19 +98,10 @@ data:
 
         if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
             touch ${DATA_PRYSM}/tosaccepted
-            if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-                prysm-gnosis-validator \
-            else
-                prysm-validator \
-            fi
+                ${PRYSM_EXECUTOR} \
                 accounts \
                 import \
-            if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-                --config-file /data/configs-gnosis-prysm/config.yaml \
-                --chain-config-file /data/configs-gnosis-prysm/config.yaml \
-            else
-                --${NETWORK_ID:-"mainnet"} \
-            fi
+                ${PRYSM_EXTRA_FLAGS} \
                 --keys-dir=${VAULT_KEYSTORES} \
                 --account-password-file=${VAULT_PASSWORD} \
                 --wallet-dir=${DATA_PRYSM}/validators \
@@ -104,19 +110,11 @@ data:
             cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
             rm ${VAULT_PASSWORD}
         elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]] || [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-            if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                lighthouse-gnosis-validator \
-            else
-                lighthouse-validator \
-            fi  
+                ${LIGHTHOUSE_EXECUTOR} \
                 account \
                 validator \
                 import \
-            if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                --testnet-dir /data/configs-gnosis-lighthouse \
-            else
-                --network=${NETWORK_ID:-"mainnet"} \
-            fi
+                ${LIGHTHOUSE_EXTRA_FLAGS} \
                 --datadir=${DATA_LIGHTHOUSE} \
                 --reuse-password \
                 --password-file=${VAULT_PASSWORD} \
@@ -138,39 +136,22 @@ data:
         OLD_VALIDATOR=`cat /data/validator.type`
         if [[ "$OLD_VALIDATOR" = "prysm" ]] || [[ "$OLD_VALIDATOR" = "prysmGnosis" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
-            if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-            prysm-gnosis-validator \
-            else
-            prysm-validator \
-            fi
+            ${PRYSM_EXECUTOR} \
                 slashing-protection \
                 export \
-                if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-                --config-file /data/configs-gnosis-prysm/config.yaml \
-                --chain-config-file /data/configs-gnosis-prysm/config.yaml \
-                else
-                    --${NETWORK_ID:-"mainnet"} \
-                fi
+                ${PRYSM_EXTRA_FLAGS} \
                 --datadir=${DATA_PRYSM} \
                 --slashing-protection-export-dir=${DATA}
             if [ $? -eq 0 ]; then
                 if [[ "$VALIDATOR_TYPE" = "lighthouse" ]] || [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
                     test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
-                    if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                        lighthouse-gnosis-validator \
-                    else
-                        lighthouse-validator \
-                    fi 
+                        ${LIGHTHOUSE_EXECUTOR} \
                         account \
                         validator \
                         slashing-protection \
                         import \
                         ${SLASHING_PROTECTION_FILE} \
-                        if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                        --testnet-dir /data/configs-gnosis-lighthouse \
-                        else
-                        --network=${NETWORK_ID:-"mainnet"} \
-                        fi
+                        ${LIGHTHOUSE_EXTRA_FLAGS} \
                         --datadir=${DATA_LIGHTHOUSE}
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
                     test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
@@ -189,38 +170,21 @@ data:
             fi
         elif [[ "$OLD_VALIDATOR" = "lighthouse" ]] || [[ "$OLD_VALIDATOR" = "lighthouseGnosis" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
-            if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                lighthouse-gnosis-validator \
-            else
-                lighthouse-validator \
-            fi
+                ${LIGHTHOUSE_EXECUTOR} \
                 account \
                 validator \
                 slashing-protection \
                 export ${SLASHING_PROTECTION_FILE} \
-            if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                --testnet-dir /data/configs-gnosis-lighthouse \
-            else
-                --network=${NETWORK_ID:-"mainnet"} \
-            fi
+                ${LIGHTHOUSE_EXTRA_FLAGS} \
                 --datadir=${DATA_LIGHTHOUSE}
             if [ $? -eq 0 ]; then
                 if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
-                    if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-                        prysm-gnosis-validator \
-                    else
-                        prysm-validator \
-                    fi
+                        ${PRYSM_EXECUTOR} \
                         slashing-protection \
                         import \
-                    if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-                        --config-file /data/configs-gnosis-prysm/config.yaml \
-                        --chain-config-file /data/configs-gnosis-prysm/config.yaml \
-                    else
-                        --${NETWORK_ID:-"mainnet"} \
-                    fi
+                        ${PRYSM_EXTRA_FLAGS} \
                         --datadir=${DATA_PRYSM} \
                         --slashing-protection-json-file=${SLASHING_PROTECTION_FILE}
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then

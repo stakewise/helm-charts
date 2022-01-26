@@ -134,10 +134,10 @@ spec:
             name: {{ template "operator.fullname" $root }}-configs
         - name: configs-gnosis-prysm
           configMap:
-            name: {{ template "operator.fullname" . }}-configs-gnosis-prysm
+            name: {{ template "operator.fullname" $root }}-configs-gnosis-prysm
         - name: configs-gnosis-lighthouse
           configMap:
-            name: {{ template "operator.fullname" . }}-configs-gnosis-lighthouse
+            name: {{ template "operator.fullname" $root }}-configs-gnosis-lighthouse
         - name: validator-init
           configMap:
             name: {{ template "operator.fullname" $root }}-init
