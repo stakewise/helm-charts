@@ -2,7 +2,7 @@
 apiVersion: autoscaling.k8s.io/v1beta2
 kind: VerticalPodAutoscaler
 metadata:
-  name: {{ template "teku.fullname" . }}
+  name: {{ template "nethermind.fullname" . }}
   labels:
     {{- include "common.labels" . | nindent 4 }}
 spec:
