@@ -54,3 +54,4 @@ RUN rm -f /usr/bin/*less* /usr/bin/*grep* \
           /usr/bin/*diff* /usr/bin/*apt*
 
 ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]
+
