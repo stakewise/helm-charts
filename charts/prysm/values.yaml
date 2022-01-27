@@ -66,6 +66,10 @@ image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
   tag: "v2.0.5"
   pullPolicy: IfNotPresent
+imageGnosis:
+  repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
+  tag: "v2.0.4-gbc"
+  pullPolicy: IfNotPresent
 
 ## RPC Port
 ##
@@ -79,7 +83,7 @@ http:
   port: "8080"
 
 ## Eth2 network ID
-##
+## Options: mainnet, prater, gnosis
 network: mainnet
 
 ## Ethereum 1 node endpoints.
@@ -136,7 +140,7 @@ verticalAutoscaler:
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
 
   ## Prometheus exporter port
   ##

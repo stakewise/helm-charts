@@ -10,18 +10,22 @@ RUN JAVA_TOOL_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" $JAVA_HOME/bin/
          --output /javaruntime
 
 FROM consensys/teku:21.12.1 as teku
+FROM ghcr.io/gnosischain/gbc-prysm-validator:v2.0.4-gbc as prysm-gnosis
+FROM ghcr.io/gnosischain/gbc-lighthouse:v2.0.1-gbc as lighthouse-gnosis
 
 FROM ubuntu:21.04
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
-ENV PRYSM_VALIDATOR_VERSION=2.0.1
+ENV PRYSM_VALIDATOR_VERSION=2.0.5
 ENV LIGHTHOUSE_VALIDATOR_VERSION=2.0.1
 ENV VAULT_VERSION=1.8.4
 ENV DEBIAN_FRONTEND=noninteractive
 
 COPY --from=jre-build /javaruntime $JAVA_HOME
 COPY --from=teku /opt/teku /opt/teku
+COPY --from=prysm-gnosis /app/cmd/validator/validator.runfiles/prysm/cmd/validator/validator_/validator /usr/local/bin/prysm-gnosis-validator
+COPY --from=lighthouse-gnosis /usr/local/bin/lighthouse /usr/local/bin/lighthouse-gnosis-validator
 
 RUN apt update && apt install curl unzip jq -y && rm -rf /var/apt/cache /var/lib/api/lists/*
 
@@ -50,3 +54,4 @@ RUN rm -f /usr/bin/*less* /usr/bin/*grep* \
           /usr/bin/*diff* /usr/bin/*apt*
 
 ENTRYPOINT ["/usr/bin/bash", "/data/scripts/validator-init.sh"]
+

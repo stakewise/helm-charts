@@ -41,6 +41,10 @@ $ helm upgrade --install operator stakewise/operator \
 
 **Please see the options supported in the `values.yaml` file.**
 
+## Changelog
+
+Please refer to the `CHANGELOG.md` file.
+
 ## <a name="vault"></a>Vault usage
 
 A vault can be deployed in two ways, the first as a dependency on the `operator` chart , the second using a [separate release](https://github.com/hashicorp/vault-helm).
@@ -229,3 +233,4 @@ vault:
 - https://lighthouse-book.sigmaprime.io/
 - https://www.coincashew.com/coins/overview-eth/guide-or-how-to-setup-a-validator-on-eth2-mainnet
 - https://learn.hashicorp.com/tutorials/vault/kubernetes-google-cloud-gke?in=vault/kubernetes
+

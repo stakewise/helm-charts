@@ -53,7 +53,7 @@ image:
   repository: openethereum/openethereum
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v3.2.6"
+  tag: "v3.3.2"
 
 ## How many geth nodes to run simultaneously
 ##
@@ -69,7 +69,7 @@ podDisruptionBudget:
   maxUnavailable: 1
 
 ## Which network should the node join
-##
+## Options: mainnet, goerli, gnosis
 network: mainnet
 
 ## Chain-dependend configurations
@@ -104,7 +104,7 @@ extraFlags: []
 metrics:
   ## Whether to enable metrics collection or not
   ##
-  enabled: false
+  enabled: true
 
   ## Prometheus exporter port
   ##

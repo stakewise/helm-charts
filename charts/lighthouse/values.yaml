@@ -59,6 +59,10 @@ image:
   repository: "sigp/lighthouse"
   tag: "v2.0.1"
   pullPolicy: IfNotPresent
+imageGnosis:
+  repository: "ghcr.io/gnosischain/gbc-lighthouse"
+  tag: "v2.0.1-gbc"
+  pullPolicy: IfNotPresent
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -97,7 +101,8 @@ verticalAutoscaler:
   containerPolicies: { }
 
 ## Eth2 network ID
-##
+## Options: mainnet, prater, gnosis
+## 
 network: mainnet
 
 ## RPC Port
@@ -117,7 +122,7 @@ eth1Endpoints: []
 ##
 metrics:
   # Whether to enable metrics collection or not
-  enabled: false
+  enabled: true
 
   # Prometheus exporter port
   port: 5054
@@ -125,6 +130,7 @@ metrics:
   # Extra flags to pass for collecting metrics
   flags:
     - "--metrics"
+    - "--metrics-port=5054"
     - "--metrics-address=0.0.0.0"
 
   ## Prometheus Service Monitor

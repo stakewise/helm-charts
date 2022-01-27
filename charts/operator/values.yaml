@@ -43,7 +43,8 @@ initImageBusybox:
 enabled: false
 
 ## What type of validator to use.
-## Options: prysm, lighthouse
+## Options for Ethereum: prysm, lighthouse, teku
+## Options for Gnosis: prysm, lighthouse
 ##
 type: prysm
 
@@ -67,9 +68,15 @@ image:
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
     tag: "v2.0.5"
+  prysmGnosis:
+    repository: "ghcr.io/gnosischain/gbc-prysm-validator"
+    tag: "v2.0.4-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
     tag: "v2.0.1"
+  lighthouseGnosis:
+    repository: "ghcr.io/gnosischain/gbc-lighthouse"
+    tag: "v2.0.1-gbc"
   teku:
     repository: "consensys/teku"
     tag: "21.12.1"
@@ -78,7 +85,7 @@ image:
 ##
 initImage:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
-  tag: "v1.4.29"
+  tag: "v1.4.32"
   pullPolicy: IfNotPresent
   
 terminationGracePeriodSeconds: 900
@@ -122,7 +129,8 @@ verticalAutoscaler:
   containerPolicies: {}
   
 ## Network ID
-## Options: mainnet, prater
+## Options for Ethereum: mainnet, prater
+## Options for Gnosis: gnosis
 ##
 network: "mainnet"
 
@@ -137,10 +145,25 @@ flags:
     - "--disable-rewards-penalties-logging"
     - "--disable-account-metrics"
     - "--enable-doppelganger"
+  prysmGnosis:
+    - "--datadir=/data/prysm"
+    - "--wallet-dir=/data/prysm/validators"
+    - "--wallet-password-file=/data/prysm/validators/password.txt"
+    - "--accept-terms-of-use"
+    - "--disable-rewards-penalties-logging"
+    - "--disable-account-metrics"
+    - "--enable-doppelganger"
+    - "--config-file /data/configs-gnosis-prysm/config.yaml"
+    - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
   lighthouse:
     - "lighthouse"
     - "vc"
     - "--datadir=/data/lighthouse"
+  lighthouseGnosis:
+    - "lighthouse"
+    - "vc"
+    - "--datadir=/data/lighthouse"
+    - "--testnet-dir /data/configs-gnosis-lighthouse"
   teku:
     - "validator-client"
     - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"

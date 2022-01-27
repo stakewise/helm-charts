@@ -68,9 +68,14 @@ spec:
               mountPath: /data/scripts
       {{- end }}
       containers:
-        - name: node
+        - name: {{ template "prysm.fullname" . }}
+        {{- if ne .Values.network "gnosis" }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- else }}
+          image: "{{ .Values.imageGnosis.repository }}:{{ .Values.imageGnosis.tag }}"
+          imagePullPolicy: {{ .Values.imageGnosis.pullPolicy }}
+        {{- end }}
           args:
             - "--datadir=/data"
             - "--rpc-host=0.0.0.0"
@@ -78,9 +83,16 @@ spec:
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
             - "--http-web3provider={{ .Values.eth1Endpoint }}"
-            - "--{{ .Values.network }}"
           {{- if eq .Values.network "prater" }}
             - "--genesis-state=/data/genesis.ssz"
+          {{- end }}
+          {{- if ne .Values.network "gnosis" }}
+            - "--{{ .Values.network }}"
+          {{- else }}
+            - "--contract-deployment-block=19469077"
+            - "--bootstrap-node=/data/gnosis-config/bootnodes.yaml"
+            - "--config-file=/data/gnosis-config/config.yaml"
+            - "--chain-config-file=/data/gnosis-config/config.yaml"
           {{- end }}
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
@@ -125,6 +137,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if eq .Values.network "gnosis" }}
+            - name: gnosis-config
+              mountPath: /data/gnosis-config
+          {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -168,6 +184,11 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+      {{- if eq .Values.network "gnosis" }}
+        - name: gnosis-config
+          configMap:
+            name: {{ include "prysm.fullname" . }}-gnosis
+      {{- end }}
       {{- if eq .Values.network "prater" }}
         - name: scripts
           configMap:

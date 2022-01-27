@@ -1,0 +1,3 @@
+{{- if and (eq .Values.network "gnosis") (eq .Values.type "teku") }}
+{{- fail "Gnosis chain network can't be used with teku client" }}
+{{- end }}

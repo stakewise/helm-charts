@@ -1,104 +1,103 @@
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "lighthouse.fullname" . }}
+  name: {{ include "nethermind.fullname" . }}
   labels:
-    {{- include "lighthouse.labels" . | nindent 4 }}
+    {{- include "nethermind.labels" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "lighthouse.selectorLabels" . | nindent 6 }}
-  serviceName: {{ template "lighthouse.fullname" . }}
-  replicas: {{ .Values.replicas }}
+      {{- include "nethermind.selectorLabels" . | nindent 6 }}
+  serviceName: {{ template "nethermind.fullname" . }}
   template:
     metadata:
       labels:
-        {{- include "lighthouse.selectorLabels" . | nindent 8 }}
+        {{- include "nethermind.selectorLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.affinity }}
-      affinity:
-        {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.tolerations }}
-      tolerations:
-        {{ toYaml . | nindent 8 | trim }}
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
     {{- end }}
     {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{ toYaml . | nindent 8 | trim }}
+        {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.securityContext }}
-      securityContext:
-        {{ toYaml . | nindent 8 | trim }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ template "lighthouse.fullname" . }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      serviceAccountName: {{ include "nethermind.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
-      {{- if and .Values.persistence.enabled .Values.initChownData }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
+    {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
         - name: init-chown
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
-          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          command:
+            - /bin/sh
+            - -c
+            - mkdir -p {{ .Values.nethermind.dataDir }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.nethermind.dataDir }}
           volumeMounts:
             - name: data
-              mountPath: /data
-      {{- end }}
+              mountPath: {{ .Values.nethermind.dataDir }}
+    {{- end }}
       containers:
         - name: {{ .Chart.Name }}
-        {{- if eq .Values.network "gnosis" }}
-          image: "{{ .Values.imageGnosis.repository }}:{{ .Values.imageGnosis.tag }}"
-          imagePullPolicy: {{ .Values.imageGnosis.pullPolicy }}
-        {{- else }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-        {{- end }}
+          workingDir: {{ .Values.nethermind.dataDir }}
+          command: ['/nethermind/Nethermind.Runner']
           args:
-            - lighthouse
-            - bn
-            - --staking
-            - --http-address=0.0.0.0
-            - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
-            - --datadir=/data
-          {{- if ne .Values.network "gnosis" }}
-            - --network={{ .Values.network }}
+          {{- if eq .Values.network "gnosis" }}
+            - --config=xdai
           {{- else }}
-            - --testnet-dir=/data/gnosis-config
+            - --config={{ .Values.network }}
           {{- end }}
-          {{- range .Values.extraFlags }}
-            - {{ . | quote }}
+            - --datadir={{ .Values.nethermind.dataDir }}
+            - --Sync.FastSync={{ .Values.nethermind.fastSync }}
+          {{- if .Values.nethermind.jsonrpc.enabled }}
+            - --JsonRpc.Enabled={{ .Values.nethermind.jsonrpc.enabled }}
+            - --JsonRpc.EnabledModules={{ .Values.nethermind.jsonrpc.modules | join "," }}
+            - --JsonRpc.Host={{ .Values.nethermind.jsonrpc.host }}
+            - --JsonRpc.Port={{ .Values.nethermind.jsonrpc.ports.rest }}
+            - --JsonRpc.WebSocketsPort={{ .Values.nethermind.jsonrpc.ports.websocket }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
-          {{- range .Values.metrics.flags }}
+            - --Metrics.Enabled={{ .Values.metrics.enabled }}
+            - --Metrics.ExposePort={{ .Values.metrics.port }}
+          {{- end }}
+          {{- range .Values.nethermind.extraFlags }}
             - {{ . | quote }}
           {{- end }}
-          {{- end }}
-          env:
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
           ports:
-            - containerPort: {{ .Values.rpc.port }}
+        {{- if .Values.nethermind.jsonrpc.enabled }}
+            - name: json-rest
+              containerPort: {{ .Values.nethermind.jsonrpc.ports.rest }}
               protocol: TCP
-              name: http
-          {{- if .Values.metrics.enabled }}
-            - containerPort: {{ .Values.metrics.port }}
-              name: metrics
+            - name: json-ws
+              containerPort: {{ .Values.nethermind.jsonrpc.ports.websocket }}
               protocol: TCP
-          {{- end }}
+        {{- end }}
+        {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+        {{- end }}
           volumeMounts:
             - name: data
-              mountPath: /data
-          {{- if eq .Values.network "gnosis" }}
-            - name: gnosis-config
-              mountPath: /data/gnosis-config
-          {{- end }}
-        {{- with .Values.resources }}
+              mountPath: {{ .Values.nethermind.dataDir }}
           resources:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.nethermind.jsonrpc.enabled }}
         - name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -106,7 +105,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.rpc.port | quote }}
+              value: {{ .Values.nethermind.jsonrpc.ports.rest | quote }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
@@ -135,25 +134,21 @@ spec:
               port: {{ .Values.readinessProbe.httpGet.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
-      volumes:
-      {{- if eq .Values.network "gnosis" }}
-        - name: gnosis-config
-          configMap:
-            name: {{ include "lighthouse.fullname" . }}-gnosis
       {{- end }}
-{{- if not .Values.persistence.enabled }}
+  {{- if (not .Values.persistence.enabled) }}
+      volumes:
         - name: data
           emptyDir: {}
-{{- else }}
+  {{- else }}
   volumeClaimTemplates:
     - metadata:
         name: data
         labels:
-          {{- include "lighthouse.labels" . | nindent 10 }}
+          {{- include "nethermind.labels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}
         resources:
           requests:
             storage: {{ .Values.persistence.size | quote }}
-{{- end }}
+  {{- end }}

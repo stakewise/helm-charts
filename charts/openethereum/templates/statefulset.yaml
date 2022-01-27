@@ -59,7 +59,11 @@ spec:
             - "-d"
             - "/data/openethereum"
             - "--chain"
+            {{- if eq .Values.network "gnosis" }}
+            - "xdai"
+            {{- else }}
             - "{{ $.Values.network }}"
+            {{- end }}
             - "--jsonrpc-interface"
             - "all"
             - "--jsonrpc-hosts"

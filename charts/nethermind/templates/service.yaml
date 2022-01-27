@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "nethermind.fullname" . }}
+  labels:
+    {{- include "nethermind.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+{{- if .Values.svcHeadless }}
+  clusterIP: None
+{{- end }}
+{{- if .Values.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  ports:
+  {{- if .Values.nethermind.jsonrpc.enabled }}
+    - port: {{ .Values.nethermind.jsonrpc.ports.rest }}
+      targetPort: json-rest
+      protocol: TCP
+      name: json-rest
+    - port: {{ .Values.nethermind.jsonrpc.ports.websocket }}
+      targetPort: json-ws
+      protocol: TCP
+      name: json-ws
+  {{- end }}
+  {{- if .Values.metrics.enabled }}
+    - port: {{ .Values.metrics.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  {{- end }}
+  selector:
+    {{- include "nethermind.selectorLabels" . | nindent 4 }}
