@@ -68,10 +68,14 @@ spec:
               mountPath: /data
             - name: configs
               mountPath: "/mnt/configs"
+          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
             - name: configs-gnosis-prysm
               mountPath: "/data/configs-gnosis-prysm"
+          {{- end }}
+          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
             - name: configs-gnosis-lighthouse
               mountPath: "/data/configs-gnosis-lighthouse"
+          {{- end }}
             - name: configs
               mountPath: "/mnt/configs"
             - name: validator-init
@@ -132,12 +136,16 @@ spec:
         - name: configs
           configMap:
             name: {{ template "operator.fullname" $root }}-configs
+      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
         - name: configs-gnosis-prysm
           configMap:
             name: {{ template "operator.fullname" $root }}-configs-gnosis-prysm
+      {{- end }}
+      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
         - name: configs-gnosis-lighthouse
           configMap:
             name: {{ template "operator.fullname" $root }}-configs-gnosis-lighthouse
+      {{- end }}
         - name: validator-init
           configMap:
             name: {{ template "operator.fullname" $root }}-init

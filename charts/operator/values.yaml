@@ -44,7 +44,7 @@ enabled: false
 
 ## What type of validator to use.
 ## Options for Ethereum: prysm, lighthouse, teku
-## Options for Gnosis: prysmGnosis, lighthouseGnosis
+## Options for Gnosis: prysm, lighthouse
 ##
 type: prysm
 
@@ -130,7 +130,7 @@ verticalAutoscaler:
   
 ## Network ID
 ## Options for Ethereum: mainnet, prater
-## Options for Gnosis: gnosischain
+## Options for Gnosis: gnosis
 ##
 network: "mainnet"
 

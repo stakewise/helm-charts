@@ -37,129 +37,107 @@ data:
     DATA_LIGHTHOUSE="${DATA}/lighthouse"
     DATA_TEKU="${DATA}/teku"
     SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
-    if [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
+    
+    if [[ "${NETWORK_ID}" = "gnosis" ]]; then
         PRYSM_EXECUTOR="prysm-gnosis-validator"
         PRYSM_EXTRA_FLAGS="--config-file /data/configs-gnosis-prysm/config.yaml --chain-config-file /data/configs-gnosis-prysm/config.yaml"
+        PRYSM_IMPORT="${PRYSM_EXECUTOR} accounts import ${PRYSM_EXTRA_FLAGS} --keys-dir=${VAULT_KEYSTORES} --account-password-file=${VAULT_PASSWORD} --wallet-dir=${DATA_PRYSM}/validators --wallet-password-file=${VAULT_PASSWORD} --accept-terms-of-use"
+        PRYSM_EXPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection export ${PRYSM_EXTRA_FLAGS} --datadir=${DATA_PRYSM} --slashing-protection-export-dir=${DATA}"
+        PRYSM_IMPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection import ${PRYSM_EXTRA_FLAGS} --datadir=${DATA_PRYSM} --slashing-protection-json-file=${SLASHING_PROTECTION_FILE}"
+        LIGHTHOUSE_EXECUTOR="lighthouse-gnosis-validator"
+        LIGHTHOUSE_EXTRA_FLAGS="--testnet-dir /data/configs-gnosis-lighthouse --datadir=${DATA_LIGHTHOUSE}"
+        LIGHTHOUSE_IMPORT="${LIGHTHOUSE_EXECUTOR} account validator import ${LIGHTHOUSE_EXTRA_FLAGS} --reuse-password --password-file=${VAULT_PASSWORD} --directory=${VAULT_KEYSTORES}"
+        LIGHTHOUSE_IMPORT_SLASHING_HISTORY="${LIGHTHOUSE_EXECUTOR} account validator slashing-protection import ${SLASHING_PROTECTION_FILE} ${LIGHTHOUSE_EXTRA_FLAGS}"
+        LIGHTHOUSE_EXPORT_SLASHING_HISTORY="${LIGHTHOUSE_EXECUTOR} account validator slashing-protection export ${SLASHING_PROTECTION_FILE} ${LIGHTHOUSE_EXTRA_FLAGS}"
+        TEKU_IMPORT_SLASHING_HISTORY="/opt/teku/bin/teku slashing-protection import --data-path=${DATA_TEKU} --from=${SLASHING_PROTECTION_FILE}"
+        TEKU_EXPORT_SLASHING_HISTORY=" /opt/teku/bin/teku slashing-protection export --data-path=${DATA_TEKU} --to=${SLASHING_PROTECTION_FILE}"
     else
         PRYSM_EXECUTOR="prysm-validator"
         PRYSM_EXTRA_FLAGS="--${NETWORK_ID:-"mainnet"}"
-    fi
-    if [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-        LIGHTHOUSE_EXECUTOR="lighthouse-gnosis-validator"
-        LIGHTHOUSE_EXTRA_FLAGS="--testnet-dir /data/configs-gnosis-lighthouse"
-    else
+        PRYSM_IMPORT="${PRYSM_EXECUTOR} accounts import ${PRYSM_EXTRA_FLAGS} --keys-dir=${VAULT_KEYSTORES} --account-password-file=${VAULT_PASSWORD} --wallet-dir=${DATA_PRYSM}/validators --wallet-password-file=${VAULT_PASSWORD} --accept-terms-of-use"
+        PRYSM_EXPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection export ${PRYSM_EXTRA_FLAGS} --datadir=${DATA_PRYSM} --slashing-protection-export-dir=${DATA}"
+        PRYSM_IMPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection import ${PRYSM_EXTRA_FLAGS} --datadir=${DATA_PRYSM} --slashing-protection-json-file=${SLASHING_PROTECTION_FILE}"
         LIGHTHOUSE_EXECUTOR="lighthouse-validator"
-        LIGHTHOUSE_EXTRA_FLAGS="--network=${NETWORK_ID:-"mainnet"}"
-    fi
-
-
-    if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
-        if [ -z "$(ls -A ${DATA_PRYSM}/validators)" ]; then
-          export REIMPORT=true
-        fi
-    elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]] || [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-        if [ -z "$(ls -A ${DATA_LIGHTHOUSE}/validators)" ]; then
-          export REIMPORT=true
-        fi
-    elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
-        if [ -z "$(ls -A ${DATA_TEKU}/validator)" ]; then
-          export REIMPORT=true
-        fi
+        LIGHTHOUSE_EXTRA_FLAGS="--network=${NETWORK_ID:-"mainnet"} --datadir=${DATA_LIGHTHOUSE}"
+        LIGHTHOUSE_IMPORT="${LIGHTHOUSE_EXECUTOR} account validator import ${LIGHTHOUSE_EXTRA_FLAGS} --reuse-password --password-file=${VAULT_PASSWORD} --directory=${VAULT_KEYSTORES}"
+        LIGHTHOUSE_IMPORT_SLASHING_HISTORY="${LIGHTHOUSE_EXECUTOR} account validator slashing-protection import ${SLASHING_PROTECTION_FILE} ${LIGHTHOUSE_EXTRA_FLAGS}"
+        LIGHTHOUSE_EXPORT_SLASHING_HISTORY="${LIGHTHOUSE_EXECUTOR} account validator slashing-protection export ${SLASHING_PROTECTION_FILE} ${LIGHTHOUSE_EXTRA_FLAGS}"
+        TEKU_IMPORT_SLASHING_HISTORY="/opt/teku/bin/teku slashing-protection import --data-path=${DATA_TEKU} --from=${SLASHING_PROTECTION_FILE}"
+        TEKU_EXPORT_SLASHING_HISTORY=" /opt/teku/bin/teku slashing-protection export --data-path=${DATA_TEKU} --to=${SLASHING_PROTECTION_FILE}"
     fi
     
+    if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+        if [ -z "$(ls -A ${DATA}/${VALIDATOR_TYPE}/validators)" ]; then export REIMPORT=true; fi
+    elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
+        if [ -z "$(ls -A ${DATA_TEKU}/validator)" ]; then export REIMPORT=true; fi
+    fi
+        
+    # Keys are reimported in two cases
+    # 1. Current keystores directory is empty
+    # 2. reimportKeystores value is set to true
     if [[ "$REIMPORT" = "true" ]]; then
+        # Authorization in Vault
         bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
-        export KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+        KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
         VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
         export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
-
-
+    
         # Get keystores password
-        rm -rf ${VAULT} || true
-        mkdir -p ${VAULT_KEYSTORES}
+        rm -rf ${VAULT} || true && mkdir -p ${VAULT_KEYSTORES}
         PASSWORD=$(vault kv get -field=password.txt -version=1 validators/${SERVICE_ACCOUNT}/password)
         echo ${PASSWORD} > ${VAULT_PASSWORD}
-
+    
+        # Preparing keystores for import
         echo "$(vault kv get -version=1 validators/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
         while read line; do
             if [[ "$line" =~ ^keystore.* ]]; then
                 echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
             fi
         done <${VAULT}/keystores.txt
-        rm -f ${VAULT}/keystores.txt
+    
         if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
           echo "No keys available to start. Check that Vault is running and there are keys in it"
           exit 1
         fi
+    
+        # Remove old keystores
         rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
                ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
                ${DATA_PRYSM}/validators \
                ${DATA_TEKU}/validator || true
-
-        if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
+    
+        # Import keystores
+        if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
             touch ${DATA_PRYSM}/tosaccepted
-                ${PRYSM_EXECUTOR} \
-                accounts \
-                import \
-                ${PRYSM_EXTRA_FLAGS} \
-                --keys-dir=${VAULT_KEYSTORES} \
-                --account-password-file=${VAULT_PASSWORD} \
-                --wallet-dir=${DATA_PRYSM}/validators \
-                --wallet-password-file=${VAULT_PASSWORD} \
-                --accept-terms-of-use
+            ${PRYSM_IMPORT}
             cp ${VAULT_PASSWORD} ${DATA_PRYSM}/validators/password.txt
-            rm ${VAULT_PASSWORD}
-        elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]] || [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
-                ${LIGHTHOUSE_EXECUTOR} \
-                account \
-                validator \
-                import \
-                ${LIGHTHOUSE_EXTRA_FLAGS} \
-                --datadir=${DATA_LIGHTHOUSE} \
-                --reuse-password \
-                --password-file=${VAULT_PASSWORD} \
-                --directory=${VAULT_KEYSTORES}
-            rm ${VAULT_PASSWORD}
+        elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
+            ${LIGHTHOUSE_IMPORT}
         elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
-            mkdir -p /data/teku/validator/keys /data/teku/validator/passwords
+            mkdir -p ${DATA_TEKU}/validator/keys ${DATA_TEKU}/validator/passwords
             cd ${VAULT_KEYSTORES}
             for key in *; do
                 FILENAME=`echo ${key} | sed 's/.json//g'`
                 cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
                 cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
             done
-            rm ${VAULT_PASSWORD}
         fi
     fi
-
+    
+    # This block is responsible for migration slashing history database
+    # in case of client changed
     if [[ "$VALIDATOR_TYPE" != "`cat /data/validator.type`" ]]; then
         OLD_VALIDATOR=`cat /data/validator.type`
-        if [[ "$OLD_VALIDATOR" = "prysm" ]] || [[ "$OLD_VALIDATOR" = "prysmGnosis" ]]; then
+        if [[ "$OLD_VALIDATOR" = "prysm" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
-            ${PRYSM_EXECUTOR} \
-                slashing-protection \
-                export \
-                ${PRYSM_EXTRA_FLAGS} \
-                --datadir=${DATA_PRYSM} \
-                --slashing-protection-export-dir=${DATA}
+            ${PRYSM_EXPORT_SLASHING_HISTORY}
             if [ $? -eq 0 ]; then
-                if [[ "$VALIDATOR_TYPE" = "lighthouse" ]] || [[ "$VALIDATOR_TYPE" = "lighthouseGnosis" ]]; then
+                if [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
                     test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
-                        ${LIGHTHOUSE_EXECUTOR} \
-                        account \
-                        validator \
-                        slashing-protection \
-                        import \
-                        ${SLASHING_PROTECTION_FILE} \
-                        ${LIGHTHOUSE_EXTRA_FLAGS} \
-                        --datadir=${DATA_LIGHTHOUSE}
+                    ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
                     test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
-                    /opt/teku/bin/teku \
-                        slashing-protection \
-                        import \
-                        --data-path=${DATA_TEKU} \
-                        --from=${SLASHING_PROTECTION_FILE}
+                    ${TEKU_IMPORT_SLASHING_HISTORY}
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
@@ -168,32 +146,17 @@ data:
                 echo "Slashing history export failed"
                 exit 1
             fi
-        elif [[ "$OLD_VALIDATOR" = "lighthouse" ]] || [[ "$OLD_VALIDATOR" = "lighthouseGnosis" ]]; then
+        elif [[ "$OLD_VALIDATOR" = "lighthouse" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
-                ${LIGHTHOUSE_EXECUTOR} \
-                account \
-                validator \
-                slashing-protection \
-                export ${SLASHING_PROTECTION_FILE} \
-                ${LIGHTHOUSE_EXTRA_FLAGS} \
-                --datadir=${DATA_LIGHTHOUSE}
+            ${LIGHTHOUSE_EXPORT_SLASHING_HISTORY}
             if [ $? -eq 0 ]; then
                 if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "prysmGnosis" ]]; then
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
-                        ${PRYSM_EXECUTOR} \
-                        slashing-protection \
-                        import \
-                        ${PRYSM_EXTRA_FLAGS} \
-                        --datadir=${DATA_PRYSM} \
-                        --slashing-protection-json-file=${SLASHING_PROTECTION_FILE}
+                    ${PRYSM_IMPORT_SLASHING_HISTORY}
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
                     test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
-                    /opt/teku/bin/teku \
-                        slashing-protection \
-                        import \
-                        --data-path=${DATA_TEKU} \
-                        --from=${SLASHING_PROTECTION_FILE}
+                    ${TEKU_IMPORT_SLASHING_HISTORY}
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
@@ -204,28 +167,15 @@ data:
             fi
         elif [[ "$OLD_VALIDATOR" = "teku" ]]; then
             test -f ${SLASHING_PROTECTION_FILE} && rm -f ${SLASHING_PROTECTION_FILE}
-            /opt/teku/bin/teku \
-                slashing-protection \
-                export \
-                --data-path=${DATA_TEKU} \
-                --to=${SLASHING_PROTECTION_FILE}
+            ${TEKU_EXPORT_SLASHING_HISTORY}
             if [ $? -eq 0 ]; then
                 if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
-                    prysm-validator slashing-protection import \
-                        --datadir=${DATA_PRYSM} \
-                        --slashing-protection-json-file=${SLASHING_PROTECTION_FILE} \
-                        --${NETWORK_ID:-"mainnet"}
+                    ${PRYSM_IMPORT_SLASHING_HISTORY}
                 elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
-                    lighthouse-validator \
-                        account \
-                        validator \
-                        slashing-protection \
-                        import \
-                        ${SLASHING_PROTECTION_FILE} \
-                        --datadir=${DATA_LIGHTHOUSE} \
-                        --network=${NETWORK_ID:-"mainnet"}
+                    test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
+                    ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
@@ -236,9 +186,11 @@ data:
             fi
         fi
     fi
-
+    
     rm -rf ${VAULT} || true
 
+
+{{- if and (eq .Values.network "gnosis") (eq .Values.type "prysm") }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -409,7 +361,9 @@ data:
     # 2**9 (= 512)
     # assert EPOCHS_PER_SYNC_COMMITTEE_PERIOD * SLOTS_PER_EPOCH <= SLOTS_PER_HISTORICAL_ROOT
     EPOCHS_PER_SYNC_COMMITTEE_PERIOD: 512
+{{- end }}
 
+{{- if and (eq .Values.network "gnosis") (eq .Values.type "lighthouse") }}
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -580,3 +534,4 @@ data:
     # 2**9 (= 512)
     # assert EPOCHS_PER_SYNC_COMMITTEE_PERIOD * SLOTS_PER_EPOCH <= SLOTS_PER_HISTORICAL_ROOT
     EPOCHS_PER_SYNC_COMMITTEE_PERIOD: 512
+{{- end }}
