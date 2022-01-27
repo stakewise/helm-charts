@@ -9,7 +9,7 @@ spec:
   targetRef:
     apiVersion: "apps/v1"
     kind: StatefulSet
-    name: {{ template "teku.fullname" . }}
+    name: {{ template "nethermind.fullname" . }}
   updatePolicy:
     updateMode: {{ .Values.verticalAutoscaler.updateMode | default "Off" | quote }}
   {{- if .Values.verticalAutoscaler.containerPolicies }}
