@@ -85,7 +85,7 @@ image:
 ##
 initImage:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
-  tag: "v2.0.1"
+  tag: "v1.4.32"
   pullPolicy: IfNotPresent
   
 terminationGracePeriodSeconds: 900
