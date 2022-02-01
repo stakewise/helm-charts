@@ -10,7 +10,7 @@ data:
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  ETH1_CONFIRMATION_BLOCKS: {{ .Values.settings.eth1ConfirmationBlocks | quote }}
+  CONFIRMATION_BLOCKS: {{ .Values.settings.confirmationBlocks | quote }}
   WEB3_ENDPOINT: {{ .Values.settings.web3Endpoint | quote }}
   KEEPER_PROCESS_INTERVAL: {{ .Values.settings.keeperProcessInterval | quote }}
   TRANSACTION_TIMEOUT: {{ .Values.settings.transactionTimeout | quote }}

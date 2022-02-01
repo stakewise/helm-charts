@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.0.4"
+  tag: "v2.1.2"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -44,7 +44,7 @@ settings:
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
-  eth1ConfirmationBlocks: "15"
+  confirmationBlocks: "15"
   keeperProcessInterval: "10"
   transactionTimeout: "900"
 
