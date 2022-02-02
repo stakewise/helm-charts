@@ -1,6 +1,7 @@
 apiVersion: v2
 name: oracle
-version: 2.0.3
+version: 2.1.0
+appVersion: v2.1.2
 kubeVersion: "^1.14.0-0"
 description: The StakeWise application for submitting off-chain data to smart contracts.
 type: application
@@ -14,4 +15,3 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-appVersion: v2.0.4
