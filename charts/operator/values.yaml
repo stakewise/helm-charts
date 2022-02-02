@@ -67,10 +67,10 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.0.5"
+    tag: "v2.0.6"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
-    tag: "v2.0.4-gbc"
+    tag: "v2.0.5-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
     tag: "v2.1.2"

@@ -64,11 +64,11 @@ replicas: 1
 ##
 image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.0.5"
+  tag: "v2.0.6"
   pullPolicy: IfNotPresent
 imageGnosis:
   repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
-  tag: "v2.0.4-gbc"
+  tag: "v2.0.5-gbc"
   pullPolicy: IfNotPresent
 
 ## RPC Port

@@ -74,12 +74,6 @@ spec:
             - name: configs-gnosis-prysm
               mountPath: "/data/configs-gnosis-prysm"
           {{- end }}
-          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
-            - name: configs-gnosis-lighthouse
-              mountPath: "/data/configs-gnosis-lighthouse"
-          {{- end }}
-            - name: configs
-              mountPath: "/mnt/configs"
             - name: validator-init
               mountPath: /data/scripts
       {{- if $.Values.persistence.enabled }}
@@ -140,7 +134,7 @@ spec:
 
             {{- else if eq $.Values.type "lighthouse" }}
             {{- range $i := until (int $root.Values.lighthouse.replicas) }}
-              {{- $host := printf "operator-lighthouse-%d.operator-lighthouse:5052" $i}}
+              {{- $host := printf "http://operator-lighthouse-%d.operator-lighthouse:5052" $i}}
               {{- $replicaList = append $replicaList $host }}
             {{- end }}
             {{- with index $replicaList $counter }}
@@ -203,11 +197,6 @@ spec:
         - name: configs-gnosis-prysm
           configMap:
             name: {{ template "operator.fullname" $root }}-configs-gnosis-prysm
-      {{- end }}
-      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
-        - name: configs-gnosis-lighthouse
-          configMap:
-            name: {{ template "operator.fullname" $root }}-configs-gnosis-lighthouse
       {{- end }}
         - name: validator-init
           configMap:

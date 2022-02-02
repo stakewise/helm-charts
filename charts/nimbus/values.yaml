@@ -24,7 +24,7 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v1.5.5"
+  tag: "multiarch-v1.6.0"
 
 imagePullSecrets: []
 nameOverride: ""

@@ -24,7 +24,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2021.12.01"
+  tag: "v2022.01.03"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -224,7 +224,7 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 800Gi
+  size: 1000Gi
 
 ## Monitoring
 ##

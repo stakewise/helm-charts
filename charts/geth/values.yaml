@@ -50,7 +50,7 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.13"
+  tag: "v1.10.15"
   pullPolicy: IfNotPresent
 
 ## How many geth nodes to run simultaneously
@@ -200,7 +200,7 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 600Gi
+  size: 900Gi
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
