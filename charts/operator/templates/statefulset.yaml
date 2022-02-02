@@ -1,5 +1,7 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
+{{- $beaconChainRpcEndpointLen := len .Values.beaconChainRpcEndpoint }}
+{{- $counter := 0 }}
 {{- range (untilStep 0 (int .Values.validatorsCount) 1) }}
 ---
 apiVersion: apps/v1
@@ -94,15 +96,76 @@ spec:
           {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
           {{- end -}}
-          {{- if eq $root.Values.type "prysm" }}
+          {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
             - "--{{ $root.Values.network }}"
+          {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
+            - "--config-file /data/configs-gnosis-prysm/config.yaml"
+            - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
           {{- else if or (eq $root.Values.type "lighthouse") (eq $root.Values.type "teku") }}
             - "--network={{ $root.Values.network }}"
           {{- end }}
           {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
             - {{ . | quote }}
           {{- end -}}
-          {{- include "beacon-rpc-node" $ | nindent 12 }}
+
+          {{- $hostList := list -}}
+          {{- if $.Values.beaconChainRpcEndpoint }}
+            {{- with index $root.Values.beaconChainRpcEndpoint $counter }}
+              {{- $hostList = append $hostList . }}
+              {{- $hostList = concat $hostList $root.Values.beaconChainRpcEndpoint }}
+            {{- end }}
+            {{- $counter = add1 $counter }}
+            {{- if eq $counter $beaconChainRpcEndpointLen }}{{- $counter = 0 }}{{- end }}
+            {{- if eq $.Values.type "prysm" }}
+            - "--beacon-rpc-provider={{ $hostList | uniq | join "," }}"
+            {{- else if eq $.Values.type "lighthouse" }}
+            - "--beacon-nodes={{ $hostList | uniq | join "," }}"
+            {{- else if eq $.Values.type "teku" }}
+            - "--eth1-endpoints={{ $hostList | uniq | join "," }}"
+            {{- end }}
+          {{- else }}
+            {{- $replicaList := list -}}
+            {{- if eq $.Values.type "prysm" }}
+            {{- range $i := until (int $root.Values.prysm.replicas) }}
+              {{- $host := printf "operator-prysm-%d.operator-prysm:4000" $i}}
+              {{- $replicaList = append $replicaList $host }}
+            {{- end }}
+            {{- with index $replicaList $counter }}
+              {{- $hostList = append $hostList . }}
+              {{- $hostList = concat $hostList $replicaList }}
+            {{- end }}
+            {{- $counter = add1 $counter }}
+            {{- if eq $counter (len $replicaList) }}{{- $counter = 0 }}{{- end }}
+            - "--beacon-rpc-provider={{ $hostList | uniq | join "," }}"
+
+            {{- else if eq $.Values.type "lighthouse" }}
+            {{- range $i := until (int $root.Values.lighthouse.replicas) }}
+              {{- $host := printf "operator-lighthouse-%d.operator-lighthouse:5052" $i}}
+              {{- $replicaList = append $replicaList $host }}
+            {{- end }}
+            {{- with index $replicaList $counter }}
+              {{- $hostList = append $hostList . }}
+              {{- $hostList = concat $hostList $replicaList }}
+            {{- end }}
+            {{- $counter = add1 $counter }}
+            {{- if eq $counter (len $replicaList) }}{{- $counter = 0 }}{{- end }}
+            - "--beacon-nodes={{ $hostList | uniq | join "," }}"
+    
+            {{- else if eq $.Values.type "teku" }}
+            {{- range $i := until (int $root.Values.teku.replicas) }}
+              {{- $host := printf "operator-teku-%d.operator-teku:5051" $i}}
+              {{- $replicaList = append $replicaList $host }}
+            {{- end }}
+            {{- with index $replicaList $counter }}
+              {{- $hostList = append $hostList . }}
+              {{- $hostList = concat $hostList $replicaList }}
+            {{- end }}
+            {{- $counter = add1 $counter }}
+            {{- if eq $counter (len $replicaList) }}{{- $counter = 0 }}{{- end }}
+            - "--eth1-endpoints={{ $hostList | uniq | join "," }}"
+            {{- end }}
+          {{- end }}
+
           {{- include "validator-graffiti" $ | nindent 12 }}
           {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}

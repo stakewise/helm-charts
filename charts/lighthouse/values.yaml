@@ -57,11 +57,7 @@ replicas: 1
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   repository: "sigp/lighthouse"
-  tag: "v2.0.1"
-  pullPolicy: IfNotPresent
-imageGnosis:
-  repository: "ghcr.io/gnosischain/gbc-lighthouse"
-  tag: "v2.0.1-gbc"
+  tag: "v2.1.2"
   pullPolicy: IfNotPresent
 
 ## Node labels for pod assignment
@@ -72,7 +68,7 @@ nodeSelector: {}
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: []
+tolerations: {}
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -98,7 +94,7 @@ verticalAutoscaler:
   # If true a VPA object will be created for the StatefulSet
   enabled: false
   updateMode: Off
-  containerPolicies: { }
+  containerPolicies: {}
 
 ## Eth2 network ID
 ## Options: mainnet, prater, gnosis
@@ -180,7 +176,7 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []
 
 ## Defines whether the service must be headless
 ##

@@ -55,9 +55,9 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v3.3.2"
 
-## How many geth nodes to run simultaneously
+## How many openethereum nodes to run simultaneously
 ##
-replicas: 3
+replicas: 1
 
 ## Configure pod disruption budgets for Alertmanager
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -157,9 +157,9 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []
 
-## Configure session affinity for to hit the same geth node
+## Configure session affinity for to hit the same openethereum node
 ## for the period specified in `timeoutSeconds`
 ## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
 ##
@@ -176,15 +176,15 @@ verticalAutoscaler:
   # If true a VPA object will be created for the StatefulSet
   enabled: false
   updateMode: Off
-  containerPolicies: { }
+  containerPolicies: {}
 
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: { }
+resources: {}
 
 ## If false, data ownership will not be reset at startup
-## This allows the geth node to be run with an arbitrary user
+## This allows the openethereum node to be run with an arbitrary user
 ##
 initChownData: true
 

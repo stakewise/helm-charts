@@ -4,7 +4,7 @@ kind: Service
 metadata:
   name: {{ template "operator.fullname" . }}
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "operator.selectorLabels" . | nindent 4 }}
 spec:
   selector:
     {{- include "operator.selectorLabels" . | nindent 4 }}

@@ -57,7 +57,9 @@ securityContext: {}
 ## Erigon configuration
 ##
 
-# Name of the net to join
+## Network (chain) ID
+## Supported options: mainnet, goerli
+##
 network: mainnet
 
 erigon:
@@ -283,4 +285,4 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []

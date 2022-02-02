@@ -73,10 +73,7 @@ image:
     tag: "v2.0.4-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.0.1"
-  lighthouseGnosis:
-    repository: "ghcr.io/gnosischain/gbc-lighthouse"
-    tag: "v2.0.1-gbc"
+    tag: "v2.1.2"
   teku:
     repository: "consensys/teku"
     tag: "21.12.1"
@@ -145,25 +142,10 @@ flags:
     - "--disable-rewards-penalties-logging"
     - "--disable-account-metrics"
     - "--enable-doppelganger"
-  prysmGnosis:
-    - "--datadir=/data/prysm"
-    - "--wallet-dir=/data/prysm/validators"
-    - "--wallet-password-file=/data/prysm/validators/password.txt"
-    - "--accept-terms-of-use"
-    - "--disable-rewards-penalties-logging"
-    - "--disable-account-metrics"
-    - "--enable-doppelganger"
-    - "--config-file /data/configs-gnosis-prysm/config.yaml"
-    - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
   lighthouse:
     - "lighthouse"
     - "vc"
     - "--datadir=/data/lighthouse"
-  lighthouseGnosis:
-    - "lighthouse"
-    - "vc"
-    - "--datadir=/data/lighthouse"
-    - "--testnet-dir /data/configs-gnosis-lighthouse"
   teku:
     - "validator-client"
     - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"
@@ -175,10 +157,10 @@ extraFlags:
   prysm: []
   lighthouse: []
 
-## Beacon Chain node address
+## List of Beacon Chain node addresses
 ## If not specified, will connect to prysm/lighthouse beacon nodes
 ## deployed with this helm chart
-beaconChainRpcEndpoint: ""
+beaconChainRpcEndpoint: []
 
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.

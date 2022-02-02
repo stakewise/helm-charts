@@ -250,4 +250,4 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []
