@@ -128,9 +128,17 @@ data:
                 if [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
                     test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
                     ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
                     test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
                     ${TEKU_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
@@ -147,9 +155,17 @@ data:
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
                     ${PRYSM_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
                     test -d ${DATA_TEKU}/validator/slashprotection && rm -rf ${DATA_TEKU}/validator/slashprotection
                     ${TEKU_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
@@ -166,9 +182,17 @@ data:
                     test -f ${DATA_PRYSM}/validator.db && rm -f ${DATA_PRYSM}/validator.db
                     touch ${DATA_PRYSM}/tosaccepted
                     ${PRYSM_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
                     test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
                     ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
+                    if [ $? -ne 0 ]; then
+                        echo "Failed to import slashing history database."
+                        exit 1
+                    fi
                 else
                     echo "Wrong VALIDATOR_TYPE"
                     exit 1
