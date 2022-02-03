@@ -69,7 +69,7 @@ podDisruptionBudget:
 ## Network (chain) ID
 ## Supported options: mainnet, goerli
 ##
-network: "goerli"
+network: "mainnet"
 
 ## RPC configuration.
 ##
