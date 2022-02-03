@@ -1,7 +1,7 @@
 apiVersion: v2
 name: openethereum
-version: 0.1.0
-kubeVersion: "^1.14.0-0"
+version: 1.0.0
+kubeVersion: "^1.18.0-0"
 description: The fast, light, and robust client for the Ethereum mainnet.
 type: application
 keywords:
@@ -16,4 +16,4 @@ maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
-appVersion: v1.10.6
+appVersion: v3.3.3
