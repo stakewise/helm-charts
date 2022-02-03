@@ -103,11 +103,11 @@ Validator beacon node
 {{- define "beacon-rpc-node" -}}
 {{- if $.Values.beaconChainRpcEndpoint }}
 {{- if eq $.Values.type "prysm" }}
-- "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoint | join "," }}"
+- "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoint }}"
 {{- else if eq $.Values.type "lighthouse" }}
-- "--beacon-nodes={{ $.Values.beaconChainRpcEndpoint | join "," }}"
+- "--beacon-nodes={{ $.Values.beaconChainRpcEndpoint }}"
 {{- else if eq $.Values.type "teku" }}
-- "--eth1-endpoints={{ $.Values.beaconChainRpcEndpoint | join "," }}"
+- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoint }}"
 {{- end }}
 {{- else }}
 {{- if eq $.Values.type "prysm" }}
@@ -115,7 +115,7 @@ Validator beacon node
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes=http://operator-lighthouse:5052"
 {{- else if eq $.Values.type "teku" }}
-- "--eth1-endpoints=http://operator-teku:5051"
+- "--beacon-node-api-endpoint=http://operator-teku:5051"
 {{- end }}
 {{- end }}
 {{- end }}

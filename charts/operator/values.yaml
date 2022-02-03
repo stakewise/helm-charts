@@ -160,7 +160,7 @@ extraFlags:
 ## List of Beacon Chain node addresses
 ## If not specified, will connect to prysm/lighthouse beacon nodes
 ## deployed with this helm chart
-beaconChainRpcEndpoint: []
+beaconChainRpcEndpoint: ""
 
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.
