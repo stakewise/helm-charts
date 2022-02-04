@@ -4,18 +4,18 @@ dependencies:
   version: 0.18.0
 - name: geth
   repository: https://charts.stakewise.io
-  version: 1.0.2
+  version: 1.0.3
 - name: erigon
   repository: https://charts.stakewise.io
-  version: 1.0.3
+  version: 1.0.4
 - name: prysm
   repository: https://charts.stakewise.io
-  version: 1.0.5
+  version: 1.1.2
 - name: lighthouse
   repository: https://charts.stakewise.io
-  version: 0.1.0
+  version: 0.1.1
 - name: teku
   repository: https://charts.stakewise.io
-  version: 0.1.0
-digest: sha256:63ee3d2a57b2ccb0eff0c4b687c58eb6064cd608d217857d136cfea7bb5fcb44
-generated: "2022-01-24T10:23:08.446034+03:00"
+  version: 0.2.0
+digest: sha256:6c77c71ed06ab573b4ffc745ad0f7d2e924e234ca412500ad0c1966656b6bd47
+generated: "2022-02-04T11:08:45.884578+03:00"

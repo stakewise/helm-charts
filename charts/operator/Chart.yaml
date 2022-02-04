@@ -15,7 +15,7 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.1.0
+version: 2.1.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
@@ -42,22 +42,22 @@ dependencies:
     condition: vault.enabled
   - name: geth
     repository: https://charts.stakewise.io
-    version: "1.0.2"
+    version: "1.0.3"
     condition: geth.enabled
   - name: erigon
     repository: https://charts.stakewise.io
-    version: "1.0.3"
+    version: "1.0.4"
     condition: erigon.enabled
   - name: prysm
     repository: https://charts.stakewise.io
-    version: "1.0.5"
+    version: "1.1.2"
     condition: prysm.enabled
   - name: lighthouse
     repository: https://charts.stakewise.io
-    version: "0.1.0"
+    version: "0.1.1"
     condition: lighthouse.enabled
   - name: teku
     repository: https://charts.stakewise.io
-    version: "0.1.0"
+    version: "0.2.0"
     condition: teku.enabled
 
