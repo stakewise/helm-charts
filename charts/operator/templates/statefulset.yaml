@@ -1,5 +1,7 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
+{{- $beaconChainRpcEndpointLen := len .Values.beaconChainRpcEndpoint }}
+{{- $counter := 0 }}
 {{- range (untilStep 0 (int .Values.validatorsCount) 1) }}
 ---
 apiVersion: apps/v1
@@ -72,12 +74,6 @@ spec:
             - name: configs-gnosis-prysm
               mountPath: "/data/configs-gnosis-prysm"
           {{- end }}
-          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
-            - name: configs-gnosis-lighthouse
-              mountPath: "/data/configs-gnosis-lighthouse"
-          {{- end }}
-            - name: configs
-              mountPath: "/mnt/configs"
             - name: validator-init
               mountPath: /data/scripts
       {{- if $.Values.persistence.enabled }}
@@ -94,8 +90,11 @@ spec:
           {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
           {{- end -}}
-          {{- if eq $root.Values.type "prysm" }}
+          {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
             - "--{{ $root.Values.network }}"
+          {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
+            - "--config-file /data/configs-gnosis-prysm/config.yaml"
+            - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
           {{- else if or (eq $root.Values.type "lighthouse") (eq $root.Values.type "teku") }}
             - "--network={{ $root.Values.network }}"
           {{- end }}
@@ -140,11 +139,6 @@ spec:
         - name: configs-gnosis-prysm
           configMap:
             name: {{ template "operator.fullname" $root }}-configs-gnosis-prysm
-      {{- end }}
-      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "lighthouse") }}
-        - name: configs-gnosis-lighthouse
-          configMap:
-            name: {{ template "operator.fullname" $root }}-configs-gnosis-lighthouse
       {{- end }}
         - name: validator-init
           configMap:

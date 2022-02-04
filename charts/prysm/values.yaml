@@ -57,18 +57,18 @@ sidecar:
 
 ## How many beacon chain pods to run simultaneously
 ##
-replicas: 3
+replicas: 1
 
 ## Prysm beacon node image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
 ##
 image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.0.5"
+  tag: "v2.0.6"
   pullPolicy: IfNotPresent
 imageGnosis:
   repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
-  tag: "v2.0.4-gbc"
+  tag: "v2.0.5-gbc"
   pullPolicy: IfNotPresent
 
 ## RPC Port
@@ -107,7 +107,7 @@ nodeSelector: {}
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: []
+tolerations: {}
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
@@ -133,7 +133,7 @@ verticalAutoscaler:
   # If true a VPA object will be created for the StatefulSet
   enabled: false
   updateMode: Off
-  containerPolicies: { }
+  containerPolicies: {}
 
 ## Monitoring
 ##
@@ -193,7 +193,7 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []
 
 ## Defines whether the service must be headless
 ##
@@ -212,7 +212,7 @@ sessionAffinity:
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: { }
+resources: {}
 
 ## Configure liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/

@@ -26,7 +26,7 @@ image:
   repository: nethermind/nethermind
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.12.3"
+  tag: "1.12.4"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -250,4 +250,4 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []

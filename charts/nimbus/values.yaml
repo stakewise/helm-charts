@@ -24,7 +24,7 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v1.5.5"
+  tag: "multiarch-v1.6.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -96,10 +96,19 @@ verticalAutoscaler:
   updateMode: Off
   containerPolicies: {}
 
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
 nodeSelector: {}
 
-tolerations: []
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
 
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
 affinity: {}
 
 ## Configure liveness and readiness probes
@@ -277,6 +286,9 @@ metrics:
     ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
     ##
     enabled: false
+    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ##
+    default: true
     ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
     ##
     namespace: ""
@@ -284,15 +296,5 @@ metrics:
     ##
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: NimbusBeaconNodeDown
-    ##     expr: up{job='{{ include "nimbus.fullname" . }}'} == 0
-    ##     for: 1m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Nimbus beacon node is down
-    ##       description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
     ##
     rules: []

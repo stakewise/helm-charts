@@ -50,12 +50,12 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.13"
+  tag: "v1.10.15"
   pullPolicy: IfNotPresent
 
 ## How many geth nodes to run simultaneously
 ##
-replicas: 3
+replicas: 1
 
 ## Configure pod disruption budgets for Alertmanager
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
@@ -67,6 +67,7 @@ podDisruptionBudget:
   maxUnavailable: 1
 
 ## Network (chain) ID
+## Supported options: mainnet, goerli
 ##
 network: "mainnet"
 
@@ -158,7 +159,7 @@ metrics:
     additionalLabels: {}
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
-    rules: {}
+    rules: []
 
 ## Configure session affinity for to hit the same geth node
 ## for the period specified in `timeoutSeconds`
@@ -179,12 +180,12 @@ verticalAutoscaler:
   # If true a VPA object will be created for the StatefulSet
   enabled: false
   updateMode: Off
-  containerPolicies: { }
+  containerPolicies: {}
 
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: { }
+resources: {}
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
@@ -199,7 +200,7 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 600Gi
+  size: 900Gi
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
@@ -209,7 +210,7 @@ nodeSelector: {}
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
-tolerations: []
+tolerations: {}
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
