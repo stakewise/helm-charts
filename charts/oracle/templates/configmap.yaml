@@ -6,18 +6,18 @@ metadata:
     {{- include "oracle.labels" . | nindent 4 }}
 data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  NETWORK: {{ .Values.settings.network | quote }}
+  ENABLED_NETWORKS: {{ .Values.settings.network | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
   IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
-  ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
-  ETH2_CLIENT: {{ .Values.settings.eth2Client | quote }}
+  {{ template "network_prefix" .}}_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
   CONFIRMATION_BLOCKS: {{ .Values.settings.confirmationBlocks | quote }}
   ORACLE_PROCESS_INTERVAL: {{ .Values.settings.oracleProcessInterval | quote }}
-  STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl | quote }}
-  UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl | quote }}
-  ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl | quote }}
-  AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
+  {{ template "network_prefix" .}}_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl | quote }}
+  {{ template "network_prefix" .}}_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl | quote }}
+  {{ template "network_prefix" .}}_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl | quote }}
+  {{ template "network_prefix" .}}_RARI_FUSE_SUBGRAPH_URL: {{ .Values.settings.rariFuseSubgraphUrl | quote }}
+  {{ template "network_prefix" .}}_AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}

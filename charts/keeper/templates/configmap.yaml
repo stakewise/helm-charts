@@ -6,11 +6,13 @@ metadata:
     {{- include "keeper.labels" . | nindent 4 }}
 data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  NETWORK: {{ .Values.settings.network | quote }}
+  ENABLED_NETWORKS: {{ .Values.settings.network | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  CONFIRMATION_BLOCKS: {{ .Values.settings.confirmationBlocks | quote }}
-  WEB3_ENDPOINT: {{ .Values.settings.web3Endpoint | quote }}
-  KEEPER_PROCESS_INTERVAL: {{ .Values.settings.keeperProcessInterval | quote }}
+  {{ template "network_prefix" .}}_CONFIRMATION_BLOCKS: {{ .Values.settings.confirmationBlocks | quote }}
+  {{ template "network_prefix" .}}_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
+  {{ template "network_prefix" .}}_KEEPER_MIN_BALANCE_WEI: {{ .Values.settings.minBalanceWei | quote }}
+  {{ template "network_prefix" .}}_KEEPER_MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
+  {{ template "network_prefix" .}}_KEEPER_PROCESS_INTERVAL: {{ .Values.settings.keeperProcessInterval | quote }}
   TRANSACTION_TIMEOUT: {{ .Values.settings.transactionTimeout | quote }}

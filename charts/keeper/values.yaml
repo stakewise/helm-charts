@@ -40,13 +40,15 @@ priorityClassName: ""
 settings:
   logLevel: "INFO"
   network: "mainnet"
-  web3Endpoint: ""
+  eth1Endpoint: ""
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
   confirmationBlocks: "15"
   keeperProcessInterval: "10"
   transactionTimeout: "900"
+  minBalanceWei: "100000000000000000"
+  maxFeePerGasGwei: "150"
 
   # credentials
   oraclePrivateKey: ""

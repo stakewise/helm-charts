@@ -46,7 +46,6 @@ settings:
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
 
   eth2Endpoint: ""
-  eth2Client: "prysm"
 
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"
@@ -59,6 +58,7 @@ settings:
   stakewiseSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
   uniswapV3SubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
   ethereumSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+  rariFuseSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
   # credentials
   oraclePrivateKey: ""

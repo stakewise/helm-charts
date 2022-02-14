@@ -59,3 +59,10 @@ Selector labels
 app.kubernetes.io/name: {{ include "backend.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Environment variable prefix
+*/}}
+{{- define "network_prefix" -}}
+{{- if eq .Values.settings.network "mainnet" }}ETH_MAINNET{{ else if eq .Values.settings.network "goerli" }}ETH_GOERLI{{ else }}GNOSIS{{ end }}
+{{- end }}
