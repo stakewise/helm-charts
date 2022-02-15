@@ -4,7 +4,9 @@ commonConf:
   enabledNetworks: "mainnet"
 
   validatorMaxPenaltyCount: "5"
+  validatorRegistrationSeconds: "300"
   unpaidValidatorsExitDelay: "864000"
+  confirmationBlocks: "15"
 
   websiteName: "StakeWise"
   poolPage: "https://app.stakewise.io"
@@ -28,6 +30,7 @@ commonConf:
   telegramChatId: ""
   multisigOwnersTelegramToken: ""
   multisigOwnersTelegramChatId: ""
+
 
 securityContext:
   fsGroup: 1001
@@ -327,6 +330,7 @@ polling:
     activatedDepositsNotifySeconds: "86400"
     pollValidatorsPeriod: "30"
     pollUniswapPeriod: "60"
+    pollStakerRewards: "60"
 
 postgresql:
   enabled: false
