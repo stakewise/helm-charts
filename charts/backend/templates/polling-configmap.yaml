@@ -33,4 +33,5 @@ data:
   ACTIVATED_DEPOSITS_NOTIFY_SECONDS: {{ .Values.polling.conf.activatedDepositsNotifySeconds | quote }}
   POLL_VALIDATORS_PERIOD: {{ .Values.polling.conf.pollValidatorsPeriod | quote }}
   POLL_UNISWAP_PERIOD: {{ .Values.polling.conf.pollUniswapPeriod | quote }}
+  POLL_STAKERS_REWARDS: {{ .Values.polling.conf.pollStakersRewards | quote }}
 {{- end }}

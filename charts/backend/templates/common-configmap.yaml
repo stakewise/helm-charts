@@ -22,4 +22,6 @@ data:
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
+  CONFIRMATION_BLOCKS: {{ .Values.commonConf.confirmationBlocks | quote }}
+  VALIDATOR_REGISTRATION_SECONDS: {{ .Values.commonConf.validatorRegistrationSeconds | quote }}
 {{- end }}
