@@ -39,7 +39,7 @@ priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  network: "mainnet"
+  enabledNetworks: "mainnet"
   eth1Endpoint: ""
   enableHealthServer: "True"
   healthServerHost: "0.0.0.0"

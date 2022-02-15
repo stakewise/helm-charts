@@ -298,12 +298,21 @@ polling:
   conf:
     # Endpoints
     ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
-    eth1Endpoint: ""
+    eth1Endpoint:
+      mainnet: ""
+      goerli: ""
+      gnosis: ""
     # NB! only prysm client currently works
-    eth2Endpoint: ""
+    eth2Endpoint:
+      mainnet: ""
+      prater: ""
+      gnosis: ""
 
     # Needed for syncing validator balance snapshots
-    eth2ArchiveEndpoint: ""
+    eth2ArchiveEndpoint:
+      mainnet: ""
+      prater: ""
+      gnosis: ""
 
     # polling periods
     pollPaymentsPeriod: "15"

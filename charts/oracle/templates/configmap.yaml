@@ -6,7 +6,7 @@ metadata:
     {{- include "oracle.labels" . | nindent 4 }}
 data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  ENABLED_NETWORKS: {{ .Values.settings.network | quote }}
+  ENABLED_NETWORKS: {{ .Values.settings.enabledNetworks | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
