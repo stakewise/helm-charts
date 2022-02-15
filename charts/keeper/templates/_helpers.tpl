@@ -52,5 +52,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Environment variable prefix
 */}}
 {{- define "network_prefix" -}}
-{{- if eq .Values.settings.network "mainnet" }}ETH_MAINNET{{ else if eq .Values.settings.network "goerli" }}ETH_GOERLI{{ else if eq .Values.settings.network "gnosis" }}GNOSIS{{ fail "Network not found, check settings.network in values.yaml" }}{{ end }}
+{{- if eq .Values.settings.enabledNetworks "eth_mainnet" }}ETH_MAINNET{{ else if eq .Values.settings.enabledNetworks "eth_goerli" }}ETH_GOERLI{{ else if eq .Values.settings.enabledNetworks "gnosis" }}GNOSIS{{ fail "Network not found, check settings.enabledNetworks in values.yaml" }}{{ end }}
 {{- end }}
