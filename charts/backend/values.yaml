@@ -1,7 +1,8 @@
 # Common configuration for all the containers (server.common_conf)
 commonConf:
   secretKey: ""
-  enabledNetworks: "mainnet"
+  # possible values: eth_mainnet, eth_goerli, gnosis
+  enabledNetworks: "eth_mainnet"
 
   poolPage: "https://app.stakewise.io"
   soloPage: "https://app.stakewise.io/solo"

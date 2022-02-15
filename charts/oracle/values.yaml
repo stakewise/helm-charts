@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.1.2"
+  tag: "v2.2.0"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -39,15 +39,20 @@ priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  enabledNetworks: "mainnet"
+  # possible values: eth_mainnet, eth_goerli, gnosis
+  enabledNetworks: "eth_mainnet"
 
   ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
 
-  eth2Endpoint: ""
+  # ETH2
+  eth2Endpoint:
+    mainnet: ""
+    goerli: ""
+    gnosis: ""
 
-  enableHealthServer: "True"
+  enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 

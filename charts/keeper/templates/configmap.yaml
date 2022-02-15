@@ -10,10 +10,10 @@ data:
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  {{- if contains "mainnet" .Values.settings.enabledNetworks }}
+  {{- if contains "eth_mainnet" .Values.settings.enabledNetworks }}
   ETH_MAINNET_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.mainnet | quote }}
   {{- end }}
-  {{- if contains "goerli" .Values.settings.enabledNetworks }}
+  {{- if contains "eth_goerli" .Values.settings.enabledNetworks }}
   ETH_GOERLI_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.goerli | quote }}
   {{- end }}
   {{- if contains "gnosis" .Values.settings.enabledNetworks }}
