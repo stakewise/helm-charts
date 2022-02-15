@@ -9,8 +9,6 @@ data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
   ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}
-  VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
-  UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.commonConf.unpaidValidatorsExitDelay | quote }}
   WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
   POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
   SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
@@ -22,6 +20,7 @@ data:
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
-  CONFIRMATION_BLOCKS: {{ .Values.commonConf.confirmationBlocks | quote }}
-  VALIDATOR_REGISTRATION_SECONDS: {{ .Values.commonConf.validatorRegistrationSeconds | quote }}
+  {{- range $key, $value := .Values.commonConf.extraEnv }}
+  {{ $key }}: {{ $value | quote -}}
+  {{- end -}}
 {{- end }}

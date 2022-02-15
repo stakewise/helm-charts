@@ -51,9 +51,6 @@ settings:
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 
-  confirmationBlocks: "15"
-  oracleProcessInterval: "10"
-
   # Graph
   stakewiseSubgraphUrl:
     mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
@@ -70,9 +67,24 @@ settings:
     mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
   # credentials
-  oraclePrivateKey: ""
+  oraclePrivateKey:
+    mainnet: ""
+    goerli: ""
+    gnosis: ""
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
   awsRegion: "eu-central-1"
+
+  ## @param settings.extraEnv Extra environment variables to pass to the container
+  ## extraEnv:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraEnv: {}
+
+  ## @param settings.extraSecret Extra environment variables to pass to the container
+  ## extraSecret:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraSecret: {}

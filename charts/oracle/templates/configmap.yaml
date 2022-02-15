@@ -13,22 +13,25 @@ data:
   IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
-  {{ template "network_prefix" .}}_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
-  CONFIRMATION_BLOCKS: {{ .Values.settings.confirmationBlocks | quote }}
-  ORACLE_PROCESS_INTERVAL: {{ .Values.settings.oracleProcessInterval | quote }}
   {{ template "network_prefix" .}}_AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
   {{- if contains "mainnet" .Values.settings.enabledNetworks }}
+  ETH_MAINNET_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.mainnet | quote }}
   ETH_MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.mainnet | quote }}
   ETH_MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.mainnet | quote }}
   ETH_MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl.mainnet | quote }}
   ETH_MAINNET_RARI_FUSE_SUBGRAPH_URL: {{ .Values.settings.rariFuseSubgraphUrl.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.settings.enabledNetworks }}
+  ETH_GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.goerli | quote }}
   ETH_GOERLI_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.goerli | quote }}
   ETH_GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.goerli | quote }}
   ETH_GOERLI_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl.goerli | quote }}
   {{- end }}
   {{- if contains "gnosis" .Values.settings.enabledNetworks }}
+  GNOSIS_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.gnosis | quote }}
   GNOSIS_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.gnosis | quote }}
   GNOSIS_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.gnosis | quote }}
   {{- end }}
+  {{- range $key, $value := .Values.settings.extraEnv }}
+  {{ $key }}: {{ $value | quote -}}
+  {{- end -}}
