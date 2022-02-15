@@ -3,11 +3,8 @@ commonConf:
   secretKey: ""
   enabledNetworks: "mainnet"
 
-  websiteName: "StakeWise"
   poolPage: "https://app.stakewise.io"
   soloPage: "https://app.stakewise.io/solo"
-
-  djangoLogLevel: "INFO"
 
   sendEmails: "False"
   # Change to https://api.mailgun.net/v3
@@ -45,7 +42,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.1.1"
+  tag: "v2.2.0"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -318,7 +315,6 @@ polling:
 
   conf:
     # Endpoints
-    ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
     eth1Endpoint:
       mainnet: ""
       goerli: ""
@@ -334,9 +330,6 @@ polling:
       mainnet: ""
       prater: ""
       gnosis: ""
-
-    realityEthQuestionUrlTemplate: "https://reality.eth.link/app/#!/question/{question_id}"
-    votingPage: "https://vote.stakewise.io/"
 
     ## @param polling.conf.extraEnv Extra environment variables to pass to the container
     ## extraEnv:

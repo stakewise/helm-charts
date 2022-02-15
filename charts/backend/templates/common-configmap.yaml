@@ -9,10 +9,8 @@ data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
   ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}
-  WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
   POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
   SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
-  DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
   SEND_EMAILS: {{ .Values.commonConf.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.commonConf.mailgunSenderDomain | quote }}
   MAILGUN_API_URL: {{ .Values.commonConf.mailgunApiUrl | quote }}

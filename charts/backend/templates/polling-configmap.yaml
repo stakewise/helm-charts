@@ -7,7 +7,6 @@ metadata:
     {{- include "backend.labels" . | nindent 4 }}
     component: "polling"
 data:
-  IPFS_FETCH_ENDPOINTS: {{ .Values.polling.conf.ipfsFetchEndpoints }}
   {{- if contains "mainnet" .Values.commonConf.enabledNetworks }}
   ETH_MAINNET_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.mainnet | quote }}
   ETH_MAINNET_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.mainnet | quote }}
@@ -23,8 +22,6 @@ data:
   GNOSIS_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.gnosis | quote }}
   GNOSIS_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.gnosis | quote }}
   {{- end }}
-  REALITY_ETH_QUESTION_URL_TEMPLATE: {{ .Values.polling.conf.realityEthQuestionUrlTemplate | quote }}
-  VOTING_PAGE: {{ .Values.polling.conf.votingPage | quote }}
   {{- range $key, $value := .Values.polling.conf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
   {{- end -}}
