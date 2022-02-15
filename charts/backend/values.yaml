@@ -1,7 +1,7 @@
 # Common configuration for all the containers (server.common_conf)
 commonConf:
   secretKey: ""
-  network: "mainnet"
+  enabledNetworks: "mainnet"
 
   validatorMaxPenaltyCount: "5"
   unpaidValidatorsExitDelay: "864000"

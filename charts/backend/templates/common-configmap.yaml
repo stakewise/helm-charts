@@ -8,7 +8,7 @@ metadata:
 data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
-  ENABLED_NETWORKS: {{ .Values.commonConf.network | quote }}
+  ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}
   VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
   UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.commonConf.unpaidValidatorsExitDelay | quote }}
   WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
