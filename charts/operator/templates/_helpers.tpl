@@ -101,21 +101,13 @@ Write current validator info to /data directory
 Validator beacon node
 */}}
 {{- define "beacon-rpc-node" -}}
-{{- if $.Values.beaconChainRpcEndpoint }}
 {{- if eq $.Values.type "prysm" }}
-- "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoint }}"
+- "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "lighthouse" }}
-- "--beacon-nodes={{ $.Values.beaconChainRpcEndpoint }}"
+- "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
-- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoint }}"
-{{- end }}
-{{- else }}
-{{- if eq $.Values.type "prysm" }}
-- "--beacon-rpc-provider=operator-prysm:4000"
-{{- else if eq $.Values.type "lighthouse" }}
-- "--beacon-nodes=http://operator-lighthouse:5052"
-{{- else if eq $.Values.type "teku" }}
-- "--beacon-node-api-endpoint=http://operator-teku:5051"
+{{- with (first $.Values.beaconChainRpcEndpoints) }}
+- "--beacon-node-api-endpoint={{ . }}"
 {{- end }}
 {{- end }}
 {{- end }}

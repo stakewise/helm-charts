@@ -1,4 +1,4 @@
-{{- if or .Values.teku.p2p.enabled .Values.teku.restApi.enabled .Values.metrics.enabled }}
+{{- if or .Values.restApi.enabled .Values.metrics.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,18 +17,8 @@ spec:
       timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   ports:
-  {{- if .Values.teku.p2p.enabled }}
-    - port: {{ .Values.teku.p2p.port }}
-      targetPort: p2p-tcp
-      protocol: TCP
-      name: p2p-tcp
-    - port: {{ .Values.teku.p2p.port }}
-      targetPort: p2p-udp
-      protocol: UDP
-      name: p2p-udp
-  {{- end }}
-  {{- if .Values.teku.restApi.enabled }}
-    - port: {{ .Values.teku.restApi.port }}
+  {{- if .Values.restApi.enabled }}
+    - port: {{ .Values.restApi.port }}
       targetPort: rest-api
       protocol: TCP
       name: rest-api

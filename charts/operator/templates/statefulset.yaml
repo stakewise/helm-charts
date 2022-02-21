@@ -1,6 +1,5 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
-{{- $beaconChainRpcEndpointLen := len .Values.beaconChainRpcEndpoint }}
 {{- $counter := 0 }}
 {{- range (untilStep 0 (int .Values.validatorsCount) 1) }}
 ---
@@ -52,11 +51,7 @@ spec:
             runAsUser: 0
           env:
             - name: VAULT_ADDR
-              {{- if $root.Values.vaultAddr }}
               value: {{ $root.Values.vaultAddr | quote }}
-              {{- else }}
-              value: "http://{{ template "operator.fullname" $ }}-vault:8200"
-              {{- end }}
             - name: NETWORK_ID
               value: {{ $root.Values.network | quote }}
             - name: VALIDATOR_TYPE

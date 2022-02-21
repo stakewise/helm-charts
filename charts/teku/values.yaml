@@ -166,94 +166,46 @@ persistence:
 ##
 network: "mainnet"
 
-## Teku configuration
-teku:
-  # JAVA_OPTS
-  javaOpts: "-Xmx4g"
-  # Path to beacon node data
-  dataBeaconPath: /data/teku/beacon
-  # Path to the base directory for storage
-  dataPath: /data/teku
-  # Sets the frequency, in slots, at which to store
-  # finalized states to disk. This option is ignored
-  # if --data-storage-mode is set to PRUNE
-  dataStorageArchiveFrequency: "2048"
-  # Sets the strategy for handling historical chain data
-  # (Valid values: ARCHIVE, PRUNE)
-  dataStorageMode: PRUNE
-  # Store non-canonical blocks
-  dataStorageNonCanonicalBlocksEnabled: false
-  # URLs for Eth1 nodes
-  eth1Endpoints: []
-  # The initial state. This value should be a file or
-  # URL pointing to an SSZ-encoded finalized
-  # checkpoint state
-  initialState: ""
-  # Logging verbosity levels: OFF, FATAL, ERROR, WARN,
-  # INFO, DEBUG, TRACE, ALL
-  logging: INFO
-  # Whether Status and Event log messages include a
-  # console color display code
-  logColorEnabled: true
-  # Whether a logger is added for the console, the log
-  # file, or both (Valid values: BOTH, CONSOLE,
-  # DEFAULT_BOTH, FILE)
-  logDestination: CONSOLE
-  # Path containing the location (relative or
-  # absolute) and the log filename. If not set will
-  # default to <data-path>/logs/teku.log
-  logFile: ""
-  # Pattern for the filename to apply to rolled over
-  # log files. If not set will default to
-  # <data-path>/logs/teku_%d{yyyy-MM-dd}.log
-  logFileNamePattern: ""
-  # Whether frequent update events are logged (e.g.
-  # every slot and epoch event)
-  logIncludeEventsEnabled: true
-  # P2P Settings
-  p2p:
-    # Enable P2P
-    enabled: true
-    # P2P network interface
-    interface: "0.0.0.0"
-    # P2P port
-    port: "9000"
-    # Specify the NAT circumvention method to be used,
-    # possible values are UPNP, NONE. NONE will
-    # require manual router configuration.
-    natMethod: NONE
-    # Lower bound on the target number of peers
-    peerLowerBound: "64"
-    # Upper bound on the target number of peers
-    peerUpperBound: "74"
-    # Static peers
-    staticPeers: []
-    # Subscribe all subnets
-    subscribeAllSubnets: false
-    # P2P advertised IP
-    advertisedIP: "127.0.0.1"
-    # Enables discv5 discovery
-    discoveryEnabled: true
-    # List of ENRs of the bootnodes
-    discoveryBootNodes: []
-  # Rest API Settings
-  restApi:
-    # Enables Beacon Rest API
-    enabled: true
-    # Comma-separated list of hostnames to allow, or *
-    # to allow any host
-    hostAllowList:
-      - "*"
-    # Interface of Beacon Rest API
-    interface: "0.0.0.0"
-    # Port number of Beacon Rest API
-    port: "5051"
-    # Comma separated list of origins to allow, or * to
-    # allow any origin
-    corsOrigins:
-      - "*"
-    # Enable swagger-docs and swagger-ui endpoints
-    docsEnabled: false
+# URLs for Eth1 nodes
+eth1Endpoints: []
+
+# JAVA_OPTS
+javaOpts: "-Xmx4g"
+# Path to beacon node data
+dataBeaconPath: /data/teku/beacon
+# Path to the base directory for storage
+dataPath: /data/teku
+# Sets the frequency, in slots, at which to store
+# finalized states to disk. This option is ignored
+# if --data-storage-mode is set to PRUNE
+dataStorageArchiveFrequency: "2048"
+# Sets the strategy for handling historical chain data
+# (Valid values: ARCHIVE, PRUNE)
+dataStorageMode: PRUNE
+# Store non-canonical blocks
+dataStorageNonCanonicalBlocksEnabled: false
+# The initial state. This value should be a file or
+# URL pointing to an SSZ-encoded finalized
+# checkpoint state
+initialState: ""
+# Rest API Settings
+restApi:
+  # Enables Beacon Rest API
+  enabled: true
+  # Comma-separated list of hostnames to allow, or *
+  # to allow any host
+  hostAllowList:
+    - "*"
+  # Interface of Beacon Rest API
+  interface: "0.0.0.0"
+  # Port number of Beacon Rest API
+  port: "5051"
+  # Comma separated list of origins to allow, or * to
+  # allow any origin
+  corsOrigins:
+    - "*"
+  # Enable swagger-docs and swagger-ui endpoints
+  docsEnabled: false
 
 ## Monitoring
 ##
