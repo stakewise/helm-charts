@@ -1,3 +1,4 @@
+{{- $eth1EndpointsLen := len .Values.eth1Endpoints }}
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
@@ -82,7 +83,12 @@ spec:
             - "--rpc-port={{ .Values.rpc.port }}"
             - "--p2p-tcp-port=13000"
             - "--p2p-udp-port=12000"
-            - "--http-web3provider={{ .Values.eth1Endpoint }}"
+          {{- with (first .Values.eth1Endpoints) }}
+            - "--http-web3provider={{ . }}"
+          {{- end }}
+          {{- range (untilStep 1 (int $eth1EndpointsLen) 1) }}
+            - "--fallback-web3provider={{ index $.Values.eth1Endpoints . }}"
+          {{- end }}
           {{- if eq .Values.network "prater" }}
             - "--genesis-state=/data/genesis.ssz"
           {{- end }}

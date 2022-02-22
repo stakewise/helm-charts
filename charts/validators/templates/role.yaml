@@ -2,14 +2,14 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: {{ template "operator.fullname" . }}
+  name: {{ template "validators.fullname" . }}
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "validators.labels" . | nindent 4 }}
 rules:
   - apiGroups: [""]
     resources: ["configmap"]
     verbs: ["get"]
     resourceNames:
-      - {{ template "operator.fullname" . }}-configs
-      - {{ template "operator.fullname" . }}-init
+      - {{ template "validators.fullname" . }}-configs
+      - {{ template "validators.fullname" . }}-init
 {{- end }}

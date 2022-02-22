@@ -7,7 +7,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: data-validator{{.}}
   labels:
-    {{- include "operator.labels" $root | nindent 4 }}
+    {{- include "validators.labels" $root | nindent 4 }}
   annotations:
     "helm.sh/resource-policy": keep
 spec:

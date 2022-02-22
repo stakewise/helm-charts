@@ -45,10 +45,10 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p {{ .Values.teku.dataPath }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.teku.dataPath }}
+            - mkdir -p /data/teku && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/teku
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.teku.dataPath }}
+              mountPath: /data/teku
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -56,34 +56,19 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --network={{ .Values.network }}
-            - --data-beacon-path={{ .Values.teku.dataBeaconPath }}
-            - --data-path={{ .Values.teku.dataPath }}
-            - --data-storage-archive-frequency={{ .Values.teku.dataStorageArchiveFrequency }}
-            - --data-storage-mode={{ .Values.teku.dataStorageMode }}
-            - --data-storage-non-canonical-blocks-enabled={{ .Values.teku.dataStorageNonCanonicalBlocksEnabled }}
-            - --eth1-endpoints={{ .Values.teku.eth1Endpoints | join "," }}
-          {{- if .Values.teku.restApi.enabled }}
-            - --rest-api-enabled={{ .Values.teku.restApi.enabled }}
-            - --rest-api-host-allowlist={{ .Values.teku.restApi.hostAllowList | join "," }}
-            - --rest-api-interface={{ .Values.teku.restApi.interface }}
-            - --rest-api-port={{ .Values.teku.restApi.port }}
-            - --rest-api-cors-origins={{ .Values.teku.restApi.corsOrigins | join "," }}
-            - --rest-api-docs-enabled={{ .Values.teku.restApi.docsEnabled }}
-          {{- end }}
-          {{- if .Values.teku.initialState }}
-            - --initial-state={{ .Values.teku.initialState }}
-          {{- end }}
-          {{- if ne .Values.teku.logging "OFF" }}
-            - --logging={{ .Values.teku.logging }}
-            - --log-color-enabled={{ .Values.teku.logColorEnabled }}
-            - --log-destination={{ .Values.teku.logDestination }}
-            {{- if .Values.teku.logFile }}
-            - --log-file={{ .Values.teku.logFile }}
-            {{- end }}
-            {{- if .Values.teku.logFileNamePattern }}
-            - --log-file-name-pattern={{ .Values.teku.logFileNamePattern }}
-            {{- end }}
-            - --log-include-events-enabled={{ .Values.teku.logIncludeEventsEnabled }}
+            - --data-beacon-path=/data/teku/beacon
+            - --data-path=/data/teku
+            - --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
+            - --data-storage-mode={{ .Values.dataStorageMode }}
+            - --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
+            - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
+          {{- if .Values.restApi.enabled }}
+            - --rest-api-enabled={{ .Values.restApi.enabled }}
+            - --rest-api-host-allowlist={{ .Values.restApi.hostAllowList | join "," }}
+            - --rest-api-interface={{ .Values.restApi.interface }}
+            - --rest-api-port={{ .Values.restApi.port }}
+            - --rest-api-cors-origins={{ .Values.restApi.corsOrigins | join "," }}
+            - --rest-api-docs-enabled={{ .Values.restApi.docsEnabled }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
             - --metrics-enabled={{ .Values.metrics.enabled }}
@@ -92,39 +77,14 @@ spec:
             - --metrics-interface={{ .Values.metrics.interface }}
             - --metrics-port={{ .Values.metrics.port }}
           {{- end }}
-          {{- if .Values.teku.p2p.enabled }}
-            - --p2p-enabled={{ .Values.teku.p2p.enabled }}
-            - --p2p-interface={{ .Values.teku.p2p.interface }}
-            - --p2p-port={{ .Values.teku.p2p.port }}
-            - --p2p-nat-method={{ .Values.teku.p2p.natMethod }}
-            - --p2p-peer-lower-bound={{ .Values.teku.p2p.peerLowerBound }}
-            - --p2p-peer-upper-bound={{ .Values.teku.p2p.peerUpperBound }}
-            - --p2p-discovery-enabled={{ .Values.teku.p2p.discoveryEnabled }}
-            {{- if .Values.teku.p2p.discoveryBootNodes }}
-            - --p2p-discovery-bootnodes={{ .Values.teku.p2p.discoveryBootNodes | join "," }}
-            {{- end }}
-            {{- if .Values.teku.p2p.staticPeers }}
-            - --p2p-static-peers={{ .Values.teku.p2p.staticPeers | join "," }}
-            {{- end }}
-            - --p2p-advertised-ip={{ .Values.teku.p2p.advertisedIP }}
-            - --p2p-subscribe-all-subnets-enabled={{ .Values.teku.p2p.subscribeAllSubnets }}
+          {{- range .Values.extraFlags }}
+            - {{ . | quote }}
           {{- end }}
-          env:
-            - name: JAVA_OPTS
-              value: {{ .Values.teku.javaOpts | quote }}
-        {{- if or .Values.teku.p2p.enabled .Values.teku.restApi.enabled .Values.metrics.enabled }}
+        {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
           ports:
-          {{- if .Values.teku.p2p.enabled }}
-            - name: p2p-tcp
-              containerPort: {{ .Values.teku.p2p.port }}
-              protocol: TCP
-            - name: p2p-udp
-              containerPort: {{ .Values.teku.p2p.port }}
-              protocol: UDP
-          {{- end }}
-          {{- if .Values.teku.restApi.enabled }}
+          {{- if .Values.restApi.enabled }}
             - name: rest-api
-              containerPort: {{ .Values.teku.restApi.port }}
+              containerPort: {{ .Values.restApi.port }}
               protocol: TCP
           {{- end }}
           {{- if .Values.metrics.enabled }}
@@ -135,10 +95,10 @@ spec:
         {{- end }}
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.teku.dataPath }}
+              mountPath: /data/teku
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.teku.restApi.enabled }}
+      {{- if .Values.restApi.enabled }}
         - name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -146,7 +106,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.teku.restApi.port | quote }}
+              value: {{ .Values.restApi.port | quote }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar

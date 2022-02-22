@@ -1,0 +1,11 @@
+{{- if and (eq .Values.network "gnosis") (eq .Values.type "teku") }}
+{{- fail "Gnosis chain network can't be used with teku client" }}
+{{- end }}
+
+{{- if not .Values.beaconChainRpcEndpoints }}
+{{- fail ".Values.beaconChainRpcEndpoints is empty" }}
+{{- end }}
+
+{{- if not .Values.vaultEndpoint }}
+{{- fail ".Values.vaultEndpoint is empty" }}
+{{- end }}
