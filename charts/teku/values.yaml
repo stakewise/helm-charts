@@ -173,10 +173,6 @@ eth1Endpoints: []
 ##
 extraFlags: []
 
-# Path to beacon node data
-dataBeaconPath: /data/teku/beacon
-# Path to the base directory for storage
-dataPath: /data/teku
 # Sets the frequency, in slots, at which to store
 # finalized states to disk. This option is ignored
 # if --data-storage-mode is set to PRUNE

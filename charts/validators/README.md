@@ -1,12 +1,5 @@
 # README
 
-> :warning: **Please note**: We take StakeWise's security and our users' trust very seriously. If 
-you believe you have found a security issue in StakeWise Helm charts, _please responsibly disclose_ 
-by contacting us at [security@stakewise.io](mailto:security@stakewise.io).
-
-This repository contains the official StakeWise Helm charts for installing
-and configuring large scale ETH staking infrastructure on top of the Kubernetes
-
 > :book: **Check out the full documentation on the** [doc.stakewise.io](https://docs.stakewise.io/node-operator/infrastructure)
 
 ## Prerequisites
@@ -27,8 +20,6 @@ To install the latest version of this chart, add dependent helm repositories
 and run `helm install`:
 
 ```console
-$ helm repo add hashicorp https://helm.releases.hashicorp.com
-"hashicorp" has been added to your repositories
 $ helm repo add stakewise https://charts.stakewise.io
 
 $ helm repo update

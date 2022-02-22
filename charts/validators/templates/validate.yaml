@@ -6,6 +6,6 @@
 {{- fail ".Values.beaconChainRpcEndpoints is empty" }}
 {{- end }}
 
-{{- if not .Values.vaultAddr }}
-{{- fail ".Values.vaultAddr is empty" }}
+{{- if not .Values.vaultEndpoint }}
+{{- fail ".Values.vaultEndpoint is empty" }}
 {{- end }}

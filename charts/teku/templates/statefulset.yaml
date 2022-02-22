@@ -45,10 +45,10 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p {{ .Values.dataPath }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.dataPath }}
+            - mkdir -p /data/teku && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/teku
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.dataPath }}
+              mountPath: /data/teku
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -56,8 +56,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --network={{ .Values.network }}
-            - --data-beacon-path={{ .Values.dataBeaconPath }}
-            - --data-path={{ .Values.dataPath }}
+            - --data-beacon-path=/data/teku/beacon
+            - --data-path=/data/teku
             - --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
             - --data-storage-mode={{ .Values.dataStorageMode }}
             - --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
@@ -95,7 +95,7 @@ spec:
         {{- end }}
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.dataPath }}
+              mountPath: /data/teku
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.restApi.enabled }}
