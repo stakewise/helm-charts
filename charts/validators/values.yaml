@@ -131,10 +131,10 @@ verticalAutoscaler:
 ##
 network: "mainnet"
 
-## Existing vault address
+## Existing vault endpoint
 ## example: http://vault.vault:8200
 ##
-vaultAddr: ""
+vaultEndpoint: ""
 
 ## Validators flags
 ##

@@ -6,19 +6,19 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "operator.fullname" $root }}-validator{{.}}
+  name: {{ template "validators.fullname" $root }}-validator{{.}}
   labels:
     {{- include "validator.labels" $root | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "operator.selectorLabels" $root | nindent 6 }}
-  serviceName: {{ template "operator.fullname" $root }}
+      {{- include "validators.selectorLabels" $root | nindent 6 }}
+  serviceName: {{ template "validators.fullname" $root }}
   template:
     metadata:
       labels:
-        {{- include "operator.selectorLabels" $root | nindent 8 }}
+        {{- include "validators.selectorLabels" $root | nindent 8 }}
       annotations:
         checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
@@ -51,7 +51,7 @@ spec:
             runAsUser: 0
           env:
             - name: VAULT_ADDR
-              value: {{ $root.Values.vaultAddr | quote }}
+              value: {{ $root.Values.vaultEndpoint | quote }}
             - name: NETWORK_ID
               value: {{ $root.Values.network | quote }}
             - name: VALIDATOR_TYPE
@@ -129,15 +129,15 @@ spec:
       volumes:
         - name: configs
           configMap:
-            name: {{ template "operator.fullname" $root }}-configs
+            name: {{ template "validators.fullname" $root }}-configs
       {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
         - name: configs-gnosis-prysm
           configMap:
-            name: {{ template "operator.fullname" $root }}-configs-gnosis-prysm
+            name: {{ template "validators.fullname" $root }}-configs-gnosis-prysm
       {{- end }}
         - name: validator-init
           configMap:
-            name: {{ template "operator.fullname" $root }}-init
+            name: {{ template "validators.fullname" $root }}-init
 {{- if (not $root.Values.persistence.enabled) }}
         - name: data
           emptyDir: {}

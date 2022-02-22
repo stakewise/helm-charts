@@ -2,13 +2,13 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ template "operator.fullname" . }}
+  name: {{ template "validators.fullname" . }}
   labels:
-    {{- include "operator.labels" . | nindent 4 }}
+    {{- include "validators.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "operator.fullname" . }}
+  name: {{ template "validators.fullname" . }}
 subjects:
   {{- $root := . -}}
   {{- range (untilStep 0 (int .Values.validatorsCount) 1) }}

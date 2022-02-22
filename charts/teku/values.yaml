@@ -222,7 +222,6 @@ metrics:
     - DISCOVERY
     - EVENTBUS
     - EXECUTOR
-    - LIBP2P
     - NETWORK
     - STORAGE
     - STORAGE_HOT_DB

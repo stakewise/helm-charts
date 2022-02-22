@@ -1,4 +1,4 @@
-{{ if .Values.teku.restApi.enabled }}
+{{ if .Values.restApi.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -12,6 +12,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "teku.fullname" . }}:{{ .Values.teku.restApi.port }}']
+      args: ['{{ include "teku.fullname" . }}:{{ .Values.restApi.port }}']
   restartPolicy: Never
 {{ end }}

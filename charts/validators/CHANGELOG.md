@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - All dependencies are now installed separately to simplify the installation and maintenance process
 - beaconChainRpcEndpoint changed from string to list with ability to specify multiple eth2 endpoints
-- vaultAddr should be specified manually in all cases
+- vaultEndpoint should be specified manually in all cases
 ### Removed
 - geth, erigon, prysm, lighthouse, teku, vault dependencies
 

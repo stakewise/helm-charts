@@ -33,9 +33,8 @@ $ helm repo add stakewise https://charts.stakewise.io
 
 $ helm repo update
 
-$ helm upgrade --install operator stakewise/operator \
-  --namespace operator \
-  --set geth.enabled=true \
+$ helm upgrade --install validators stakewise/validators \
+  --namespace validators \
   --set key=value... 
 ```
 

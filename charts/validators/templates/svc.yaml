@@ -2,12 +2,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "operator.fullname" . }}
+  name: {{ template "validators.fullname" . }}
   labels:
-    {{- include "operator.selectorLabels" . | nindent 4 }}
+    {{- include "validators.selectorLabels" . | nindent 4 }}
 spec:
   selector:
-    {{- include "operator.selectorLabels" . | nindent 4 }}
+    {{- include "validators.selectorLabels" . | nindent 4 }}
   type: ClusterIP
   ports:
     - name: metrics
