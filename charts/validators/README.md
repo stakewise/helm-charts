@@ -38,7 +38,7 @@ $ helm upgrade --install validators stakewise/validators \
   --set key=value... 
 ```
 
-**Please see the options supported in the `values.yaml` file.** And the full documentation at https://docs.stakewise.io
+**Please see the options supported in the `values.yaml` file.** The full documentation is available at https://docs.stakewise.io/node-operator/stakewise-infra-package/usage
 
 ## Changelog
 

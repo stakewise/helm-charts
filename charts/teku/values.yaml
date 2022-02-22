@@ -169,8 +169,10 @@ network: "mainnet"
 # URLs for Eth1 nodes
 eth1Endpoints: []
 
-# JAVA_OPTS
-javaOpts: "-Xmx4g"
+## Extra flags for teku beacon chain node
+##
+extraFlags: []
+
 # Path to beacon node data
 dataBeaconPath: /data/teku/beacon
 # Path to the base directory for storage
@@ -184,10 +186,6 @@ dataStorageArchiveFrequency: "2048"
 dataStorageMode: PRUNE
 # Store non-canonical blocks
 dataStorageNonCanonicalBlocksEnabled: false
-# The initial state. This value should be a file or
-# URL pointing to an SSZ-encoded finalized
-# checkpoint state
-initialState: ""
 # Rest API Settings
 restApi:
   # Enables Beacon Rest API

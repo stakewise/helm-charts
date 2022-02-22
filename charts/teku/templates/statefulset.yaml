@@ -70,9 +70,6 @@ spec:
             - --rest-api-cors-origins={{ .Values.restApi.corsOrigins | join "," }}
             - --rest-api-docs-enabled={{ .Values.restApi.docsEnabled }}
           {{- end }}
-          {{- if .Values.initialState }}
-            - --initial-state={{ .Values.initialState }}
-          {{- end }}
           {{- if .Values.metrics.enabled }}
             - --metrics-enabled={{ .Values.metrics.enabled }}
             - --metrics-categories={{ .Values.metrics.categories | join "," }}
@@ -83,9 +80,6 @@ spec:
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
-          env:
-            - name: JAVA_OPTS
-              value: {{ .Values.javaOpts | quote }}
         {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
           ports:
           {{- if .Values.restApi.enabled }}
