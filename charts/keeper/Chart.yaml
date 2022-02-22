@@ -1,7 +1,7 @@
 apiVersion: v2
 name: keeper
 version: 2.2.0
-appVersion: v2.2.0
+appVersion: v2.2.6
 kubeVersion: "^1.14.0-0"
 description: StakeWise Keeper is used to aggregate transactions from the oracles and submit them on-chain.
 type: application

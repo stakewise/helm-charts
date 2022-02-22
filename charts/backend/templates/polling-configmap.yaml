@@ -7,15 +7,20 @@ metadata:
     {{- include "backend.labels" . | nindent 4 }}
     component: "polling"
 data:
-  {{- if contains "eth_mainnet" .Values.commonConf.enabledNetworks }}
-  ETH_MAINNET_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.mainnet | quote }}
-  ETH_MAINNET_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.mainnet | quote }}
-  ETH_MAINNET_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.mainnet | quote }}
+  {{- if contains "mainnet" .Values.commonConf.enabledNetworks }}
+  MAINNET_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.mainnet | quote }}
+  MAINNET_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.mainnet | quote }}
+  MAINNET_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.mainnet | quote }}
   {{- end }}
-  {{- if contains "eth_goerli" .Values.commonConf.enabledNetworks }}
-  ETH_GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.goerli | quote }}
-  ETH_GOERLI_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.goerli | quote }}
-  ETH_GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.goerli | quote }}
+  {{- if contains "goerli" .Values.commonConf.enabledNetworks }}
+  GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.goerli | quote }}
+  GOERLI_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.goerli | quote }}
+  GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.goerli | quote }}
+  {{- end }}
+  {{- if contains "perm_goerli" .Values.commonConf.enabledNetworks }}
+  PERM_GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.permGoerli | quote }}
+  PERM_GOERLI_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.permGoerli | quote }}
+  PERM_GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.permGoerli | quote }}
   {{- end }}
   {{- if contains "gnosis" .Values.commonConf.enabledNetworks }}
   GNOSIS_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.gnosis | quote }}

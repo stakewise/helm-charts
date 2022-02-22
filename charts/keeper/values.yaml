@@ -39,12 +39,15 @@ priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  # possible values: eth_mainnet, eth_goerli, gnosis
-  enabledNetworks: "eth_mainnet"
+  # possible values: goerli, perm_goerli, gnosis, mainnet
+  enabledNetworks: "mainnet"
+
   eth1Endpoint:
     mainnet: ""
     goerli: ""
+    permGoerli: ""
     gnosis: ""
+
   enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
@@ -53,8 +56,15 @@ settings:
   oraclePrivateKey:
     mainnet: ""
     goerli: ""
+    permGoerli: ""
     gnosis: ""
-  
+
+  awsRegion:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
   ## @param settings.extraEnv Extra environment variables to pass to the container
   ## extraEnv:
   ##   MY_ENV_VAR: my_value

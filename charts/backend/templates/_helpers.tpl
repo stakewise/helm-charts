@@ -59,10 +59,3 @@ Selector labels
 app.kubernetes.io/name: {{ include "backend.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
-
-{{/*
-Environment variable prefix
-*/}}
-{{- define "network_prefix" -}}
-{{- if eq .Values.settings.enabledNetworks "eth_mainnet" }}ETH_MAINNET{{ else if eq .Values.settings.enabledNetworks "eth_goerli" }}ETH_GOERLI{{ else if eq .Values.settings.enabledNetworks "gnosis" }}GNOSIS{{ fail "Network not found, check settings.enabledNetworks in values.yaml" }}{{ end }}
-{{- end }}
