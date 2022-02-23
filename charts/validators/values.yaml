@@ -56,7 +56,8 @@ type: prysm
 reimportKeystores: false
 
 ## How many validators to run
-## **NB! Every validators hosts up to 100 keys, so the number of validators must be >= (number of validator keys) / 100
+## **NB! Every validator hosts up to 100 keys in Mainnet and 1000 keys in Gnosis,
+## so the number of validators must be >= (total number of validator keys) / max number of keys per validator
 ##
 validatorsCount: 0
 
