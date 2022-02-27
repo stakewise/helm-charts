@@ -6,6 +6,7 @@ commonConf:
 
   poolPage: "https://app.stakewise.io"
   soloPage: "https://app.stakewise.io/solo"
+  stakingAprSamplesCount: "3"
 
   sendEmails: "False"
   # Change to https://api.mailgun.net/v3
@@ -43,7 +44,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.2.0"
+  tag: "v2.2.4"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -315,8 +316,8 @@ polling:
           memory: 100Mi
 
   conf:
-    # Endpoints
     eth1Endpoint:
+      # must also be provided in case goerli or perm_goerli network is enabled
       mainnet: ""
       goerli: ""
       permGoerli: ""
@@ -335,6 +336,23 @@ polling:
       goerli: ""
       permGoerli: ""
       gnosis: ""
+
+    # Graph
+    stakewiseSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
+      permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
+      gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
+    uniswapV3SubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
+    ethereumSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+      permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+      gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
+    rariFuseSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
     ## @param polling.conf.extraEnv Extra environment variables to pass to the container
     ## extraEnv:

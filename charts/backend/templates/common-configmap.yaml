@@ -18,6 +18,7 @@ data:
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
+  STAKING_APR_SAMPLES_COUNT: {{ .Values.commonConf.stakingAprSamplesCount | quote }}
   {{- range $key, $value := .Values.commonConf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
   {{- end -}}
