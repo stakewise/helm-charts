@@ -17,9 +17,12 @@ data:
   DEFAULT_FROM_EMAIL: {{ .Values.commonConf.defaultFromEmail | quote }}
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
-  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
   STAKING_APR_SAMPLES_COUNT: {{ .Values.commonConf.stakingAprSamplesCount | quote }}
   {{- range $key, $value := .Values.commonConf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
   {{- end -}}
+  MAINNET_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.mainnet | quote }}
+  GOERLI_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.goerli | quote }}
+  PERM_GOERLI_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.permGoerli | quote }}
+  GNOSIS_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.gnosis | quote }}
 {{- end }}
