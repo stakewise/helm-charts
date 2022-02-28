@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.1.2"
+  tag: "v2.2.8"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -39,31 +39,77 @@ priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  network: "mainnet"
+  # possible values: goerli, perm_goerli, gnosis, mainnet
+  enabledNetworks: "mainnet"
 
   ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
 
-  eth2Endpoint: ""
-  eth2Client: "prysm"
+  # ETH2
+  eth2Endpoint:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
 
-  enableHealthServer: "True"
+  enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 
-  confirmationBlocks: "15"
-  oracleProcessInterval: "10"
-
   # Graph
-  stakewiseSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
-  uniswapV3SubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
-  ethereumSubgraphUrl: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+  stakewiseSubgraphUrl:
+    mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+    goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
+    permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
+    gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
+  uniswapV3SubgraphUrl:
+    mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+    goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
+  ethereumSubgraphUrl:
+    mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+    goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+    permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+    gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
+  rariFuseSubgraphUrl:
+    mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
   # credentials
-  oraclePrivateKey: ""
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
-  awsAccessKeyID: ""
-  awsSecretAccessKey: ""
-  awsRegion: "eu-central-1"
+
+  oraclePrivateKey:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  awsAccessKeyID:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  awsSecretAccessKey:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  awsRegion:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  ## @param settings.extraEnv Extra environment variables to pass to the container
+  ## extraEnv:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraEnv: {}
+
+  ## @param settings.extraSecret Extra environment variables to pass to the container
+  ## extraSecret:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraSecret: {}

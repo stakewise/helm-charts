@@ -7,18 +7,40 @@ metadata:
     {{- include "backend.labels" . | nindent 4 }}
     component: "polling"
 data:
-  IPFS_FETCH_ENDPOINTS: {{ .Values.polling.conf.ipfsFetchEndpoints }}
-  ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint | quote }}
-  ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint | quote }}
-  ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint | quote }}
-  POLL_PAYMENTS_PERIOD: {{ .Values.polling.conf.pollPaymentsPeriod | quote }}
-  POLL_ORACLES_PERIOD: {{ .Values.polling.conf.pollOraclesPeriod | quote }}
-  POLL_SETTINGS_PERIOD: {{ .Values.polling.conf.pollSettingsPeriod | quote }}
-  REALITY_ETH_QUESTION_URL_TEMPLATE: {{ .Values.polling.conf.realityEthQuestionUrlTemplate | quote }}
-  VOTING_PAGE: {{ .Values.polling.conf.votingPage | quote }}
-  POLL_ACTIVATIONS_PERIOD: {{ .Values.polling.conf.pollActivationsPeriod | quote }}
-  POLL_TOKEN_TRANSFERS_PERIOD: {{ .Values.polling.conf.pollTokenTransfersPeriod | quote }}
-  ACTIVATED_DEPOSITS_NOTIFY_SECONDS: {{ .Values.polling.conf.activatedDepositsNotifySeconds | quote }}
-  POLL_VALIDATORS_PERIOD: {{ .Values.polling.conf.pollValidatorsPeriod | quote }}
-  POLL_UNISWAP_PERIOD: {{ .Values.polling.conf.pollUniswapPeriod | quote }}
+  {{- if or (contains "mainnet" .Values.commonConf.enabledNetworks) (contains "goerli" .Values.commonConf.enabledNetworks) (contains "perm_goerli" .Values.commonConf.enabledNetworks) }}
+  MAINNET_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.mainnet | quote }}
+  {{- end }}
+  {{- if contains "mainnet" .Values.commonConf.enabledNetworks }}
+  MAINNET_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.mainnet | quote }}
+  MAINNET_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.mainnet | quote }}
+  MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.mainnet | quote }}
+  MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.mainnet | quote }}
+  MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.polling.conf.uniswapV3SubgraphUrl.mainnet | quote }}
+  MAINNET_RARI_FUSE_SUBGRAPH_URL: {{ .Values.polling.conf.rariFuseSubgraphUrl.mainnet | quote }}
+  {{- end }}
+  {{- if contains "goerli" .Values.commonConf.enabledNetworks }}
+  GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.goerli | quote }}
+  GOERLI_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.goerli | quote }}
+  GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.goerli | quote }}
+  GOERLI_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.goerli | quote }}
+  GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.goerli | quote }}
+  GOERLI_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.polling.conf.uniswapV3SubgraphUrl.goerli | quote }}
+  {{- end }}
+  {{- if contains "perm_goerli" .Values.commonConf.enabledNetworks }}
+  PERM_GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.permGoerli | quote }}
+  PERM_GOERLI_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.permGoerli | quote }}
+  PERM_GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.permGoerli | quote }}
+  PERM_GOERLI_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.permGoerli | quote }}
+  PERM_GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.permGoerli | quote }}
+  {{- end }}
+  {{- if contains "gnosis" .Values.commonConf.enabledNetworks }}
+  GNOSIS_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.gnosis | quote }}
+  GNOSIS_ETH2_ENDPOINT: {{ .Values.polling.conf.eth2Endpoint.gnosis | quote }}
+  GNOSIS_ETH2_ARCHIVE_ENDPOINT: {{ .Values.polling.conf.eth2ArchiveEndpoint.gnosis | quote }}
+  GNOSIS_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.gnosis | quote }}
+  GNOSIS_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.gnosis | quote }}
+  {{- end }}
+  {{- range $key, $value := .Values.polling.conf.extraEnv }}
+  {{ $key }}: {{ $value | quote -}}
+  {{- end -}}
 {{- end }}

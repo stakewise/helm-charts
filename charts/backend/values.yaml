@@ -1,16 +1,12 @@
 # Common configuration for all the containers (server.common_conf)
 commonConf:
   secretKey: ""
-  network: "mainnet"
+  # possible values: goerli, perm_goerli, gnosis, mainnet
+  enabledNetworks: "goerli,perm_goerli,gnosis,mainnet"
 
-  validatorMaxPenaltyCount: "5"
-  unpaidValidatorsExitDelay: "864000"
-
-  websiteName: "StakeWise"
   poolPage: "https://app.stakewise.io"
   soloPage: "https://app.stakewise.io/solo"
-
-  djangoLogLevel: "INFO"
+  stakingAprSamplesCount: "3"
 
   sendEmails: "False"
   # Change to https://api.mailgun.net/v3
@@ -29,13 +25,26 @@ commonConf:
   multisigOwnersTelegramToken: ""
   multisigOwnersTelegramChatId: ""
 
+  ## @param commonConf.extraEnv Extra environment variables to pass to the container
+  ## extraEnv:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraEnv: {}
+
+  ## @param commonConf.extraSecret Extra environment variables to pass to the container
+  ## extraSecret:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraSecret: {}
+
+
 securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.1.1"
+  tag: "v2.2.4"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -46,6 +55,11 @@ admin:
   # Admin configuration parameters.
   conf:
     allowedHosts: ""
+    ## @param admin.conf.extraSecret Extra environment variables to pass to the container
+    ## extraSecret:
+    ##   MY_ENV_VAR: my_value
+    ##
+    extraSecret: {}
 
   # How many admin pods to run simultaneously.
   replicas: 1
@@ -132,6 +146,12 @@ api:
     recaptchaContactScore: "0.5"
     recaptchaProfileAction: "profile"
     recaptchaProfileScore: "0.5"
+
+    ## @param api.conf.extraSecret Extra environment variables to pass to the container
+    ## extraSecret:
+    ##   MY_ENV_VAR: my_value
+    ##
+    extraSecret: {}
 
   # How many api pods to run simultaneously.
   replicas: 2
@@ -296,28 +316,49 @@ polling:
           memory: 100Mi
 
   conf:
-    # Endpoints
-    ipfsFetchEndpoints: "/dns/ipfs.infura.io/tcp/5001/https,https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
-    eth1Endpoint: ""
+    eth1Endpoint:
+      # must also be provided in case goerli or perm_goerli network is enabled
+      mainnet: ""
+      goerli: ""
+      permGoerli: ""
+      gnosis: ""
+
     # NB! only prysm client currently works
-    eth2Endpoint: ""
+    eth2Endpoint:
+      mainnet: ""
+      goerli: ""
+      permGoerli: ""
+      gnosis: ""
 
     # Needed for syncing validator balance snapshots
-    eth2ArchiveEndpoint: ""
+    eth2ArchiveEndpoint:
+      mainnet: ""
+      goerli: ""
+      permGoerli: ""
+      gnosis: ""
 
-    # polling periods
-    pollPaymentsPeriod: "15"
-    pollOraclesPeriod: "15"
-    pollSettingsPeriod: "120"
+    # Graph
+    stakewiseSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
+      permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
+      gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
+    uniswapV3SubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
+    ethereumSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+      goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+      permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+      gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
+    rariFuseSubgraphUrl:
+      mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
-    realityEthQuestionUrlTemplate: "https://reality.eth.link/app/#!/question/{question_id}"
-    votingPage: "https://vote.stakewise.io/"
-
-    pollActivationsPeriod: "15"
-    pollTokenTransfersPeriod: "15"
-    activatedDepositsNotifySeconds: "86400"
-    pollValidatorsPeriod: "30"
-    pollUniswapPeriod: "60"
+    ## @param polling.conf.extraEnv Extra environment variables to pass to the container
+    ## extraEnv:
+    ##   MY_ENV_VAR: my_value
+    ##
+    extraEnv: {}
 
 postgresql:
   enabled: false

@@ -8,13 +8,9 @@ metadata:
 data:
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
-  NETWORK: {{ .Values.commonConf.network | quote }}
-  VALIDATOR_MAX_PENALTY_COUNT: {{ .Values.commonConf.validatorMaxPenaltyCount | quote }}
-  UNPAID_VALIDATORS_EXIT_DELAY: {{ .Values.commonConf.unpaidValidatorsExitDelay | quote }}
-  WEBSITE_NAME: {{ .Values.commonConf.websiteName | quote }}
+  ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}
   POOL_PAGE: {{ .Values.commonConf.poolPage | quote }}
   SOLO_PAGE: {{ .Values.commonConf.soloPage | quote }}
-  DJANGO_LOG_LEVEL: {{ .Values.commonConf.djangoLogLevel | quote }}
   SEND_EMAILS: {{ .Values.commonConf.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.commonConf.mailgunSenderDomain | quote }}
   MAILGUN_API_URL: {{ .Values.commonConf.mailgunApiUrl | quote }}
@@ -22,4 +18,8 @@ data:
   MANAGERS: {{ .Values.commonConf.managers | quote }}
   STATIC_URL: {{ .Values.commonConf.staticUrl | quote }}
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications | quote }}
+  STAKING_APR_SAMPLES_COUNT: {{ .Values.commonConf.stakingAprSamplesCount | quote }}
+  {{- range $key, $value := .Values.commonConf.extraEnv }}
+  {{ $key }}: {{ $value | quote -}}
+  {{- end -}}
 {{- end }}

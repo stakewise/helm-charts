@@ -23,7 +23,7 @@ tolerations: [ ]
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.1.2"
+  tag: "v2.2.8"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -39,14 +39,40 @@ priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  network: "mainnet"
-  web3Endpoint: ""
-  enableHealthServer: "True"
+  # possible values: goerli, perm_goerli, gnosis, mainnet
+  enabledNetworks: "mainnet"
+
+  eth1Endpoint:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
-  confirmationBlocks: "15"
-  keeperProcessInterval: "10"
-  transactionTimeout: "900"
 
   # credentials
-  oraclePrivateKey: ""
+  oraclePrivateKey:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  awsRegion:
+    mainnet: ""
+    goerli: ""
+    permGoerli: ""
+    gnosis: ""
+
+  ## @param settings.extraEnv Extra environment variables to pass to the container
+  ## extraEnv:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraEnv: {}
+
+  ## @param settings.extraSecret Extra environment variables to pass to the container
+  ## extraSecret:
+  ##   MY_ENV_VAR: my_value
+  ##
+  extraSecret: {}
