@@ -39,8 +39,8 @@ jobs:
       - name: Build and Push Validator Init Image
         uses: docker/build-push-action@v2
         with:
-          context: charts/operator/docker
-          file: charts/operator/docker/Dockerfile
+          context: charts/validators/docker
+          file: charts/validators/docker/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
