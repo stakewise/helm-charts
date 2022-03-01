@@ -37,6 +37,6 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami/
     condition: postgresql.enabled
   - name: ipfs
-    version: 1.0.1
+    version: 1.0.2
     repository: "file://../ipfs"
     condition: ipfs.enabled
