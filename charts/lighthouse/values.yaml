@@ -57,7 +57,7 @@ replicas: 1
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   repository: "sigp/lighthouse"
-  tag: "v2.1.2"
+  tag: "v2.1.3"
   pullPolicy: IfNotPresent
 
 ## Node labels for pod assignment
@@ -103,8 +103,7 @@ network: mainnet
 
 ## RPC Port
 ##
-rpc:
-  port: "5052"
+rpcPort: "5052"
 
 ## Extra flags for lighthouse beacon chain node
 ##

@@ -53,7 +53,7 @@ image:
   repository: openethereum/openethereum
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v3.3.3"
+  tag: "v3.3.4"
 
 ## How many openethereum nodes to run simultaneously
 ##

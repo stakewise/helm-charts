@@ -83,12 +83,6 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-            - containerPort: 30303
-              name: discovery-tcp
-              protocol: TCP
-            - containerPort: 30303
-              name: discovery-udp
-              protocol: UDP
           {{- if .Values.rpc.enabled }}
             - name: rpc
               containerPort: {{ .Values.rpc.port }}

@@ -50,7 +50,7 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.15"
+  tag: "v1.10.16"
   pullPolicy: IfNotPresent
 
 ## How many geth nodes to run simultaneously

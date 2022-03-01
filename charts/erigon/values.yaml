@@ -24,7 +24,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2022.01.03"
+  tag: "v2022.02.04"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -62,87 +62,26 @@ securityContext: {}
 ##
 network: mainnet
 
-erigon:
-  # Data directory for the databases
-  dataDir: "/data/erigon"
-  # Directory to store the ethash mining DAGs
-  ethHashDagDir: "/data/erigon-ethhash"
-  # Batch size for the execution stage
-  batchSize: "512M"
-  # Outstanding limit of block bodies being downloaded
-  blockDownloaderWindow: "32768"
-  # Enabling internal db logs. Very high verbosity levels may require recompile db
-  databaseVerbosity: "2"
-  # private api network address, for example: 127.0.0.1:9090,
-  # empty string means not to start the listener.
-  # Do not expose to public network.
-  # Serves remote database interface (default: "127.0.0.1:9090")
-  privateApiAddr: 127.0.0.1:9090
-  # HTTP-RPC server listening interface
-  httpAddr: 0.0.0.0
-  # Comma separated list of virtual hostnames from which to accept requests (server enforced).
-  # Accepts '*' wildcard
-  httpVhosts: "*"
-  # Comma separated list of domains from which to accept cross origin requests (browser enforced)
-  httpCorsDomain: "*"
-  # API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
-  # Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
-  httpApi: "eth,erigon,web3,net,txpool"
-  # Amount of requests server handle simultaneously - requests
-  # over this limit will wait.
-  # Increase it - if clients see 'request timeout' while server
-  # load is low - it means your 'hot data' is small or have much RAM.
-  privateApiRateLimit: "31872"
-  # Buffer size for ETL operations.
-  etlBufferSize: "256MB"
-  # Network listening port
-  port: "30303"
-  # ETH65 Network listening port
-  p2pEth65Port: "30304"
-  # NAT port mapping mechanism (any|none|upnp|pmp|extip:<IP>)
-  #     "" or "none"         default - do not nat
-  #     "extip:77.12.33.4"   will assume the local machine is reachable on the given IP
-  #     "any"                uses the first auto-detected mechanism
-  #     "upnp"               uses the Universal Plug and Play protocol
-  #     "pmp"                uses NAT-PMP with an auto-detected gateway address
-  #     "pmp:192.168.0.1"    uses NAT-PMP with the given gateway address
-  nat: ""
-  # P2P node key file
-  nodeKey: ""
-  # P2P node key as hex (for testing)
-  nodeKeyHex: ""
-  # Comma separated enode URLs to connect to
-  staticPeers: ""
-  # Comma separated enode URLs which are always allowed to connect, even above the peer limit
-  trustedPeers: ""
-  # Maximum number of network peers (network disabled if set to 0)
-  maxPeers: "100"
+# private api network address, for example: 127.0.0.1:9090,
+# empty string means not to start the listener.
+# Do not expose to public network.
+# Serves remote database interface (default: "127.0.0.1:9090")
+privateApiAddr: 127.0.0.1:9090
+# HTTP-RPC server listening interface
+httpAddr: 0.0.0.0
+# Comma separated list of virtual hostnames from which to accept requests (server enforced).
+# Accepts '*' wildcard
+httpVhosts: "*"
+# Comma separated list of domains from which to accept cross origin requests (browser enforced)
+httpCorsDomain: "*"
+# API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
+# Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
+httpApi: "eth,erigon,web3,net,txpool"
 
-  # Enable mining
-  mine: false
-  # Comma separated HTTP URL list to notify of new work packages
-  minerNotify: ""
-  # Target gas floor for mined blocks
-  minerGasTarget: "8000000"
-  # Target gas ceiling for mined blocks
-  minerGasLimit: "8000000"
-  # Public address for block mining rewards
-  minerEtherBase: "0"
-  # Block extra data set by the miner
-  minerExtraData: ""
-  # Disable remote sealing verification
-  minerNoVerify: false
-
-  ## Extra flags for mainnet network
-  ##
-  mainnetExtraFlags:
-    - "--prune.r.before=11184524"
-    - "--prune=htc"
-
-  ## Extra flags for goerli network
-  ##
-  goerliExtraFlags:
-  - "--prune.r.before=4367322"
+## Extra flags for mainnet network
+##
+extraFlags:
+  - "--prune.r.before=11184524"
   - "--prune=htc"
 
 service:

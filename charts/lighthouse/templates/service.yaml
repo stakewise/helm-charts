@@ -23,7 +23,7 @@ spec:
 {{- end }}
   ports:
     - name: http
-      port: {{ .Values.rpc.port }}
+      port: {{ .Values.rpcPort }}
       targetPort: http
   {{- if .Values.metrics.enabled }}
     - name: metrics

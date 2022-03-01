@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "lighthouse.fullname" . }}:{{ .Values.rpc.port }}']
+      args: ['{{ include "lighthouse.fullname" . }}:{{ .Values.rpcPort }}']
   restartPolicy: Never

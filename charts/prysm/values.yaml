@@ -68,7 +68,7 @@ image:
   pullPolicy: IfNotPresent
 imageGnosis:
   repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
-  tag: "v2.0.5-gbc"
+  tag: "v2.0.6-gbc"
   pullPolicy: IfNotPresent
 
 ## RPC Port
