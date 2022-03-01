@@ -19,7 +19,12 @@ commonConf:
 
   staticUrl: "https://static.stakewise.io/"
 
-  sendTelegramNotifications: "False"
+  sendTelegramNotifications:
+    mainnet: "False"
+    goerli: "False"
+    permGoerli: "False"
+    gnosis: "False"
+
   telegramToken: ""
   telegramChatId: ""
   multisigOwnersTelegramToken: ""
@@ -44,7 +49,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.2.4"
+  tag: "v2.2.5"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
