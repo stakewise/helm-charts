@@ -45,16 +45,16 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p {{ .Values.nethermind.dataDir }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.nethermind.dataDir }}
+            - mkdir -p /data/nethermind && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/nethermind
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.nethermind.dataDir }}
+              mountPath: /data/nethermind
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          workingDir: {{ .Values.nethermind.dataDir }}
+          workingDir: /data/nethermind
           command: ['/nethermind/Nethermind.Runner']
           args:
           {{- if eq .Values.network "gnosis" }}
@@ -62,29 +62,28 @@ spec:
           {{- else }}
             - --config={{ .Values.network }}
           {{- end }}
-            - --datadir={{ .Values.nethermind.dataDir }}
-            - --Sync.FastSync={{ .Values.nethermind.fastSync }}
-          {{- if .Values.nethermind.jsonrpc.enabled }}
-            - --JsonRpc.Enabled={{ .Values.nethermind.jsonrpc.enabled }}
-            - --JsonRpc.EnabledModules={{ .Values.nethermind.jsonrpc.modules | join "," }}
-            - --JsonRpc.Host={{ .Values.nethermind.jsonrpc.host }}
-            - --JsonRpc.Port={{ .Values.nethermind.jsonrpc.ports.rest }}
-            - --JsonRpc.WebSocketsPort={{ .Values.nethermind.jsonrpc.ports.websocket }}
+            - --datadir=/data/nethermind
+          {{- if .Values.jsonrpc.enabled }}
+            - --JsonRpc.Enabled={{ .Values.jsonrpc.enabled }}
+            - --JsonRpc.EnabledModules={{ .Values.jsonrpc.modules | join "," }}
+            - --JsonRpc.Host={{ .Values.jsonrpc.host }}
+            - --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
+            - --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
             - --Metrics.Enabled={{ .Values.metrics.enabled }}
             - --Metrics.ExposePort={{ .Values.metrics.port }}
           {{- end }}
-          {{- range .Values.nethermind.extraFlags }}
+          {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
           ports:
-        {{- if .Values.nethermind.jsonrpc.enabled }}
+        {{- if .Values.jsonrpc.enabled }}
             - name: json-rest
-              containerPort: {{ .Values.nethermind.jsonrpc.ports.rest }}
+              containerPort: {{ .Values.jsonrpc.ports.rest }}
               protocol: TCP
             - name: json-ws
-              containerPort: {{ .Values.nethermind.jsonrpc.ports.websocket }}
+              containerPort: {{ .Values.jsonrpc.ports.websocket }}
               protocol: TCP
         {{- end }}
         {{- if .Values.metrics.enabled }}
@@ -94,10 +93,10 @@ spec:
         {{- end }}
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.nethermind.dataDir }}
+              mountPath: /data/nethermind
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.nethermind.jsonrpc.enabled }}
+      {{- if .Values.jsonrpc.enabled }}
         - name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -105,7 +104,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.nethermind.jsonrpc.ports.rest | quote }}
+              value: {{ .Values.jsonrpc.ports.rest | quote }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar

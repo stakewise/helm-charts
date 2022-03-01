@@ -16,12 +16,12 @@ spec:
       timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   ports:
-  {{- if .Values.nethermind.jsonrpc.enabled }}
-    - port: {{ .Values.nethermind.jsonrpc.ports.rest }}
+  {{- if .Values.jsonrpc.enabled }}
+    - port: {{ .Values.jsonrpc.ports.rest }}
       targetPort: json-rest
       protocol: TCP
       name: json-rest
-    - port: {{ .Values.nethermind.jsonrpc.ports.websocket }}
+    - port: {{ .Values.jsonrpc.ports.websocket }}
       targetPort: json-ws
       protocol: TCP
       name: json-ws

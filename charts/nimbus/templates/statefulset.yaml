@@ -45,10 +45,10 @@ spec:
           command:
             - /bin/sh
             - -c
-            - mkdir -p {{ .Values.nimbus.dataDir }} && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} {{ .Values.nimbus.dataDir }}
+            - mkdir -p /data/nimbus && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/nimbus && chmod 700 /data/nimbus
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.nimbus.dataDir }}
+              mountPath: /data/nimbus
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -56,65 +56,36 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --network={{ .Values.network }}
-            - --data-dir={{ .Values.nimbus.dataDir }}
+            - --data-dir=/data/nimbus
             - --non-interactive
-            - --log-level={{ .Values.nimbus.logLevel }}
-          {{- range .Values.nimbus.web3Url }}
-            - --web3-url={{ . }}
-          {{- end }}
-            - --agent-string={{ .Values.nimbus.agentString }}
-            - --subscribe-all-subnets={{ .Values.nimbus.subscribeAllSubnets }}
-            - --num-threads={{ .Values.nimbus.numThreads }}
-            - --listen-address={{ .Values.nimbus.listenAddress }}
-            - --dump={{ .Values.nimbus.dump }}
-          {{- if .Values.nimbus.discv5.enabled }}
-            - --tcp-port={{ .Values.nimbus.discv5.tcpPort }}
-            - --udp-port={{ .Values.nimbus.discv5.udpPort }}
-          {{- end }}
-          {{- if .Values.nimbus.rpc.enabled }}
+          {{- if .Values.rpc.enabled }}
             - --rpc
-            - --rpc-port={{ .Values.nimbus.rpc.port }}
-            - --rpc-address={{ .Values.nimbus.rpc.address }}
+            - --rpc-port={{ .Values.rpc.port }}
+            - --rpc-address={{ .Values.rpc.address }}
           {{- end }}
-          {{- if .Values.nimbus.rest.enabled }}
+          {{- if .Values.rest.enabled }}
             - --rest
-            - --rest-port={{ .Values.nimbus.rest.port }}
-            - --rest-address={{ .Values.nimbus.rest.address }}
-          {{- end }}
-            - --max-peers={{ .Values.nimbus.maxPeers }}
-            - --nat={{ .Values.nimbus.nat }}
-            - --enr-auto-update={{ .Values.nimbus.enrAutoUpdate }}
-            - --node-name={{ .Values.nimbus.nodeName }}
-            - --stop-at-epoch={{ .Values.nimbus.stopAtEpoch }}
-          {{- if .Values.nimbus.bootstrapNode }}
-            - --bootstrap-node={{ .Values.nimbus.bootstrapNode | join "," }}
-          {{- end }}
-          {{- if .Values.nimbus.directPeer }}
-            - --direct-peer={{ .Values.nimbus.directPeer | join "," }}
+            - --rest-port={{ .Values.rest.port }}
+            - --rest-address={{ .Values.rest.address }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
             - --metrics
             - --metrics-address={{ .Values.metrics.address }}
             - --metrics-port={{ .Values.metrics.port }}
           {{- end }}
-        {{- if or .Values.nimbus.discv5.enabled .Values.nimbus.rpc.enabled .Values.nimbus.rest.enabled .Values.metrics.enabled }}
+          {{- range .Values.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+        {{- if or .Values.rpc.enabled .Values.rest.enabled .Values.metrics.enabled }}
           ports:
-          {{- if .Values.nimbus.discv5.enabled }}
-            - name: p2p-tcp
-              containerPort: {{ .Values.nimbus.discv5.tcpPort }}
-              protocol: TCP
-            - name: p2p-udp
-              containerPort: {{ .Values.nimbus.discv5.udpPort }}
-              protocol: UDP
-          {{- end }}
-          {{- if .Values.nimbus.rpc.enabled }}
+          {{- if .Values.rpc.enabled }}
             - name: json-rpc
-              containerPort: {{ .Values.nimbus.rpc.port }}
+              containerPort: {{ .Values.rpc.port }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.nimbus.rest.enabled }}
+          {{- if .Values.rest.enabled }}
             - name: rest
-              containerPort: {{ .Values.nimbus.rest.port }}
+              containerPort: {{ .Values.rest.port }}
               protocol: TCP
           {{- end }}
           {{- if .Values.metrics.enabled }}
@@ -125,10 +96,10 @@ spec:
         {{- end }}
           volumeMounts:
             - name: data
-              mountPath: {{ .Values.nimbus.dataDir }}
+              mountPath: /data/nimbus
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.nimbus.rest.enabled }}
+      {{- if .Values.rest.enabled }}
         - name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -136,7 +107,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.nimbus.rest.port | quote }}
+              value: {{ .Values.rest.port | quote }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar

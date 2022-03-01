@@ -16,24 +16,14 @@ spec:
       timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   ports:
-  {{- if .Values.nimbus.discv5.enabled }}
-    - port: {{ .Values.nimbus.discv5.tcpPort }}
-      targetPort: p2p-tcp
-      protocol: TCP
-      name: p2p-tcp
-    - port: {{ .Values.nimbus.discv5.udpPort }}
-      targetPort: p2p-udp
-      protocol: UDP
-      name: p2p-udp
-  {{- end }}
-  {{- if .Values.nimbus.rpc.enabled }}
-    - port: {{ .Values.nimbus.rpc.port }}
+  {{- if .Values.rpc.enabled }}
+    - port: {{ .Values.rpc.port }}
       targetPort: json-rpc
       protocol: TCP
       name: json-rpc
   {{- end }}
-  {{- if .Values.nimbus.rest.enabled }}
-    - port: {{ .Values.nimbus.rest.port }}
+  {{- if .Values.rest.enabled }}
+    - port: {{ .Values.rest.port }}
       targetPort: rest
       protocol: TCP
       name: rest
