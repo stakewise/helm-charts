@@ -1,19 +1,19 @@
 kind: StatefulSet
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 metadata:
-  name: {{ template "ipfs.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "ipfs.selectorLabels" . | nindent 6 }}
-  serviceName: {{ template "ipfs.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        {{- include "ipfs.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -31,7 +31,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "ipfs.fullname" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
@@ -46,12 +46,12 @@ spec:
               mountPath: {{ .Values.ipfs.path }}
       {{- end }}
       containers:
-        - name: {{ template "ipfs.fullname" . }}
+        - name: {{ include "common.names.fullname" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ template "ipfs.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
           ports:
             - containerPort: {{ .Values.service.ports.p2p }}
               name: p2p-tcp
@@ -97,7 +97,7 @@ spec:
       volumes:
         - name: entrypoint
           configMap:
-            name: {{ template "ipfs.fullname" . }}-entrypoint
+            name: {{ include "common.names.fullname" . }}-entrypoint
             defaultMode: 0777
 {{- if (not .Values.persistence.enabled) }}
         - name: data
@@ -111,7 +111,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "ipfs.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}
@@ -121,7 +121,7 @@ spec:
     - metadata:
         name: fuse-ipfs
         labels:
-          {{- include "ipfs.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}
@@ -131,7 +131,7 @@ spec:
     - metadata:
         name: fuse-ipns
         labels:
-          {{- include "ipfs.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

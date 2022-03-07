@@ -18,3 +18,7 @@ maintainers:
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: v2.0.6
 
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

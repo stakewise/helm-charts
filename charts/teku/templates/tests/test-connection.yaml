@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "{{ include "teku.fullname" . }}-test-connection"
+  name: "{{ include "common.names.fullname" . }}-test-connection"
   labels:
-    {{- include "teku.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
 spec:
@@ -12,6 +12,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "teku.fullname" . }}:{{ .Values.restApi.port }}']
+      args: ['{{ include "common.names.fullname" . }}:{{ .Values.restApi.port }}']
   restartPolicy: Never
 {{ end }}

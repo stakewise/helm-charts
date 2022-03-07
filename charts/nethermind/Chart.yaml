@@ -13,3 +13,8 @@ home: https://nethermind.io/
 sources:
   - https://github.com/NethermindEth/nethermind
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

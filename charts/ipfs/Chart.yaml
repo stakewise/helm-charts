@@ -29,3 +29,8 @@ keywords:
 home: https://ipfs.io
 sources:
   - https://github.com/ipfs/go-ipfs
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

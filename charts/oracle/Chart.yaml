@@ -15,3 +15,8 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

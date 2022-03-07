@@ -9,7 +9,7 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "erigon.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     {{- if .Values.metrics.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
@@ -37,5 +37,5 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "erigon.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
 {{- end }}

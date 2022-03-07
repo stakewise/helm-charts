@@ -1,5 +1,5 @@
 {{- if .Values.ingress.api.enabled -}}
-{{- $fullName := include "ipfs.fullname" . -}}
+{{- $fullName := include "common.names.fullname" . -}}
 {{- $svcPort := .Values.service.ports.api -}}
 {{- if and .Values.ingress.api.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.api.annotations "kubernetes.io/ingress.class") }}
@@ -17,7 +17,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}-api
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
   {{- with .Values.ingress.api.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
@@ -62,7 +62,7 @@ spec:
 
 {{- if .Values.ingress.gateway.enabled }}
 ---
-{{- $fullName := include "ipfs.fullname" . -}}
+{{- $fullName := include "common.names.fullname" . -}}
 {{- $svcPort := .Values.service.ports.gateway -}}
 {{- if and .Values.ingress.gateway.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.ingress.gateway.annotations "kubernetes.io/ingress.class") }}
@@ -80,7 +80,7 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}-gateway
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
   {{- with .Values.ingress.gateway.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}

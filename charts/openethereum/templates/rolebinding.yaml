@@ -2,15 +2,15 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: {{ template "openethereum.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "openethereum.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: {{ template "openethereum.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ template "openethereum.fullname" . }}
+    name: {{ include "common.names.fullname" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

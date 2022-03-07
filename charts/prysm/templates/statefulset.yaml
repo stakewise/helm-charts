@@ -1,20 +1,20 @@
 {{- $eth1EndpointsLen := len .Values.eth1Endpoints }}
 kind: StatefulSet
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 metadata:
-  name: {{ template "prysm.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "prysm.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "prysm.selectorLabels" . | nindent 6 }}
-  serviceName: {{ template "prysm.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        {{- include "prysm.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -32,7 +32,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "prysm.fullname" . }}
+      serviceAccountName: {{ include "common.names.fullname" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       initContainers:
       {{- if and .Values.persistence.enabled .Values.initChownData }}
@@ -69,7 +69,7 @@ spec:
               mountPath: /data/scripts
       {{- end }}
       containers:
-        - name: {{ template "prysm.fullname" . }}
+        - name: {{ include "common.names.fullname" . }}
         {{- if ne .Values.network "gnosis" }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
@@ -193,12 +193,12 @@ spec:
       {{- if eq .Values.network "gnosis" }}
         - name: gnosis-config
           configMap:
-            name: {{ include "prysm.fullname" . }}-gnosis
+            name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
       {{- if eq .Values.network "prater" }}
         - name: scripts
           configMap:
-            name: {{ include "prysm.fullname" . }}
+            name: {{ include "common.names.fullname" . }}
       {{- end }}
 {{- if (not .Values.persistence.enabled) }}
         - name: data
@@ -208,7 +208,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "prysm.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

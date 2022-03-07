@@ -1,19 +1,19 @@
 kind: StatefulSet
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 metadata:
-  name: {{ template "geth.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "geth.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "geth.selectorLabels" . | nindent 6 }}
-  serviceName: {{ template "geth.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        {{- include "geth.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -31,7 +31,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "geth.fullname" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
@@ -149,7 +149,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "geth.labels" . | nindent 10 }}
+          {{- include "common.labels.matchLabels" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

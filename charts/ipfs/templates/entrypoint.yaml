@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "ipfs.fullname" . }}-entrypoint
+  name: {{ include "common.names.fullname" . }}-entrypoint
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 data:
   start_ipfs: |
     #!/bin/sh

@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ipfs.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -28,4 +28,4 @@ spec:
       protocol: TCP
       name: websocket
   selector:
-    {{- include "ipfs.selectorLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
