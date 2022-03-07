@@ -1,20 +1,20 @@
 {{ $networkConfig := index $.Values.networks $.Values.network }}
 kind: StatefulSet
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 metadata:
-  name: {{ template "openethereum.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "openethereum.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
-      {{- include "openethereum.selectorLabels" . | nindent 6 }}
-  serviceName: {{ template "openethereum.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        {{- include "openethereum.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -32,7 +32,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "openethereum.fullname" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
@@ -135,7 +135,7 @@ spec:
       volumes:
         - name: scripts
           configMap:
-            name: {{ include "openethereum.fullname" . }}
+            name: {{ include "common.names.fullname" . }}
 {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
@@ -144,7 +144,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "openethereum.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

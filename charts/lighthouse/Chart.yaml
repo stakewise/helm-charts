@@ -17,3 +17,8 @@ maintainers:
     email: dmitri@stakewise.io
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: v2.1.3
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

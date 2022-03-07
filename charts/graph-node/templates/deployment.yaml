@@ -1,9 +1,9 @@
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 kind: Deployment
 metadata:
-  name: {{ include "graph-node.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "graph-node.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
@@ -12,7 +12,7 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      {{- include "graph-node.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
@@ -22,13 +22,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "graph-node.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "graph-node.serviceAccountName" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.SecurityContext | nindent 8 }}
       {{- with .Values.nodeSelector }}
@@ -52,9 +52,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ template "graph-node.fullname" . }}
+                name: {{ template "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "graph-node.fullname" . }}
+                name: {{ template "common.names.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.ports.http }}

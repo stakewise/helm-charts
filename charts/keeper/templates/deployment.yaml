@@ -1,20 +1,20 @@
 kind: Deployment
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 metadata:
-  name: {{ template "keeper.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "keeper.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   replicas: 1
   strategy:
     type: Recreate
   selector:
     matchLabels:
-      {{- include "keeper.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "keeper.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
       annotations:
         checksum/keeper-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         checksum/keeper-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
@@ -31,7 +31,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ template "keeper.fullname" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
     {{- if .Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
@@ -44,9 +44,9 @@ spec:
           args: ["oracle/keeper/main.py"]
           envFrom:
             - configMapRef:
-                name: {{ template "keeper.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "keeper.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}

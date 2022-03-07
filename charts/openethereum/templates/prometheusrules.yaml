@@ -2,28 +2,28 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name: {{ include "openethereum.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   {{- if .Values.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "openethereum.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     {{- if .Values.metrics.prometheusRule.additionalLabels }}
     {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   groups:
   {{- with .Values.metrics.prometheusRule.rules }}
-    - name: {{ template "openethereum.fullname" $ }}
+    - name: {{ include "common.names.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
   {{- if .Values.metrics.prometheusRule.default }}
-    - name: {{ template "openethereum.fullname" $ }}-default
+    - name: {{ include "common.names.fullname" $ }}-default
       rules:
         - alert: OpenEthereumNodeDown
-          expr: up{job='{{ include "openethereum.fullname" . }}'} == 0
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
           for: 1m
           labels:
             severity: critical

@@ -1,15 +1,15 @@
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name: {{ include "erigon.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "erigon.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "erigon.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "erigon.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName:  {{ include "common.names.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -17,7 +17,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "erigon.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -26,7 +26,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
-      serviceAccountName: {{ include "erigon.serviceAccountName" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
         - name: init-chown
@@ -148,7 +148,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "erigon.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

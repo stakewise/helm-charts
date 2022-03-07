@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ssv-node.fullname" . }}-tcp
+  name: {{ include "common.names.fullname" . }}-tcp
   labels:
-    {{- include "ssv-node.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,14 +12,14 @@ spec:
       protocol: TCP
       name: discovery-tcp
   selector:
-    {{- include "ssv-node.selectorLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "ssv-node.fullname" . }}-udp
+  name: {{ include "common.names.fullname" . }}-udp
   labels:
-    {{- include "ssv-node.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -28,4 +28,4 @@ spec:
       protocol: UDP
       name: discovery-udp
   selector:
-    {{- include "ssv-node.selectorLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}

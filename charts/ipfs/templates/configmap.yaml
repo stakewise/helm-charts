@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "ipfs.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "ipfs.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 data:
   IPFS_PATH: {{ .Values.ipfs.path | quote }}
   IPFS_PROFILE: {{ .Values.ipfs.profile | quote }}

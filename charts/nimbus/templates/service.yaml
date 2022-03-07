@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "nimbus.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "nimbus.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
 {{- if .Values.svcHeadless }}
@@ -35,4 +35,4 @@ spec:
       name: metrics
   {{- end }}
   selector:
-    {{- include "nimbus.selectorLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
