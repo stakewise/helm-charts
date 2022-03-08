@@ -42,5 +42,5 @@ data:
   {{- end }}
   {{- range $key, $value := .Values.polling.conf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
-  {{- end -}}
+  {{- end }}
 {{- end }}
