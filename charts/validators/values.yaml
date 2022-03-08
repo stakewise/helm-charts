@@ -40,7 +40,7 @@ initImageBusybox:
 ## Can be used to temporarily disable validators 
 ## until synchronization of eth1/eth2 nodes is complete
 ##
-enabled: false
+enabled: true
 
 ## What type of validator to use.
 ## Options for Ethereum: prysm, lighthouse, teku
