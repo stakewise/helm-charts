@@ -31,7 +31,7 @@ spec:
             summary: Teku beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: Teku50SlotsBehind
-          expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "teku.fullname" . }}'} > 50
+          expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
           for: 2m
           labels:
             severity: critical
