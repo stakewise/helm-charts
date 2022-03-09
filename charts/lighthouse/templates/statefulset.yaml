@@ -57,8 +57,6 @@ spec:
             - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
             - --datadir=/data
             - --network={{ .Values.network }}
-            - --subscribe-all-subnets
-            - --import-all-attestations
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}
