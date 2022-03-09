@@ -4,7 +4,7 @@
 
 ## How many ipfs instances to run simultaneously
 ##
-replicas: 1
+replicaCount: 1
 
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/

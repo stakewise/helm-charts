@@ -57,7 +57,7 @@ sidecar:
 
 ## How many beacon chain pods to run simultaneously
 ##
-replicas: 1
+replicaCount: 1
 
 ## Prysm beacon node image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain

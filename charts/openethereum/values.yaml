@@ -57,7 +57,7 @@ image:
 
 ## How many openethereum nodes to run simultaneously
 ##
-replicas: 1
+replicaCount: 1
 
 ## Configure pod disruption budgets for Alertmanager
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
