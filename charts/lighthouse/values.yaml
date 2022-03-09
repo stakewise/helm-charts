@@ -107,7 +107,9 @@ rpcPort: "5052"
 
 ## Extra flags for lighthouse beacon chain node
 ##
-extraFlags: []
+extraFlags:
+  - --subscribe-all-subnets
+  - --import-all-attestations
 
 ## Ethereum 1 node endpoints.
 ##
