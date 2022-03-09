@@ -9,7 +9,7 @@ spec:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
   serviceName: {{ include "common.names.fullname" . }}
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.replicaCount }}
   template:
     metadata:
       labels:

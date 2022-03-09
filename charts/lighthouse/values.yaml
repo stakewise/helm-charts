@@ -51,7 +51,7 @@ sidecar:
 
 ## How many beacon chain pods to run simultaneously
 ##
-replicas: 1
+replicaCount: 1
 
 ## Lighthouse beacon node image version
 ## ref: https://hub.docker.com/r/sigp/lighthouse
