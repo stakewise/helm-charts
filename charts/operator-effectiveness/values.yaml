@@ -4,7 +4,7 @@
 
 extraEnv:
   SCORING_SERVER_BIND_ADDR: "0.0.0.0:3000"
-  SCORING_GRAPH_NODE_URL: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli
+  SCORING_GRAPH_NODE_URL: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet
   SCORING_ETH2_NODE_URL: http://127.0.0.1:8545
   SCORING_DATABASE_PATH: /data/operator.db
 
