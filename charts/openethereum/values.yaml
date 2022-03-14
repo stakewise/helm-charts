@@ -35,6 +35,15 @@ securityContext:
 rbac:
   create: true
 
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  tag: "v1.0.2"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3001
+
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
@@ -217,3 +226,32 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
+##
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /eth1/liveness
+    port: sidecar
+    scheme: HTTP
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 30
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 1
+  httpGet:
+    path: /eth1/readiness
+    port: sidecar
+    scheme: HTTP
+
