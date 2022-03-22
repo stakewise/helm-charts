@@ -57,7 +57,7 @@ replicaCount: 1
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   repository: "sigp/lighthouse"
-  tag: "v2.1.4"
+  tag: "v2.1.5"
   pullPolicy: IfNotPresent
 
 ## Node labels for pod assignment
