@@ -24,3 +24,8 @@ jobs:
           fetch-depth: 2
       - name: Deploy Helm Charts
         run: ./scripts/chart.sh
+      - uses: sarisia/actions-status-discord@v1
+        if: always()
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          title: "Release"
