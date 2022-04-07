@@ -33,7 +33,22 @@ securityContext:
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
 rbac:
+  ## @param rbac.create Specifies whether RBAC resources are to be created
+  ##
   create: true
+  ## @param rbac.rules Required ClusterRole rules
+  ## @default -- See `values.yaml`
+  ##
+  rules:
+    ## Required to get information about the serices nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+      - "services"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -71,6 +86,30 @@ imageGnosis:
   tag: "v2.0.6-gbc"
   pullPolicy: IfNotPresent
 
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.port
+  port: 13000
+  ## @param p2pNodePort.startAt Port used to start
+  ##
+  initContainer:
+    image:
+      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
+      ##
+      repository: bitnami/kubectl
+      ## @param p2pNodePort.initContainer.tag Container tag
+      ##
+      tag: "1.23"
+      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
+      ##
+      pullPolicy: IfNotPresent
+
 ## RPC Port
 ##
 rpc:
@@ -96,7 +135,7 @@ extraFlags:
   # Beacon chain options
   - "--accept-terms-of-use"
   # p2p options
-  - "--p2p-max-peers=100"
+  - "--p2p-max-peers=160"
   - "--enable-peer-scorer"
 
 ## Node labels for pod assignment

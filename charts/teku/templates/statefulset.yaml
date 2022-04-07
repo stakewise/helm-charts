@@ -35,8 +35,44 @@ spec:
       priorityClassName: {{ .Values.priorityClassName | quote }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
-    {{- if and .Values.persistence.enabled .Values.initChownData }}
+    {{- if or (and .Values.persistence.enabled .Values.initChownData) (.Values.p2pNodePort.enabled) }}
       initContainers:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: init-nodeport
+          image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
+          imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+              until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
+              export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+              echo "EXTERNAL_PORT=$EXTERNAL_PORT" >  /env/init-nodeport;
+              echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+              cat /env/init-nodeport;
+          volumeMounts:
+            - name: env-nodeport
+              mountPath: /env
+        {{- end }}
+        {{- if and .Values.persistence.enabled .Values.initChownData }}
         - name: init-chown
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -49,37 +85,54 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/teku
+        {{- end }}
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          args:
-            - --network={{ .Values.network }}
-            - --data-beacon-path=/data/teku/beacon
-            - --data-path=/data/teku
-            - --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
-            - --data-storage-mode={{ .Values.dataStorageMode }}
-            - --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
-            - --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
-          {{- if .Values.restApi.enabled }}
-            - --rest-api-enabled={{ .Values.restApi.enabled }}
-            - --rest-api-host-allowlist={{ .Values.restApi.hostAllowList | join "," }}
-            - --rest-api-interface={{ .Values.restApi.interface }}
-            - --rest-api-port={{ .Values.restApi.port }}
-            - --rest-api-cors-origins={{ .Values.restApi.corsOrigins | join "," }}
-            - --rest-api-docs-enabled={{ .Values.restApi.docsEnabled }}
-          {{- end }}
-          {{- if .Values.metrics.enabled }}
-            - --metrics-enabled={{ .Values.metrics.enabled }}
-            - --metrics-categories={{ .Values.metrics.categories | join "," }}
-            - --metrics-host-allowlist={{ .Values.metrics.hostAllowList | join "," }}
-            - --metrics-interface={{ .Values.metrics.interface }}
-            - --metrics-port={{ .Values.metrics.port }}
-          {{- end }}
-          {{- range .Values.extraFlags }}
-            - {{ . | quote }}
-          {{- end }}
+          command:
+            - sh
+            - -ac
+            - >
+            {{- if .Values.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+            {{- end }}
+              exec /opt/teku/bin/teku
+              --network={{ .Values.network }}
+              --data-beacon-path=/data/teku/beacon
+              --data-path=/data/teku
+              --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
+              --data-storage-mode={{ .Values.dataStorageMode }}
+              --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
+              --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
+              --p2p-enabled=true
+              --p2p-port={{ .Values.p2pNodePort.port }}
+            {{- if .Values.p2pNodePort.enabled }}
+              --p2p-advertised-ip=$EXTERNAL_IP
+              --p2p-advertised-port=$EXTERNAL_PORT
+            {{- else }}
+              --p2p-advertised-ip=$(POD_IP)
+              --p2p-advertised-port={{ .Values.p2pNodePort.port }}
+            {{- end }}
+            {{- if .Values.restApi.enabled }}
+              --rest-api-enabled={{ .Values.restApi.enabled }}
+              --rest-api-host-allowlist={{ .Values.restApi.hostAllowList | join "," }}
+              --rest-api-interface={{ .Values.restApi.interface }}
+              --rest-api-port={{ .Values.restApi.port }}
+              --rest-api-cors-origins={{ .Values.restApi.corsOrigins | join "," }}
+              --rest-api-docs-enabled={{ .Values.restApi.docsEnabled }}
+            {{- end }}
+            {{- if .Values.metrics.enabled }}
+              --metrics-enabled={{ .Values.metrics.enabled }}
+              --metrics-categories={{ .Values.metrics.categories | join "," }}
+              --metrics-host-allowlist={{ .Values.metrics.hostAllowList | join "," }}
+              --metrics-interface={{ .Values.metrics.interface }}
+              --metrics-port={{ .Values.metrics.port }}
+            {{- end }}
+            {{- range .Values.extraFlags }}
+              {{ . | quote }}
+            {{- end }}
         {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
           ports:
           {{- if .Values.restApi.enabled }}
@@ -92,10 +145,27 @@ spec:
               containerPort: {{ .Values.metrics.port }}
               protocol: TCP
           {{- end }}
+          {{- if .Values.p2pNodePort.enabled }}
+            - name: p2p-tcp
+              containerPort: {{ .Values.p2pNodePort.port }}
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: {{ .Values.p2pNodePort.port }}
+              protocol: UDP
+          {{- end }}
         {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           volumeMounts:
             - name: data
               mountPath: /data/teku
+            {{- if .Values.p2pNodePort.enabled }}
+            - name: env-nodeport
+              mountPath: /env
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.restApi.enabled }}
@@ -136,8 +206,12 @@ spec:
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
-  {{- if (not .Values.persistence.enabled) }}
       volumes:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: env-nodeport
+          emptyDir: {}
+        {{- end }}
+  {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
   {{- else }}

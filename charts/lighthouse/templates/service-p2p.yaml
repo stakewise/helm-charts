@@ -1,0 +1,25 @@
+{{- if .Values.p2pNodePort.enabled -}}
+{{- range $i, $e := until (int $.Values.replicaCount) }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+    pod: {{ include "common.names.fullname" $ }}-{{ $i }}
+    type: p2p
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp
+      port: {{ $.Values.p2pNodePort.port }}
+      protocol: TCP
+      targetPort: p2p-tcp
+  selector:
+    {{- include "common.labels.matchLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: {{ include "common.names.fullname" $ }}-{{ $i }}
+
+{{- end }}
+{{- end }}
