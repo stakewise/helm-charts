@@ -74,7 +74,7 @@ image:
     tag: "v2.0.6-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.1.4"
+    tag: "v2.1.5"
   teku:
     repository: "consensys/teku"
     tag: "22.1"
@@ -167,7 +167,15 @@ extraFlags:
 ## List of Beacon Chain node addresses
 ## If not specified, will connect to prysm/lighthouse beacon nodes
 ## deployed with this helm chart
+##
 beaconChainRpcEndpoints: []
+
+## Randomize endpoints if specified
+## Has a higher priority than beaconChainRpcEndpoints,
+## all specified hosts will be randomly assigned to all validators,
+## used to more evenly distribute the load
+##
+beaconChainRpcEndpointsRandomized: []
 
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.

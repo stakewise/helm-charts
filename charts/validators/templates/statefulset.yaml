@@ -2,6 +2,22 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
 {{- range (untilStep 0 (int .Values.validatorsCount) 1) }}
+
+{{ $rpcEndpoints := list }}
+{{- if $.Values.beaconChainRpcEndpointsRandomized }}
+{{- $rpcList := list }}
+{{- range (untilStep $counter (len $.Values.beaconChainRpcEndpointsRandomized) 1) }}
+{{ $rpcList = append $rpcList (index $.Values.beaconChainRpcEndpointsRandomized .) }}
+{{- end }}
+{{ $rpcList = append $rpcList $.Values.beaconChainRpcEndpointsRandomized }}
+{{ $rpcEndpoints = include "flatten" $rpcList }}
+{{- if ge $counter (len $.Values.beaconChainRpcEndpointsRandomized) }}
+  {{- $counter = 1 }}
+{{- else }}
+  {{ $counter = int (add1 $counter) }}
+{{- end }}
+{{- end }}
+
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -81,7 +97,7 @@ spec:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
-          args:  
+          args:
           {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
           {{- end -}}
@@ -96,7 +112,24 @@ spec:
           {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
             - {{ . | quote }}
           {{- end -}}
+
+        {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if eq $.Values.type "prysm" }}
+            - "--beacon-rpc-provider={{ $rpcEndpoints }}"
+          {{- else if eq $.Values.type "lighthouse" }}
+            - "--beacon-nodes={{ $rpcEndpoints }}"
+          {{- else if eq $.Values.type "teku" }}
+          {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if gt $beaconChainRpcEndpointsLen 1 }}
+          {{- fail "Teku supports only one beacon node host, please specify one host." }}
+          {{- else }}
+            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+          {{- end }}
+          {{- end }}
+        {{- else }}
           {{- include "beacon-rpc-node" $ | nindent 12 }}
+        {{- end }}
+
           {{- include "validator-graffiti" $ | nindent 12 }}
           {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
