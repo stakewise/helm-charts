@@ -127,3 +127,19 @@ Validator graffiti
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "flatten_list" -}}
+  {{- $output := list -}}
+  {{- range . -}}
+    {{- if (kindIs "slice" . ) -}}
+      {{- $output = (concat $output ( get (fromYaml (include "flatten_list" . ) )  "list" ) ) -}}
+    {{- else -}}
+      {{- $output = (append $output . ) -}}
+    {{- end -}}
+  {{- end -}}
+  {{- toYaml (dict "list" $output) -}}
+{{- end -}}
+
+{{- define "flatten" -}}
+  {{- get ( fromYaml (include "flatten_list" . ) ) "list" | uniq | join "," }}
+{{- end -}}
