@@ -16,7 +16,6 @@ data:
   MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.mainnet | quote }}
   MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.mainnet | quote }}
   MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.polling.conf.uniswapV3SubgraphUrl.mainnet | quote }}
-  MAINNET_RARI_FUSE_SUBGRAPH_URL: {{ .Values.polling.conf.rariFuseSubgraphUrl.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.commonConf.enabledNetworks }}
   GOERLI_ETH1_ENDPOINT: {{ .Values.polling.conf.eth1Endpoint.goerli | quote }}
