@@ -18,7 +18,6 @@ data:
   MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.mainnet | quote }}
   MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.mainnet | quote }}
   MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl.mainnet | quote }}
-  MAINNET_RARI_FUSE_SUBGRAPH_URL: {{ .Values.settings.rariFuseSubgraphUrl.mainnet | quote }}
   MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.settings.enabledNetworks }}

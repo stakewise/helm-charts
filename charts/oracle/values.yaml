@@ -80,8 +80,6 @@ settings:
     goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
     permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
     gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
-  rariFuseSubgraphUrl:
-    mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/rari-fuse-mainnet"
 
   # credentials
   ipfsPinataApiKey: ""
