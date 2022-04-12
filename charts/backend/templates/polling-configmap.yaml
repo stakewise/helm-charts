@@ -39,6 +39,7 @@ data:
   GNOSIS_STAKEWISE_SUBGRAPH_URL: {{ .Values.polling.conf.stakewiseSubgraphUrl.gnosis | quote }}
   GNOSIS_ETHEREUM_SUBGRAPH_URL: {{ .Values.polling.conf.ethereumSubgraphUrl.gnosis | quote }}
   {{- end }}
+  SENTRY_DSN: {{ .Values.polling.conf.sentryDsn | quote }}
   {{- range $key, $value := .Values.polling.conf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
   {{- end }}
