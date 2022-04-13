@@ -2,7 +2,7 @@
 {{- fail "Gnosis chain network can't be used with teku client" }}
 {{- end }}
 
-{{- if not .Values.beaconChainRpcEndpoints }}
+{{- if and (not .Values.beaconChainRpcEndpoints) (not .Values.beaconChainRpcEndpointsRandomized) }}
 {{- fail ".Values.beaconChainRpcEndpoints is empty" }}
 {{- end }}
 

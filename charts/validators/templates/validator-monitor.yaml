@@ -1,0 +1,126 @@
+{{- if .Values.validatorMonitor.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "validators.fullname" . }}-monitor
+  labels:
+    component: validator-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: validator-monitor
+  serviceName: {{ template "validators.fullname" . }}-monitor
+  template:
+    metadata:
+      labels:
+        component: validator-monitor
+    spec:
+    {{- with .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      containers:
+        - name: monitor
+          image: "{{ .Values.validatorMonitor.image.repository }}:{{ .Values.validatorMonitor.image.tag }}"
+          imagePullPolicy: {{ .Values.validatorMonitor.image.pullPolicy }}
+          env:
+            - name: BIND_ADDRESS
+              value: "0.0.0.0:{{ .Values.validatorMonitor.port }}"
+            - name: GRAPH_NODE_URL
+              value: {{ .Values.validatorMonitor.graphNodeUrl | quote }}
+            - name: BEACON_NODE_URL
+              value: {{ .Values.validatorMonitor.beaconNodeUrl | quote }}
+            - name: INDEX_CHUNCK_SIZE
+              value: {{ .Values.validatorMonitor.indexChunckSize | quote }}
+            - name: SLOTS_PER_EPOCH
+              value: {{ .Values.validatorMonitor.slotsPerEpoch | quote }}
+            - name: OPERATOR_WALLETS
+              value: {{ join "," .Values.validatorMonitor.operatorWallets | quote }}
+          ports:
+            - containerPort: {{ .Values.validatorMonitor.port }}
+              name: metrics
+              protocol: TCP
+        {{- with .Values.validatorMonitor.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "validators.fullname" . }}-monitor
+  labels:
+    component: validator-monitor
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.validatorMonitor.port }}
+      targetPort: metrics
+      protocol: TCP
+      name: metrics
+  selector:
+    component: validator-monitor
+
+{{- if .Values.metrics.serviceMonitor.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "validators.fullname" . }}-monitor
+  {{- if .Values.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    component: validator-monitor
+    {{- if .Values.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /metrics
+      {{- if .Values.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.relabellings }}
+      relabelings: {{- toYaml .Values.metrics.serviceMonitor.relabellings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      component: validator-monitor
+{{- end }}
+
+{{- end }}
