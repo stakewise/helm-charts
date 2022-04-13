@@ -24,7 +24,7 @@ spec:
       rules:
         - alert: ValidatorMissedAttestations
           expr: validator_effectiveness_status{job='{{ template "validators.fullname" $ }}-monitor'} == 0
-          for: 5m
+          for: 10m
           labels:
             severity: critical
           annotations:
