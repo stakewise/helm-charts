@@ -196,10 +196,7 @@ validatorMonitor:
   graphNodeUrl: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet
   beaconNodeUrl: http://localhost:5052
   indexChunckSize: 500
-  operatorWallets:
-    - 0x102f792028a56f13d6d99ed4ec8a6125de98582a
-    - 0x5fc60576b92c5ce5c341c43e3b2866eb9e0cddd1
-    - 0xf91aa4a655b6f43243ed4c2853f3508314daa2ab
+  operatorWallets: []
   ## Configure resource requests and limits.
   ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
   ##
