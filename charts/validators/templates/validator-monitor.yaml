@@ -50,8 +50,6 @@ spec:
               value: {{ .Values.validatorMonitor.beaconNodeUrl | quote }}
             - name: INDEX_CHUNCK_SIZE
               value: {{ .Values.validatorMonitor.indexChunckSize | quote }}
-            - name: SLOTS_PER_EPOCH
-              value: {{ .Values.validatorMonitor.slotsPerEpoch | quote }}
             - name: OPERATOR_WALLETS
               value: {{ join "," .Values.validatorMonitor.operatorWallets | quote }}
           ports:
