@@ -9,15 +9,15 @@ RUN JAVA_TOOL_OPTIONS="-Djdk.lang.Process.launchMechanism=vfork" $JAVA_HOME/bin/
          --compress=2 \
          --output /javaruntime
 
-FROM consensys/teku:21.12.1 as teku
-FROM ghcr.io/gnosischain/gbc-prysm-validator:v2.0.4-gbc as prysm-gnosis
+FROM consensys/teku:22.4 as teku
+FROM ghcr.io/gnosischain/gbc-prysm-validator:v2.0.6-gbc as prysm-gnosis
 
 FROM ubuntu:21.04
 
 ENV JAVA_HOME=/opt/java/openjdk
 ENV PATH "${JAVA_HOME}/bin:${PATH}"
-ENV PRYSM_VALIDATOR_VERSION=2.0.5
-ENV LIGHTHOUSE_VALIDATOR_VERSION=2.1.2
+ENV PRYSM_VALIDATOR_VERSION=2.0.6
+ENV LIGHTHOUSE_VALIDATOR_VERSION=2.2.1
 ENV VAULT_VERSION=1.8.4
 ENV DEBIAN_FRONTEND=noninteractive
 
