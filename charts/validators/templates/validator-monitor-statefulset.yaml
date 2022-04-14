@@ -1,0 +1,63 @@
+{{- if .Values.validatorMonitor.enabled }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "validators.fullname" . }}-monitor
+  labels:
+    component: validator-monitor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: validator-monitor
+  serviceName: {{ template "validators.fullname" . }}-monitor
+  template:
+    metadata:
+      labels:
+        component: validator-monitor
+    spec:
+    {{- with .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      containers:
+        - name: monitor
+          image: "{{ .Values.validatorMonitor.image.repository }}:{{ .Values.validatorMonitor.image.tag }}"
+          imagePullPolicy: {{ .Values.validatorMonitor.image.pullPolicy }}
+          env:
+            - name: BIND_ADDRESS
+              value: "0.0.0.0:{{ .Values.validatorMonitor.port }}"
+            - name: GRAPH_NODE_URL
+              value: {{ .Values.validatorMonitor.graphNodeUrl | quote }}
+            - name: BEACON_NODE_URL
+              value: {{ .Values.validatorMonitor.beaconNodeUrl | quote }}
+            - name: INDEX_CHUNCK_SIZE
+              value: {{ .Values.validatorMonitor.indexChunckSize | quote }}
+            - name: OPERATOR_WALLETS
+              value: {{ join "," .Values.validatorMonitor.operatorWallets | quote }}
+          ports:
+            - containerPort: {{ .Values.validatorMonitor.port }}
+              name: metrics
+              protocol: TCP
+        {{- with .Values.validatorMonitor.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+{{- end }}
