@@ -24,7 +24,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2022.02.04"
+  tag: "v2022.04.01"
 
 imagePullSecrets: []
 nameOverride: ""

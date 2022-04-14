@@ -74,16 +74,16 @@ image:
     tag: "v2.0.6-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.1.5"
+    tag: "v2.2.1"
   teku:
     repository: "consensys/teku"
-    tag: "22.1"
+    tag: "22.4"
   
 ## Init image is used to initialise validators
 ##
 initImage:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
-  tag: "v1.5.2"
+  tag: "v1.5.3"
   pullPolicy: IfNotPresent
   
 terminationGracePeriodSeconds: 900
