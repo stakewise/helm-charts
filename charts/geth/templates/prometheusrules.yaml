@@ -26,7 +26,7 @@ spec:
           expr: up{job="{{ include "common.names.fullname" . }}"} == 0
           for: 5m
           labels:
-            severity: error
+            severity: critical
           annotations:
             summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
             description: Geth Node {{ printf "{{ $labels.instance }}" }} is down

@@ -26,7 +26,7 @@ spec:
           expr: up{job=" {{ include "common.names.fullname" . }}"} == 0
           for: 5m
           labels:
-            severity: error
+            severity: critical
           annotations:
             summary: Erigon Node {{ printf "{{ $labels.instance }}" }} down
             description: Erigon Node {{ printf "{{ $labels.instance }}" }} is down
