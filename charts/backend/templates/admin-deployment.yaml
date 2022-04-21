@@ -54,7 +54,7 @@ spec:
                 name: {{ template "backend.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "backend.settings.admin_settings"
+              value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
       {{- if .Values.admin.user.create }}
@@ -71,7 +71,7 @@ spec:
                 name: {{ template "admin.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "backend.settings.admin_settings"
+              value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
       {{- end }}
@@ -86,7 +86,7 @@ spec:
                 name: {{ template "backend.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
-              value: "backend.settings.admin_settings"
+              value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
         {{- with .Values.admin.resources }}
