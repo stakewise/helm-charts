@@ -1,5 +1,6 @@
 # Common configuration for all the containers (server.common_conf)
 commonConf:
+  environment: "staging"
   secretKey: ""
   # possible values: goerli, perm_goerli, gnosis, mainnet
   enabledNetworks: "goerli,perm_goerli,gnosis,mainnet"
@@ -49,7 +50,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.3.1"
+  tag: "v2.3.2"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 

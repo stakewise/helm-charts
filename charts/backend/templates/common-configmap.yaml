@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "backend.labels" . | nindent 4 }}
 data:
+  ENVIRONMENT: {{ .Values.commonConf.environment | quote }}
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
   ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}
