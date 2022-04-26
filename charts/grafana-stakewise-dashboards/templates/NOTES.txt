@@ -1,0 +1,7 @@
+The following dashboards will be imported into Grafana:
+
+{{- $root := . }}
+{{ range $path, $bytes := .Files.Glob "dashboards/**.json" }}
+-> {{ $path | replace "dashboards/" ""}}
+{{- end }}
+

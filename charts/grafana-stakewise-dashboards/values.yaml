@@ -1,0 +1,9 @@
+## Grafana dashboards folder
+##
+dashboardsFolder: StakeWise
+
+importFromValue:
+  # dashboardName: |-
+  #   {
+  #     dashboard json
+  #   }
