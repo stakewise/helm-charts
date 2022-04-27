@@ -79,11 +79,11 @@ replicaCount: 1
 ##
 image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.0.6"
+  tag: "v2.1.0"
   pullPolicy: IfNotPresent
 imageGnosis:
   repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
-  tag: "v2.0.6-gbc"
+  tag: "v2.1.0-gbc"
   pullPolicy: IfNotPresent
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
