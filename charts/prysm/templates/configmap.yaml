@@ -29,7 +29,7 @@ data:
     - "enr:-Ku4QFaTwgoms-EiiRIfHUH3FXprWUFgjHg4UuWvilqoUQtDbmTszVIxUEOwQUmA2qkiP-T9wXjc_rVUuh9cU7WgwbgBh2F0dG5ldHOIAAAAAAAAAACEZXRoMpD5Jd3FAAAAZP__________gmlkgnY0gmlwhC0hBmCJc2VjcDI1NmsxoQOpsg1XCrXmCwZKcSTcycLwldoKUMHPUpMEVGeg_EEhuYN1ZHCCKvg"
   config.yaml: |
     CONFIG_NAME: gnosis
-    PRESET_BASE: mainnet
+    PRESET_BASE: gnosis
     
     # Misc
     # ---------------------------------------------------------------
