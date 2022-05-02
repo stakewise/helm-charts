@@ -19,6 +19,8 @@ data:
   MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.mainnet | quote }}
   MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl.mainnet | quote }}
   MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.mainnet | quote }}
+  MAINNET_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.mainnet | quote }}
+  MAINNET_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.settings.enabledNetworks }}
   GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.goerli | quote }}
@@ -26,18 +28,24 @@ data:
   GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.goerli | quote }}
   GOERLI_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.settings.uniswapV3SubgraphUrl.goerli | quote }}
   GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.goerli | quote }}
+  GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.goerli | quote }}
+  GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.goerli | quote }}
   {{- end }}
   {{- if contains "perm_goerli" .Values.settings.enabledNetworks }}
   PERM_GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.permGoerli | quote }}
   PERM_GOERLI_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.permGoerli | quote }}
   PERM_GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.permGoerli | quote }}
   PERM_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.permGoerli | quote }}
+  PERM_GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.permGoerli | quote }}
+  PERM_GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.permGoerli | quote }}
   {{- end }}
   {{- if contains "gnosis" .Values.settings.enabledNetworks }}
   GNOSIS_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.gnosis | quote }}
   GNOSIS_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.gnosis | quote }}
   GNOSIS_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.gnosis | quote }}
   GNOSIS_AWS_S3_REGION: {{ .Values.settings.awsRegion.gnosis | quote }}
+  GNOSIS_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.gnosis | quote }}
+  GNOSIS_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.gnosis | quote }}
   {{- end }}
   {{- range $key, $value := .Values.settings.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
