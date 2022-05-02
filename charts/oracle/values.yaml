@@ -32,7 +32,7 @@ serviceAccount:
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.3.1"
+  tag: "v2.4.0"
   pullPolicy: IfNotPresent
 
 # Configure resource requests and limits.
@@ -108,6 +108,20 @@ settings:
     goerli: ""
     permGoerli: ""
     gnosis: ""
+
+  # the chunk size for fetching validators' balances
+  validatorsFetchChunkSize:
+    mainnet: "100"
+    goerli: "100"
+    permGoerli: "100"
+    gnosis: "100"
+
+  # max number of validators to register in a single transaction
+  validatorsBatchSize:
+    mainnet: "10"
+    goerli: "10"
+    permGoerli: "10"
+    gnosis: "10"
 
   ## @param settings.extraEnv Extra environment variables to pass to the container
   ## extraEnv:
