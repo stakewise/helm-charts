@@ -15,21 +15,19 @@ metadata:
     pod: {{ include "common.names.fullname" $ }}-{{ $i }}
     type: p2p
 spec:
-  type: {{ $.Values.p2pNodePort.type }}
+  type: NodePort
   externalTrafficPolicy: Local
   ports:
     - name: p2p-tcp
-      port: {{ include "prysm.p2pPort" $ }}
+      port: {{ include "erigon.p2pPort" $ }}
       protocol: TCP
       targetPort: p2p-tcp
       nodePort: {{ $port }}
-  {{- if eq $.Values.p2pNodePort.type "NodePort" }}
     - name: p2p-udp
-      port: {{ include "prysm.p2pPort" $ }}
+      port: {{ include "erigon.p2pPort" $ }}
       protocol: UDP
       targetPort: p2p-udp
       nodePort: {{ $port }}
-  {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
     statefulset.kubernetes.io/pod-name: {{ include "common.names.fullname" $ }}-{{ $i }}

@@ -35,8 +35,43 @@ spec:
       priorityClassName: {{ .Values.priorityClassName | quote }}
       securityContext:
         {{- toYaml .Values.securityContext | nindent 8 }}
-    {{- if and .Values.persistence.enabled .Values.initChownData }}
+    {{- if or (and .Values.persistence.enabled .Values.initChownData) (.Values.p2pNodePort.enabled) }}
       initContainers:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: init-nodeport
+          image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
+          imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+              export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+              echo "EXTERNAL_PORT=$EXTERNAL_PORT" >  /env/init-nodeport;
+              echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+              cat /env/init-nodeport;
+          volumeMounts:
+            - name: env-nodeport
+              mountPath: /env
+        {{- end }}
+        {{- if and .Values.persistence.enabled .Values.initChownData }}
         - name: init-chown
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -49,51 +84,77 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
+        {{- end }}
     {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           workingDir: /data/nethermind
-          command: ['/nethermind/Nethermind.Runner']
-          args:
+          command:
+            - sh
+            - -ac
+            - >
+            {{- if .Values.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+            {{- end }}
+              exec /nethermind/Nethermind.Runner
           {{- if eq .Values.network "gnosis" }}
-            - --config=xdai
+              --config=xdai
           {{- else }}
-            - --config={{ .Values.network }}
+              --config={{ .Values.network }}
           {{- end }}
-            - --datadir=/data/nethermind
+              --datadir=/data/nethermind
           {{- if .Values.jsonrpc.enabled }}
-            - --JsonRpc.Enabled={{ .Values.jsonrpc.enabled }}
-            - --JsonRpc.EnabledModules={{ .Values.jsonrpc.modules | join "," }}
-            - --JsonRpc.Host={{ .Values.jsonrpc.host }}
-            - --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
-            - --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
+              --JsonRpc.Enabled={{ .Values.jsonrpc.enabled }}
+              --JsonRpc.EnabledModules={{ .Values.jsonrpc.modules | join "," }}
+              --JsonRpc.Host={{ .Values.jsonrpc.host }}
+              --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
+              --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
-            - --Metrics.Enabled={{ .Values.metrics.enabled }}
-            - --Metrics.ExposePort={{ .Values.metrics.port }}
+              --Metrics.Enabled={{ .Values.metrics.enabled }}
+              --Metrics.ExposePort={{ .Values.metrics.port }}
+          {{- end }}
+          {{- if .Values.p2pNodePort.enabled }}
+              --Network.ExternalIp==$EXTERNAL_IP
+              --Network.P2PPort=$EXTERNAL_PORT
+              --Network.DiscoveryPort=$EXTERNAL_PORT
+          {{- else }}
+              --Network.ExternalIp=$(POD_IP)
+              --Network.P2PPort={{ include "nethermind.p2pPort" . }}
+              --Network.DiscoveryPort={{ include "nethermind.p2pPort" . }}
           {{- end }}
           {{- range .Values.extraFlags }}
-            - {{ . | quote }}
+              {{ . | quote }}
           {{- end }}
           ports:
-        {{- if .Values.jsonrpc.enabled }}
+          {{- if .Values.jsonrpc.enabled }}
             - name: json-rest
               containerPort: {{ .Values.jsonrpc.ports.rest }}
               protocol: TCP
             - name: json-ws
               containerPort: {{ .Values.jsonrpc.ports.websocket }}
               protocol: TCP
-        {{- end }}
-        {{- if .Values.metrics.enabled }}
+          {{- end }}
+          {{- if .Values.metrics.enabled }}
             - name: metrics
               containerPort: {{ .Values.metrics.port }}
               protocol: TCP
-        {{- end }}
+          {{- end }}
+          {{- if .Values.p2pNodePort.enabled }}
+            - name: p2p-tcp
+              containerPort: {{ include "nethermind.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: {{ include "nethermind.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
+            - name: env-nodeport
+              mountPath: /env
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.jsonrpc.enabled }}
@@ -134,11 +195,15 @@ spec:
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
-  {{- if (not .Values.persistence.enabled) }}
       volumes:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: env-nodeport
+          emptyDir: {}
+        {{- end }}
+{{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
-  {{- else }}
+{{- else }}
   volumeClaimTemplates:
     - metadata:
         name: data

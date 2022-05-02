@@ -1,5 +1,10 @@
 {{- if .Values.p2pNodePort.enabled -}}
 {{- range $i, $e := until (int $.Values.replicaCount) }}
+{{- $port := add $.Values.p2pNodePort.startAt $i -}}
+{{- if hasKey $.Values.p2pNodePort.portsOverwrite ($i | toString) -}}
+  {{ $port = index $.Values.p2pNodePort.portsOverwrite ($i | toString) }}
+{{- end }}
+
 ---
 apiVersion: v1
 kind: Service
@@ -10,13 +15,21 @@ metadata:
     pod: {{ include "common.names.fullname" $ }}-{{ $i }}
     type: p2p
 spec:
-  type: LoadBalancer
+  type: {{ $.Values.p2pNodePort.type }}
   externalTrafficPolicy: Local
   ports:
     - name: p2p-tcp
-      port: {{ $.Values.p2pNodePort.port }}
+      port: {{ include "lighthouse.p2pPort" $ }}
       protocol: TCP
       targetPort: p2p-tcp
+      nodePort: {{ $port }}
+  {{- if eq $.Values.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp
+      port: {{ include "lighthouse.p2pPort" $ }}
+      protocol: UDP
+      targetPort: p2p-udp
+      nodePort: {{ $port }}
+  {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
     statefulset.kubernetes.io/pod-name: {{ include "common.names.fullname" $ }}-{{ $i }}
