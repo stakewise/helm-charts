@@ -27,8 +27,43 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
-      {{- if and .Values.persistence.enabled .Values.initChownData }}
+    {{- if or (and .Values.persistence.enabled .Values.initChownData) (.Values.p2pNodePort.enabled) }}
       initContainers:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: init-nodeport
+          image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
+          imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+              export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+              echo "EXTERNAL_PORT=$EXTERNAL_PORT" >  /env/init-nodeport;
+              echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+              cat /env/init-nodeport;
+          volumeMounts:
+            - name: env-nodeport
+              mountPath: /env
+        {{- end }}
+        {{- if and .Values.persistence.enabled .Values.initChownData }}
         - name: init-chown
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -38,25 +73,39 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-      {{- end }}
+        {{- end }}
+    {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["erigon"]
-          args:
-            - --datadir=/data/erigon
-            - --private.api.addr={{ .Values.privateApiAddr }}
-            - --chain={{ .Values.network }}
+          command:
+            - sh
+            - -ac
+            - >
+            {{- if .Values.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+            {{- end }}
+              exec erigon
+              --datadir=/data/erigon
+              --private.api.addr={{ .Values.privateApiAddr }}
+              --chain={{ .Values.network }}
+          {{- if .Values.p2pNodePort.enabled }}
+              --nat=extip:$EXTERNAL_IP
+              --port=$EXTERNAL_PORT
+          {{- else }}
+              --nat=extip:$(POD_IP)
+              --port={{ include "erigon.p2pPort" $ }}
+          {{- end }}
           {{- range .Values.extraFlags }}
-            - {{ . }}
+              {{ . }}
           {{- end }}
           {{- if .Values.metrics.enabled }}
-            - --metrics
-            - --metrics.addr={{ .Values.metrics.addr }}
-            - --metrics.port={{ .Values.metrics.port }}
+              --metrics
+              --metrics.addr={{ .Values.metrics.addr }}
+              --metrics.port={{ .Values.metrics.port }}
           {{- end }}
           ports:
             - name: grpc
@@ -67,11 +116,21 @@ spec:
               protocol: TCP
               containerPort: {{ .Values.metrics.port }}
           {{- end }}
+          {{- if .Values.p2pNodePort.enabled }}
+            - name: p2p-tcp
+              containerPort: {{ include "erigon.p2pPort" $ }}
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: {{ include "erigon.p2pPort" $ }}
+              protocol: UDP
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: env-nodeport
+              mountPath: /env
         - name: {{ .Chart.Name }}-rpc-daemon
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -140,6 +199,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.p2pNodePort.enabled }}
+        - name: env-nodeport
+          emptyDir: {}
+        {{- end }}
 {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}

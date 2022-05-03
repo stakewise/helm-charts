@@ -1,0 +1,3 @@
+{{- define "erigon.p2pPort" -}}
+{{- printf "30303" -}}
+{{- end -}}

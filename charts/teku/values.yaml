@@ -55,12 +55,21 @@ rbac:
   ## @param rbac.create Specifies whether RBAC resources are to be created
   ##
   create: true
+  ## @param rbac.clusterRules Required ClusterRole rules
+  ## @default -- See `values.yaml`
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    - apiGroups: [""]
+      resources:
+      - "nodes"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
   ## @param rbac.rules Required ClusterRole rules
   ## @default -- See `values.yaml`
-  ##
   rules:
     ## Required to get information about the serices nodePort.
-    ##
     - apiGroups: [""]
       resources:
       - "services"
@@ -194,18 +203,25 @@ eth1Endpoints: []
 ##
 extraFlags: []
 
-## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
-## This will generate a service for each replica, with a port binding via NodePort.
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
+## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
 ## This is useful if you want to expose and announce your node to the Internet.
 ##
 p2pNodePort:
   ## @param p2pNodePort.enabled Expose P2P port via NodePort
   ##
   enabled: false
-  ## @param p2pNodePort.port
-  port: 9000
-  ## @param p2pNodePort.startAt Port used to start
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
+  startAt: 31500
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
   initContainer:
     image:
       ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
