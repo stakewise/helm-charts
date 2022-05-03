@@ -214,7 +214,7 @@ p2pNodePort:
   ## @param p2pNodePort.type
   ## Options: NodePort, LoadBalancer
   type: NodePort
-  ## @param p2pNodePort.startAt Port used to start
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
   startAt: 31500
   ## @param p2pNodePort.portsOverwrite Overwrite a port for specific replicas

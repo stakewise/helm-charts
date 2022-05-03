@@ -223,7 +223,7 @@ p2pNodePort:
   ## @param p2pNodePort.enabled Expose P2P port via NodePort
   ##
   enabled: false
-  ## @param p2pNodePort.startAt Port used to start
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
   startAt: 31200
   ## @param p2pNodePort.portsOverwrite Overwrite a port for specific replicas
