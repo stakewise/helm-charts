@@ -133,7 +133,7 @@ p2pNodePort:
   enabled: false
   ## @param p2pNodePort.startAt Port used to start
   ##
-  startAt: 31000
+  startAt: 31100
   ## @param p2pNodePort.portsOverwrite Overwrite a port for specific replicas
   ## @default -- See `values.yaml` for example
   portsOverwrite: {}
