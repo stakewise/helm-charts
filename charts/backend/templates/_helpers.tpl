@@ -32,8 +32,8 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" (include "backend.fullname" .) "api" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "polling.fullname" -}}
-{{- printf "%s-%s" (include "backend.fullname" .) "polling" | trunc 63 | trimSuffix "-" -}}
+{{- define "celery.fullname" -}}
+{{- printf "%s-%s" (include "backend.fullname" .) "celery" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
 {{- define "backend.chart" -}}

@@ -45,12 +45,12 @@ commonConf:
 
 
 securityContext:
-  fsGroup: 1001
-  runAsUser: 1001
+  fsGroup: 65534
+  runAsUser: 65534
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.3.2"
+  tag: "sha-dcd7e10"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -239,7 +239,7 @@ api:
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
   priorityClassName: ""
 
-polling:
+celery:
   priorityClassName: ""
 
   # Affinity Settings
@@ -250,76 +250,25 @@ polling:
   # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
   tolerations: [ ]
 
-  deployments:
-    - command: "poll_payments"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
+  # How many celery worker pods to run simultaneously.
+  workerReplicaCount: 3
+  # How many celery beat pods to run simultaneously.
+  beatReplicaCount: 1
 
-    - command: "poll_validator_bills"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
-
-    - command: "poll_oracles"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 100m
-          memory: 100Mi
-
-    - command: "poll_settings"
-      terminationGracePeriodSeconds: 300
-      resources:
-        requests:
-          cpu: 100m
-          memory: 200Mi
-
-    - command: "poll_activations"
-      terminationGracePeriodSeconds: 300
-      resources:
-        requests:
-          cpu: 100m
-          memory: 200Mi
-
-    - command: "poll_token_transfers"
-      terminationGracePeriodSeconds: 300
-      resources:
-        requests:
-          cpu: 100m
-          memory: 200Mi
-
-    - command: "poll_balance_snapshots"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 50m
-          memory: 100Mi
-
-    - command: "poll_validators"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 50m
-          memory: 100Mi
-
-    - command: "poll_token_stats"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 50m
-          memory: 100Mi
-
-    - command: "poll_stakers_rewards"
-      terminationGracePeriodSeconds: 180
-      resources:
-        requests:
-          cpu: 50m
-          memory: 100Mi
+  flower:
+    # Configure ingress
+    # https://kubernetes.io/docs/concepts/services-networking/ingress/
+    ingress:
+      enabled: true
+      className: ""
+      annotations: {}
+      tls: []
+      hosts: []
+    # How many celery flower pods to run simultaneously.
+    replicaCount: 1
+    port: "5555"
+    user: ""
+    password: ""
 
   conf:
     eth1Endpoint:
@@ -358,11 +307,16 @@ polling:
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
 
-    ## @param polling.conf.extraEnv Extra environment variables to pass to the container
+    ## @param celery.conf.extraEnv Extra environment variables to pass to the container
     ## extraEnv:
     ##   MY_ENV_VAR: my_value
     ##
     extraEnv: {}
+  
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
 
 postgresql:
   enabled: false
@@ -422,3 +376,12 @@ postgresql:
     enabled: false
   metrics:
     enabled: true
+
+rabbitmq:
+  enabled: true
+  auth:
+    username: "rabbitmq"
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 8Gi

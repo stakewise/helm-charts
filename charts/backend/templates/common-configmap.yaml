@@ -1,4 +1,4 @@
-{{- if or .Values.admin.enabled .Values.api.enabled .Values.polling.deployments }}
+{{- if or .Values.admin.enabled .Values.api.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -7,6 +7,7 @@ metadata:
     {{- include "backend.labels" . | nindent 4 }}
 data:
   ENVIRONMENT: {{ .Values.commonConf.environment | quote }}
+  CELERY_FLOWER_USER: {{ .Values.celery.flower.user | quote }}
   # https://github.com/notifiers/notifiers/issues/328
   USERNAME: user
   ENABLED_NETWORKS: {{ .Values.commonConf.enabledNetworks | quote }}

@@ -1,0 +1,53 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ template "celery.fullname" . }}-worker
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "celery-worker"
+spec:
+  replicas: {{ default 1 .Values.celery.workerReplicaCount }}
+  selector:
+    matchLabels:
+      {{- include "backend.selectorLabels" . | nindent 6 }}
+      component: "celery-worker"
+  template:
+    metadata:
+      labels:
+        {{- include "backend.selectorLabels" . | nindent 8 }}
+        component: "celery-worker"
+      annotations:
+        checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
+        checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
+        checksum/celery-configmap: {{ include (print $.Template.BasePath "/celery-configmap.yaml") . | sha256sum }}
+    spec:
+    {{- if .Values.celery.tolerations }}
+      tolerations:
+        {{ tpl .Values.celery.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.celery.affinity }}
+      affinity:
+        {{ tpl .Values.celery.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ template "celery.fullname" . }}
+      priorityClassName: {{ .Values.admin.priorityClassName | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["/start-celeryworker"]
+          envFrom:
+            - secretRef:
+                name: {{ template "backend.fullname" . }}
+            - configMapRef:
+                name: {{ template "backend.fullname" . }}
+            - configMapRef:
+                name: {{ template "celery.fullname" . }}
+        {{- with .Values.celery.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
