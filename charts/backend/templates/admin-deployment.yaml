@@ -40,9 +40,6 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-    {{- if .Values.image.pullSecrets }}
-      imagePullSecrets: {{ toYaml .Values.image.pullSecrets | nindent 6 }}
-    {{- end }}
       serviceAccountName: {{ template "admin.fullname" . }}
       priorityClassName: {{ .Values.admin.priorityClassName | quote }}
       initContainers:
