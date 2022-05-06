@@ -129,8 +129,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
+          {{- end }}
         - name: {{ .Chart.Name }}-rpc-daemon
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
