@@ -156,8 +156,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
+          {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
+          {{- end }}
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}

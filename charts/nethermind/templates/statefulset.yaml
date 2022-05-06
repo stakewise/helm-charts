@@ -153,8 +153,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
+          {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.jsonrpc.enabled }}
