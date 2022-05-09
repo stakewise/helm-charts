@@ -90,6 +90,11 @@ image:
   tag: "v2.2.1"
   pullPolicy: IfNotPresent
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
@@ -128,7 +133,7 @@ verticalAutoscaler:
 
 ## Eth2 network ID
 ## Options: mainnet, prater, gnosis
-## 
+##
 network: mainnet
 
 ## RPC Port

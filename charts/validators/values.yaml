@@ -37,7 +37,7 @@ initImageBusybox:
 ##
 
 ## Whether to enable validator statefulset or not
-## Can be used to temporarily disable validators 
+## Can be used to temporarily disable validators
 ## until synchronization of eth1/eth2 nodes is complete
 ##
 enabled: true
@@ -78,14 +78,19 @@ image:
   teku:
     repository: "consensys/teku"
     tag: "22.4"
-  
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 ## Init image is used to initialise validators
 ##
 initImage:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
   tag: "v1.5.3"
   pullPolicy: IfNotPresent
-  
+
 terminationGracePeriodSeconds: 900
 
 ## Spearate service account per validator.
@@ -96,7 +101,7 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations: {}
-  
+
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
@@ -125,7 +130,7 @@ verticalAutoscaler:
   enabled: false
   updateMode: Off
   containerPolicies: {}
-  
+
 ## Network ID
 ## Options for Ethereum: mainnet, prater
 ## Options for Gnosis: gnosis
@@ -156,7 +161,7 @@ flags:
     - "validator-client"
     - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"
     - "--log-destination=CONSOLE"
-  
+
 ## Validators extra flags
 ##
 extraFlags:
@@ -236,7 +241,7 @@ metrics:
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
-    
+
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -295,7 +300,7 @@ metrics:
     ##         summary: Prysm validator hourly earning <= 0
     ##         description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
     ##     - alert: PrysmValidatorAlotOfErrorsLastHour
-    ##       expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0) 
+    ##       expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
     ##       for: 5m
     ##       labels:
     ##         severity: warning

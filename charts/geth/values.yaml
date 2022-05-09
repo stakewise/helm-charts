@@ -83,6 +83,11 @@ image:
   tag: "v1.10.17"
   pullPolicy: IfNotPresent
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 ## How many geth nodes to run simultaneously
 ##
 replicaCount: 1
@@ -169,7 +174,7 @@ metrics:
     - "--pprof"
     - "--pprof.addr=0.0.0.0"
     - "--pprof.port=6060"
-    
+
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint

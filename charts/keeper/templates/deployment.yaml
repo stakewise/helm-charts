@@ -19,6 +19,10 @@ spec:
         checksum/keeper-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         checksum/keeper-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
+    {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
     {{- if .Values.tolerations }}
       tolerations:
         {{ tpl .Values.tolerations . | nindent 8 | trim }}
