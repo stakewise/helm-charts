@@ -38,10 +38,6 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
     {{- with $root.Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ . }}
     {{- end }}
