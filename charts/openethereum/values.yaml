@@ -64,6 +64,11 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v3.3.5"
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 ## How many openethereum nodes to run simultaneously
 ##
 replicaCount: 1
@@ -118,7 +123,7 @@ metrics:
   ## Prometheus exporter port
   ##
   port: 3000
-    
+
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
@@ -254,4 +259,3 @@ readinessProbe:
     path: /eth1/readiness
     port: sidecar
     scheme: HTTP
-

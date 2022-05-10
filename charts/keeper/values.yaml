@@ -35,6 +35,11 @@ image:
   tag: "v2.4.0"
   pullPolicy: IfNotPresent
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 # Configure resource requests and limits.
 # http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
