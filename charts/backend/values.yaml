@@ -318,6 +318,12 @@ celery:
       cpu: 50m
       memory: 100Mi
 
+cloudsqlProxy:
+  enabled: false
+  replicaCount: 1
+  instance: ""
+  serviceAccountKey: ""
+
 postgresql:
   enabled: false
   volumePermissions:

@@ -1,0 +1,17 @@
+{{- if .Values.cloudsqlProxy.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "cloudsql.fullname" . }}
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+    component: "cloudsqlproxy"
+spec:
+  selector:
+    {{- include "backend.selectorLabels" . | nindent 4 }}
+    component: "cloudsqlproxy"
+  clusterIP: None
+  ports:
+    - port: 5432
+      targetPort: 5432
+{{- end }}

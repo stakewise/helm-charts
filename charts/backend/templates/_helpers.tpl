@@ -36,6 +36,10 @@ If release name contains chart name it will be used as a full name.
 {{- printf "%s-%s" (include "backend.fullname" .) "celery" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "cloudsql.fullname" -}}
+{{- printf "%s-%s" (include "backend.fullname" .) "cloudsql" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{- define "backend.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
