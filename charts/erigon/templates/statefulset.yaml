@@ -107,6 +107,12 @@ spec:
               --metrics.addr={{ .Values.metrics.addr }}
               --metrics.port={{ .Values.metrics.port }}
           {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
           ports:
             - name: grpc
               protocol: TCP
