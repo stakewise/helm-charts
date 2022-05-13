@@ -293,15 +293,15 @@ celery:
       gnosis: ""
 
     # Graph
-    stakewiseSubgraphUrl:
+    stakewiseSubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
-    uniswapV3SubgraphUrl:
+    uniswapV3SubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
-    ethereumSubgraphUrl:
+    ethereumSubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
