@@ -117,7 +117,7 @@ spec:
               --Metrics.ExposePort={{ .Values.metrics.port }}
           {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
-              --Network.ExternalIp==$EXTERNAL_IP
+              --Network.ExternalIp=$EXTERNAL_IP
               --Network.P2PPort=$EXTERNAL_PORT
               --Network.DiscoveryPort=$EXTERNAL_PORT
           {{- else }}
