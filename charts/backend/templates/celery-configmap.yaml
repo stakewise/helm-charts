@@ -13,9 +13,9 @@ data:
   {{- if contains "mainnet" .Values.commonConf.enabledNetworks }}
   MAINNET_ETH2_ENDPOINT: {{ .Values.celery.conf.eth2Endpoint.mainnet | quote }}
   MAINNET_ETH2_ARCHIVE_ENDPOINT: {{ .Values.celery.conf.eth2ArchiveEndpoint.mainnet | quote }}
-  MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.celery.conf.stakewiseSubgraphUrls.mainnet | quote }}
-  MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.celery.conf.ethereumSubgraphUrls.mainnet | quote }}
-  MAINNET_UNISWAP_V3_SUBGRAPH_URL: {{ .Values.celery.conf.uniswapV3SubgraphUrls.mainnet | quote }}
+  MAINNET_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.mainnet | quote }}
+  MAINNET_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.mainnet | quote }}
+  MAINNET_UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.celery.conf.uniswapV3SubgraphUrls.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.commonConf.enabledNetworks }}
   GOERLI_ETH1_ENDPOINT: {{ .Values.celery.conf.eth1Endpoint.goerli | quote }}
