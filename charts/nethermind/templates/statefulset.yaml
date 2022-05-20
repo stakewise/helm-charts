@@ -125,6 +125,12 @@ spec:
               --Network.P2PPort={{ include "nethermind.p2pPort" . }}
               --Network.DiscoveryPort={{ include "nethermind.p2pPort" . }}
           {{- end }}
+          {{- if .Values.loggingConfiguration.enabled }}
+              --log={{ .Values.loggingConfiguration.logLevel }}
+          {{- end }} 
+          {{- if .Values.fastSync.enabled }}
+              --Network.MaxActivePeers={{ .Values.fastSync.maxActivePeers }}
+          {{- end }} 
           {{- range .Values.extraFlags }}
               {{ . | quote }}
           {{- end }}

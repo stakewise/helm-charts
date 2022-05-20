@@ -302,3 +302,17 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
     rules: []
+
+## When loggingConfiguration is enabled, your pod will be executed with a specific level of logging.
+## For more information: https://docs.nethermind.io/nethermind/ethereum-client/logging-configuration
+##
+loggingConfiguration:
+  enabled: false
+  logLevel: DEBUG
+
+## When fastSync is enabled, your pod will be configured with the specific amount of active peers.
+## For more information: https://docs.nethermind.io/nethermind/ethereum-client/logging-configuration
+##
+fastSync:
+  enabled: false
+  maxActivePeers: 256
