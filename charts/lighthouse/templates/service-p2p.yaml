@@ -14,6 +14,10 @@ metadata:
     {{- include "common.labels.standard" $ | nindent 4 }}
     pod: {{ include "common.names.fullname" $ }}-{{ $i }}
     type: p2p
+  {{- with .Values.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ $.Values.p2pNodePort.type }}
   externalTrafficPolicy: Local

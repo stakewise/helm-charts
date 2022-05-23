@@ -108,6 +108,9 @@ p2pNodePort:
   ## @param p2pNodePort.enabled Expose P2P port via NodePort
   ##
   enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
   ## @param p2pNodePort.type
   ## Options: NodePort, LoadBalancer
   type: NodePort
