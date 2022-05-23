@@ -18,6 +18,9 @@ commonConf:
   defaultFromEmail: '"Stakewise" <no-reply@mail.stakewise.io>'
   managers: ""
 
+  sentryDsn: ""
+  memcachedUrl: ""
+
   staticUrl: "https://static.stakewise.io/"
 
   sendTelegramNotifications:
@@ -50,7 +53,7 @@ securityContext:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "sha-dcd7e10"
+  tag: "sha-3eef10e"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -391,3 +394,9 @@ rabbitmq:
     enabled: true
     storageClass: ""
     size: 8Gi
+
+memcached:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false
