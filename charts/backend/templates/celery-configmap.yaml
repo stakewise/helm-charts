@@ -8,34 +8,30 @@ metadata:
 data:
   ENVIRONMENT: {{ .Values.commonConf.environment | quote }}
   {{- if or (contains "mainnet" .Values.commonConf.enabledNetworks) (contains "goerli" .Values.commonConf.enabledNetworks) (contains "perm_goerli" .Values.commonConf.enabledNetworks) }}
-  MAINNET_ETH1_ENDPOINT: {{ .Values.celery.conf.eth1Endpoint.mainnet | quote }}
+  MAINNET_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.mainnet | quote }}
   {{- end }}
   {{- if contains "mainnet" .Values.commonConf.enabledNetworks }}
-  MAINNET_ETH2_ENDPOINT: {{ .Values.celery.conf.eth2Endpoint.mainnet | quote }}
-  MAINNET_ETH2_ARCHIVE_ENDPOINT: {{ .Values.celery.conf.eth2ArchiveEndpoint.mainnet | quote }}
+  MAINNET_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.mainnet | quote }}
   MAINNET_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.mainnet | quote }}
   MAINNET_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.mainnet | quote }}
   MAINNET_UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.celery.conf.uniswapV3SubgraphUrls.mainnet | quote }}
   {{- end }}
   {{- if contains "goerli" .Values.commonConf.enabledNetworks }}
-  GOERLI_ETH1_ENDPOINT: {{ .Values.celery.conf.eth1Endpoint.goerli | quote }}
-  GOERLI_ETH2_ENDPOINT: {{ .Values.celery.conf.eth2Endpoint.goerli | quote }}
-  GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.celery.conf.eth2ArchiveEndpoint.goerli | quote }}
+  GOERLI_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.goerli | quote }}
+  GOERLI_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.goerli | quote }}
   GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.goerli | quote }}
   GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.goerli | quote }}
   GOERLI_UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.celery.conf.uniswapV3SubgraphUrls.goerli | quote }}
   {{- end }}
   {{- if contains "perm_goerli" .Values.commonConf.enabledNetworks }}
-  PERM_GOERLI_ETH1_ENDPOINT: {{ .Values.celery.conf.eth1Endpoint.permGoerli | quote }}
-  PERM_GOERLI_ETH2_ENDPOINT: {{ .Values.celery.conf.eth2Endpoint.permGoerli | quote }}
-  PERM_GOERLI_ETH2_ARCHIVE_ENDPOINT: {{ .Values.celery.conf.eth2ArchiveEndpoint.permGoerli | quote }}
+  PERM_GOERLI_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.permGoerli | quote }}
+  PERM_GOERLI_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.permGoerli | quote }}
   PERM_GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.permGoerli | quote }}
   PERM_GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.permGoerli | quote }}
   {{- end }}
   {{- if contains "gnosis" .Values.commonConf.enabledNetworks }}
-  GNOSIS_ETH1_ENDPOINT: {{ .Values.celery.conf.eth1Endpoint.gnosis | quote }}
-  GNOSIS_ETH2_ENDPOINT: {{ .Values.celery.conf.eth2Endpoint.gnosis | quote }}
-  GNOSIS_ETH2_ARCHIVE_ENDPOINT: {{ .Values.celery.conf.eth2ArchiveEndpoint.gnosis | quote }}
+  GNOSIS_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.gnosis | quote }}
+  GNOSIS_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.gnosis | quote }}
   GNOSIS_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.gnosis | quote }}
   GNOSIS_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.gnosis | quote }}
   {{- end }}

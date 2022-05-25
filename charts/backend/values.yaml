@@ -274,7 +274,7 @@ celery:
     password: ""
 
   conf:
-    eth1Endpoint:
+    eth1Endpoints:
       # must also be provided in case goerli or perm_goerli network is enabled
       mainnet: ""
       goerli: ""
@@ -282,14 +282,7 @@ celery:
       gnosis: ""
 
     # NB! only prysm client currently works
-    eth2Endpoint:
-      mainnet: ""
-      goerli: ""
-      permGoerli: ""
-      gnosis: ""
-
-    # Needed for syncing validator balance snapshots
-    eth2ArchiveEndpoint:
+    eth2Endpoints:
       mainnet: ""
       goerli: ""
       permGoerli: ""
