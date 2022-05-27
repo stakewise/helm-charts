@@ -32,7 +32,7 @@ serviceAccount:
 # Docker image
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.4.0"
+  tag: "v2.5.2"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -61,6 +61,8 @@ settings:
     goerli: ""
     permGoerli: ""
     gnosis: ""
+    harbourMainnet: ""
+    harbourKeeper: ""
 
   enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
@@ -72,12 +74,16 @@ settings:
     goerli: ""
     permGoerli: ""
     gnosis: ""
+    harbourMainnet: ""
+    harbourKeeper: ""
 
   awsRegion:
     mainnet: ""
     goerli: ""
     permGoerli: ""
     gnosis: ""
+    harbourMainnet: ""
+    harbourKeeper: ""
 
   ## @param settings.extraEnv Extra environment variables to pass to the container
   ## extraEnv:
