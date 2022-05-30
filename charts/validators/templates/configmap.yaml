@@ -71,17 +71,19 @@ data:
     if [[ "$REIMPORT" = "true" ]]; then
         # Authorization in Vault
         bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
+        NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+        ROLE="${NAMESPACE}-${SERVICE_ACCOUNT}"
         KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
-        VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
+        VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${ROLE}"'"}' ${VAULT_ADDR}/v1/auth/kubernetes/login`
         export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
     
         # Get keystores password
         rm -rf ${VAULT} || true && mkdir -p ${VAULT_KEYSTORES}
-        PASSWORD=$(vault kv get -field=password.txt -version=1 validators/${SERVICE_ACCOUNT}/password)
+        PASSWORD=$(vault kv get -field=password.txt -version=1 ${NAMESPACE}/${SERVICE_ACCOUNT}/password)
         echo ${PASSWORD} > ${VAULT_PASSWORD}
     
         # Preparing keystores for import
-        echo "$(vault kv get -version=1 validators/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
+        echo "$(vault kv get -version=1 ${NAMESPACE}/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
         while read line; do
             if [[ "$line" =~ ^keystore.* ]]; then
                 echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
