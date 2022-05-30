@@ -280,6 +280,8 @@ celery:
       goerli: ""
       permGoerli: ""
       gnosis: ""
+      harbourGoerli: ""
+      harbourMainnet: ""
 
     # NB! only prysm client currently works
     eth2Endpoints:
@@ -287,6 +289,8 @@ celery:
       goerli: ""
       permGoerli: ""
       gnosis: ""
+      harbourGoerli: ""
+      harbourMainnet: ""
 
     # Graph
     stakewiseSubgraphUrls:
@@ -294,6 +298,8 @@ celery:
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
+      harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-mainnet"
+      harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-goerli"
     uniswapV3SubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
@@ -302,6 +308,8 @@ celery:
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
+      harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+      harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
 
     ## @param celery.conf.extraEnv Extra environment variables to pass to the container
     ## extraEnv:

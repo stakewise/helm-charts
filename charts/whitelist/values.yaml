@@ -1,0 +1,114 @@
+# Default values for whitelist.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/whitelist
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v1.0.3"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# Whitelist configuration
+apiKey: ""
+enabledNetworks: "harbour_mainnet"
+confirmationBlocks: "15"
+transactionTimeout: "900"
+harbourMainnetEth1Endpoint: ""
+harbourMainnetPrivateKey: ""
+harbourGoerliEth1Endpoint: ""
+harbourGoerliPrivateKey: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
