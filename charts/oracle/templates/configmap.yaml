@@ -47,6 +47,22 @@ data:
   GNOSIS_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.gnosis | quote }}
   GNOSIS_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.gnosis | quote }}
   {{- end }}
+  {{- if contains "harbour_mainnet" .Values.settings.enabledNetworks }}
+  HARBOUR_MAINNET_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.harbourMainnet | quote }}
+  HARBOUR_MAINNET_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.harbourMainnet | quote }}
+  HARBOUR_MAINNET_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.harbourMainnet | quote }}
+  HARBOUR_MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourMainnet | quote }}
+  HARBOUR_MAINNET_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.harbourMainnet | quote }}
+  HARBOUR_MAINNET_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.harbourMainnet | quote }}
+  {{- end }}
+  {{- if contains "harbour_goerli" .Values.settings.enabledNetworks }}
+  HARBOUR_GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.harbourGoerli | quote }}
+  HARBOUR_GOERLI_STAKEWISE_SUBGRAPH_URL: {{ .Values.settings.stakewiseSubgraphUrl.harbourGoerli | quote }}
+  HARBOUR_GOERLI_ETHEREUM_SUBGRAPH_URL: {{ .Values.settings.ethereumSubgraphUrl.harbourGoerli | quote }}
+  HARBOUR_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourGoerli | quote }}
+  HARBOUR_GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.harbourGoerli | quote }}
+  HARBOUR_GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.harbourGoerli | quote }}
+  {{- end }}
   {{- range $key, $value := .Values.settings.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
   {{- end -}}
