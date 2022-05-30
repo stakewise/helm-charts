@@ -35,6 +35,18 @@ data:
   GNOSIS_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.gnosis | quote }}
   GNOSIS_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.gnosis | quote }}
   {{- end }}
+  {{- if contains "harbour_goerli" .Values.commonConf.enabledNetworks }}
+  HARBOUR_GOERLI_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.harbourGoerli | quote }}
+  HARBOUR_GOERLI_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.harbourGoerli | quote }}
+  HARBOUR_GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.harbourGoerli | quote }}
+  HARBOUR_GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.harbourGoerli | quote }}
+  {{- end }}
+  {{- if contains "harbour_mainnet" .Values.commonConf.enabledNetworks }}
+  HARBOUR_GOERLI_ETH1_ENDPOINTS: {{ .Values.celery.conf.eth1Endpoints.harbourMainnet | quote }}
+  HARBOUR_GOERLI_ETH2_ENDPOINTS: {{ .Values.celery.conf.eth2Endpoints.harbourMainnet | quote }}
+  HARBOUR_GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.celery.conf.stakewiseSubgraphUrls.harbourMainnet | quote }}
+  HARBOUR_GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.celery.conf.ethereumSubgraphUrls.harbourMainnet | quote }}
+  {{- end }}
   SENTRY_DSN: {{ .Values.commonConf.sentryDsn | quote }}
   {{- range $key, $value := .Values.celery.conf.extraEnv }}
   {{ $key }}: {{ $value | quote -}}
