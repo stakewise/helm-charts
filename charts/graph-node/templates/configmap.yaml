@@ -8,10 +8,11 @@ data:
   ETHEREUM_POLLING_INTERVAL: {{ .Values.graph.ethereumPollingInterval | quote }}
   EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
   GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
+  ipfs: {{ .Values.graph.ipfsUrl | quote }}
+  ethereum: {{ .Values.graph.ethereumNode | quote }}
+
   {{- with .Values.postgresql }}
   postgres_host: {{ .postgresqlHost | quote }}
   postgres_user: {{ .postgresqlUsername | quote }}
   postgres_db: {{ .postgresqlDatabase | quote }}
   {{- end }}
-  ipfs: {{ .Values.graph.ipfsUrl | quote }}
-  ethereum: {{ .Values.graph.ethereumNode | quote }}

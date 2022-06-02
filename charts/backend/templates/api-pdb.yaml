@@ -7,12 +7,12 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
     component: "api"
 spec:
-{{- if .Values.api.podDisruptionBudget.minAvailable }}
+  {{- if .Values.api.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.api.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.api.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  {{- if .Values.api.podDisruptionBudget.maxUnavailable }}
   maxUnavailable: {{ .Values.api.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}

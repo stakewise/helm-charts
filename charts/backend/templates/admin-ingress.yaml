@@ -8,23 +8,23 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
-  {{- with .Values.admin.ingress.labels }}
+    {{- with .Values.admin.ingress.labels }}
     {{ toYaml . | nindent 4 | trim }}
-  {{- end }}
-{{- with .Values.admin.ingress.annotations }}
+    {{- end }}
+  {{- with .Values.admin.ingress.annotations }}
   annotations:
     {{ toYaml . | nindent 4 | trim }}
-{{- end }}
+  {{- end }}
 spec:
-{{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  {{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.admin.ingress.className }}
-{{- end }}
-{{- with .Values.admin.ingress.tls }}
+  {{- end }}
+  {{- with .Values.admin.ingress.tls }}
   tls:
     {{ toYaml . | nindent 4 | trim }}
-{{- end }}
+  {{- end }}
   rules:
-  {{- range .Values.admin.ingress.hosts }}
+    {{- range .Values.admin.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
@@ -35,5 +35,5 @@ spec:
                 name: {{ $fullName }}
                 port:
                   name: http
-  {{- end }}
+    {{- end }}
 {{- end }}

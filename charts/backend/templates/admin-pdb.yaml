@@ -7,12 +7,12 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
 spec:
-{{- if .Values.admin.podDisruptionBudget.minAvailable }}
+  {{- if .Values.admin.podDisruptionBudget.minAvailable }}
   minAvailable: {{ .Values.admin.podDisruptionBudget.minAvailable }}
-{{- end }}
-{{- if .Values.admin.podDisruptionBudget.maxUnavailable }}
+  {{- end }}
+  {{- if .Values.admin.podDisruptionBudget.maxUnavailable }}
   maxUnavailable: {{ .Values.admin.podDisruptionBudget.maxUnavailable }}
-{{- end }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "backend.selectorLabels" . | nindent 6 }}
