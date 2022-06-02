@@ -1,7 +1,7 @@
 apiVersion: v2
 name: backend
-version: 2.3.4
-appVersion: v2.3.4
+version: 2.3.5
+appVersion: v2.3.5
 kubeVersion: "^1.18.0-0"
 description: The StakeWise backend application.
 type: application
@@ -13,8 +13,11 @@ home: https://stakewise.io/
 sources:
   - https://github.com/tsudmi/backend/
 dependencies:
+  - name: common
+    version: 1.x.x
+    repository: "file://../common"
   - name: postgresql
-    version: 10.13.8
+    version: 11.6.0
     repository: https://charts.bitnami.com/bitnami/
     condition: postgresql.enabled
   - name: rabbitmq

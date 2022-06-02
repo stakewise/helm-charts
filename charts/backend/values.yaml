@@ -2,8 +2,8 @@
 commonConf:
   environment: "staging"
   secretKey: ""
-  # possible values: goerli, perm_goerli, gnosis, mainnet
-  enabledNetworks: "goerli,perm_goerli,gnosis,mainnet"
+  # Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
+  enabledNetworks: "goerli,perm_goerli,gnosis,mainnet,harbour_goerli,harbour_mainnet"
 
   poolPage: "https://app.stakewise.io"
   soloPage: "https://app.stakewise.io/solo"
@@ -34,28 +34,17 @@ commonConf:
   multisigOwnersTelegramToken: ""
   multisigOwnersTelegramChatId: ""
 
-  ## @param commonConf.extraEnv Extra environment variables to pass to the container
-  ## extraEnv:
-  ##   MY_ENV_VAR: my_value
-  ##
-  extraEnv: {}
-
-  ## @param commonConf.extraSecret Extra environment variables to pass to the container
-  ## extraSecret:
-  ##   MY_ENV_VAR: my_value
-  ##
-  extraSecret: {}
-
-
-securityContext:
-  fsGroup: 65534
-  runAsUser: 65534
-
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "sha-3eef10e"
+  tag: "v2.3.5"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
 
 admin:
   # Whether to deploy admin or not.
@@ -64,11 +53,6 @@ admin:
   # Admin configuration parameters.
   conf:
     allowedHosts: ""
-    ## @param admin.conf.extraSecret Extra environment variables to pass to the container
-    ## extraSecret:
-    ##   MY_ENV_VAR: my_value
-    ##
-    extraSecret: {}
 
   # How many admin pods to run simultaneously.
   replicas: 1
@@ -78,22 +62,6 @@ admin:
   podDisruptionBudget:
     enabled: false
     maxUnavailable: 1
-
-  # Create HorizontalPodAutoscaler object.
-  # https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-  horizontalAutoscaler:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          targetAverageUtilization: 90
-      - type: Resource
-        resource:
-          name: memory
-          targetAverageUtilization: 90
 
   # Create an admin user if needed.
   user:
@@ -122,16 +90,23 @@ admin:
   # http://kubernetes.io/docs/user-guide/compute-resources/
   resources:
     requests:
-      cpu: 10m
-      memory: 150Mi
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 300m
+      memory: 1024Mi
 
-  # Affinity Settings
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: { }
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 65534
 
-  # Toleration Settings
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-  tolerations: [ ]
+  # Tolerations for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # Affinity for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
 
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
@@ -156,12 +131,6 @@ api:
     recaptchaProfileAction: "profile"
     recaptchaProfileScore: "0.5"
 
-    ## @param api.conf.extraSecret Extra environment variables to pass to the container
-    ## extraSecret:
-    ##   MY_ENV_VAR: my_value
-    ##
-    extraSecret: {}
-
   # How many api pods to run simultaneously.
   replicas: 2
 
@@ -170,35 +139,6 @@ api:
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
-
-  # Create HorizontalPodAutoscaler object.
-  # https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-  horizontalAutoscaler:
-    enabled: false
-    minReplicas: 1
-    maxReplicas: 3
-    metrics:
-      - type: Resource
-        resource:
-          name: cpu
-          targetAverageUtilization: 90
-      - type: Resource
-        resource:
-          name: memory
-          targetAverageUtilization: 90
-
-  # Vertical Pod Autoscaler config
-  # Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-  verticalAutoscaler:
-    # If true a VPA object will be created for the Deployment
-    # NB! VPA must not be used together with HPA
-    enabled: false
-    updateMode: Off
-    containerPolicies: |
-      - containerName: {{ .Chart.Name }}
-        maxAllowed:
-          cpu: "100m"
-          memory: "500m"
 
   # "Host" Header value to pass with the request for Host verification.
   probesHostHeader: "api.stakewise.io"
@@ -218,25 +158,25 @@ api:
 
   # Configure resource requests and limits.
   # http://kubernetes.io/docs/user-guide/compute-resources/
-  resources: { }
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
 
-  # Affinity Settings
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: |
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - weight: 1
-          podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                app: {{ template "backend.name" . }}
-                release: {{ .Release.Name | quote }}
-                component: "api"
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 65534
 
-  # Toleration Settings
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-  tolerations: [ ]
+  # Tolerations for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # Affinity for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
 
   # used to assign priority to pods
   # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
@@ -245,20 +185,48 @@ api:
 celery:
   priorityClassName: ""
 
-  # Affinity Settings
-  # https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  affinity: { }
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 65534
 
-  # Toleration Settings
-  # https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
-  tolerations: [ ]
+  # Tolerations for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  tolerations: []
+
+  # Affinity for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  affinity: {}
 
   # How many celery worker pods to run simultaneously.
   workerReplicaCount: 3
+
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  workerResources:
+    requests:
+      cpu: 1000m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+
   # How many celery beat pods to run simultaneously.
   beatReplicaCount: 1
 
+  # Configure resource requests and limits.
+  # http://kubernetes.io/docs/user-guide/compute-resources/
+  beatResources:
+    requests:
+      cpu: 50m
+      memory: 256Mi
+    limits:
+      cpu: 250m
+      memory: 512Mi
+
   flower:
+    # How many celery flower pods to run simultaneously.
+    replicaCount: 1
+
     # Configure ingress
     # https://kubernetes.io/docs/concepts/services-networking/ingress/
     ingress:
@@ -267,11 +235,19 @@ celery:
       annotations: {}
       tls: []
       hosts: []
-    # How many celery flower pods to run simultaneously.
-    replicaCount: 1
     port: "5555"
     user: ""
     password: ""
+    
+    # Configure resource requests and limits.
+    # http://kubernetes.io/docs/user-guide/compute-resources/
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        cpu: 250m
+        memory: 512Mi
 
   conf:
     eth1Endpoints:
@@ -311,17 +287,6 @@ celery:
       harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
       harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
 
-    ## @param celery.conf.extraEnv Extra environment variables to pass to the container
-    ## extraEnv:
-    ##   MY_ENV_VAR: my_value
-    ##
-    extraEnv: {}
-  
-  resources:
-    requests:
-      cpu: 50m
-      memory: 100Mi
-
 cloudsqlProxy:
   enabled: false
   replicaCount: 1
@@ -330,71 +295,14 @@ cloudsqlProxy:
 
 postgresql:
   enabled: false
-  volumePermissions:
-    enabled: true
-    image:
-      registry: docker.io
-      repository: bitnami/bitnami-shell
-      tag: 10-debian-10-r98
-      pullPolicy: Always
-    securityContext:
-      runAsUser: 0
-  securityContext:
-    enabled: true
-    fsGroup: 1001
-  containerSecurityContext:
-    enabled: true
-    runAsUser: 1001
-  serviceAccount:
-    enabled: true
-    name: postgresql
-  rbac:
-    create: false
-  postgresqlHost: "postgres"
-  postgresqlPort: "5432"
-  postgresqlUsername: "postgres"
-  postgresqlPassword: "postgres"
-  usePasswordFile: true
-  postgresqlDatabase: backend
-  postgresqlDataDir: /bitnami/postgresql/data
-  primaryAsStandBy:
-    enabled: false
-  postgresqlSharedPreloadLibraries: "pgaudit"
-  shmVolume:
-    enabled: true
-    chmod:
-      enabled: true
-  persistence:
-    enabled: true
-    mountPath: /bitnami/postgresql
-    subPath: ''
-    accessModes:
-      - ReadWriteOnce
-    size: 20Gi
-    annotations: { }
-    selector: { }
-  readReplicas:
-    persistence:
-      enabled: true
-  resources:
-    requests:
-      memory: 384Mi
-      cpu: 250m
-  networkPolicy:
-    enabled: false
-  tls:
-    enabled: false
-  metrics:
-    enabled: true
 
 rabbitmq:
   enabled: true
   auth:
     username: "rabbitmq"
+    password: "rabbitmq"
   persistence:
-    enabled: true
-    storageClass: ""
-    size: 8Gi
+    enabled: false
 
 memcached:
   enabled: true

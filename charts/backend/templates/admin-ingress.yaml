@@ -1,12 +1,12 @@
 {{- if and .Values.admin.enabled .Values.admin.ingress.enabled }}
-{{ $fullName := include "admin.fullname" . }}
+{{ $fullName := include "common.names.fullname" . }}
 {{ $ingressPath := .Values.admin.ingress.path }}
-apiVersion: networking.k8s.io/v1
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ template "admin.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-admin
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
   {{- with .Values.admin.ingress.labels }}
     {{ toYaml . | nindent 4 | trim }}
@@ -16,9 +16,9 @@ metadata:
     {{ toYaml . | nindent 4 | trim }}
 {{- end }}
 spec:
-  {{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+{{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.admin.ingress.className }}
-  {{- end }}
+{{- end }}
 {{- with .Values.admin.ingress.tls }}
   tls:
     {{ toYaml . | nindent 4 | trim }}

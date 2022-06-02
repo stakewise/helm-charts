@@ -1,14 +1,10 @@
 {{- if and .Values.api.enabled .Values.api.podDisruptionBudget.enabled }}
-{{- if semverCompare ">=1.21-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: policy/v1
-{{- else -}}
-apiVersion: policy/v1beta1
-{{- end }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "api.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-api
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "api"
 spec:
 {{- if .Values.api.podDisruptionBudget.minAvailable }}
@@ -19,6 +15,6 @@ spec:
 {{- end }}
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
       component: "api"
 {{- end }}

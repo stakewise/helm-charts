@@ -1,14 +1,10 @@
 {{- if and .Values.admin.enabled .Values.admin.podDisruptionBudget.enabled }}
-{{- if semverCompare ">=1.21-0" .Capabilities.KubeVersion.GitVersion -}}
-apiVersion: policy/v1
-{{- else -}}
-apiVersion: policy/v1beta1
-{{- end }}
+apiVersion: {{ include "common.capabilities.policy.apiVersion" . }}
 kind: PodDisruptionBudget
 metadata:
-  name: {{ template "admin.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-admin
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
 spec:
 {{- if .Values.admin.podDisruptionBudget.minAvailable }}
