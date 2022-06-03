@@ -87,8 +87,8 @@ settings:
     goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
     permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
     gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
-    harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-mainnet"
-    harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-goerli"
+    harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+    harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
   uniswapV3SubgraphUrl:
     mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
     goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
