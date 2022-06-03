@@ -321,7 +321,7 @@ celery:
       permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
       harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-mainnet"
-      harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-goerli"
+      harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
     uniswapV3SubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
