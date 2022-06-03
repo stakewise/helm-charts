@@ -27,7 +27,7 @@ spec:
             path: /
             backend:
               service:
-                name: {{ $fullName }}-flower
+                name: {{ $fullName }}-celery-flower
                 port:
                   name: http
     {{- end }}

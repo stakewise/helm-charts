@@ -1,8 +1,10 @@
-# Common configuration for all the containers (server.common_conf)
+## Common configuration for all the containers (server.common_conf)
+##
 commonConf:
   environment: "staging"
   secretKey: ""
-  # Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
+  ## Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
+  ##
   enabledNetworks: "goerli,perm_goerli,gnosis,mainnet,harbour_goerli,harbour_mainnet"
 
   poolPage: "https://app.stakewise.io"
@@ -10,8 +12,9 @@ commonConf:
   stakingAprSamplesCount: "3"
 
   sendEmails: "False"
-  # Change to https://api.mailgun.net/v3
-  # if you are using Mailgun’s US region
+  ## Change to https://api.mailgun.net/v3
+  ## if you are using Mailgun’s US region
+  ##
   mailgunApiUrl: "https://api.eu.mailgun.net/v3"
   mailgunApiKey: ""
   mailgunSenderDomain: "mail.stakewise.io"
@@ -41,43 +44,51 @@ image:
   pullSecrets: [ ]
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  ## Specifies whether a service account should be created
+  ##
   create: true
-  # Annotations to add to the service account
+  ## Annotations to add to the service account
+  ##
   annotations: {}
 
 admin:
-  # Whether to deploy admin or not.
+  ## Whether to deploy admin or not.
+  ##
   enabled: true
 
-  # Admin configuration parameters.
+  ## Admin configuration parameters.
+  ##
   conf:
     allowedHosts: ""
 
-  # How many admin pods to run simultaneously.
+  ## How many admin pods to run simultaneously.
+  ##
   replicas: 1
 
-  # Enable pod disruption budget.
-  # https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ## Enable pod disruption budget.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
   podDisruptionBudget:
     enabled: false
     maxUnavailable: 1
 
-  # Create an admin user if needed.
+  ## Create an admin user if needed.
+  ##
   user:
     create: false
     username: "username"
     password: "password"
     email: "user@example.com"
 
-  # "Host" Header value to pass with the request for Host verification.
+  ## "Host" Header value to pass with the request for Host verification.
+  ##
   probesHostHeader: ""
 
   serviceType: ClusterIP
   servicePort: "8000"
 
-  # Configure ingress
-  # https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ## Configure ingress
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
   ingress:
     enabled: false
     className: ""
@@ -86,8 +97,9 @@ admin:
     path: "/admin"
     hosts: []
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources:
     requests:
       cpu: 100m
@@ -96,27 +108,35 @@ admin:
       cpu: 300m
       memory: 1024Mi
 
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
   securityContext:
     fsGroup: 65534
     runAsUser: 65534
 
-  # Tolerations for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
   tolerations: []
 
-  # Affinity for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
 api:
-  # Whether to deploy api or not.
+  ## Whether to deploy api or not.
+  ##
   enabled: true
 
-  # API configuration parameters.
+  ## API configuration parameters.
+  ##
   conf:
     allowedHosts: ""
     corsOriginWhitelist: ""
@@ -131,23 +151,27 @@ api:
     recaptchaProfileAction: "profile"
     recaptchaProfileScore: "0.5"
 
-  # How many api pods to run simultaneously.
+  ## How many api pods to run simultaneously.
+  ##
   replicas: 2
 
-  # Enable pod disruption budget.
-  # https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ## Enable pod disruption budget.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ##
   podDisruptionBudget:
     enabled: true
     maxUnavailable: 1
 
-  # "Host" Header value to pass with the request for Host verification.
+  ## "Host" Header value to pass with the request for Host verification.
+  ##
   probesHostHeader: "api.stakewise.io"
 
   serviceType: ClusterIP
   servicePort: "8000"
 
-  # Configure ingress
-  # https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ## Configure ingress
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
   ingress:
     enabled: true
     className: ""
@@ -156,8 +180,9 @@ api:
     path: "/"
     hosts: []
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   resources:
     requests:
       cpu: 100m
@@ -166,42 +191,55 @@ api:
       cpu: 1000m
       memory: 1024Mi
 
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
   securityContext:
     fsGroup: 65534
     runAsUser: 65534
 
-  # Tolerations for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
   tolerations: []
 
-  # Affinity for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
   affinity: {}
 
-  # used to assign priority to pods
-  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ## used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
   priorityClassName: ""
 
 celery:
   priorityClassName: ""
 
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
   securityContext:
     fsGroup: 65534
     runAsUser: 65534
 
-  # Tolerations for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
   tolerations: []
 
-  # Affinity for pod assignment
-  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
   affinity: {}
 
-  # How many celery worker pods to run simultaneously.
+  ## How many celery worker pods to run simultaneously.
+  ##
   workerReplicaCount: 3
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   workerResources:
     requests:
       cpu: 1000m
@@ -210,11 +248,13 @@ celery:
       cpu: 1000m
       memory: 1024Mi
 
-  # How many celery beat pods to run simultaneously.
+  ## How many celery beat pods to run simultaneously.
+  ##
   beatReplicaCount: 1
 
-  # Configure resource requests and limits.
-  # http://kubernetes.io/docs/user-guide/compute-resources/
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
   beatResources:
     requests:
       cpu: 50m
@@ -224,11 +264,13 @@ celery:
       memory: 512Mi
 
   flower:
-    # How many celery flower pods to run simultaneously.
+    ## How many celery flower pods to run simultaneously.
+    ##
     replicaCount: 1
 
-    # Configure ingress
-    # https://kubernetes.io/docs/concepts/services-networking/ingress/
+    ## Configure ingress
+    ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+    ##
     ingress:
       enabled: true
       className: ""
@@ -239,8 +281,9 @@ celery:
     user: ""
     password: ""
     
-    # Configure resource requests and limits.
-    # http://kubernetes.io/docs/user-guide/compute-resources/
+    ## Configure resource requests and limits.
+    ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+    ##
     resources:
       requests:
         cpu: 50m
@@ -251,7 +294,8 @@ celery:
 
   conf:
     eth1Endpoints:
-      # must also be provided in case goerli or perm_goerli network is enabled
+      ## Must also be provided in case goerli or perm_goerli network is enabled
+      ##
       mainnet: ""
       goerli: ""
       permGoerli: ""
@@ -259,7 +303,8 @@ celery:
       harbourGoerli: ""
       harbourMainnet: ""
 
-    # NB! only prysm client currently works
+    ## NB! only prysm client currently works
+    ##
     eth2Endpoints:
       mainnet: ""
       goerli: ""
@@ -268,7 +313,8 @@ celery:
       harbourGoerli: ""
       harbourMainnet: ""
 
-    # Graph
+    ## Graph
+    ##
     stakewiseSubgraphUrls:
       mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
       goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"

@@ -15,11 +15,11 @@ metadata:
     {{- end }}
 spec:
   groups:
-  {{- with .Values.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}
-      rules: {{- tpl (toYaml .) $ | nindent 8 }}
-  {{- end }}
-  {{- if .Values.prometheusRule.default }}
+    {{- with .Values.prometheusRule.rules }}
+      - name: {{ include "common.names.fullname" $ }}
+        rules: {{- tpl (toYaml .) $ | nindent 8 }}
+    {{- end }}
+    {{- if .Values.prometheusRule.default }}
     - name: {{ include "common.names.fullname" $ }}-default
       rules:
         - alert: SubgraphIsOutOfSync
@@ -30,5 +30,5 @@ spec:
           annotations:
             summary: Subgraph {{ printf "{{ $labels.deployment }}" }} is out of sync
             description: Namespace - {{ printf "{{ $labels.namespace }}" }} network - {{ printf "{{ $labels.network }}" }}
-  {{- end }}
+    {{- end }}
 {{- end }}

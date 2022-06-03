@@ -15,22 +15,22 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.affinity }}
+      {{- with .Values.affinity }}
       affinity:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.tolerations }}
+      {{- end }}
+      {{- with .Values.tolerations }}
       tolerations:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.nodeSelector }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.securityContext }}
+      {{- end }}
+      {{- with .Values.securityContext }}
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
+      {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
@@ -68,18 +68,18 @@ spec:
               mountPath: /data
             - name: configs
               mountPath: /data/configs
-        {{- with .Values.resources }}
+          {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
+          {{- end }}
       volumes:
         - name: configs
           configMap:
             name: {{ include "common.names.fullname" . }}
-{{- if (not .Values.persistence.enabled) }}
+  {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
-{{- else }}
+  {{- else }}
   volumeClaimTemplates:
     - metadata:
         name: data
@@ -91,4 +91,4 @@ spec:
         resources:
           requests:
             storage: {{ .Values.persistence.size | quote }}
-{{- end }}
+  {{- end }}

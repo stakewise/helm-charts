@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ include "whitelist.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "whitelist.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "whitelist.selectorLabels" . | nindent 6 }}
-  serviceName: {{ include "whitelist.fullname" . }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -19,13 +19,13 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "whitelist.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "whitelist.serviceAccountName" . }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
@@ -54,9 +54,9 @@ spec:
               value: "/data/whitelist.db"
           envFrom:
             - configMapRef:
-                name: {{ template "whitelist.fullname" . }}
+                name: {{ template "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "whitelist.fullname" . }}
+                name: {{ template "common.names.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
@@ -95,7 +95,7 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "whitelist.labels" . | nindent 10 }}
+          {{- include "common.labels.standard" . | nindent 10 }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}

@@ -63,6 +63,3 @@ data:
   HARBOUR_GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.harbourGoerli | quote }}
   HARBOUR_GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.harbourGoerli | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.settings.extraEnv }}
-  {{ $key }}: {{ $value | quote -}}
-  {{- end -}}

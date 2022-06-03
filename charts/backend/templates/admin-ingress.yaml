@@ -32,7 +32,7 @@ spec:
             path: {{ $ingressPath }}
             backend:
               service:
-                name: {{ $fullName }}
+                name: {{ $fullName }}-admin
                 port:
                   name: http
     {{- end }}
