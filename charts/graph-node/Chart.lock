@@ -4,9 +4,9 @@ dependencies:
   version: 1.0.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
-  version: 10.13.15
+  version: 11.6.0
 - name: ipfs
   repository: file://../ipfs
   version: 1.0.2
-digest: sha256:38517cc6193a96e63e6b16aba49cff4b5132a6482a5c3ee3f7c539c95ba8c38f
-generated: "2022-03-07T12:13:00.664011151+03:00"
+digest: sha256:09d9b679d6552e6c1df76759f1600eb4e3affd7681aeceb165da5b6a07aef8af
+generated: "2022-06-06T15:21:10.985020339+03:00"
