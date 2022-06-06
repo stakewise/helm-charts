@@ -7,14 +7,16 @@ replicaCount: 1
 image:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/whitelist
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  ## Overrides the image tag whose default is the chart appVersion.
+  ##
   tag: "v1.0.3"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# Whitelist configuration
+## Whitelist configuration
+##
 apiKey: ""
 enabledNetworks: "harbour_mainnet"
 confirmationBlocks: "15"
@@ -25,12 +27,15 @@ harbourGoerliEth1Endpoint: ""
 harbourGoerliPrivateKey: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  ## Specifies whether a service account should be created
+  ##
   create: true
-  # Annotations to add to the service account
+  ## Annotations to add to the service account
+  ##
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  ##
   name: ""
 
 podAnnotations: {}
@@ -67,16 +72,17 @@ ingress:
   #      - chart-example.local
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+  ## We usually recommend not to specify default resources and to leave this as a conscious
+  ## choice for the user. This also increases chances charts run on environments with little
+  ## resources, such as Minikube. If you do want to specify resources, uncomment the following
+  ## lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  ## limits:
+  ##   cpu: 100m
+  ##   memory: 128Mi
+  ## requests:
+  ##   cpu: 100m
+  ##   memory: 128Mi
+  ##
 
 autoscaling:
   enabled: false
@@ -85,10 +91,19 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
 nodeSelector: {}
 
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
 tolerations: []
 
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
 affinity: {}
 
 ## Init image is used to chown data volume, initialise genesis, etc.

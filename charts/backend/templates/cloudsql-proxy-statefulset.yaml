@@ -1,24 +1,24 @@
 {{- if .Values.cloudsqlProxy.enabled }}
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name: {{ template "cloudsql.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-cloudsql
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "cloudsqlproxy"
 spec:
   replicas: {{ .Values.cloudsqlProxy.replicaCount }}
   serviceName: cloudsqlproxy
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
       component: "cloudsqlproxy"
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        {{- include "backend.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
         component: "cloudsqlproxy"
     spec:
       affinity:
@@ -55,5 +55,5 @@ spec:
       volumes:
       - name: service-account-key
         secret:
-          secretName: {{ template "cloudsql.fullname" . }}
+          secretName: {{ include "common.names.fullname" . }}-cloudsql
 {{- end }}

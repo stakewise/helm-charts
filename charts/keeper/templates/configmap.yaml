@@ -34,6 +34,3 @@ data:
   HARBOR_GOERLI_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.harbourGoerli | quote }}
   HARBOR_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourGoerli | quote }}
   {{- end }}
-  {{- range $key, $value := .Values.settings.extraEnv }}
-  {{ $key }}: {{ $value | quote -}}
-  {{- end -}}

@@ -1,39 +1,39 @@
 kind: Deployment
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 metadata:
-  name: {{ template "celery.fullname" . }}-flower
+  name: {{ include "common.names.fullname" . }}-celery-flower
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "celery-flower"
 spec:
   replicas: {{ default 1 .Values.celery.flower.replicaCount }}
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
       component: "celery-flower"
   template:
     metadata:
       labels:
-        {{- include "backend.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
         component: "celery-flower"
       annotations:
         checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
         checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
         checksum/celery-configmap: {{ include (print $.Template.BasePath "/celery-configmap.yaml") . | sha256sum }}
     spec:
-    {{- if .Values.celery.tolerations }}
-      tolerations:
-        {{ tpl .Values.celery.tolerations . | nindent 8 | trim }}
-    {{- end }}
-    {{- if .Values.celery.affinity }}
+      {{- with .Values.celery.affinity }}
       affinity:
-        {{ tpl .Values.celery.affinity . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.securityContext }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.celery.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-      serviceAccountName: {{ template "celery.fullname" . }}
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.admin.priorityClassName | quote }}
       containers:
         - name: {{ .Chart.Name }}
@@ -42,16 +42,16 @@ spec:
           command: ["/start-flower"]
           envFrom:
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ template "celery.fullname" . }}
+                name: {{ include "common.names.fullname" . }}-celery
           ports:
             - name: http
               containerPort: {{ .Values.celery.flower.port }}
               protocol: TCP
-        {{- with .Values.celery.resources }}
+          {{- with .Values.celery.flower.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
+          {{- end }}

@@ -1,10 +1,10 @@
 {{- if .Values.admin.enabled }}
 kind: Deployment
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 metadata:
-  name: {{ template "admin.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-admin
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
 spec:
   replicas: {{ default 1 .Values.admin.replicas }}
@@ -16,31 +16,31 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
       component: "admin"
   template:
     metadata:
       labels:
-        {{- include "backend.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
         component: "admin"
       annotations:
         checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
         checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
         checksum/admin-secret: {{ include (print $.Template.BasePath "/admin-secret.yaml") . | sha256sum }}
     spec:
-    {{- if .Values.admin.tolerations }}
-      tolerations:
-        {{ tpl .Values.admin.tolerations . | nindent 8 | trim }}
-    {{- end }}
-    {{- if .Values.admin.affinity }}
+      {{- with .Values.admin.affinity }}
       affinity:
-        {{ tpl .Values.admin.affinity . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.securityContext }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-      serviceAccountName: {{ template "admin.fullname" . }}
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.admin.priorityClassName | quote }}
       initContainers:
         - name: initdb
@@ -49,63 +49,63 @@ spec:
           command: ["python", "manage.py", "migrate", "--no-input"]
           envFrom:
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
               value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
-      {{- if .Values.admin.user.create }}
+        {{- if .Values.admin.user.create }}
         - name: init-admin
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["/bin/sh", "-c", "python manage.py create_superuser"]
           envFrom:
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "admin.fullname" . }}
+                name: {{ include "common.names.fullname" . }}-admin
           env:
             - name: DJANGO_SETTINGS_MODULE
               value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
-      {{- end }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
           env:
             - name: DJANGO_SETTINGS_MODULE
               value: "config.settings.admin_settings"
             - name: ALLOWED_HOSTS
               value: {{ .Values.admin.conf.allowedHosts | quote }}
-        {{- with .Values.admin.resources }}
-          resources:
-            {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.admin.servicePort }}
               protocol: TCP
+          {{- with .Values.admin.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
           livenessProbe:
             httpGet:
               path: "/admin/login/"
               port: http
-            {{- if .Values.admin.probesHostHeader }}
+              {{- if .Values.admin.probesHostHeader }}
               httpHeaders:
                 - name: Host
                   value: {{ .Values.admin.probesHostHeader | quote }}
-            {{- end }}
+              {{- end }}
             initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5
@@ -114,11 +114,11 @@ spec:
             httpGet:
               path: "/admin/login/"
               port: http
-            {{- if .Values.admin.probesHostHeader }}
+              {{- if .Values.admin.probesHostHeader }}
               httpHeaders:
                 - name: Host
                   value: {{ .Values.admin.probesHostHeader | quote }}
-            {{- end }}
+              {{- end }}
             initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5

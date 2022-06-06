@@ -8,19 +8,19 @@ image:
   repository: graphprotocol/graph-node
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.25.1"
+  tag: "v0.26.0"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 ## Graph Node Configuration
-#
+##
 graph:
-  # how often to poll Ethereum for new blocks (in ms)
+  # How often to poll Ethereum for new blocks (in ms)
   ethereumPollingInterval: 500
   # Control log levels
-  # values: debug, error, info, warn, or trace
+  # Options: debug, error, info, warn, or trace
   graphLog: "info"
   # IPFS URL
   ipfsUrl: graph-node-ipfs:5001
@@ -101,7 +101,8 @@ affinity: {}
 priorityClassName: ""
 
 ## PostgreSQL Server
-#
+## ref: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+##
 postgresql:
   enabled: true
   volumePermissions:
@@ -158,7 +159,8 @@ postgresql:
   metrics:
     enabled: true
 
-# IPFS Server
+## IPFS Server
+##
 ipfs:
   enabled: true
 
@@ -167,47 +169,34 @@ ipfs:
 ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
 ##
 serviceMonitor:
-  ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-  ##
+  # Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
   enabled: false
-  ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
-  ##
+  # The namespace in which the ServiceMonitor will be created
   namespace: ""
-  ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
-  ##
+  # The interval at which metrics should be scraped
   interval: 30s
-  ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
-  ##
+  # The timeout after which the scrape is ended
   scrapeTimeout: ""
-  ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
-  ##
+  # Metrics RelabelConfigs to apply to samples before scraping.
   relabellings: []
-  ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
-  ##
+  # Metrics RelabelConfigs to apply to samples before ingestion.
   metricRelabelings: []
-  ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
-  ##
+  # Specify honorLabels parameter to add the scrape endpoint
   honorLabels: false
-  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-  ##
+  # Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   additionalLabels: {}
 
 ## Custom PrometheusRule to be defined
 ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
 ##
 prometheusRule:
-  ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-  ##
+  # Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
   enabled: false
-  ## @param metrics.prometheusRule.default Create a default set of Alerts
-  ##
+  # Create a default set of Alerts
   default: true
-  ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
-  ##
+  # The namespace in which the prometheusRule will be created
   namespace: ""
-  ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
-  ##
+  # Additional labels for the prometheusRule
   additionalLabels: {}
-  ## @param metrics.prometheusRule.rules Custom Prometheus rules
-  ##
+  # Custom Prometheus rules
   rules: []

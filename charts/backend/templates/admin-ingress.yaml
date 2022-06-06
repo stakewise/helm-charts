@@ -1,30 +1,30 @@
 {{- if and .Values.admin.enabled .Values.admin.ingress.enabled }}
-{{ $fullName := include "admin.fullname" . }}
+{{ $fullName := include "common.names.fullname" . }}
 {{ $ingressPath := .Values.admin.ingress.path }}
-apiVersion: networking.k8s.io/v1
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ template "admin.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-admin
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "admin"
-  {{- with .Values.admin.ingress.labels }}
+    {{- with .Values.admin.ingress.labels }}
     {{ toYaml . | nindent 4 | trim }}
-  {{- end }}
-{{- with .Values.admin.ingress.annotations }}
+    {{- end }}
+  {{- with .Values.admin.ingress.annotations }}
   annotations:
     {{ toYaml . | nindent 4 | trim }}
-{{- end }}
+  {{- end }}
 spec:
   {{- if and .Values.admin.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.admin.ingress.className }}
   {{- end }}
-{{- with .Values.admin.ingress.tls }}
+  {{- with .Values.admin.ingress.tls }}
   tls:
     {{ toYaml . | nindent 4 | trim }}
-{{- end }}
+  {{- end }}
   rules:
-  {{- range .Values.admin.ingress.hosts }}
+    {{- range .Values.admin.ingress.hosts }}
     - host: {{ . }}
       http:
         paths:
@@ -32,8 +32,8 @@ spec:
             path: {{ $ingressPath }}
             backend:
               service:
-                name: {{ $fullName }}
+                name: {{ $fullName }}-admin
                 port:
                   name: http
-  {{- end }}
+    {{- end }}
 {{- end }}

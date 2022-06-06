@@ -1,10 +1,10 @@
 {{- if .Values.api.enabled }}
 kind: Deployment
-apiVersion: apps/v1
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
 metadata:
-  name: {{ template "api.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-api
   labels:
-    {{- include "backend.labels" . | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
     component: "api"
 spec:
   replicas: {{ default 1 .Values.api.replicas }}
@@ -16,31 +16,31 @@ spec:
       maxUnavailable: 0
   selector:
     matchLabels:
-      {{- include "backend.selectorLabels" . | nindent 6 }}
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
       component: "api"
   template:
     metadata:
       labels:
-        {{- include "backend.selectorLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
         component: "api"
       annotations:
         checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
         checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
         checksum/api-secret: {{ include (print $.Template.BasePath "/api-secret.yaml") . | sha256sum }}
     spec:
-    {{- if .Values.api.tolerations }}
-      tolerations:
-        {{ tpl .Values.api.tolerations . | nindent 8 | trim }}
-    {{- end }}
-    {{- if .Values.api.affinity }}
+      {{- with .Values.api.affinity }}
       affinity:
-        {{ tpl .Values.api.affinity . | nindent 8 | trim }}
-    {{- end }}
-    {{- with .Values.securityContext }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-      serviceAccountName: {{ template "api.fullname" . }}
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.api.priorityClassName | quote }}
       initContainers:
         - name: migrate-db
@@ -49,11 +49,11 @@ spec:
           command: ["python", "manage.py", "migrate", "--no-input"]
           envFrom:
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "api.fullname" . }}
+                name: {{ include "common.names.fullname" . }}-api
           env:
             - name: DJANGO_SETTINGS_MODULE
               value: "config.settings.api_settings"
@@ -63,18 +63,18 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - secretRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ template "backend.fullname" . }}
+                name: {{ include "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "api.fullname" . }}
+                name: {{ include "common.names.fullname" . }}-api
           env:
             - name: DJANGO_SETTINGS_MODULE
               value: "config.settings.api_settings"
-        {{- with .Values.api.resources }}
+          {{- with .Values.api.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
+          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.api.servicePort }}
@@ -83,11 +83,11 @@ spec:
             httpGet:
               path: /healthz/
               port: http
-            {{- if .Values.api.probesHostHeader }}
+              {{- if .Values.api.probesHostHeader }}
               httpHeaders:
                 - name: Host
                   value: {{ .Values.api.probesHostHeader | quote }}
-            {{- end }}
+              {{- end }}
             initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5
@@ -96,11 +96,11 @@ spec:
             httpGet:
               path: /healthz/
               port: http
-            {{- if .Values.api.probesHostHeader }}
+              {{- if .Values.api.probesHostHeader }}
               httpHeaders:
                 - name: Host
                   value: {{ .Values.api.probesHostHeader | quote }}
-            {{- end }}
+              {{- end }}
             initialDelaySeconds: 15
             timeoutSeconds: 30
             failureThreshold: 5

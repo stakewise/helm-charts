@@ -2,37 +2,45 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Pod Security Context
-# ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
 securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
-# Termination Grace Period
-# https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
 terminationGracePeriodSeconds: 1800
 
-# Affinity Settings
-# https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+## Affinity Settings
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
 affinity: { }
 
-# Toleration Settings
-# https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+## Toleration Settings
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+##
 tolerations: [ ]
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  ## Specifies whether a service account should be created
+  ##
   create: true
-  # Annotations to add to the service account
+  ## Annotations to add to the service account
+  ##
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  ##
   name: ""
 
-# Docker image
+## Docker image
+##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.5.3"
+  tag: "v2.5.4"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -40,20 +48,23 @@ image:
 ##
 imagePullSecrets: []
 
-# Configure resource requests and limits.
-# http://kubernetes.io/docs/user-guide/compute-resources/
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
 resources:
   requests:
     cpu: 10m
     memory: 200Mi
 
-# used to assign priority to pod
-# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+## Used to assign priority to pod
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
 priorityClassName: ""
 
 settings:
   logLevel: "INFO"
-  # possible values: goerli, perm_goerli, gnosis, mainnet
+  ## Possible values: goerli, perm_goerli, gnosis, mainnet
+  ##
   enabledNetworks: "mainnet"
 
   eth1Endpoint:
@@ -68,7 +79,8 @@ settings:
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 
-  # credentials
+  ## Credentials
+  ##
   oraclePrivateKey:
     mainnet: ""
     goerli: ""
@@ -84,15 +96,3 @@ settings:
     gnosis: ""
     harbourMainnet: ""
     harbourKeeper: ""
-
-  ## @param settings.extraEnv Extra environment variables to pass to the container
-  ## extraEnv:
-  ##   MY_ENV_VAR: my_value
-  ##
-  extraEnv: {}
-
-  ## @param settings.extraSecret Extra environment variables to pass to the container
-  ## extraSecret:
-  ##   MY_ENV_VAR: my_value
-  ##
-  extraSecret: {}

@@ -1,5 +1,5 @@
-apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
-kind: Deployment
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
 metadata:
   name: {{ include "common.names.fullname" . }}
   labels:
@@ -8,23 +8,22 @@ spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
-  strategy:
-    type: Recreate
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   template:
     metadata:
       annotations:
         checksum/graph-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/graph-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-      {{- with .Values.podAnnotations }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.image.pullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

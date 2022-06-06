@@ -1,12 +1,15 @@
 dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
-  version: 10.13.8
+  version: 11.6.0
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami/
   version: 9.0.0
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
   version: 6.0.21
-digest: sha256:88c82a2eb81b4b26ea1dc40364406d579a16e995481c56443fbfdf3669aa5846
-generated: "2022-05-23T12:26:00.892587+03:00"
+digest: sha256:8de1598dfd521d2059f4380340d538899b5306a8ec1e8f891a2701c482a33463
+generated: "2022-06-02T18:06:25.795689015+03:00"

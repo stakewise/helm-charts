@@ -30,7 +30,8 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# IPFS Configuration
+## IPFS Configuration
+##
 ipfs:
   # Data Path
   path: /data/ipfs
@@ -69,6 +70,9 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+## Service
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/
+##
 service:
   type: ClusterIP
   ports:
@@ -77,6 +81,9 @@ service:
     gateway: 8080
     websocket: 8081
 
+## Ingress
+## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+##
 ingress:
   api:
     enabled: false
@@ -113,7 +120,7 @@ ingress:
 ## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
 ##
 verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
+  ## If true a VPA object will be created for the StatefulSet
   enabled: false
   updateMode: Off
   containerPolicies: { }
