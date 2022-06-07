@@ -29,6 +29,15 @@ graph:
   # "instant" or "synced". Synced will only switch a named subgraph to a new deployment once it has synced,
   # making the new deployment the "Pending" version
   experimentalSubgraphVersionSwitchingMode: "synced"
+  # Number of Ethereum blocks to request in parallel.
+  # Also limits other parallel requests such such as trace_filter
+  ethereumBlockBatchSize: 250
+  # Maximum number of blocks to scan for triggers in each request
+  graphEthereumMaxBlockRangeSize: 2000
+  # How many simultaneous connections to allow to the store.
+  # Due to implementation details, this value may not be strictly adhered to
+  storeConnectionPoolSize: 25
+  
 
 serviceAccount:
   # Specifies whether a service account should be created

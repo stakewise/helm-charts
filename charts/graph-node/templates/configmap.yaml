@@ -7,6 +7,9 @@ metadata:
 data:
   ETHEREUM_POLLING_INTERVAL: {{ .Values.graph.ethereumPollingInterval | quote }}
   EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
+  ETHEREUM_BLOCK_BATCH_SIZE: {{ .Values.graph.ethereumBlockBatchSize | quote }}
+  GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: {{ .Values.graph.graphEthereumMaxBlockRangeSize | quote }}
+  STORE_CONNECTION_POOL_SIZE: {{ .Values.graph.storeConnectionPoolSize | quote }}
   GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
   ipfs: {{ .Values.graph.ipfsUrl | quote }}
   ethereum: {{ .Values.graph.ethereumNode | quote }}
