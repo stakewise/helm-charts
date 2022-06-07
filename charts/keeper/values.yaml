@@ -79,6 +79,8 @@ settings:
   healthServerHost: "0.0.0.0"
   healthServerPort: "8080"
 
+  sentryDsn: ""
+
   ## Credentials
   ##
   oraclePrivateKey:

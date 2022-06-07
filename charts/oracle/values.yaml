@@ -66,6 +66,8 @@ settings:
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
 
+  sentryDsn: ""
+
   ## ETH2
   ##
   eth2Endpoint:
