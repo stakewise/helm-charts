@@ -30,4 +30,6 @@ data:
   GOERLI_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.goerli | quote }}
   PERM_GOERLI_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.permGoerli | quote }}
   GNOSIS_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.gnosis | quote }}
+  HARBOUR_GOERLI_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.harbourGoerli | quote }}
+  HARBOUR_MAINNET_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.commonConf.sendTelegramNotifications.harbourMainnet | quote }}
 {{- end }}
