@@ -40,7 +40,7 @@ serviceAccount:
 ##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.5.4"
+  tag: "v2.5.6"
   pullPolicy: IfNotPresent
 
 ## Configure resource requests and limits.
@@ -65,6 +65,8 @@ settings:
   ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
+
+  sentryDsn: ""
 
   ## ETH2
   ##

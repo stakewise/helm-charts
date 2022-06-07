@@ -31,6 +31,8 @@ commonConf:
     goerli: "False"
     permGoerli: "False"
     gnosis: "False"
+    harbourGoerli: "False"
+    harbourMainnet: "False"
 
   telegramToken: ""
   telegramChatId: ""
@@ -39,7 +41,7 @@ commonConf:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.3.5"
+  tag: "v2.3.7"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
