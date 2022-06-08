@@ -195,7 +195,7 @@ validatorMonitor:
   enabled: false
   image:
     repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-monitor"
-    tag: "v0.0.6"
+    tag: "v0.0.7"
     pullPolicy: IfNotPresent
   port: 9000
   ## Options:
