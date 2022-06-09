@@ -41,7 +41,7 @@ commonConf:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.3.7"
+  tag: "v2.3.9"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
