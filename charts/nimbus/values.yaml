@@ -153,6 +153,7 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 300Gi
+  annotations: {}
 
 
 ## Nimbus: an Ethereum 1.0 and 2.0 Client for Resource-Restricted Devices

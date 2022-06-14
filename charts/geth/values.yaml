@@ -267,6 +267,7 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 900Gi
+  annotations: {}
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/

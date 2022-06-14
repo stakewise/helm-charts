@@ -185,6 +185,7 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 300Gi
+  annotations: {}
 
 
 ## Teku is an open-source Ethereum 2.0 client written in Java.
