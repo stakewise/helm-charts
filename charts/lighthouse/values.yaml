@@ -87,7 +87,7 @@ replicaCount: 1
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   repository: "sigp/lighthouse"
-  tag: "v2.3.0"
+  tag: "v2.3.1"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
