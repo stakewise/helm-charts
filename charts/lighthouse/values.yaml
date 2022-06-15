@@ -312,3 +312,4 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 250Gi
+  annotations: {}
