@@ -1,4 +1,6 @@
-{{- if or .Values.rpc.enabled .Values.ws.enabled }}
+{{- if or .Values.global.execution.rpc.enabled .Values.rpc.enabled
+  .Values.global.execution.ws.enabled .Values.ws.enabled
+  .Values.global.metrics.enabled .Values.metrics.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -16,20 +18,19 @@ spec:
 {{- end }}
   type: ClusterIP
   ports:
-  {{- if .Values.rpc.enabled }}
+  {{- if or .Values.global.execution.rpc.enabled .Values.rpc.enabled }}
     - name: rpc
-      port: {{ .Values.rpc.port }}
+      port: {{ coalesce .Values.global.execution.rpc.port .Values.rpc.port }}
       targetPort: rpc
   {{- end }}
-  {{- if .Values.ws.enabled }}
+  {{- if or .Values.global.execution.ws.enabled .Values.ws.enabled }}
     - name: ws
-      port: {{ .Values.ws.port }}
+      port: {{ coalesce .Values.global.execution.ws.port .Values.ws.port }}
       targetPort: ws
   {{- end }}
-  {{- if .Values.metrics.enabled }}
+  {{- if or .Values.global.metrics.enabled .Values.metrics.enabled }}
     - name: metrics
       port: {{ .Values.metrics.port }}
       targetPort: metrics
   {{- end }}
 {{- end }}
-

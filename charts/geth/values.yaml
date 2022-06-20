@@ -2,6 +2,94 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## Globals sections
+## These values are accessible for helm in this chart and subcharts
+## ref: https://helm.sh/docs/chart_template_guide/subcharts_and_globals/
+##
+global:
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## @param rbac.create Specifies whether RBAC resources are to be created
+    ##
+    create: true
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Settings related to the execution clients (e.g.: Geth, Nethermind, Besu, Erigion, ..)
+  ##
+  execution:
+    ## Network (chain) ID
+    ## Supported options: mainnet, goerli
+    ##
+    network: "mainnet"
+
+    ## RPC configuration.
+    ##
+    rpc:
+      enabled: true
+      port: "8545"
+      api: "web3,eth,net"
+      corsDomain: ""
+      vhosts: "*"
+
+    ## WebSocket configuration.
+    ##
+    ws:
+      enabled: true
+      port: "8546"
+      api: "web3,eth,net"
+      origins: "*"
+
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: true
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
+
 ## Provide a name in place of geth for `app:` labels
 ##
 nameOverride: ""
@@ -14,8 +102,6 @@ fullnameOverride: ""
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -33,31 +119,28 @@ securityContext:
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
 rbac:
-  ## @param rbac.create Specifies whether RBAC resources are to be created
-  ##
-  create: true
   ## @param rbac.clusterRules Required ClusterRole rules
   ## @default -- See `values.yaml`
   clusterRules:
     ## Required to obtain the nodes external IP
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## @param rbac.rules Required ClusterRole rules
   ## @default -- See `values.yaml`
   rules:
     ## Required to get information about the serices nodePort.
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -103,25 +186,32 @@ podDisruptionBudget:
 
 ## Network (chain) ID
 ## Supported options: mainnet, goerli
+#
+## Value overwritten by: global.execution.network
 ##
-network: "mainnet"
+# network: "mainnet"
+network: ""
 
 ## RPC configuration.
+## See global.execution.rpc for default values.
+## rpc:
+##   enabled: true
+##   port: "8545"
+##   api: "web3,eth,net"
+##   corsDomain: ""
+##   vhosts: "*"
 ##
-rpc:
-  enabled: true
-  port: "8545"
-  api: "web3,eth,net"
-  corsDomain: ""
-  vhosts: "*"
+rpc: {}
 
 ## WebSocket configuration.
+## See global.execution.ws for default values.
+## ws:
+##  enabled: true
+##  port: "8546"
+##  api: "web3,eth,net"
+##  origins: "*"
 ##
-ws:
-  enabled: true
-  port: "8546"
-  api: "web3,eth,net"
-  origins: "*"
+ws: {}
 
 ## Extra flags to pass to the node
 ##
@@ -162,9 +252,6 @@ p2pNodePort:
 ## Monitoring
 ##
 metrics:
-  ## Whether to enable metrics collection or not
-  ##
-  enabled: true
 
   ## Prometheus exporter port
   ##
@@ -183,9 +270,6 @@ metrics:
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   ##
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
     ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
     ##
     namespace: ""
@@ -211,9 +295,6 @@ metrics:
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
   prometheusRule:
-    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
     ## @param metrics.prometheusRule.default Create a default set of Alerts
     ##
     default: true
@@ -294,7 +375,6 @@ priorityClassName: ""
 ## NB! readinessProbe and livenessProbe must be disabled before fully synced
 ##
 livenessProbe:
-  enabled: true
   initialDelaySeconds: 900
   timeoutSeconds: 3
   periodSeconds: 30
@@ -306,7 +386,6 @@ livenessProbe:
     scheme: HTTP
 
 readinessProbe:
-  enabled: true
   initialDelaySeconds: 30
   timeoutSeconds: 3
   periodSeconds: 30
