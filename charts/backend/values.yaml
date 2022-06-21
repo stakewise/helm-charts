@@ -41,7 +41,7 @@ commonConf:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.3.9"
+  tag: "v2.3.12"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -334,6 +334,36 @@ celery:
       gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
       harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
       harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
+
+## Prometheus Service Monitor
+## ref: https://github.com/coreos/prometheus-operator
+##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+##
+serviceMonitor:
+  ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+  ##
+  enabled: false
+  ## The namespace in which the ServiceMonitor will be created
+  ##
+  namespace: ""
+  ## The interval at which metrics should be scraped
+  ##
+  interval: 30s
+  ## The timeout after which the scrape is ended
+  ##
+  scrapeTimeout: ""
+  ## Metrics RelabelConfigs to apply to samples before scraping.
+  ##
+  relabellings: []
+  ## Metrics RelabelConfigs to apply to samples before ingestion.
+  ##
+  metricRelabelings: []
+  ## Specify honorLabels parameter to add the scrape endpoint
+  ##
+  honorLabels: false
+  ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+  ##
+  additionalLabels: {}
 
 cloudsqlProxy:
   enabled: false
