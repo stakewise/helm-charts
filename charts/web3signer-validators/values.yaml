@@ -336,7 +336,3 @@ livenessProbe:
       path: /metrics
       port: metrics
       scheme: HTTP
-
-## If false, data ownership will not be reset at startup
-##
-initChownData: true
