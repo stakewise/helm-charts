@@ -259,6 +259,8 @@ restApi:
   interface: "0.0.0.0"
   # Port number of Beacon Rest API
   port: "5051"
+  # Port name for the respective k8s service
+  portName: "rest-api"
   # Comma separated list of origins to allow, or * to
   # allow any origin
   corsOrigins:

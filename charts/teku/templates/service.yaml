@@ -19,9 +19,9 @@ spec:
   ports:
   {{- if .Values.restApi.enabled }}
     - port: {{ .Values.restApi.port }}
-      targetPort: rest-api
+      targetPort: {{ .Values.restApi.portName }}
       protocol: TCP
-      name: rest-api
+      name: {{ .Values.restApi.portName }}
   {{- end }}
   {{- if .Values.metrics.enabled }}
     - port: {{ .Values.metrics.port }}
