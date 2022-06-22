@@ -16,7 +16,7 @@ maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
 icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
-appVersion: v2.3.0
+appVersion: v2.3.1
 
 dependencies:
 - name: common
