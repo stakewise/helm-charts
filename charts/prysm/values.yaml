@@ -134,10 +134,15 @@ p2pNodePort:
       ##
       pullPolicy: IfNotPresent
 
-## RPC Port
+## Settings for gRPC (beacon client api)
 ##
 rpc:
+  # Port number for beacon client rpc connection
   port: "4000"
+  # Host on which the RPC server should listen
+  host: "0.0.0.0"
+  # Port name for the respective k8s service
+  portName: "rpc"
 
 ## HTTP Port
 ##
