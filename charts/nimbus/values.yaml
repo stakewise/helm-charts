@@ -173,10 +173,12 @@ rpc:
 # REST Server settings
 rest:
   enabled: true
-  # Port for the REST server
+  # Port of the REST server
   port: "5052"
+  # Port name for the respective k8s service
+  portName: "rest"
   # Listening address of the REST server
-  address: 0.0.0.0
+  address: "0.0.0.0"
 
 ## Extra flags to pass to the node
 ##

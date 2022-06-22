@@ -24,9 +24,9 @@ spec:
   {{- end }}
   {{- if .Values.rest.enabled }}
     - port: {{ .Values.rest.port }}
-      targetPort: rest
+      targetPort: {{ .Values.rest.portName }}
       protocol: TCP
-      name: rest
+      name: {{ .Values.rest.portName }}
   {{- end }}
   {{- if .Values.metrics.enabled }}
     - port: {{ .Values.metrics.port }}
