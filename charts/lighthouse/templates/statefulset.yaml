@@ -105,7 +105,12 @@ spec:
               exec lighthouse
               bn
               --staking
-              --http-address=0.0.0.0
+            {{- if .Values.http.enabled }}
+              --http
+              --http-port={{ .Values.http.port }}
+              --http-address={{ .Values.http.address }}
+              --http-allow-origin={{ .Values.http.allowOrigin }}
+            {{- end}}
               --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
               --datadir=/data
               --network={{ .Values.network }}
@@ -136,9 +141,9 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-            - containerPort: {{ .Values.rpcPort }}
+            - containerPort: {{ .Values.http.port }}
               protocol: TCP
-              name: http
+              name: {{ .Values.http.portName }}
           {{- if .Values.metrics.enabled }}
             - containerPort: {{ .Values.metrics.port }}
               name: metrics
@@ -170,7 +175,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.rpcPort | quote }}
+              value: {{ .Values.http.port | quote }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
