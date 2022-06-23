@@ -216,7 +216,7 @@ metrics:
     scrapeTimeout: ""
     ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
     ##
-    relabellings: []
+    relabelings: []
     ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []

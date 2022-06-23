@@ -1,6 +1,6 @@
 apiVersion: v2
-name: validators
-description: A Helm chart for installing and configuring large scale ETH staking infrastructure on top of the Kubernetes
+name: web3signer-validators
+description: A Helm chart for installing validators for the web3signer.
 
 # A chart can be either an 'application' or a 'library' chart.
 #

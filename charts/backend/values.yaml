@@ -354,7 +354,7 @@ serviceMonitor:
   scrapeTimeout: ""
   ## Metrics RelabelConfigs to apply to samples before scraping.
   ##
-  relabellings: []
+  relabelings: []
   ## Metrics RelabelConfigs to apply to samples before ingestion.
   ##
   metricRelabelings: []
