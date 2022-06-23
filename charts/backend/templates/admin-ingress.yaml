@@ -35,5 +35,12 @@ spec:
                 name: {{ $fullName }}-admin
                 port:
                   name: http
+          - pathType: ImplementationSpecific
+            path: /service/prometheus
+            backend:
+              service:
+                name: {{ $fullName }}-admin
+                port:
+                  name: http
     {{- end }}
 {{- end }}

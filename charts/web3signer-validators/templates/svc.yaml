@@ -1,0 +1,16 @@
+{{- if .Values.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "validators.fullname" . }}
+  labels:
+    {{- include "validators.selectorLabels" . | nindent 4 }}
+spec:
+  selector:
+    {{- include "validators.selectorLabels" . | nindent 4 }}
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: {{ .Values.metrics.port }}
+      targetPort: metrics
+{{- end }}
