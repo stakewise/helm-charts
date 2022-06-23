@@ -84,7 +84,7 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if .Values.rest.enabled }}
-            - name: rest
+            - name: {{ .Values.rest.portName }}
               containerPort: {{ .Values.rest.port }}
               protocol: TCP
           {{- end }}

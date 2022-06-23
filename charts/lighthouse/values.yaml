@@ -136,9 +136,19 @@ verticalAutoscaler:
 ##
 network: mainnet
 
-## RPC Port
+## Rest API Settings
 ##
-rpcPort: "5052"
+http:
+  # Enables Beacon Rest API
+  enabled: true
+  # Port of the REST server
+  port: "5052"
+  # Port name for the respective k8s service
+  portName: "http"
+  # Listening address of the REST server
+  address: "0.0.0.0"
+  # Access-Control-Allow-Origin response HTTP header
+  allowOrigin: "*"
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
 ## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.

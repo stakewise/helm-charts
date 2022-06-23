@@ -141,7 +141,7 @@ spec:
         {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
           ports:
           {{- if .Values.restApi.enabled }}
-            - name: rest-api
+            - name: {{ .Values.restApi.portName }}
               containerPort: {{ .Values.restApi.port }}
               protocol: TCP
           {{- end }}
