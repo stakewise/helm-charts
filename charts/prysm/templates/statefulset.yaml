@@ -126,7 +126,7 @@ spec:
         {{- end }}
           args:
             - "--datadir=/data"
-            - "--rpc-host=0.0.0.0"
+            - "--rpc-host={{ .Values.rpc.host }}"
             - "--rpc-port={{ .Values.rpc.port }}"
           {{- if .Values.p2pNodePort.enabled }}
             - "--config-file=/env/init-nodeport"
@@ -174,7 +174,7 @@ spec:
                   fieldPath: status.podIP
           ports:
             - containerPort: {{ .Values.rpc.port }}
-              name: rpc
+              name: {{ .Values.rpc.portName }}
               protocol: TCP
           {{- if .Values.p2pNodePort.enabled }}
             - name: p2p-tcp

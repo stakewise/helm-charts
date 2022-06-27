@@ -26,7 +26,7 @@ image:
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.5"
+  tag: "22.6.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -259,6 +259,8 @@ restApi:
   interface: "0.0.0.0"
   # Port number of Beacon Rest API
   port: "5051"
+  # Port name for the respective k8s service
+  portName: "rest-api"
   # Comma separated list of origins to allow, or * to
   # allow any origin
   corsOrigins:
