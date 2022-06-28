@@ -60,7 +60,7 @@ network: "prater"
 
 ## Number of epochs to keep when pruning the slashing protection database.
 ##
-pruningEpochToKeep: 10000
+pruningEpochToKeep: 100
 
 ## Hours between slashing protection database pruning operations.
 ##
