@@ -138,6 +138,9 @@ flags:
     - "vc"
     - "--datadir=/data/lighthouse"
     - "--init-slashing-protection"
+    - "--logfile-compress"
+    - "--logfile-max-size=64"
+    - "--logfile-max-number=2"
   teku:
     - "validator-client"
     - "--log-destination=CONSOLE"
