@@ -172,9 +172,7 @@ spec:
           configMap:
             name: {{ template "validators.fullname" $root }}-gnosis-prysm
         - name: data
-          emptyDir:
-            medium: Memory
-            sizeLimit: 64Mi
+          emptyDir: {}
 
 {{- end }}
 {{- end }}
