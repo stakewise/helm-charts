@@ -6,31 +6,9 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  ENABLED_NETWORKS: {{ .Values.settings.enabledNetworks | quote }}
+  NETWORK: {{ .Values.settings.network | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  {{- if contains "mainnet" .Values.settings.enabledNetworks }}
-  MAINNET_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.mainnet | quote }}
-  MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.mainnet | quote }}
-  {{- end }}
-  {{- if contains "goerli" .Values.settings.enabledNetworks }}
-  GOERLI_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.goerli | quote }}
-  GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.goerli | quote }}
-  {{- end }}
-  {{- if contains "perm_goerli" .Values.settings.enabledNetworks }}
-  PERM_GOERLI_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.permGoerli | quote }}
-  PERM_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.permGoerli | quote }}
-  {{- end }}
-  {{- if contains "gnosis" .Values.settings.enabledNetworks }}
-  GNOSIS_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.gnosis | quote }}
-  GNOSIS_AWS_S3_REGION: {{ .Values.settings.awsRegion.gnosis | quote }}
-  {{- end }}
-  {{- if contains "harbour_mainnet" .Values.settings.enabledNetworks }}
-  HARBOUR_MAINNET_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.harbourMainnet | quote }}
-  HARBOUR_MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourMainnet | quote }}
-  {{- end }}
-  {{- if contains "harbour_goerli" .Values.settings.enabledNetworks }}
-  HARBOR_GOERLI_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint.harbourGoerli | quote }}
-  HARBOR_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourGoerli | quote }}
-  {{- end }}
+  MAINNET_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
+  MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}

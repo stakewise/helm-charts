@@ -6,60 +6,17 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  ENABLED_NETWORKS: {{ .Values.settings.enabledNetworks | quote }}
+  NETWORK: {{ .Values.settings.network | quote }}
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
   IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
-  {{- if contains "mainnet" .Values.settings.enabledNetworks }}
-  MAINNET_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.mainnet | quote }}
-  MAINNET_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.mainnet | quote }}
-  MAINNET_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.mainnet | quote }}
-  MAINNET_UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.settings.uniswapV3SubgraphUrls.mainnet | quote }}
-  MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.mainnet | quote }}
-  MAINNET_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.mainnet | quote }}
-  MAINNET_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.mainnet | quote }}
-  {{- end }}
-  {{- if contains "goerli" .Values.settings.enabledNetworks }}
-  GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.goerli | quote }}
-  GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.goerli | quote }}
-  GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.goerli | quote }}
-  GOERLI_UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.settings.uniswapV3SubgraphUrls.goerli | quote }}
-  GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.goerli | quote }}
-  GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.goerli | quote }}
-  GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.goerli | quote }}
-  {{- end }}
-  {{- if contains "perm_goerli" .Values.settings.enabledNetworks }}
-  PERM_GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.permGoerli | quote }}
-  PERM_GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.permGoerli | quote }}
-  PERM_GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.permGoerli | quote }}
-  PERM_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.permGoerli | quote }}
-  PERM_GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.permGoerli | quote }}
-  PERM_GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.permGoerli | quote }}
-  {{- end }}
-  {{- if contains "gnosis" .Values.settings.enabledNetworks }}
-  GNOSIS_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.gnosis | quote }}
-  GNOSIS_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.gnosis | quote }}
-  GNOSIS_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.gnosis | quote }}
-  GNOSIS_AWS_S3_REGION: {{ .Values.settings.awsRegion.gnosis | quote }}
-  GNOSIS_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.gnosis | quote }}
-  GNOSIS_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.gnosis | quote }}
-  {{- end }}
-  {{- if contains "harbour_mainnet" .Values.settings.enabledNetworks }}
-  HARBOUR_MAINNET_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.harbourMainnet | quote }}
-  HARBOUR_MAINNET_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.harbourMainnet | quote }}
-  HARBOUR_MAINNET_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.harbourMainnet | quote }}
-  HARBOUR_MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourMainnet | quote }}
-  HARBOUR_MAINNET_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.harbourMainnet | quote }}
-  HARBOUR_MAINNET_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.harbourMainnet | quote }}
-  {{- end }}
-  {{- if contains "harbour_goerli" .Values.settings.enabledNetworks }}
-  HARBOUR_GOERLI_ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint.harbourGoerli | quote }}
-  HARBOUR_GOERLI_STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls.harbourGoerli | quote }}
-  HARBOUR_GOERLI_ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls.harbourGoerli | quote }}
-  HARBOUR_GOERLI_AWS_S3_REGION: {{ .Values.settings.awsRegion.harbourGoerli | quote }}
-  HARBOUR_GOERLI_VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize.harbourGoerli | quote }}
-  HARBOUR_GOERLI_VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize.harbourGoerli | quote }}
-  {{- end }}
+  ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
+  STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls | quote }}
+  ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls | quote }}
+  UNISWAP_V3_SUBGRAPH_URLS: {{ .Values.settings.uniswapV3SubgraphUrls | quote }}
+  AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
+  VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize | quote }}
+  VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize | quote }}
