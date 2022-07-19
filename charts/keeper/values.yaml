@@ -40,7 +40,7 @@ serviceAccount:
 ##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.5.6"
+  tag: "v2.6.1"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -65,15 +65,9 @@ settings:
   logLevel: "INFO"
   ## Possible values: goerli, perm_goerli, gnosis, mainnet
   ##
-  enabledNetworks: "mainnet"
+  network: "mainnet"
 
-  eth1Endpoint:
-    mainnet: ""
-    goerli: ""
-    permGoerli: ""
-    gnosis: ""
-    harbourMainnet: ""
-    harbourKeeper: ""
+  eth1Endpoint: ""
 
   enableHealthServer: "False"
   healthServerHost: "0.0.0.0"
@@ -83,18 +77,5 @@ settings:
 
   ## Credentials
   ##
-  oraclePrivateKey:
-    mainnet: ""
-    goerli: ""
-    permGoerli: ""
-    gnosis: ""
-    harbourMainnet: ""
-    harbourKeeper: ""
-
-  awsRegion:
-    mainnet: ""
-    goerli: ""
-    permGoerli: ""
-    gnosis: ""
-    harbourMainnet: ""
-    harbourKeeper: ""
+  oraclePrivateKey: ""
+  awsRegion: ""
