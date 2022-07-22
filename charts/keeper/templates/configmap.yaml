@@ -10,5 +10,5 @@ data:
   ENABLE_HEALTH_SERVER: {{ .Values.settings.enableHealthServer | quote }}
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
-  MAINNET_KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
-  MAINNET_AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
+  KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
+  AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
