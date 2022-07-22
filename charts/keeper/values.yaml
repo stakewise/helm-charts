@@ -40,7 +40,7 @@ serviceAccount:
 ##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.6.1"
+  tag: "v2.7.0"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
