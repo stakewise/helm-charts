@@ -2,6 +2,42 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.35"
+  pullPolicy: IfNotPresent
+
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  tag: "v1.0.3"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3000
+
+## Configuration for lighthouse eth v2 beacon chain node
+## ref: https://lighthouse-book.sigmaprime.io/
+##
+
+## How many beacon chain pods to run simultaneously
+##
+replicaCount: 1
+
+## Lighthouse beacon node image version
+## ref: https://hub.docker.com/r/sigp/lighthouse
+image:
+  repository: "sigp/lighthouse"
+  tag: "v2.4.0"
+  pullPolicy: IfNotPresent
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
 ## Provide a name in place of lighthouse for `app:` labels
 ##
 nameOverride: ""
@@ -9,6 +45,51 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
+
+## Eth2 network ID
+## Options: mainnet, prater/goerli, gnosis
+##
+network: mainnet
+
+## Rest API Settings
+##
+http:
+  # Enables Beacon Rest API
+  enabled: true
+  # Port of the REST server
+  port: "5052"
+  # Port name for the respective k8s service
+  portName: "http"
+  # Listening address of the REST server
+  address: "0.0.0.0"
+  # Access-Control-Allow-Origin response HTTP header
+  allowOrigin: "*"
+
+## The target number of peers.
+##
+targetPeers: 80
+
+## Extra flags for lighthouse beacon chain node
+##
+extraFlags: []
+
+## One or more comma-delimited server endpoints for web3 connection.
+## If multiple endpoints are given the endpoints are used as fallback
+## in the given order. Also enables the --eth1 flag. Defaults to
+## http://127.0.0.1:8545.
+##
+eth1Endpoints: []
+
+## Server endpoint for an execution layer jwt authenticated HTTP JSON-RPC connection.
+## Uses the same endpoint to populate the deposit cache.
+## Also enables the --merge flag.If not provided, uses the default value of
+## http://127.0.0.1:8551
+##
+executionEndpoint: []
+
+## The hex-encoded JWT secret for the execution endpoint provided
+## in the --execution-endpoint flag
+JWTSecret: ""
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -59,42 +140,6 @@ rbac:
       - "list"
       - "watch"
 
-## Init image is used to chown data volume, initialise genesis, etc.
-##
-initImage:
-  repository: "busybox"
-  tag: "1.34"
-  pullPolicy: IfNotPresent
-
-## Sidecar image is used to perform Liveness/Readiness probes.
-##
-sidecar:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-  tag: "v1.0.3"
-  pullPolicy: IfNotPresent
-  bindAddr: "0.0.0.0"
-  bindPort: 3000
-
-## Configuration for lighthouse eth v2 beacon chain node
-## ref: https://lighthouse-book.sigmaprime.io/
-##
-
-## How many beacon chain pods to run simultaneously
-##
-replicaCount: 1
-
-## Lighthouse beacon node image version
-## ref: https://hub.docker.com/r/sigp/lighthouse
-image:
-  repository: "sigp/lighthouse"
-  tag: "v2.3.1"
-  pullPolicy: IfNotPresent
-
-## Credentials to fetch images from private registry
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-##
-imagePullSecrets: []
-
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
@@ -131,24 +176,51 @@ verticalAutoscaler:
   updateMode: Off
   containerPolicies: {}
 
-## Eth2 network ID
-## Options: mainnet, prater, gnosis
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-network: mainnet
+resources: {}
 
-## Rest API Settings
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ##
-http:
-  # Enables Beacon Rest API
+livenessProbe:
   enabled: true
-  # Port of the REST server
-  port: "5052"
-  # Port name for the respective k8s service
-  portName: "http"
-  # Listening address of the REST server
-  address: "0.0.0.0"
-  # Access-Control-Allow-Origin response HTTP header
-  allowOrigin: "*"
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /eth2/liveness
+    port: sidecar
+    scheme: HTTP
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 300
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 2
+  httpGet:
+    path: /eth2/readiness
+    port: sidecar
+    scheme: HTTP
+
+## Defines whether the service must be headless
+##
+svcHeadless: false
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: true
+  # The session duration in seconds
+  timeoutSeconds: 86400
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
 ## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
@@ -179,24 +251,10 @@ p2pNodePort:
       repository: bitnami/kubectl
       ## @param p2pNodePort.initContainer.tag Container tag
       ##
-      tag: "1.23"
+      tag: "1.24"
       ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
       ##
       pullPolicy: IfNotPresent
-
-## The target number of peers.
-##
-targetPeers: 160
-
-## Extra flags for lighthouse beacon chain node
-##
-extraFlags:
-  - --subscribe-all-subnets
-  - --import-all-attestations
-
-## Ethereum 1 node endpoints.
-##
-eth1Endpoints: []
 
 ## Monitoring
 ##
@@ -261,52 +319,6 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
     rules: []
-
-## Defines whether the service must be headless
-##
-svcHeadless: false
-
-## Configure session affinity for validator clients to hit the same beacon node
-## for the period specified in `timeoutSeconds`
-## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-##
-sessionAffinity:
-  # Whether to enable session affinity or not
-  enabled: true
-  # The session duration in seconds
-  timeoutSeconds: 86400
-
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-##
-resources: {}
-
-## Configure liveness and readiness probes
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-##
-livenessProbe:
-  enabled: true
-  initialDelaySeconds: 900
-  timeoutSeconds: 3
-  periodSeconds: 30
-  failureThreshold: 3
-  successThreshold: 1
-  httpGet:
-    path: /eth2/liveness
-    port: sidecar
-    scheme: HTTP
-
-readinessProbe:
-  enabled: true
-  initialDelaySeconds: 300
-  timeoutSeconds: 3
-  periodSeconds: 30
-  failureThreshold: 30
-  successThreshold: 2
-  httpGet:
-    path: /eth2/readiness
-    port: sidecar
-    scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user

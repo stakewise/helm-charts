@@ -110,7 +110,15 @@ spec:
               --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
               --data-storage-mode={{ .Values.dataStorageMode }}
               --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
+            {{- if .Values.JWTSecret }}
+              --ee-endpoint={{ .Values.eeEndpoint }}
+              --ee-jwt-secret-file=/secret/jwtsecret
+              {{- if .Values.builderEndpoint }}
+              --builder-endpoint={{ .Values.builderEndpoint }}
+              {{- end }}
+            {{- else }}
               --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
+            {{- end }}
               --p2p-enabled=true
               --p2p-port={{ include "teku.p2pPort" . }}
             {{- if .Values.p2pNodePort.enabled }}
@@ -167,6 +175,11 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/teku
+            {{- if .Values.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+            {{- end }}
             {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
@@ -212,6 +225,11 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+        {{- if .Values.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+        {{- end }}
         {{- if .Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}

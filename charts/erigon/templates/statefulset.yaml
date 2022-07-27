@@ -99,6 +99,20 @@ spec:
               --nat=extip:$(POD_IP)
               --port={{ include "erigon.p2pPort" $ }}
           {{- end }}
+          {{- if .Values.terminalTotalDifficulty }}
+              --override.terminaltotaldifficulty={{ .Values.terminalTotalDifficulty }}
+          {{- end }}
+              --private.api.addr={{ .Values.privateApiAddr }}
+              --http.addr={{ .Values.httpAddr }}
+              --http.vhosts={{ .Values.httpVhosts }}
+              --http.corsdomain={{ .Values.httpCorsDomain }}
+              --http.api={{ .Values.httpApi }}
+              --http.port={{ .Values.service.port.rpc }}
+              --engine.addr={{ .Values.engineAddr }}
+              --engine.port={{ .Values.service.port.engine }}
+          {{- if .Values.JWTSecret }}
+              --authrpc.jwtsecret=/secret/jwtsecret
+          {{- end }}
           {{- range .Values.extraFlags }}
               {{ . }}
           {{- end }}
@@ -117,6 +131,14 @@ spec:
             - name: grpc
               protocol: TCP
               containerPort: {{ .Values.service.port.grpc }}
+            - name: rpc
+              protocol: TCP
+              containerPort: {{ .Values.service.port.rpc }}
+            {{- if .Values.JWTSecret }}
+            - name: engine
+              protocol: TCP
+              containerPort: {{ .Values.service.port.engine }}
+            {{- end }}
           {{- if .Values.metrics.enabled }}
             - name: metrics
               protocol: TCP
@@ -135,29 +157,15 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if .Values.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
           {{- end }}
-        - name: {{ .Chart.Name }}-rpc-daemon
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["rpcdaemon"]
-          args:
-            - --private.api.addr={{ .Values.privateApiAddr }}
-            - --http.addr={{ .Values.httpAddr }}
-            - --http.vhosts={{ .Values.httpVhosts }}
-            - --http.corsdomain={{ .Values.httpCorsDomain }}
-            - --http.api={{ .Values.httpApi }}
-            - --http.port={{ .Values.service.port.rpc }}
-          ports:
-            - name: rpc
-              protocol: TCP
-              containerPort: {{ .Values.service.port.rpc }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
         - name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
@@ -207,6 +215,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        {{- if .Values.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+        {{- end }}
         {{- if .Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}

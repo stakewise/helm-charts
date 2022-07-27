@@ -1,7 +1,11 @@
 apiVersion: v2
-name: erigon
-description: Ethereum implementation on the efficiency frontier
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+name: mev-boost
+description: mev-boost allows proof-of-stake Ethereum consensus clients to outsource block construction
+home: https://boost.flashbots.net/
+keywords:
+  - ethereum
+  - blockchain
+  - mev-boost
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -13,26 +17,18 @@ icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/imag
 # pipeline. Library charts do not define any templates and therefore cannot be deployed.
 type: application
 
-keywords:
-  - ethereum
-  - blockchain
-  - erigon
-  - p2p
-sources:
-  - https://github.com/ledgerwatch/erigon
-
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 1.1.8
+version: 0.1.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "v2022.07.03"
+appVersion: "0.0.7"
 
 dependencies:
-  - name: common
-    version: 1.x.x
-    repository: "file://../common"
+- name: common
+  repository: file://../common
+  version: 1.0.0

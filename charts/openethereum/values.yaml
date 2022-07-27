@@ -48,7 +48,7 @@ sidecar:
 ##
 initImage:
   repository: "busybox"
-  tag: "1.34"
+  tag: "1.35"
   pullPolicy: IfNotPresent
 
 ## Configuration for openethereum eth v1 node

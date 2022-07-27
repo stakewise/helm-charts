@@ -8,7 +8,7 @@ replicaCount: 1
 ##
 initImage:
   repository: "busybox"
-  tag: "1.34"
+  tag: "1.35"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -26,11 +26,66 @@ image:
   repository: nethermind/nethermind
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.13.3"
+  tag: "1.13.4"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+## Nethermind Settings
+##
+
+## Eth2 network ID
+## Options: mainnet, goerli, rinkeby, ropsten, gnosis, poacore,
+##          sokol, energyweb, volta, kovan
+##
+network: "mainnet"
+
+## Extra flags to pass to the node
+##
+extraFlags: []
+
+jsonrpc:
+  enabled: true
+  # Defines which RPC modules should be enabled.
+  # Built in modules are: Admin, Baseline, Clique, Consensus,
+  #                       Db, Debug, Deposit, Erc20, Eth, Evm,
+  #                       Health Mev, NdmConsumer, NdmProvider,
+  #                       Net, Nft, Parity, Personal, Proof, Subscribe,
+  #                       Trace, TxPool, Vault, Web3.
+  modules:
+      - Eth
+      - Subscribe
+      - Trace
+      - TxPool
+      - Web3
+      - Personal
+      - Proof
+      - Net
+      - Parity
+      - Health
+      - Engine
+  host: 0.0.0.0
+  ports:
+    rest: 8545
+    websocket: 8546
+
+# Hex encoded secret for jwt authentication.
+JWTSecret: ""
+
+merge:
+  # Defines whether the Merge plugin is enabled bundles are allowed.
+  enabled: false
+  # Account to be used by the block author.
+  # If it is not specified the address zero will be used.
+  feeRecipient: ""
+  # URL to Builder Relay. If set when building blocks nethermind will send them to the relay.
+  builderRelayUrl: ""
+  # Final total difficulty is total difficulty of the last PoW block.
+  # FinalTotalDifficulty >= TerminalTotalDifficulty.
+  finalTotalDifficulty: ""
+  # Terminal total difficulty used for transition process.
+  terminalTotalDifficulty: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -94,6 +149,37 @@ sessionAffinity:
   enabled: true
   # The session duration in seconds
   timeoutSeconds: 86400
+
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAt: 31200
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
+  initContainer:
+    image:
+      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
+      ##
+      repository: bitnami/kubectl
+      ## @param p2pNodePort.initContainer.tag Container tag
+      ##
+      tag: "1.24"
+      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
+      ##
+      pullPolicy: IfNotPresent
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -177,75 +263,6 @@ persistence:
     - ReadWriteOnce
   size: 250Gi
   annotations: {}
-
-
-## Nethermind Settings
-##
-
-## Eth2 network ID
-## Options: mainnet, goerli, rinkeby, ropsten, gnosis, poacore,
-##          sokol, energyweb, volta, kovan
-##
-network: "mainnet"
-
-jsonrpc:
-  enabled: true
-  # Defines which RPC modules should be enabled.
-  # Built in modules are: Admin, Baseline, Clique, Consensus,
-  #                       Db, Debug, Deposit, Erc20, Eth, Evm,
-  #                       Health Mev, NdmConsumer, NdmProvider,
-  #                       Net, Nft, Parity, Personal, Proof, Subscribe,
-  #                       Trace, TxPool, Vault, Web3.
-  modules:
-      - Eth
-      - Subscribe
-      - Trace
-      - TxPool
-      - Web3
-      - Personal
-      - Proof
-      - Net
-      - Parity
-      - Health
-  host: 0.0.0.0
-  ports:
-    rest: 8545
-    websocket: 8546
-
-## Extra flags to pass to the node
-##
-extraFlags: []
-
-## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
-## This will generate a service for each replica, with a port binding via NodePort.
-## This is useful if you want to expose and announce your node to the Internet.
-##
-p2pNodePort:
-  ## @param p2pNodePort.enabled Expose P2P port via NodePort
-  ##
-  enabled: false
-  ## @param p2pNodePort.annotations
-  ##
-  annotations: {}
-  ## @param p2pNodePort.startAt The ports allocation will start from this value
-  ##
-  startAt: 31200
-  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
-  ## @default -- See `values.yaml` for example
-  replicaToNodePort: {}
-  #  "0": 32345
-  #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.23"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 ## Monitoring
 ##

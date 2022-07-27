@@ -16,6 +16,11 @@ spec:
 {{- end }}
   type: ClusterIP
   ports:
+  {{- if .Values.JWTSecret }}
+    - name: authrpc
+      port: {{ .Values.authRpc.port }}
+      targetPort: authrpc
+  {{- end }}
   {{- if .Values.rpc.enabled }}
     - name: rpc
       port: {{ .Values.rpc.port }}

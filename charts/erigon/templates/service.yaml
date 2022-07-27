@@ -11,6 +11,12 @@ spec:
       targetPort: rpc
       protocol: TCP
       name: rpc
+    {{- if .Values.JWTSecret }}
+    - port: {{ .Values.service.port.engine }}
+      targetPort: engine
+      protocol: TCP
+      name: engine
+    {{- end }}
     - port: {{ .Values.service.port.grpc }}
       targetPort: grpc
       protocol: TCP

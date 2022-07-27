@@ -63,7 +63,7 @@ rbac:
 ##
 initImage:
   repository: "busybox"
-  tag: "1.34"
+  tag: "1.35"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -80,7 +80,7 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.19"
+  tag: "v1.10.20"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -92,6 +92,45 @@ imagePullSecrets: []
 ##
 replicaCount: 1
 
+## Network (chain) ID
+## Supported options: mainnet, goerli
+##
+network: "mainnet"
+
+# Hex encoded secret for jwt authentication.
+JWTSecret: ""
+
+# Manually specify TerminalTotalDifficulty, overriding the bundled setting
+terminalTotalDifficulty: ""
+
+## AuthRPC configuration.
+##
+authRpc:
+  port: "8551"
+  vhosts: "*"
+
+## RPC configuration.
+##
+rpc:
+  enabled: true
+  port: "8545"
+  api: "web3,eth,net,engine"
+  corsDomain: ""
+  vhosts: "*"
+
+## WebSocket configuration.
+##
+ws:
+  enabled: true
+  port: "8546"
+  api: "web3,eth,net,engine"
+  origins: "*"
+
+## Extra flags to pass to the node
+##
+extraFlags:
+  - "--syncmode=snap"
+
 ## Configure pod disruption budgets for Alertmanager
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
 ## This configuration is immutable once created and will require the PDB to be deleted to be changed
@@ -101,32 +140,17 @@ podDisruptionBudget:
   enabled: true
   maxUnavailable: 1
 
-## Network (chain) ID
-## Supported options: mainnet, goerli
+## Configure session affinity for to hit the same geth node
+## for the period specified in `timeoutSeconds`
+## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
 ##
-network: "mainnet"
-
-## RPC configuration.
-##
-rpc:
+sessionAffinity:
+  ## Whether to enable session affinity or not
+  ##
   enabled: true
-  port: "8545"
-  api: "web3,eth,net"
-  corsDomain: ""
-  vhosts: "*"
-
-## WebSocket configuration.
-##
-ws:
-  enabled: true
-  port: "8546"
-  api: "web3,eth,net"
-  origins: "*"
-
-## Extra flags to pass to the node
-##
-extraFlags:
-  - "--syncmode=snap"
+  ## The session duration in seconds
+  ##
+  timeoutSeconds: 86400
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
 ## This will generate a service for each replica, with a port binding via NodePort.
@@ -154,7 +178,7 @@ p2pNodePort:
       repository: bitnami/kubectl
       ## @param p2pNodePort.initContainer.tag Container tag
       ##
-      tag: "1.23"
+      tag: "1.24"
       ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
       ##
       pullPolicy: IfNotPresent
@@ -226,18 +250,6 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
     rules: []
-
-## Configure session affinity for to hit the same geth node
-## for the period specified in `timeoutSeconds`
-## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
-##
-sessionAffinity:
-  ## Whether to enable session affinity or not
-  ##
-  enabled: true
-  ## The session duration in seconds
-  ##
-  timeoutSeconds: 86400
 
 ## Vertical Pod Autoscaler config
 ## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler

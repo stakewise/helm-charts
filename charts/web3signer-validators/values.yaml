@@ -71,16 +71,16 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.1.0"
+    tag: "v2.1.3"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
-    tag: "v2.1.0-gbc"
+    tag: "v2.1.2-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.3.1"
+    tag: "v2.4.0"
   teku:
     repository: "consensys/teku"
-    tag: "22.5"
+    tag: "22.7.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

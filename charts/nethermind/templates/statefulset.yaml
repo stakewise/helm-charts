@@ -112,6 +112,9 @@ spec:
               --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
               --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
           {{- end }}
+          {{- if .Values.JWTSecret }}
+              --JsonRpc.JwtSecretFile=/secret/jwtsecret
+          {{- end }}
           {{- if .Values.metrics.enabled }}
               --Metrics.Enabled={{ .Values.metrics.enabled }}
               --Metrics.ExposePort={{ .Values.metrics.port }}
@@ -124,6 +127,21 @@ spec:
               --Network.ExternalIp=$(POD_IP)
               --Network.P2PPort={{ include "nethermind.p2pPort" . }}
               --Network.DiscoveryPort={{ include "nethermind.p2pPort" . }}
+          {{- end }}
+          {{-  if .Values.merge.enabled }}
+              --Merge.Enabled=true
+              {{- if .Values.merge.feeRecipient }}
+              --Merge.FeeRecipient={{ .Values.merge.feeRecipient }}
+              {{- end }}
+              {{- if .Values.merge.builderRelayUrl }}
+              --Merge.BuilderRelayUrl={{ .Values.merge.builderRelayUrl }}
+              {{- end }}
+              {{- if .Values.merge.finalTotalDifficulty }}
+              --Merge.FinalTotalDifficulty={{ .Values.merge.finalTotalDifficulty }}
+              {{- end }}
+              {{- if .Values.merge.terminalTotalDifficulty }}
+              --Merge.TerminalTotalDifficulty={{ .Values.merge.terminalTotalDifficulty }}
+              {{- end }}
           {{- end }}
           {{- range .Values.extraFlags }}
               {{ . | quote }}
@@ -153,6 +171,11 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
+          {{- if .Values.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
@@ -198,6 +221,11 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+        {{- if .Values.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+        {{- end }}
         {{- if .Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}

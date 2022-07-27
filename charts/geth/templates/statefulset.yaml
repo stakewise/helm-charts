@@ -86,7 +86,7 @@ spec:
         {{- end }}
       {{- end }}
       containers:
-        - name: node
+        - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
@@ -97,6 +97,12 @@ spec:
               . /env/init-nodeport;
             {{- end }}
               exec geth
+          {{- if .Values.JWTSecret }}
+              --authrpc.jwtsecret=/secret/jwtsecret
+              --authrpc.addr=0.0.0.0
+              --authrpc.port={{ .Values.authRpc.port }}
+              --authrpc.vhosts={{ .Values.authRpc.vhosts }}
+          {{- end }}
           {{- if .Values.rpc.enabled }}
               --http
               --http.addr=0.0.0.0
@@ -119,6 +125,9 @@ spec:
               --ws.origins={{ .Values.ws.origins }}
               --ws.api={{ .Values.ws.api }}
           {{- end }}
+          {{- if .Values.terminalTotalDifficulty }}
+              --override.terminaltotaldifficulty={{ .Values.terminalTotalDifficulty }}
+          {{- end }}
               --datadir=/data/ethereum
               --ethash.dagdir=/data/ethereum/.ethash
               --ipcdisable
@@ -137,6 +146,10 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
+          {{- if .Values.JWTSecret }}
+            - name: authrpc
+              containerPort: {{ .Values.authRpc.port }}
+          {{- end }}
           {{- if .Values.rpc.enabled }}
             - name: rpc
               containerPort: {{ .Values.rpc.port }}
@@ -160,6 +173,11 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
+          {{- if .Values.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
@@ -207,6 +225,11 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
+        {{- if .Values.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+        {{- end }}
         {{- if .Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}

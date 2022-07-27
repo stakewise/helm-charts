@@ -111,7 +111,15 @@ spec:
               --http-address={{ .Values.http.address }}
               --http-allow-origin={{ .Values.http.allowOrigin }}
             {{- end}}
+            {{- if .Values.eth1Endpoints }}
               --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
+            {{- end }}
+            {{- if .Values.executionEndpoint }}
+              --execution-endpoint={{ .Values.executionEndpoint }}
+            {{- end }}
+            {{- if .Values.JWTSecret }}
+              --execution-jwt=/secret/jwtsecret
+            {{- end }}
               --datadir=/data
               --network={{ .Values.network }}
               --disable-upnp
@@ -160,6 +168,11 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+            {{- if .Values.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+            {{- end }}
             {{- if .Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
@@ -204,8 +217,13 @@ spec:
               port: {{ .Values.readinessProbe.httpGet.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
-      {{- if or (not .Values.persistence.enabled) (.Values.p2pNodePort.enabled) }}
       volumes:
+        {{- if .Values.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+        {{- end }}
+      {{- if or (not .Values.persistence.enabled) (.Values.p2pNodePort.enabled) }}
         {{- if .Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}
