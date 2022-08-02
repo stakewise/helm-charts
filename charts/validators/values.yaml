@@ -30,6 +30,16 @@ initImageBusybox:
   tag: "1.35"
   pullPolicy: IfNotPresent
 
+## CLI image is used to fetch public keys.
+##
+cliImage:
+  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
+  tag: "v1.1.10"
+  pullPolicy: IfNotPresent
+
+## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
+##
+dbKeystoreUrl: ""
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
@@ -48,13 +58,6 @@ enabled: true
 ##
 type: prysm
 
-## Reimport Keystores
-## Set the value to true if you added new keystores
-## to the vault or you just need to re-sync the state.
-## Options: true, false
-##
-reimportKeystores: false
-
 ## How many validators to run
 ## **NB! Every validator hosts up to 100 keys in Mainnet and 1000 keys in Gnosis,
 ## so the number of validators must be >= (total number of validator keys) / max number of keys per validator
@@ -68,13 +71,13 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.1.3"
+    tag: "v2.1.4-rc.0"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.4.0"
+    tag: "v2.5.0"
   teku:
     repository: "consensys/teku"
     tag: "22.7.0"
@@ -84,14 +87,7 @@ image:
 ##
 imagePullSecrets: []
 
-## Init image is used to initialise validators
-##
-initImage:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-init"
-  tag: "v1.5.3"
-  pullPolicy: IfNotPresent
-
-terminationGracePeriodSeconds: 900
+terminationGracePeriodSeconds: 300
 
 ## Spearate service account per validator.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -122,33 +118,17 @@ affinity: {}
 ##
 priorityClassName: ""
 
-## Vertical Pod Autoscaler config
-## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: {}
-
 ## Network ID
 ## Options for Ethereum: mainnet, prater
 ## Options for Gnosis: gnosis
 ##
 network: "mainnet"
 
-## Existing vault endpoint
-## example: http://vault.vault:8200
-##
-vaultEndpoint: ""
-
 ## Validators flags
 ##
 flags:
   prysm:
     - "--datadir=/data/prysm"
-    - "--wallet-dir=/data/prysm/validators"
-    - "--wallet-password-file=/data/prysm/validators/password.txt"
     - "--accept-terms-of-use"
     - "--disable-rewards-penalties-logging"
     - "--disable-account-metrics"
@@ -157,10 +137,14 @@ flags:
     - "lighthouse"
     - "vc"
     - "--datadir=/data/lighthouse"
+    - "--init-slashing-protection"
+    - "--logfile-compress"
+    - "--logfile-max-size=64"
+    - "--logfile-max-number=2"
   teku:
     - "validator-client"
-    - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"
     - "--log-destination=CONSOLE"
+    - "--data-base-path=/data"
 
 ## Validators extra flags
 ##
@@ -168,6 +152,10 @@ extraFlags:
   prysm: []
   lighthouse: []
   teku: []
+
+## Web3Signer Endpoint
+##
+web3signerEndpoint: http://web3signer:6174
 
 ## List of Beacon Chain node addresses
 ## If not specified, will connect to prysm/lighthouse beacon nodes
@@ -187,35 +175,6 @@ beaconChainRpcEndpointsRandomized: []
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
 ##
 graffiti: ""
-
-## Validator Monitor
-## ref: https://github.com/stakewise/validator-monitor
-##
-validatorMonitor:
-  enabled: false
-  image:
-    repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/validator-monitor"
-    tag: "v0.0.7"
-    pullPolicy: IfNotPresent
-  port: 9000
-  ## Options:
-  ## mainnet: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet
-  ## goerli: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli
-  ## gnosis: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis
-  graphNodeUrl: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet
-  beaconNodeUrl: http://localhost:5052
-  indexChunckSize: 800
-  operatorWallets: []
-  ## Configure resource requests and limits.
-  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-  ##
-  resources:
-    limits:
-      cpu: 600m
-      memory: 512Mi
-    requests:
-      cpu: 300m
-      memory: 128Mi
 
 ## Monitoring
 ##
@@ -237,7 +196,6 @@ metrics:
       - "--metrics-address=0.0.0.0"
     teku:
       - "--metrics-enabled=true"
-      - "--metrics-categories=JVM,PROCESS,BEACON,DISCOVERY,EVENTBUS,EXECUTOR,LIBP2P,NETWORK,STORAGE,STORAGE_HOT_DB,STORAGE_FINALIZED_DB,REMOTE_VALIDATOR,VALIDATOR,VALIDATOR_PERFORMANCE"
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
@@ -261,7 +219,7 @@ metrics:
     scrapeTimeout: ""
     ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
     ##
-    relabellings: []
+    relabelings: []
     ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []
@@ -381,17 +339,3 @@ livenessProbe:
       path: /metrics
       port: metrics
       scheme: HTTP
-
-## If false, data ownership will not be reset at startup
-##
-initChownData: true
-
-## Whether or not to allocate persistent volume disk for the data directory.
-## In case of pod failure, the pod data directory will still persist.
-##
-persistence:
-  enabled: true
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  size: 5Gi

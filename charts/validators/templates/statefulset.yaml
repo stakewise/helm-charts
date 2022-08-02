@@ -38,151 +38,141 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
-    {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-    {{- end }}
-    {{- with $root.Values.terminationGracePeriodSeconds }}
+      {{- with $root.Values.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ . }}
-    {{- end }}
-    {{- with $root.Values.affinity }}
+      {{- end }}
+      {{- with $root.Values.affinity }}
       affinity:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with $root.Values.tolerations }}
+      {{- end }}
+      {{- with $root.Values.tolerations }}
       tolerations:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with $root.Values.nodeSelector }}
+      {{- end }}
+      {{- with $root.Values.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-    {{- with $root.Values.securityContext }}
+      {{- end }}
+      {{- with $root.Values.securityContext }}
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
-      serviceAccountName: "validator{{.}}"
+      {{- end }}
+      serviceAccountName: "validators"
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
-        - name: init-validator
-          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
-          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
+        - name: get-configs
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           env:
-            - name: VAULT_ADDR
-              value: {{ $root.Values.vaultEndpoint | quote }}
-            - name: NETWORK_ID
-              value: {{ $root.Values.network | quote }}
-            - name: VALIDATOR_TYPE
-              value: {{ $root.Values.type | quote }}
-            - name: SERVICE_ACCOUNT
-              value: "validator{{.}}"
-            - name: REIMPORT
-              value: {{ $root.Values.reimportKeystores | quote }}
+            - name: WEB3SIGNER_URL
+              value: {{ $root.Values.web3signerEndpoint }}
+          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}"]
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: configs
-              mountPath: "/mnt/configs"
-          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
-            - name: configs-gnosis-prysm
-              mountPath: "/data/configs-gnosis-prysm"
-          {{- end }}
-            - name: validator-init
-              mountPath: /data/scripts
-      {{- if $.Values.persistence.enabled }}
-        {{- include "init-validator-info" $root | nindent 8 }}
-      {{- end }}
-      {{- if and $.Values.persistence.enabled $.Values.initChownData }}
-        {{- include "init-chown" $root | nindent 8 }}
-      {{- end }}
+        - name: prepare
+          image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
+          imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - sh
+            - -c
+            - >
+              mkdir -p /data/lighthouse/validators;
+              cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
+              cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
+              echo "validators-external-signer-public-keys: $(cat /data/validator_keys.csv)" > /data/config;
+              echo "validators-external-signer-public-keys: $(cat /data/validator_keys.csv)" >> /data/config_gnosis_prysm;
+              chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: gnosis-prysm
+              mountPath: /mnt/gnosis-prysm
       containers:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           args:
-          {{- range (pluck $root.Values.type $root.Values.flags | first) }}
+            {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
-          {{- end -}}
-          {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
+            {{- end -}}
+
+            {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
             - "--{{ $root.Values.network }}"
-          {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
-            - "--config-file /data/configs-gnosis-prysm/config.yaml"
-            - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
-          {{- else if or (eq $root.Values.type "lighthouse") (eq $root.Values.type "teku") }}
+            - "--config-file=/data/config"
+            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
+            - "--config-file /data/config_gnosis_prysm"
+            - "--chain-config-file /data/config_gnosis_prysm"
+            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
-          {{- end }}
-          {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
-            - {{ . | quote }}
-          {{- end -}}
+            {{- else if eq $root.Values.type "teku" }}
+            - "--network=auto"
+            - "--config-file=/data/config"
+            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- end }}
 
-        {{- if $.Values.beaconChainRpcEndpointsRandomized }}
-          {{- if eq $.Values.type "prysm" }}
+            {{- include "validator-graffiti" $ | nindent 12 }}
+
+          {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+            {{- if eq $.Values.type "prysm" }}
             - "--beacon-rpc-provider={{ $rpcEndpoints }}"
-          {{- else if eq $.Values.type "lighthouse" }}
+            {{- else if eq $.Values.type "lighthouse" }}
             - "--beacon-nodes={{ $rpcEndpoints }}"
-          {{- else if eq $.Values.type "teku" }}
-          {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
-          {{- if gt $beaconChainRpcEndpointsLen 1 }}
-          {{- fail "Teku supports only one beacon node host, please specify one host." }}
-          {{- else }}
+            {{- else if eq $.Values.type "teku" }}
+            {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
+            {{- if gt $beaconChainRpcEndpointsLen 1 }}
+            {{- fail "Teku supports only one beacon node host, please specify one host." }}
+            {{- else }}
             - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+            {{- end }}
+            {{- end }}
+          {{- else }}
+            {{- include "beacon-rpc-node" $ | nindent 12 }}
           {{- end }}
-          {{- end }}
-        {{- else }}
-          {{- include "beacon-rpc-node" $ | nindent 12 }}
-        {{- end }}
 
-          {{- include "validator-graffiti" $ | nindent 12 }}
-          {{- if $root.Values.metrics.enabled }}
+            {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
             - {{ . | quote }}
             {{- end }}
-          {{- end }}
-        {{- if $root.Values.metrics.enabled }}
+            {{- end }}
+
+            {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
+            - {{ . | quote }}
+            {{- end -}}
+
+          {{- if $root.Values.metrics.enabled }}
           ports:
             - containerPort: {{ $root.Values.metrics.port }}
               name: metrics
               protocol: TCP
-        {{- end }}
-        {{- with $root.Values.resources }}
+          {{- end }}
+          {{- with (pluck $root.Values.type $root.Values.readinessProbe | first) }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with (pluck $root.Values.type $root.Values.livenessProbe | first) }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $root.Values.resources }}
           resources:
             {{ toYaml . | nindent 16 | trim }}
-        {{- end }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: configs
-              mountPath: "/mnt/configs"
-        {{- with (pluck $root.Values.type $root.Values.readinessProbe | first) }}
-          readinessProbe:
-            {{- toYaml . | nindent 12 }}
-        {{- end }}
-        {{- with (pluck $root.Values.type $root.Values.livenessProbe | first) }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
-        {{- end }}
       volumes:
-        - name: configs
+        - name: gnosis-prysm
           configMap:
-            name: {{ template "validators.fullname" $root }}-configs
-      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
-        - name: configs-gnosis-prysm
-          configMap:
-            name: {{ template "validators.fullname" $root }}-configs-gnosis-prysm
-      {{- end }}
-        - name: validator-init
-          configMap:
-            name: {{ template "validators.fullname" $root }}-init
-{{- if (not $root.Values.persistence.enabled) }}
+            name: {{ template "validators.fullname" $root }}-gnosis-prysm
         - name: data
           emptyDir: {}
-{{- else }}
-        - name: data
-          persistentVolumeClaim:
-            claimName: data-validator{{.}}
-{{- end }}
 
 {{- end }}
 {{- end }}

@@ -19,16 +19,4 @@ spec:
     - name: {{ template "validators.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if .Values.metrics.prometheusRule.default }}
-    - name: {{ template "validators.fullname" $ }}-monitor
-      rules:
-        - alert: ValidatorMissedAttestations
-          expr: validator_effectiveness_status{job='{{ template "validators.fullname" $ }}-monitor'} == 0
-          for: 18m
-          labels:
-            severity: critical
-          annotations:
-            summary: Validator Missed Attestations
-            description: Wallet {{ printf "{{ $labels.wallet_id }}" }}. Validator index {{ printf "{{ $labels.validator_index }}" }}
-  {{- end }}
 {{- end }}

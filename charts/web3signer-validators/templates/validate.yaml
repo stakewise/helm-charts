@@ -1,3 +1,0 @@
-{{- if and (not .Values.beaconChainRpcEndpoints) (not .Values.beaconChainRpcEndpointsRandomized) }}
-{{- fail ".Values.beaconChainRpcEndpoints is empty" }}
-{{- end }}
