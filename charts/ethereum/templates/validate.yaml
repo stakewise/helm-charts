@@ -1,0 +1,3 @@
+{{- if not .Values.JWTSecret }}
+{{- fail ".Values.JWTSecret is required" }}
+{{- end }}

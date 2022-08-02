@@ -1,0 +1,86 @@
+{{- if .Values.p2pNodePort.enabled -}}
+{{- $root := . -}}
+
+{{- range $i, $e := until (int $root.Values.replicaCount) }}
+{{- $port := add $root.Values.p2pNodePort.startAt.executionClient $i -}}
+{{- if hasKey $root.Values.p2pNodePort.replicaToNodePort.executionClient ($i | toString) -}}
+  {{ $port = index $root.Values.p2pNodePort.replicaToNodePort.executionClient ($i | toString) }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-{{ $root.Values.executionClient }}-{{ $i }}-0
+  labels:
+    {{- include "ethereum.labels" $root | nindent 4 }}
+    pod: {{ template "ethereum.fullname" $root }}-{{ $root.Values.executionClient }}-{{ $i }}-0
+    client: execution
+    type: p2p
+  {{- with $.Values.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp
+      port: 1
+      protocol: TCP
+      targetPort: p2p-tcp
+      nodePort: {{ $port }}
+    {{- if eq $.Values.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp
+      port: 1
+      protocol: UDP
+      targetPort: p2p-udp
+      nodePort: {{ $port }}
+    {{- end }}
+  selector:
+    {{- include "ethereum.selectorLabels" $root | nindent 4 }}
+    client: execution
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $root }}-{{ $root.Values.executionClient }}-{{ $i }}-0
+{{- end }}
+
+{{- range $i, $e := until (int $root.Values.replicaCount) }}
+{{- $port := add $root.Values.p2pNodePort.startAt.consensusClient $i -}}
+{{- if hasKey $root.Values.p2pNodePort.replicaToNodePort.consensusClient ($i | toString) -}}
+  {{ $port = index $root.Values.p2pNodePort.replicaToNodePort.consensusClient ($i | toString) }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "ethereum.fullname" $ }}-{{ $root.Values.consensusClient }}-{{ $i }}-0
+  labels:
+    {{- include "ethereum.labels" $root | nindent 4 }}
+    pod: {{ template "ethereum.fullname" $root }}-{{ $root.Values.consensusClient }}-{{ $i }}-0
+    client: consensus
+    type: p2p
+  {{- with $.Values.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp
+      port: 1
+      protocol: TCP
+      targetPort: p2p-tcp
+      nodePort: {{ $port }}
+    {{- if eq $.Values.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp
+      port: 1
+      protocol: UDP
+      targetPort: p2p-udp
+      nodePort: {{ $port }}
+    {{- end }}
+  selector:
+    {{- include "ethereum.selectorLabels" $root | nindent 4 }}
+    client: consensus
+    statefulset.kubernetes.io/pod-name: {{ template "ethereum.fullname" $root }}-{{ $root.Values.consensusClient }}-{{ $i }}-0
+{{- end }}
+
+{{- end }}

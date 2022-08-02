@@ -1,0 +1,88 @@
+{{ $root := . }}
+{{ $data := dict "Values" .Values "mode" "executionClient" "client" .Values.executionClient }}
+{{- range (untilStep 0 (int .Values.replicaCount) 1) }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "ethereum.fullname" $root }}-{{ $root.Values.executionClient }}-{{.}}
+  labels:
+    {{- include "ethereum.labels" $root | nindent 4 }}
+    client: execution
+    id: {{ . | quote }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ethereum.selectorLabels" $root | nindent 6 }}
+      client: execution
+      id: {{ . | quote }}
+  serviceName: {{ include "ethereum.fullname" $root }}
+  template:
+    metadata:
+      {{- with pluck $root.Values.executionClient $root.Values.podAnnotations | first }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ethereum.selectorLabels" $root | nindent 8 }}
+        client: execution
+        id: {{ . | quote }}
+    spec:
+      serviceAccountName: {{ include "ethereum.serviceAccountName" $root }}
+      {{- with index $root.Values.securityContext $root.Values.executionClient }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $root.Values.nodeSelector.executionClient }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $root.Values.affinity.executionClient }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $root.Values.tolerations.executionClient }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      {{- if or (and $root.Values.persistence.enabled $root.Values.initChownData) ($root.Values.p2pNodePort.enabled) }}
+      initContainers:
+        {{- if $root.Values.p2pNodePort.enabled }}
+        {{- include "init.nodeport" $data | nindent 8 }}
+        {{- end }}
+        {{- if and $root.Values.persistence.enabled $root.Values.initChownData }}
+        {{- include "init.chown" $data | nindent 8 }}
+        {{- end }}
+      {{- end }}
+      containers:
+        {{- if eq $root.Values.executionClient "geth" }}
+        {{- include "geth.container" $data | nindent 8 }}
+        {{- else if eq $root.Values.executionClient "nethermind" }}
+        {{- include "nethermind.container" $data | nindent 8 }}
+        {{- else if eq $root.Values.executionClient "erigon" }}
+        {{- include "erigon.container" $data | nindent 8 }}
+        {{- end }}
+
+      volumes:
+        - name: jwtsecret
+          secret:
+            secretName: {{ template "ethereum.fullname" $root }}
+      {{- if $root.Values.p2pNodePort.enabled }}
+        - name: env
+          emptyDir: {}
+      {{- end }}
+      {{- if not $root.Values.persistence.enabled }}
+        - name: data
+          emptyDir: {}
+      {{- else if $root.Values.persistence.existingClaim }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $root.Values.persistence.existingClaim }}
+      {{- else }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ template "ethereum.fullname" $root }}-{{ $root.Values.executionClient }}-{{.}}
+      {{- end }}
+{{- end }}
