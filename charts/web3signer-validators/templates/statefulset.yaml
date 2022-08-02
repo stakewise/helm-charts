@@ -1,7 +1,7 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{- range (untilStep (int .Values.validatorsKeyIndex) (add .Values.validatorsKeyIndex .Values.validatorsCount) 1) }}
+{{- range (untilStep (int .Values.validatorsKeyIndex) (int (add .Values.validatorsKeyIndex .Values.validatorsCount)) 1) }}
 
 {{ $rpcEndpoints := list }}
 {{- if $.Values.beaconChainRpcEndpointsRandomized }}
