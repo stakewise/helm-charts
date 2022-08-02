@@ -24,7 +24,7 @@ $ helm repo add stakewise https://charts.stakewise.io
 
 $ helm repo update
 
-$ helm upgrade --install web3signer-validators stakewise/web3signer-validators \
+$ helm upgrade --install validators stakewise/validators \
   --namespace validators \
   --set key=value... 
 ```
