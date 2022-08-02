@@ -58,9 +58,10 @@ enabled: true
 ##
 type: prysm
 
-## If you want to run multiple validator types (e.g
-## lighouse, teku,...) you need to adjust the key index to prevent double signing. Please be careful with this setting
-## and be aware of boundaries of each validator client you would like to run.
+## If you want to run multiple validator types (e.g lighouse, teku,...)
+## you need to adjust the key index to prevent double signing.
+## Please be careful with this setting and be aware of boundaries
+## of each validator client you would like to run.
 ##
 ## Example:
 ## - 700 Keys in Web3Signer database
