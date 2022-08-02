@@ -1,6 +1,6 @@
 apiVersion: v2
 name: ethereum
-description: Universal helm chart to deploy ethereum execution+consensus nodes
+description: Universal helm chart to deploy Ethereum execution and consensus nodes
 keywords:
   - ethereum
   - blockchain
