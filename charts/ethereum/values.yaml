@@ -1,49 +1,63 @@
-# Default values for ethereum.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
+## Default values for ethereum.
+## This is a YAML-formatted file.
+## Declare variables to be passed into your templates.
+##
 
 replicaCount: 1
 
-# Options: geth, nethermind, erigon
+## Options: geth, nethermind, erigon
+##
 executionClient: "geth"
-# Options: prysm, lighthouse, teku
+## Options: prysm, lighthouse, teku
+##
 consensusClient: "prysm"
 
-# Network
-# Options: mainnet, goerli, gnosis
+## Network
+## Options: mainnet, goerli, gnosis
+##
 network: goerli
 
-# Hex encoded secret for jwt authentication.
+## Hex encoded secret for jwt authentication.
+##
 JWTSecret: ""
 
-# Manually specify TerminalTotalDifficulty, overriding the bundled setting
+## Manually specify TerminalTotalDifficulty, overriding the bundled setting
+##
 terminalTotalDifficulty: ""
-# Defines whether the Merge plugin is enabled bundles are allowed
+## Defines whether the Merge plugin is enabled bundles are allowed
+##
 mergeEnabled: true
-# URL to Builder Relay. If set when building blocks client will send them to the relay.
+## URL to Builder Relay. If set when building blocks client will send them to the relay.
+##
 builderEndpoint: ""
-# Post bellatrix, this address will receive the transaction fees produced by any blocks
-# from this node. Default to junk whilst bellatrix is in development state.
-# Validator client can override this value through the preparebeaconproposer api.
-# (default: "0x0000000000000000000000000000000000000000")
+## Post bellatrix, this address will receive the transaction fees produced by any blocks
+## from this node. Default to junk whilst bellatrix is in development state.
+## Validator client can override this value through the preparebeaconproposer api.
+## (default: "0x0000000000000000000000000000000000000000")
+##
 suggestedFeeRecipient: ""
 
-# Consensus Client RPC Settings
+## Consensus Client RPC Settings
+##
 consensusClientRpcPort: 8555
-# Execution Client RPC Settings
+## Execution Client RPC Settings
+##
 executionClientRpcPort: 8555
-# API's offered over the HTTP-RPC interface
+## API's offered over the HTTP-RPC interface
+##
 executionClientApiModules: "web3,eth,net,engine"
 
-# Set the frequency (in slots) at which to store finalized states to disk.
-# Specifying a larger number of slots as the archive frequency has a potentially higher
-# overhead for retrieving finalized states since more states may need to be regenerated
-# to get to the requested state.
-# Specifying a lower number of slots as the frequency increases the disk space usage.
+## Set the frequency (in slots) at which to store finalized states to disk.
+## Specifying a larger number of slots as the archive frequency has a potentially higher
+## overhead for retrieving finalized states since more states may need to be regenerated
+## to get to the requested state.
+## Specifying a lower number of slots as the frequency increases the disk space usage.
+##
 dataStorageArchiveFrequency: "8192"
 
 
-# Extra flags to pass to the node
+## Extra flags to pass to the node
+##
 extraFlags:
   executionClient: []
   consensusClient: []
@@ -69,13 +83,15 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-# Init image is used to chown data volume, initialise genesis, etc.
+## Init image is used to chown data volume, initialise genesis, etc.
+##
 initImage:
   repository: "busybox"
   tag: "1.35"
   pullPolicy: IfNotPresent
 
-# Sidecar image is used to perform Liveness/Readiness probes.
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
 sidecar:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
   tag: "v1.0.3"
@@ -84,12 +100,15 @@ sidecar:
   bindPort: 3000
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  ## Specifies whether a service account should be created
+  ##
   create: true
-  # Annotations to add to the service account
+  ## Annotations to add to the service account
+  ##
   annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  ##
   name: ""
 
 podAnnotations:
@@ -123,20 +142,25 @@ securityContext:
 service:
   type: ClusterIP
 
-# When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
-# This will generate a service for each replica, with a port binding via NodePort.
-# This is useful if you want to expose and announce your node to the Internet.
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
 p2pNodePort:
-  # Expose P2P port via NodePort
+  ## Expose P2P port via NodePort
+  ##
   enabled: false
   annotations: {}
-  # Options: NodePort, LoadBalancer
+  ## Options: NodePort, LoadBalancer
+  ##
   type: NodePort
-  # The ports allocation will start from this value
+  ## The ports allocation will start from this value
+  ##
   startAt:
     executionClient: 31100
     consensusClient: 31200
-  # Overwrite a port for specific replicas
+  ## Overwrite a port for specific replicas
+  ##
   replicaToNodePort:
     executionClient: {}
       #  "0": 32345
@@ -166,9 +190,10 @@ affinity:
   executionClient: {}
   consensusClient: {}
 
-# Configure liveness and readiness probes
-# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-# NB! readinessProbe and livenessProbe must be disabled before fully synced
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
+##
 livenessProbe:
   enabled: true
   initialDelaySeconds: 900
@@ -197,14 +222,18 @@ readinessProbe:
     port: sidecar
     scheme: HTTP
 
-# RBAC configuration.
-# ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
 rbac:
-  # Specifies whether RBAC resources are to be created
+  ## Specifies whether RBAC resources are to be created
+  ##
   create: true
-  # Required ClusterRole rules
+  ## Required ClusterRole rules
+  ##
   clusterRules:
-    # Required to obtain the nodes external IP
+    ## Required to obtain the nodes external IP
+    ##
     - apiGroups: [""]
       resources:
       - "nodes"
@@ -212,9 +241,11 @@ rbac:
       - "get"
       - "list"
       - "watch"
-  # Required Role rules
+  ## Required Role rules
+  ##
   rules:
-    # Required to get information about the services nodePort.
+    ## Required to get information about the services nodePort.
+    ##
     - apiGroups: [""]
       resources:
       - "services"
@@ -223,64 +254,88 @@ rbac:
       - "list"
       - "watch"
 
-# If false, data ownership will not be reset at startup
-# This allows the geth node to be run with an arbitrary user
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
 initChownData: true
 
-# Whether or not to allocate persistent volume disk for the data directory.
-# In case of node failure, the node data directory will still persist.
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
 persistence:
-  # Uses an EmptyDir when not enabled
+  ## Uses an EmptyDir when not enabled
+  ##
   enabled: true
   storageClassName: ""
-  # Use an existing PVC when persistence.enabled
+  ## Use an existing PVC when persistence.enabled
+  ##
   existingClaim: null
-  # Access modes for the volume claim template
+  ## Access modes for the volume claim template
+  ##
   accessModes:
     - ReadWriteOnce
-  # Requested size for volume claim template
+  ## Requested size for volume claim template
+  ##
   size:
     executionClient: 50Gi
     consensusClient: 50Gi
-  # Annotations for volume claim template
+  ## Annotations for volume claim template
+  ##
   annotations: {}
 
-# Monitoring
+## Monitoring
+##
 metrics:
-  # Whether to enable metrics collection or not
+  ## Whether to enable metrics collection or not
+  ##
   enabled: true
 
-  # Prometheus exporter port
+  ## Prometheus exporter port
+  ##
   port: 6060
 
-  # Prometheus Service Monitor
-  # ref: https://github.com/coreos/prometheus-operator
-  #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
   serviceMonitor:
-    # Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    ##
     enabled: false
-    # The namespace in which the ServiceMonitor will be created
+    ## The namespace in which the ServiceMonitor will be created
+    ##
     namespace: ""
-    # The interval at which metrics should be scraped
+    ## The interval at which metrics should be scraped
+    ##
     interval: 30s
     ## The timeout after which the scrape is ended
+    ##
     scrapeTimeout: ""
-    # Metrics RelabelConfigs to apply to samples before scraping.
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
     relabellings: []
-    # Metrics RelabelConfigs to apply to samples before ingestion.
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
     metricRelabelings: []
-    # Specify honorLabels parameter to add the scrape endpoint
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
     honorLabels: false
-    # Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
     additionalLabels: {}
-  # Custom PrometheusRule to be defined
-  # ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
   prometheusRule:
-    # Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    ##
     enabled: false
-    # The namespace in which the prometheusRule will be created
+    ## The namespace in which the prometheusRule will be created
+    ##
     namespace: ""
-    # Additional labels for the prometheusRule
+    ## Additional labels for the prometheusRule
+    ##
     additionalLabels: {}
-    # Custom Prometheus rules
+    ## Custom Prometheus rules
+    ##
     rules: []

@@ -58,6 +58,27 @@ enabled: true
 ##
 type: prysm
 
+## If you have more than 100 key on Mainnet or 1000 keys on Gnosis and you want to run multiple validator types (e.g
+## lighouse, teku,...) you need to adjust the key index to prevent double signing. Please be careful with this setting
+## and be aware of boundaries of each validator client you would like to run.
+##
+## Example:
+## - 700 Keys in Web3Signer database
+## - 4 Lighthouse validators
+## - 3 Prysm validators
+##
+## Deployment 1 => validatorsKeyIndex: 0
+##                 validatorsCount: 4
+##                 type: lighthouse
+##
+## Deployment 2 => validatorsKeyIndex: 4
+##                 validatorsCount: 3
+##                 type: prysm
+##
+## **NB! If you not fully understand what is done here, keep this value at 0 and set validatorsCount to the maximum of
+## your keys and do not spin up this Chart multiple times!
+validatorsKeyIndex: 0
+
 ## How many validators to run
 ## **NB! Every validator hosts up to 100 keys in Mainnet and 1000 keys in Gnosis,
 ## so the number of validators must be >= (total number of validator keys) / max number of keys per validator
