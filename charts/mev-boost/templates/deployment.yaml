@@ -20,7 +20,7 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -34,9 +34,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
-            - -{{ .Values.network }}
+            - -{{ .Values.global.network }}
             - -relays
-            - {{ pluck .Values.network .Values.relays | first }}
+            - {{ pluck .Values.global.network .Values.relays | first }}
             - -addr
             - 0.0.0.0:{{ .Values.service.port }}
             - -loglevel

@@ -2,7 +2,74 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+global:
+  replicaCount: 1
+
+  ## Eth2 network ID
+  ##
+  network: mainnet
+
+  ## Hex encoded secret for jwt authentication.
+  ##
+  JWTSecret: ""
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+  
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+  
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+  
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -28,18 +95,15 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "1.13.4"
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 ## Nethermind Settings
 ##
-
-## Eth2 network ID
-## Options: mainnet, goerli, rinkeby, ropsten, gnosis, poacore,
-##          sokol, energyweb, volta, kovan
-##
-network: "mainnet"
 
 ## Extra flags to pass to the node
 ##
@@ -70,9 +134,6 @@ jsonrpc:
     rest: 8545
     websocket: 8546
 
-# Hex encoded secret for jwt authentication.
-JWTSecret: ""
-
 merge:
   # Defines whether the Merge plugin is enabled bundles are allowed.
   enabled: false
@@ -88,8 +149,6 @@ merge:
   terminalTotalDifficulty: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -107,13 +166,11 @@ securityContext:
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
 rbac:
-  ## @param rbac.create Specifies whether RBAC resources are to be created
+  ## Required ClusterRole rules
   ##
-  create: true
-  ## @param rbac.clusterRules Required ClusterRole rules
-  ## @default -- See `values.yaml`
   clusterRules:
     ## Required to obtain the nodes external IP
+    ##
     - apiGroups: [""]
       resources:
       - "nodes"
@@ -121,10 +178,11 @@ rbac:
       - "get"
       - "list"
       - "watch"
-  ## @param rbac.rules Required ClusterRole rules
-  ## @default -- See `values.yaml`
+  ## Required Role rules
+  ##
   rules:
     ## Required to get information about the serices nodePort.
+    ##
     - apiGroups: [""]
       resources:
       - "services"
@@ -225,7 +283,6 @@ affinity: {}
 ## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
 livenessProbe:
-  enabled: true
   initialDelaySeconds: 900
   timeoutSeconds: 3
   periodSeconds: 30
@@ -237,7 +294,6 @@ livenessProbe:
     scheme: HTTP
 
 readinessProbe:
-  enabled: true
   initialDelaySeconds: 60
   timeoutSeconds: 3
   periodSeconds: 30
@@ -267,10 +323,6 @@ persistence:
 ## Monitoring
 ##
 metrics:
-  ## Whether to enable metrics collection or not
-  ##
-  enabled: true
-
   ## Metrics port to expose metrics for Prometheus
   ##
   port: 8008
@@ -280,46 +332,40 @@ metrics:
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   ##
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ## The namespace in which the ServiceMonitor will be created
     ##
     namespace: ""
-    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ## The interval at which metrics should be scraped
     ##
     interval: 30s
-    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ## The timeout after which the scrape is ended
     ##
     scrapeTimeout: ""
-    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ## Metrics RelabelConfigs to apply to samples before scraping.
     ##
     relabellings: []
-    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []
-    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ## Specify honorLabels parameter to add the scrape endpoint
     ##
     honorLabels: false
-    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     ##
     additionalLabels: {}
   ## Custom PrometheusRule to be defined
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
   prometheusRule:
-    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ## Create a default set of Alerts
     ##
     default: true
-    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ## The namespace in which the prometheusRule will be created
     ##
     namespace: ""
-    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ## Additional labels for the prometheusRule
     ##
     additionalLabels: {}
-    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## Custom Prometheus rules
     ##
     rules: []

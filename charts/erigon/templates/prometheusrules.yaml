@@ -1,8 +1,9 @@
-{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.metrics.enabled)
+           (or .Values.global.metrics.prometheusRule.enabled .Values.metrics.prometheusRule.enabled) }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
-  name:  {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" . }}
   {{- if .Values.metrics.prometheusRule.namespace }}
   namespace: {{ .Values.metrics.prometheusRule.namespace }}
   {{- else }}

@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
@@ -19,7 +19,7 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -91,7 +91,7 @@ spec:
               exec erigon
               --datadir=/data/erigon
               --private.api.addr={{ .Values.privateApiAddr }}
-              --chain={{ .Values.network }}
+              --chain={{ .Values.global.network }}
           {{- if .Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
               --port=$EXTERNAL_PORT
@@ -110,7 +110,7 @@ spec:
               --http.port={{ .Values.service.port.rpc }}
               --engine.addr={{ .Values.engineAddr }}
               --engine.port={{ .Values.service.port.engine }}
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
           {{- end }}
           {{- range .Values.extraFlags }}
@@ -134,7 +134,7 @@ spec:
             - name: rpc
               protocol: TCP
               containerPort: {{ .Values.service.port.rpc }}
-            {{- if .Values.JWTSecret }}
+            {{- if .Values.global.JWTSecret }}
             - name: engine
               protocol: TCP
               containerPort: {{ .Values.service.port.engine }}
@@ -157,7 +157,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -178,7 +178,7 @@ spec:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -190,7 +190,7 @@ spec:
               port: {{ .Values.livenessProbe.httpGet.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -215,7 +215,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if .Values.JWTSecret }}
+        {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}

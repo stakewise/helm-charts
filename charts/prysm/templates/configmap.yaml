@@ -1,4 +1,4 @@
-{{- if or (eq .Values.network "prater") (eq .Values.network "ropsten") (eq .Values.network "sepolia") -}}
+{{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -8,24 +8,24 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/sh
-{{- if eq .Values.network "prater" }}
+{{- if eq .Values.global.network "prater" }}
     if ! [ -f /data/genesis.ssz ]; then
       curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth2-clients/eth2-networks/32dcce003694ea17e04bc17cc56de2f7909a1d95/shared/prater/genesis.ssz"
     fi
 {{- end }}
-{{- if eq .Values.network "ropsten" }}
+{{- if eq .Values.global.network "ropsten" }}
     if ! [ -f /data/genesis.ssz ]; then
       curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth-clients/merge-testnets/main/ropsten-beacon-chain/genesis.ssz"
     fi
 {{- end }}
-{{- if eq .Values.network "sepolia" }}
+{{- if eq .Values.global.network "sepolia" }}
     if ! [ -f /data/genesis.ssz ]; then
       curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth-clients/merge-testnets/main/sepolia/genesis.ssz"
     fi
 {{- end }}
 {{- end }}
 
-{{- if eq .Values.network "gnosis" }}
+{{- if eq .Values.global.network "gnosis" }}
 ---
 apiVersion: v1
 kind: ConfigMap

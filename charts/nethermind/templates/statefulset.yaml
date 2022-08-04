@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
@@ -15,7 +15,7 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -99,10 +99,10 @@ spec:
               . /env/init-nodeport;
             {{- end }}
               exec /nethermind/Nethermind.Runner
-          {{- if eq .Values.network "gnosis" }}
+          {{- if eq .Values.global.network "gnosis" }}
               --config=xdai
           {{- else }}
-              --config={{ .Values.network }}
+              --config={{ .Values.global.network }}
           {{- end }}
               --datadir=/data/nethermind
           {{- if .Values.jsonrpc.enabled }}
@@ -112,7 +112,7 @@ spec:
               --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
               --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
           {{- end }}
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
           {{- end }}
           {{- if .Values.metrics.enabled }}
@@ -171,7 +171,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -195,7 +195,7 @@ spec:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -207,7 +207,7 @@ spec:
               port: {{ .Values.livenessProbe.httpGet.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -221,7 +221,7 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.JWTSecret }}
+        {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}

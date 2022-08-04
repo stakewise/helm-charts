@@ -5,7 +5,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
@@ -15,7 +15,7 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -104,13 +104,13 @@ spec:
               . /env/init-nodeport;
             {{- end }}
               exec /opt/teku/bin/teku
-              --network={{ .Values.network }}
+              --network={{ .Values.global.network }}
               --data-beacon-path=/data/teku/beacon
               --data-path=/data/teku
               --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
               --data-storage-mode={{ .Values.dataStorageMode }}
               --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
-            {{- if .Values.JWTSecret }}
+            {{- if .Values.global.JWTSecret }}
               --ee-endpoint={{ .Values.eeEndpoint }}
               --ee-jwt-secret-file=/secret/jwtsecret
               {{- if .Values.builderEndpoint }}
@@ -175,7 +175,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/teku
-            {{- if .Values.JWTSecret }}
+            {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -199,7 +199,7 @@ spec:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -211,7 +211,7 @@ spec:
               port: {{ .Values.livenessProbe.httpGet.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -225,7 +225,7 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.JWTSecret }}
+        {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}

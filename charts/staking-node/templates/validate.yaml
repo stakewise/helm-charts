@@ -1,0 +1,25 @@
+{{- if or
+    (and .Values.executionClient.erigonEnabled .Values.executionClient.gethEnabled .Values.executionClient.nethermindEnabled)
+    (and .Values.executionClient.erigonEnabled .Values.executionClient.gethEnabled)
+    (and .Values.executionClient.erigonEnabled .Values.executionClient.nethermindEnabled)
+    (and .Values.executionClient.gethEnabled .Values.executionClient.erigonEnabled .Values.executionClient.nethermindEnabled)
+    (and .Values.executionClient.gethEnabled .Values.executionClient.erigonEnabled)
+    (and .Values.executionClient.gethEnabled .Values.executionClient.nethermindEnabled)
+    (and .Values.executionClient.nethermindEnabled .Values.executionClient.gethEnabled .Values.executionClient.erigonEnabled)
+    (and .Values.executionClient.nethermindEnabled .Values.executionClient.erigonEnabled)
+    (and .Values.executionClient.nethermindEnabled .Values.executionClient.gethEnabled) }}
+{{- fail "Only one execution client allowed" }}
+{{- end }}
+
+{{- if or
+    (and .Values.consensusClient.prysmEnabled .Values.consensusClient.lighthouseEnabled .Values.consensusClient.tekuEnabled)
+    (and .Values.consensusClient.prysmEnabled .Values.consensusClient.lighthouseEnabled)
+    (and .Values.consensusClient.prysmEnabled .Values.consensusClient.tekuEnabled)
+    (and .Values.consensusClient.lighthouseEnabled .Values.consensusClient.prysmEnabled .Values.consensusClient.tekuEnabled)
+    (and .Values.consensusClient.lighthouseEnabled .Values.consensusClient.prysmEnabled)
+    (and .Values.consensusClient.lighthouseEnabled .Values.consensusClient.tekuEnabled)
+    (and .Values.consensusClient.tekuEnabled .Values.consensusClient.lighthouseEnabled .Values.consensusClient.prysmEnabled)
+    (and .Values.consensusClient.tekuEnabled .Values.consensusClient.prysmEnabled)
+    (and .Values.consensusClient.tekuEnabled .Values.consensusClient.lighthouseEnabled) }}
+{{- fail "Only one consensus client allowed" }}
+{{- end }}

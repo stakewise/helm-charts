@@ -1,0 +1,16 @@
+# Default values for staking-node.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  replicaCount: 1
+  JWTSecret: ""
+
+executionClient:
+  erigonEnabled: false
+  gethEnabled: false
+  nethermindEnabled: false
+consensusClient:
+  prysmEnabled: false
+  lighthouseEnabled: false
+  tekuEnabled: false

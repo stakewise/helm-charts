@@ -2,8 +2,14 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-# Options: goerli-shadow-fork-5, ropsten, kiln, sepolia
-network: "ropsten"
+global:
+  # Options: goerli-shadow-fork-5, ropsten, kiln, sepolia
+  network: "ropsten"
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
 
 # Relay URLs
 relays:

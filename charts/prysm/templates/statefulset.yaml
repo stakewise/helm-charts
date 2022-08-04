@@ -10,13 +10,13 @@ spec:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
   serviceName: {{ include "common.names.fullname" . }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.replicaCount }}
   template:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -103,7 +103,7 @@ spec:
             - name: data
               mountPath: /data
       {{- end }}
-      {{- if or (eq .Values.network "prater") (eq .Values.network "ropsten") (eq .Values.network "sepolia") }}
+      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -117,7 +117,7 @@ spec:
     {{- end }}
       containers:
         - name: {{ include "common.names.fullname" . }}
-        {{- if ne .Values.network "gnosis" }}
+        {{- if ne .Values.global.network "gnosis" }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- else }}
@@ -141,13 +141,13 @@ spec:
             - "--http-web3provider={{ . }}"
           {{- end }}
           
-          {{- if not .Values.JWTSecret }}
+          {{- if not .Values.global.JWTSecret }}
           {{- range (untilStep 1 (int $eth1EndpointsLen) 1) }}
             - "--fallback-web3provider={{ index $.Values.eth1Endpoints . }}"
           {{- end }}
           {{- end }}
 
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - "--jwt-secret=/secret/jwtsecret"
             {{- if .Values.httpMevRelay }}
             - "--http-mev-relay={{ .Values.httpMevRelay }}"
@@ -162,12 +162,12 @@ spec:
             - "--terminal-total-difficulty-override={{ .Values.totalDifficultyOverride }}"
           {{- end }}
 
-          {{- if or (eq .Values.network "prater") (eq .Values.network "ropsten") (eq .Values.network "sepolia") }}
+          {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - "--genesis-state=/data/genesis.ssz"
           {{- end }}
 
-          {{- if ne .Values.network "gnosis" }}
-            - "--{{ .Values.network }}"
+          {{- if ne .Values.global.network "gnosis" }}
+            - "--{{ .Values.global.network }}"
           {{- else }}
             - "--contract-deployment-block=19469077"
             - "--bootstrap-node=/data/gnosis-config/bootnodes.yaml"
@@ -222,7 +222,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -231,7 +231,7 @@ spec:
             - name: env-nodeport
               mountPath: /env
           {{- end }}
-          {{- if eq .Values.network "gnosis" }}
+          {{- if eq .Values.global.network "gnosis" }}
             - name: gnosis-config
               mountPath: /data/gnosis-config
           {{- end }}
@@ -252,7 +252,7 @@ spec:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -264,7 +264,7 @@ spec:
               port: {{ .Values.livenessProbe.httpGet.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -278,7 +278,7 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-      {{- if .Values.JWTSecret }}
+      {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}
@@ -287,12 +287,12 @@ spec:
         - name: env-nodeport
           emptyDir: {}
       {{- end }}
-      {{- if eq .Values.network "gnosis" }}
+      {{- if eq .Values.global.network "gnosis" }}
         - name: gnosis-config
           configMap:
             name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
-      {{- if or (eq .Values.network "prater") (eq .Values.network "ropsten") (eq .Values.network "sepolia") }}
+      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}

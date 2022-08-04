@@ -1,0 +1,50 @@
+apiVersion: v2
+name: staking-node
+description: Umbrella chart for deploying blockchain nodes for staking
+
+# A chart can be either an 'application' or a 'library' chart.
+#
+# Application charts are a collection of templates that can be packaged into versioned archives
+# to be deployed.
+#
+# Library charts provide useful utilities or functions for the chart developer. They're included as
+# a dependency of application charts to inject those utilities and functions into the rendering
+# pipeline. Library charts do not define any templates and therefore cannot be deployed.
+type: application
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+# Versions are expected to follow Semantic Versioning (https://semver.org/)
+version: 1.0.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application. Versions are not expected to
+# follow Semantic Versioning. They should reflect the version the application is using.
+# It is recommended to use it with quotes.
+appVersion: "1.0.1"
+
+dependencies:
+  - name: erigon
+    version: x.x.x
+    repository: file://../erigon
+    condition: executionClient.erigonEnabled
+  - name: geth
+    version: x.x.x
+    repository: file://../geth
+    condition: executionClient.gethEnabled
+  - name: nethermind
+    version: x.x.x
+    repository: file://../nethermind
+    condition: executionClient.nethermindEnabled
+  - name: prysm
+    version: x.x.x
+    repository: file://../prysm
+    condition: consensusClient.prysmEnabled
+  - name: lighthouse
+    version: x.x.x
+    repository: file://../lighthouse
+    condition: consensusClient.lighthouseEnabled
+  - name: teku
+    version: x.x.x
+    repository: file://../teku
+    condition: consensusClient.tekuEnabled

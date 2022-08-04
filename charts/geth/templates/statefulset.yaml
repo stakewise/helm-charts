@@ -9,13 +9,13 @@ spec:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
   serviceName: {{ include "common.names.fullname" . }}
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.global.replicaCount }}
   template:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
@@ -97,7 +97,7 @@ spec:
               . /env/init-nodeport;
             {{- end }}
               exec geth
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
               --authrpc.addr=0.0.0.0
               --authrpc.port={{ .Values.authRpc.port }}
@@ -131,7 +131,7 @@ spec:
               --datadir=/data/ethereum
               --ethash.dagdir=/data/ethereum/.ethash
               --ipcdisable
-              --{{ .Values.network }}
+              --{{ .Values.global.network }}
           {{- range .Values.extraFlags }}
               {{ . | quote }}
           {{- end }}
@@ -146,7 +146,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: authrpc
               containerPort: {{ .Values.authRpc.port }}
           {{- end }}
@@ -173,7 +173,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-          {{- if .Values.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -199,7 +199,7 @@ spec:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -211,7 +211,7 @@ spec:
               port: {{ .Values.livenessProbe.httpGet.port }}
               scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -225,7 +225,7 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.JWTSecret }}
+        {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}
