@@ -86,6 +86,10 @@ validatorsKeyIndex: 0
 ##
 validatorsCount: 0
 
+## Default fee recipient for all validator keys.
+##
+suggestedFeeRecipient: ""
+
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
 ## ref: https://hub.docker.com/r/sigp/lighthouse
@@ -99,7 +103,7 @@ image:
     tag: "v2.1.2-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v2.5.0"
+    tag: "v2.5.1"
   teku:
     repository: "consensys/teku"
     tag: "22.7.0"

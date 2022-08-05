@@ -3,11 +3,11 @@
 # Declare variables to be passed into your templates.
 
 global:
-  replicaCount: 1
+  replicaCount: 2
   JWTSecret: ""
 
 executionClient:
-  erigonEnabled: false
+  erigonEnabled: true
   gethEnabled: false
   nethermindEnabled: false
 consensusClient:

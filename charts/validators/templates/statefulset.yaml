@@ -117,6 +117,12 @@ spec:
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
             {{- end }}
 
+            {{- if eq $root.Values.type "teku" }}
+            - "--validators-proposer-default-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
+            {{- else }}
+            - "--suggested-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
+            {{- end }}
+
             {{- include "validator-graffiti" $ | nindent 12 }}
 
           {{- if $.Values.beaconChainRpcEndpointsRandomized }}
