@@ -1,46 +1,52 @@
+{{- $root := . -}}
+{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
+---
 kind: StatefulSet
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" $root }}-{{ $i }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "common.labels.standard" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
 spec:
-  replicas: {{ .Values.global.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+      {{- include "common.labels.matchLabels" $root | nindent 6 }}
+      replicaID: {{ $i | quote }}
+  serviceName: {{ include "common.names.fullname" $root }}
   template:
     metadata:
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" $root | nindent 8 }}
+        replicaID: {{ $i | quote }}
     spec:
-    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
+    {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.nodeSelector }}
+    {{- with $root.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.affinity }}
+    {{- with $root.Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with $root.Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
-      priorityClassName: {{ .Values.priorityClassName | quote }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" $root }}
+      priorityClassName: {{ $root.Values.priorityClassName | quote }}
       securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
-    {{- if or (and .Values.persistence.enabled .Values.initChownData) (.Values.p2pNodePort.enabled) }}
+        {{- toYaml $root.Values.securityContext | nindent 8 }}
+    {{- if or (and $root.Values.persistence.enabled $root.Values.initChownData) ($root.Values.p2pNodePort.enabled) }}
       initContainers:
-        {{- if .Values.p2pNodePort.enabled }}
+        {{- if $root.Values.p2pNodePort.enabled }}
         - name: init-nodeport
-          image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
-          imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
+          image: "{{ $root.Values.p2pNodePort.initContainer.image.repository }}:{{ $root.Values.p2pNodePort.initContainer.image.tag }}"
+          imagePullPolicy: {{ $root.Values.p2pNodePort.initContainer.image.pullPolicy }}
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
@@ -71,166 +77,166 @@ spec:
             - name: env-nodeport
               mountPath: /env
         {{- end }}
-        {{- if and .Values.persistence.enabled .Values.initChownData }}
+        {{- if and $root.Values.persistence.enabled $root.Values.initChownData }}
         - name: init-chown
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           command:
             - /bin/sh
             - -c
-            - mkdir -p /data/nethermind && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/nethermind
+            - mkdir -p /data/nethermind && chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data/nethermind
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
         {{- end }}
     {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ $root.Chart.Name }}
+          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag | default $root.Chart.AppVersion }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           workingDir: /data/nethermind
           command:
             - sh
             - -ac
             - >
-            {{- if .Values.p2pNodePort.enabled }}
+            {{- if $root.Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
               exec /nethermind/Nethermind.Runner
-          {{- if eq .Values.global.network "gnosis" }}
+          {{- if eq $root.Values.global.network "gnosis" }}
               --config=xdai
           {{- else }}
-              --config={{ .Values.global.network }}
+              --config={{ $root.Values.global.network }}
           {{- end }}
               --datadir=/data/nethermind
-          {{- if .Values.jsonrpc.enabled }}
-              --JsonRpc.Enabled={{ .Values.jsonrpc.enabled }}
-              --JsonRpc.EnabledModules={{ .Values.jsonrpc.modules | join "," }}
-              --JsonRpc.Host={{ .Values.jsonrpc.host }}
-              --JsonRpc.Port={{ .Values.jsonrpc.ports.rest }}
-              --JsonRpc.WebSocketsPort={{ .Values.jsonrpc.ports.websocket }}
+          {{- if $root.Values.jsonrpc.enabled }}
+              --JsonRpc.Enabled={{ $root.Values.jsonrpc.enabled }}
+              --JsonRpc.EnabledModules={{ $root.Values.jsonrpc.modules | join "," }}
+              --JsonRpc.Host={{ $root.Values.jsonrpc.host }}
+              --JsonRpc.Port={{ $root.Values.jsonrpc.ports.rest }}
+              --JsonRpc.WebSocketsPort={{ $root.Values.jsonrpc.ports.websocket }}
           {{- end }}
-          {{- if .Values.global.JWTSecret }}
+          {{- if $root.Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
           {{- end }}
-          {{- if .Values.metrics.enabled }}
-              --Metrics.Enabled={{ .Values.metrics.enabled }}
-              --Metrics.ExposePort={{ .Values.metrics.port }}
+          {{- if $root.Values.metrics.enabled }}
+              --Metrics.Enabled={{ $root.Values.metrics.enabled }}
+              --Metrics.ExposePort={{ $root.Values.metrics.port }}
           {{- end }}
-          {{- if .Values.p2pNodePort.enabled }}
+          {{- if $root.Values.p2pNodePort.enabled }}
               --Network.ExternalIp=$EXTERNAL_IP
               --Network.P2PPort=$EXTERNAL_PORT
               --Network.DiscoveryPort=$EXTERNAL_PORT
           {{- else }}
               --Network.ExternalIp=$(POD_IP)
-              --Network.P2PPort={{ include "nethermind.p2pPort" . }}
-              --Network.DiscoveryPort={{ include "nethermind.p2pPort" . }}
+              --Network.P2PPort={{ include "nethermind.p2pPort" $root }}
+              --Network.DiscoveryPort={{ include "nethermind.p2pPort" $root }}
           {{- end }}
-          {{-  if .Values.merge.enabled }}
+          {{-  if $root.Values.merge.enabled }}
               --Merge.Enabled=true
-              {{- if .Values.merge.feeRecipient }}
-              --Merge.FeeRecipient={{ .Values.merge.feeRecipient }}
+              {{- if $root.Values.merge.feeRecipient }}
+              --Merge.FeeRecipient={{ $root.Values.merge.feeRecipient }}
               {{- end }}
-              {{- if .Values.merge.builderRelayUrl }}
-              --Merge.BuilderRelayUrl={{ .Values.merge.builderRelayUrl }}
+              {{- if $root.Values.merge.builderRelayUrl }}
+              --Merge.BuilderRelayUrl={{ $root.Values.merge.builderRelayUrl }}
               {{- end }}
-              {{- if .Values.merge.finalTotalDifficulty }}
-              --Merge.FinalTotalDifficulty={{ .Values.merge.finalTotalDifficulty }}
+              {{- if $root.Values.merge.finalTotalDifficulty }}
+              --Merge.FinalTotalDifficulty={{ $root.Values.merge.finalTotalDifficulty }}
               {{- end }}
-              {{- if .Values.merge.terminalTotalDifficulty }}
-              --Merge.TerminalTotalDifficulty={{ .Values.merge.terminalTotalDifficulty }}
+              {{- if $root.Values.merge.terminalTotalDifficulty }}
+              --Merge.TerminalTotalDifficulty={{ $root.Values.merge.terminalTotalDifficulty }}
               {{- end }}
           {{- end }}
-          {{- range .Values.extraFlags }}
+          {{- range $root.Values.extraFlags }}
               {{ . | quote }}
           {{- end }}
           ports:
-          {{- if .Values.jsonrpc.enabled }}
+          {{- if $root.Values.jsonrpc.enabled }}
             - name: json-rest
-              containerPort: {{ .Values.jsonrpc.ports.rest }}
+              containerPort: {{ $root.Values.jsonrpc.ports.rest }}
               protocol: TCP
             - name: json-ws
-              containerPort: {{ .Values.jsonrpc.ports.websocket }}
+              containerPort: {{ $root.Values.jsonrpc.ports.websocket }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.metrics.enabled }}
+          {{- if $root.Values.metrics.enabled }}
             - name: metrics
-              containerPort: {{ .Values.metrics.port }}
+              containerPort: {{ $root.Values.metrics.port }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.p2pNodePort.enabled }}
+          {{- if $root.Values.p2pNodePort.enabled }}
             - name: p2p-tcp
-              containerPort: {{ include "nethermind.p2pPort" . }}
+              containerPort: {{ include "nethermind.p2pPort" $root }}
               protocol: TCP
             - name: p2p-udp
-              containerPort: {{ include "nethermind.p2pPort" . }}
+              containerPort: {{ include "nethermind.p2pPort" $root }}
               protocol: UDP
           {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data/nethermind
-          {{- if .Values.global.JWTSecret }}
+          {{- if $root.Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
           {{- end }}
-          {{- if .Values.p2pNodePort.enabled }}
+          {{- if $root.Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
           {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.jsonrpc.enabled }}
+            {{- toYaml $root.Values.resources | nindent 12 }}
+      {{- if $root.Values.jsonrpc.enabled }}
         - name: sidecar
-          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
-          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          image: "{{ $root.Values.sidecar.repository }}:{{ $root.Values.sidecar.tag }}"
+          imagePullPolicy: {{ $root.Values.sidecar.pullPolicy }}
           env:
             - name: SERVER_BINDADDR
-              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+              value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.jsonrpc.ports.rest | quote }}
+              value: {{ $root.Values.jsonrpc.ports.rest | quote }}
           ports:
-            - containerPort: {{ .Values.sidecar.bindPort }}
+            - containerPort: {{ $root.Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
+        {{- if or $root.Values.global.livenessProbe.enabled $root.Values.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ $root.Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ $root.Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ $root.Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ $root.Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ $root.Values.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path }}
-              port: {{ .Values.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+              path: {{ $root.Values.livenessProbe.httpGet.path }}
+              port: {{ $root.Values.livenessProbe.httpGet.port }}
+              scheme: {{ $root.Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
+        {{- if or $root.Values.global.readinessProbe.enabled $root.Values.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ $root.Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ $root.Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ $root.Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ $root.Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ $root.Values.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path }}
-              port: {{ .Values.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+              path: {{ $root.Values.readinessProbe.httpGet.path }}
+              port: {{ $root.Values.readinessProbe.httpGet.port }}
+              scheme: {{ $root.Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.global.JWTSecret }}
+        {{- if $root.Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ include "common.names.fullname" $root }}
         {{- end }}
-        {{- if .Values.p2pNodePort.enabled }}
+        {{- if $root.Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}
         {{- end }}
-{{- if (not .Values.persistence.enabled) }}
+{{- if (not $root.Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}
@@ -238,15 +244,17 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "common.labels.standard" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
+          {{- include "common.labels.standard" $root | nindent 10 }}
+      {{- with $root.Values.persistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
       {{- end }}
       spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
+        accessModes: {{ $root.Values.persistence.accessModes }}
+        storageClassName: {{ $root.Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.persistence.size | quote }}
+            storage: {{ $root.Values.persistence.size | quote }}
   {{- end }}
+
+{{- end }}

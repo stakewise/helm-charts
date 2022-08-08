@@ -298,15 +298,6 @@ metrics:
     ##
     rules: []
 
-## Vertical Pod Autoscaler config
-## Ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: {}
-
 ## Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##

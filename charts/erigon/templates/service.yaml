@@ -1,34 +1,40 @@
+{{- $root := . -}}
+{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name:  {{ include "common.names.fullname" . }}
+  name:  {{ include "common.names.fullname" $root }}-{{ $i }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "common.labels.standard" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
 spec:
-{{- if .Values.svcHeadless }}
+{{- if $root.Values.svcHeadless }}
   clusterIP: None
 {{- end }}
-  type: {{ .Values.service.type }}
+  type: {{ $root.Values.service.type }}
   ports:
-    - port: {{ .Values.service.port.rpc }}
+    - port: {{ $root.Values.service.port.rpc }}
       targetPort: rpc
       protocol: TCP
       name: rpc
-    {{- if .Values.JWTSecret }}
-    - port: {{ .Values.authRpc.port }}
+    {{- if $root.Values.JWTSecret }}
+    - port: {{ $root.Values.authRpc.port }}
       targetPort: authrpc
       protocol: TCP
       name: authrpc
     {{- end }}
-    - port: {{ .Values.service.port.grpc }}
+    - port: {{ $root.Values.service.port.grpc }}
       targetPort: grpc
       protocol: TCP
       name: grpc
-  {{- if .Values.metrics.enabled }}
-    - port: {{ .Values.metrics.port }}
+  {{- if $root.Values.metrics.enabled }}
+    - port: {{ $root.Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   {{- end }}
   selector:
-    {{- include "common.labels.matchLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
+{{- end }}

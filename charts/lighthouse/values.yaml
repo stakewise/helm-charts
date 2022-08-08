@@ -3,8 +3,6 @@
 # Declare variables to be passed into your templates.
 
 global:
-  replicaCount: 1
-
   ## Eth2 network ID
   ##
   network: mainnet
@@ -15,6 +13,12 @@ global:
   ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
+
+  ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
+  ## Uses the same endpoint to populate the deposit cache.
+  ## A separate Statefulset will be created for each specified address
+  ##
+  executionEndpoints: []
 
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -73,17 +77,6 @@ global:
 
   readinessProbe:
     enabled: true
-  
-  ## Execution client connection settings
-  ## Example:
-  ##
-  ## connectToStatefulset:
-  ##   name: "geth"
-  ##   port: "8545"
-  ##
-  connectToStatefulset:
-    name: ""
-    port: ""
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -146,20 +139,6 @@ targetPeers: 80
 ## Extra flags for lighthouse beacon chain node
 ##
 extraFlags: []
-
-## One or more comma-delimited server endpoints for web3 connection.
-## If multiple endpoints are given the endpoints are used as fallback
-## in the given order. Also enables the --eth1 flag. Defaults to
-## http://127.0.0.1:8545.
-##
-eth1Endpoints: []
-
-## Server endpoint for an execution layer jwt authenticated HTTP JSON-RPC connection.
-## Uses the same endpoint to populate the deposit cache.
-## Also enables the --merge flag.If not provided, uses the default value of
-## http://127.0.0.1:8551
-##
-executionEndpoint: []
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

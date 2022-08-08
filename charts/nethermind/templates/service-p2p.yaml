@@ -12,7 +12,7 @@ metadata:
   name: {{ include "common.names.fullname" $ }}-{{ $i }}
   labels:
     {{- include "common.labels.standard" $ | nindent 4 }}
-    pod: {{ include "common.names.fullname" $ }}-{{ $i }}
+    replicaID: {{ $i | quote }}
     type: p2p
   {{- with $.Values.p2pNodePort.annotations }}
   annotations:
@@ -34,7 +34,7 @@ spec:
       nodePort: {{ $port }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
-    statefulset.kubernetes.io/pod-name: {{ include "common.names.fullname" $ }}-{{ $i }}
+    replicaID: {{ $i | quote }}
 
 {{- end }}
 {{- end }}

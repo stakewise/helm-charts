@@ -3,8 +3,6 @@
 # Declare variables to be passed into your templates.
 
 global:
-  replicaCount: 1
-
   ## Eth2 network ID
   ##
   network: mainnet
@@ -15,6 +13,12 @@ global:
   ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
+
+  ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
+  ## Uses the same endpoint to populate the deposit cache.
+  ## A separate Statefulset will be created for each specified address
+  ##
+  executionEndpoints: []
 
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -73,17 +77,6 @@ global:
 
   readinessProbe:
     enabled: true
-  
-  ## Execution client connection settings
-  ## Example:
-  ##
-  ## connectToStatefulset:
-  ##   name: "geth"
-  ##   port: "8545"
-  ##
-  connectToStatefulset:
-    name: ""
-    port: ""
 
 ## Provide a name in place of prysm for `app:` labels
 ##
@@ -279,15 +272,6 @@ priorityClassName: ""
 podDisruptionBudget:
   enabled: true
   maxUnavailable: 1
-
-## Vertical Pod Autoscaler config
-## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: {}
 
 ## Monitoring
 ##

@@ -1,36 +1,43 @@
+{{- $root := . -}}
+{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
+---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" $root }}-{{ $i }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "common.labels.standard" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
 spec:
-  type: {{ .Values.service.type }}
-{{- if .Values.svcHeadless }}
+  type: {{ $root.Values.service.type }}
+{{- if $root.Values.svcHeadless }}
   clusterIP: None
 {{- end }}
-{{- if .Values.sessionAffinity.enabled }}
+{{- if $root.Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ $root.Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   ports:
-  {{- if .Values.jsonrpc.enabled }}
-    - port: {{ .Values.jsonrpc.ports.rest }}
+  {{- if $root.Values.jsonrpc.enabled }}
+    - port: {{ $root.Values.jsonrpc.ports.rest }}
       targetPort: json-rest
       protocol: TCP
       name: json-rest
-    - port: {{ .Values.jsonrpc.ports.websocket }}
+    - port: {{ $root.Values.jsonrpc.ports.websocket }}
       targetPort: json-ws
       protocol: TCP
       name: json-ws
   {{- end }}
-  {{- if .Values.metrics.enabled }}
-    - port: {{ .Values.metrics.port }}
+  {{- if $root.Values.metrics.enabled }}
+    - port: {{ $root.Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   {{- end }}
   selector:
-    {{- include "common.labels.matchLabels" . | nindent 4 }}
+    {{- include "common.labels.matchLabels" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
+
+{{- end }}
