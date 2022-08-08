@@ -102,6 +102,8 @@ spec:
             {{- if .Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
+              ID=`echo $HOSTNAME | awk -F- '{print $NF}'`;
+              EXECUTION_ENDPOINT="http://${STATEFULSET_NAME}-${ID}.${STATEFULSET_NAME}:${STATEFULSET_PORT}";
               exec lighthouse
               bn
               --staking
@@ -111,15 +113,14 @@ spec:
               --http-address={{ .Values.http.address }}
               --http-allow-origin={{ .Values.http.allowOrigin }}
             {{- end}}
-            {{- if .Values.eth1Endpoints }}
+            {{- if .Values.global.connectToStatefulset.name }}
+              --execution-endpoint=${EXECUTION_ENDPOINT}
+            {{- else if .Values.executionEndpoint -}}
+              --execution-endpoint={{ .Values.executionEndpoint }}
+            {{- else if .Values.eth1Endpoints }}
               --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
             {{- end }}
-            {{- if .Values.executionEndpoint }}
-              --execution-endpoint={{ .Values.executionEndpoint }}
-            {{- end }}
-            {{- if .Values.global.JWTSecret }}
               --execution-jwt=/secret/jwtsecret
-            {{- end }}
               --datadir=/data
               --network={{ .Values.global.network }}
               --disable-upnp
@@ -148,6 +149,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: STATEFULSET_NAME
+              value: {{ .Values.global.connectToStatefulset.name | quote }}
+            - name: STATEFULSET_PORT
+              value: {{ .Values.global.connectToStatefulset.port | quote }}
           ports:
             - containerPort: {{ .Values.http.port }}
               protocol: TCP

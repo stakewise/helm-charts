@@ -23,3 +23,9 @@
     (and .Values.consensusClient.tekuEnabled .Values.consensusClient.lighthouseEnabled) }}
 {{- fail "Only one consensus client allowed" }}
 {{- end }}
+
+{{- if or
+    (not .Values.global.connectToStatefulset.name)
+    (not .Values.global.connectToStatefulset.port) }}
+{{- fail "Execution Statefulset name or port not set" }}
+{{- end }}

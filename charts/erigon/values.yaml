@@ -9,7 +9,10 @@ global:
   ##
   network: mainnet
 
-  ## Hex encoded secret for jwt authentication.
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
 
@@ -91,7 +94,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2022.07.03"
+  tag: "v2022.08.01"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -118,10 +121,14 @@ httpCorsDomain: "*"
 # API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
 # Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
 httpApi: "eth,erigon,web3,net,txpool,engine"
-# HTTP-RPC server listening interface for engineAPI
-engineAddr: 0.0.0.0
 # Manually specify TerminalTotalDifficulty, overriding the bundled setting
 terminalTotalDifficulty: ""
+
+## AuthRPC configuration.
+##
+authRpc:
+  port: "8551"
+  vhosts: "*"
 
 ## Extra flags for mainnet network
 ##
@@ -178,6 +185,10 @@ rbac:
       - "get"
       - "list"
       - "watch"
+
+## Defines whether the service must be headless
+##
+svcHeadless: false
 
 service:
   type: ClusterIP

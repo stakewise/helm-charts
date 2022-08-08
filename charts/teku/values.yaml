@@ -9,7 +9,10 @@ global:
   ##
   network: mainnet
 
-  ## Hex encoded secret for jwt authentication.
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
 
@@ -70,6 +73,17 @@ global:
 
   readinessProbe:
     enabled: true
+  
+  ## Execution client connection settings
+  ## Example:
+  ##
+  ## connectToStatefulset:
+  ##   name: "geth"
+  ##   port: "8545"
+  ##
+  connectToStatefulset:
+    name: ""
+    port: ""
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -93,7 +107,7 @@ image:
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.7.0"
+  tag: "22.8.0"
 
 imagePullSecrets: []
 nameOverride: ""

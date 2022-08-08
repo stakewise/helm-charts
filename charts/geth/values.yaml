@@ -9,7 +9,10 @@ global:
   ##
   network: mainnet
 
-  ## Hex encoded secret for jwt authentication.
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
 
@@ -92,7 +95,7 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.20"
+  tag: "v1.10.21"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry

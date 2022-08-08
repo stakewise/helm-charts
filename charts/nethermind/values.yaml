@@ -9,7 +9,10 @@ global:
   ##
   network: mainnet
 
-  ## Hex encoded secret for jwt authentication.
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
 
@@ -93,7 +96,7 @@ image:
   repository: nethermind/nethermind
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.13.4"
+  tag: "1.13.6"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

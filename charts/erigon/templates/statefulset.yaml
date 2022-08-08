@@ -108,10 +108,11 @@ spec:
               --http.corsdomain={{ .Values.httpCorsDomain }}
               --http.api={{ .Values.httpApi }}
               --http.port={{ .Values.service.port.rpc }}
-              --engine.addr={{ .Values.engineAddr }}
-              --engine.port={{ .Values.service.port.engine }}
           {{- if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
+              --authrpc.addr=0.0.0.0
+              --authrpc.port={{ .Values.authRpc.port }}
+              --authrpc.vhosts={{ .Values.authRpc.vhosts }}
           {{- end }}
           {{- range .Values.extraFlags }}
               {{ . }}
@@ -135,9 +136,9 @@ spec:
               protocol: TCP
               containerPort: {{ .Values.service.port.rpc }}
             {{- if .Values.global.JWTSecret }}
-            - name: engine
+            - name: authrpc
               protocol: TCP
-              containerPort: {{ .Values.service.port.engine }}
+              containerPort: {{ .Values.authRpc.port }}
             {{- end }}
           {{- if .Values.metrics.enabled }}
             - name: metrics

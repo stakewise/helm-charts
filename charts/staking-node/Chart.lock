@@ -1,21 +1,21 @@
 dependencies:
 - name: erigon
   repository: file://../erigon
-  version: 1.1.8
+  version: 2.1.0
 - name: geth
   repository: file://../geth
-  version: 1.1.7
+  version: 2.1.0
 - name: nethermind
   repository: file://../nethermind
-  version: 1.1.3
+  version: 2.1.0
 - name: prysm
   repository: file://../prysm
-  version: 1.3.5
+  version: 2.1.0
 - name: lighthouse
   repository: file://../lighthouse
-  version: 1.3.5
+  version: 2.1.0
 - name: teku
   repository: file://../teku
-  version: 1.1.4
-digest: sha256:4dddb7b2b48d5b236ad9775b27ec683451b9da780d5003262c96b91991a4ecb5
-generated: "2022-08-04T12:36:10.216801+03:00"
+  version: 2.1.0
+digest: sha256:3b9da0220e5124fa8957ea97aaa8b29a558738982d4e4b804365f5f1f94f2f4e
+generated: "2022-08-08T09:36:35.278376+03:00"

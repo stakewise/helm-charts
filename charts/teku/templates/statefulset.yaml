@@ -103,6 +103,8 @@ spec:
             {{- if .Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
+              ID=`echo $HOSTNAME | awk -F- '{print $NF}'`;
+              EXECUTION_ENDPOINT="http://${STATEFULSET_NAME}-${ID}.${STATEFULSET_NAME}:${STATEFULSET_PORT}";
               exec /opt/teku/bin/teku
               --network={{ .Values.global.network }}
               --data-beacon-path=/data/teku/beacon
@@ -111,7 +113,11 @@ spec:
               --data-storage-mode={{ .Values.dataStorageMode }}
               --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
             {{- if .Values.global.JWTSecret }}
+              {{- if .Values.global.connectToStatefulset.name }}
+              --ee-endpoint=${EXECUTION_ENDPOINT}
+              {{- else }}
               --ee-endpoint={{ .Values.eeEndpoint }}
+              {{- end }}
               --ee-jwt-secret-file=/secret/jwtsecret
               {{- if .Values.builderEndpoint }}
               --builder-endpoint={{ .Values.builderEndpoint }}
@@ -172,6 +178,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: STATEFULSET_NAME
+              value: {{ .Values.global.connectToStatefulset.name | quote }}
+            - name: STATEFULSET_PORT
+              value: {{ .Values.global.connectToStatefulset.port | quote }}
           volumeMounts:
             - name: data
               mountPath: /data/teku

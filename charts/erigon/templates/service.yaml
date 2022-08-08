@@ -5,6 +5,9 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
+{{- if .Values.svcHeadless }}
+  clusterIP: None
+{{- end }}
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port.rpc }}
@@ -12,10 +15,10 @@ spec:
       protocol: TCP
       name: rpc
     {{- if .Values.JWTSecret }}
-    - port: {{ .Values.service.port.engine }}
-      targetPort: engine
+    - port: {{ .Values.authRpc.port }}
+      targetPort: authrpc
       protocol: TCP
-      name: engine
+      name: authrpc
     {{- end }}
     - port: {{ .Values.service.port.grpc }}
       targetPort: grpc

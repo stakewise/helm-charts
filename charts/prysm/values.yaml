@@ -9,7 +9,10 @@ global:
   ##
   network: mainnet
 
-  ## Hex encoded secret for jwt authentication.
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
   ##
   JWTSecret: ""
 
@@ -70,6 +73,17 @@ global:
 
   readinessProbe:
     enabled: true
+  
+  ## Execution client connection settings
+  ## Example:
+  ##
+  ## connectToStatefulset:
+  ##   name: "geth"
+  ##   port: "8545"
+  ##
+  connectToStatefulset:
+    name: ""
+    port: ""
 
 ## Provide a name in place of prysm for `app:` labels
 ##
@@ -235,8 +249,6 @@ totalDifficultyOverride: ""
 ## Extra flags for prysm beacon chain node
 ##
 extraFlags:
-  # Beacon chain options
-  - "--accept-terms-of-use"
   # p2p options
   - "--p2p-max-peers=160"
   - "--enable-peer-scorer"

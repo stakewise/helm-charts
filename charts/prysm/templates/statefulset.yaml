@@ -38,16 +38,18 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.fullname" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
-    {{- if or (.Values.p2pNodePort.enabled) (and .Values.persistence.enabled .Values.initChownData) (.Values.persistence.enabled)}}
       initContainers:
-      {{- if .Values.p2pNodePort.enabled }}
-        - name: init-nodeport
+        - name: init
           image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
           imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
           env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -60,49 +62,46 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: spec.nodeName
+            - name: STATEFULSET_NAME
+              value: {{ .Values.global.connectToStatefulset.name | quote }}
+            - name: STATEFULSET_PORT
+              value: {{ .Values.global.connectToStatefulset.port | quote }}
           command:
             - sh
             - -c
             - >
               echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
-          {{- if eq .Values.p2pNodePort.type "LoadBalancer" }}
+          {{- if .Values.p2pNodePort.enabled }}
+              {{- if eq .Values.p2pNodePort.type "LoadBalancer" }}
               until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
               export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
               export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
-          {{- else }}
+              {{- else }}
               export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
               export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+              {{- end }}
+              echo "p2p-host-ip: $EXTERNAL_IP"   > /config/config.yaml;
+              echo "p2p-tcp-port: $EXTERNAL_PORT" >>  /config/config.yaml;
+              echo "p2p-udp-port: $EXTERNAL_PORT" >>  /config/config.yaml;
+          {{- else }}
+              echo "p2p-host-ip: $POD_IP"   > /config/config.yaml;
+              echo 'p2p-tcp-port: {{ include "prysm.p2pPort" . }}' >>  /config/config.yaml;
+              echo 'p2p-udp-port: {{ include "prysm.p2pPort" . }}' >>  /config/config.yaml;
           {{- end }}
-              echo "p2p-host-ip: $EXTERNAL_IP"   > /env/init-nodeport;
-              echo "p2p-tcp-port: $EXTERNAL_PORT" >>  /env/init-nodeport;
-              echo "p2p-udp-port: $EXTERNAL_PORT" >>  /env/init-nodeport;
-              cat /env/init-nodeport;
+          {{- if .Values.global.connectToStatefulset }}
+              ID=`echo $HOSTNAME | awk -F- '{print $NF}'`;
+              echo "http://${STATEFULSET_NAME}-${ID}.${STATEFULSET_NAME}:${STATEFULSET_PORT}";
+              echo "http-web3provider: http://${STATEFULSET_NAME}-${ID}.${STATEFULSET_NAME}:${STATEFULSET_PORT}" >> /config/config.yaml;
+          {{- end }}
+              cat /config/config.yaml;
+          {{- if and .Values.persistence.enabled .Values.initChownData }}
+              chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data;
+          {{- end }}
           volumeMounts:
-            - name: env-nodeport
-              mountPath: /env
-      {{- end }}
-      {{- if and .Values.persistence.enabled .Values.initChownData }}
-        - name: init-chown
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
-          volumeMounts:
+            - name: config
+              mountPath: /config
             - name: data
               mountPath: /data
-      {{- end }}
-      {{- if .Values.persistence.enabled }}
-        - name: cleanup-network-keys
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command: ["rm", "-f", "/data/network-keys"]
-          volumeMounts:
-            - name: data
-              mountPath: /data
-      {{- end }}
       {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
@@ -114,7 +113,6 @@ spec:
             - name: scripts
               mountPath: /data/scripts
       {{- end }}
-    {{- end }}
       containers:
         - name: {{ include "common.names.fullname" . }}
         {{- if ne .Values.global.network "gnosis" }}
@@ -128,23 +126,20 @@ spec:
             - "--datadir=/data"
             - "--rpc-host={{ .Values.rpc.host }}"
             - "--rpc-port={{ .Values.rpc.port }}"
+            - "--accept-terms-of-use"
 
-          {{- if .Values.p2pNodePort.enabled }}
-            - "--config-file=/env/init-nodeport"
-          {{- else }}
-            - "--p2p-host-ip=$(POD_IP)"
-            - "--p2p-tcp-port={{ include "prysm.p2pPort" . }}"
-            - "--p2p-udp-port={{ include "prysm.p2pPort" . }}"
-          {{- end }}
-
-          {{- with (first .Values.eth1Endpoints) }}
-            - "--http-web3provider={{ . }}"
-          {{- end }}
+            - "--config-file=/config/config.yaml"
           
-          {{- if not .Values.global.JWTSecret }}
-          {{- range (untilStep 1 (int $eth1EndpointsLen) 1) }}
-            - "--fallback-web3provider={{ index $.Values.eth1Endpoints . }}"
-          {{- end }}
+          {{- if not .Values.global.connectToStatefulset }}
+            {{- with (first .Values.eth1Endpoints) }}
+            - "--http-web3provider={{ . }}"
+            {{- end }}
+          
+            {{- if not .Values.global.JWTSecret }}
+            {{- range (untilStep 1 (int $eth1EndpointsLen) 1) }}
+              - "--fallback-web3provider={{ index $.Values.eth1Endpoints . }}"
+            {{- end }}
+            {{- end }}
           {{- end }}
 
           {{- if .Values.global.JWTSecret }}
@@ -227,10 +222,8 @@ spec:
               mountPath: /secret
               readOnly: true
           {{- end }}
-          {{- if .Values.p2pNodePort.enabled }}
-            - name: env-nodeport
-              mountPath: /env
-          {{- end }}
+            - name: config
+              mountPath: /config
           {{- if eq .Values.global.network "gnosis" }}
             - name: gnosis-config
               mountPath: /data/gnosis-config
@@ -240,7 +233,7 @@ spec:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
       {{- if .Values.http.enabled }}
-        - name: sidecar
+        {{- name: sidecar
           image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
           env:
@@ -275,7 +268,7 @@ spec:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.readinessProbe.httpGet.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
-        {{- end }}
+        {{- end }}}}
       {{- end }}
       volumes:
       {{- if .Values.global.JWTSecret }}
@@ -283,10 +276,8 @@ spec:
           secret:
             secretName: {{ include "common.names.fullname" . }}
       {{- end }}
-      {{- if .Values.p2pNodePort.enabled }}
-        - name: env-nodeport
+        - name: config
           emptyDir: {}
-      {{- end }}
       {{- if eq .Values.global.network "gnosis" }}
         - name: gnosis-config
           configMap:

@@ -4,13 +4,37 @@
 
 global:
   replicaCount: 2
+
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
+  ##
   JWTSecret: ""
 
+  ## Execution client connection settings
+  ## Example:
+  ##
+  ## connectToStatefulset:
+  ##   name: "staking-node-erigon"
+  ##   port: "8551"
+  ##
+  connectToStatefulset:
+    name: ""
+    port: ""
+
 executionClient:
-  erigonEnabled: true
+  erigonEnabled: false
   gethEnabled: false
   nethermindEnabled: false
 consensusClient:
   prysmEnabled: false
   lighthouseEnabled: false
   tekuEnabled: false
+
+geth:
+  svcHeadless: true
+erigon:
+  svcHeadless: true
+nethermind:
+  svcHeadless: true
