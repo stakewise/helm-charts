@@ -11,5 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: [' {{ include "common.names.fullname" . }}:{{ .Values.service.port.rpc }}']
+      args: [' {{ include "common.names.fullname" . }}:{{ .Values.http.port }}']
   restartPolicy: Never
