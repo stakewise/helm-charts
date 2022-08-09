@@ -83,21 +83,6 @@ Update permissions on files inside /data directory
 {{- end }}
 
 {{/*
-Write current validator info to /data directory
-*/}}
-{{- define "init-validator-info" -}}
-- name: init-validator-info
-  image: "{{ .Values.initImageBusybox.repository }}:{{ .Values.initImageBusybox.tag }}"
-  imagePullPolicy: {{ .Values.initImageBusybox.pullPolicy }}
-  securityContext:
-    runAsUser: 0
-  command: ["/bin/sh", "-c", "echo {{ .Values.type }} > /data/validator.type"]
-  volumeMounts:
-    - name: data
-      mountPath: /data
-{{- end }}
-
-{{/*
 Validator beacon node
 */}}
 {{- define "beacon-rpc-node" -}}

@@ -8,7 +8,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.6.0"
+  tag: "22.8.0"
 
 ## Init image is used to chown data volume, etc.
 ##

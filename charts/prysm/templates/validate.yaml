@@ -1,0 +1,8 @@
+{{- if not .Values.global.JWTSecret }}
+{{- fail ".Values.global.JWTSecret is required" }}
+{{- end }}
+
+{{- $endpoints := uniq .Values.global.executionEndpoints -}}
+{{- if lt (len $endpoints) (len .Values.global.executionEndpoints)}}
+{{- fail ".Values.global.executionClients must only contain unique values, since each consensus client must be connected to a unique execution client." }}
+{{- end }}

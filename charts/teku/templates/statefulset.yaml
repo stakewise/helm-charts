@@ -1,46 +1,52 @@
+{{- $root := . -}}
+{{- range $i, $e := until (len .Values.global.executionEndpoints) }}
+---
 kind: StatefulSet
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" $root }}-{{ $i }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "common.labels.standard" $root | nindent 4 }}
+    replicaID: {{ $i | quote }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+      {{- include "common.labels.matchLabels" $root | nindent 6 }}
+      replicaID: {{ $i | quote }}
+  serviceName: {{ include "common.names.fullname" $root }}
   template:
     metadata:
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" $root | nindent 8 }}
+        replicaID: {{ $i | quote }}
     spec:
-    {{- with .Values.imagePullSecrets }}
+    {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.nodeSelector }}
+    {{- with $root.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.affinity }}
+    {{- with $root.Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with .Values.tolerations }}
+    {{- with $root.Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
-      priorityClassName: {{ .Values.priorityClassName | quote }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" $root }}
+      priorityClassName: {{ $root.Values.priorityClassName | quote }}
       securityContext:
-        {{- toYaml .Values.securityContext | nindent 8 }}
-    {{- if or (and .Values.persistence.enabled .Values.initChownData) (.Values.p2pNodePort.enabled) }}
+        {{- toYaml $root.Values.securityContext | nindent 8 }}
+    {{- if or (and $root.Values.persistence.enabled $root.Values.initChownData) ($root.Values.p2pNodePort.enabled) }}
       initContainers:
-        {{- if .Values.p2pNodePort.enabled }}
+        {{- if $root.Values.p2pNodePort.enabled }}
         - name: init-nodeport
-          image: "{{ .Values.p2pNodePort.initContainer.image.repository }}:{{ .Values.p2pNodePort.initContainer.image.tag }}"
-          imagePullPolicy: {{.Values.p2pNodePort.initContainer.image.pullPolicy }}
+          image: "{{ $root.Values.p2pNodePort.initContainer.image.repository }}:{{ $root.Values.p2pNodePort.initContainer.image.tag }}"
+          imagePullPolicy: {{ $root.Values.p2pNodePort.initContainer.image.pullPolicy }}
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
@@ -62,7 +68,7 @@ spec:
             - -c
             - >
               echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
-          {{- if eq .Values.p2pNodePort.type "LoadBalancer" }}
+          {{- if eq $root.Values.p2pNodePort.type "LoadBalancer" }}
               until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
               export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
               export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
@@ -77,85 +83,89 @@ spec:
             - name: env-nodeport
               mountPath: /env
         {{- end }}
-        {{- if and .Values.persistence.enabled .Values.initChownData }}
+        {{- if and $root.Values.persistence.enabled $root.Values.initChownData }}
         - name: init-chown
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           command:
             - /bin/sh
             - -c
-            - mkdir -p /data/teku && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data/teku
+            - mkdir -p /data/teku && chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data/teku
           volumeMounts:
             - name: data
               mountPath: /data/teku
         {{- end }}
     {{- end }}
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        - name: {{ $root.Chart.Name }}
+          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag | default $root.Chart.AppVersion }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           command:
             - sh
             - -ac
             - >
-            {{- if .Values.p2pNodePort.enabled }}
+            {{- if $root.Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
               exec /opt/teku/bin/teku
-              --network={{ .Values.network }}
+              --network={{ $root.Values.global.network }}
               --data-beacon-path=/data/teku/beacon
               --data-path=/data/teku
-              --data-storage-archive-frequency={{ .Values.dataStorageArchiveFrequency }}
-              --data-storage-mode={{ .Values.dataStorageMode }}
-              --data-storage-non-canonical-blocks-enabled={{ .Values.dataStorageNonCanonicalBlocksEnabled }}
-              --eth1-endpoints={{ .Values.eth1Endpoints | join "," }}
+              --data-storage-archive-frequency={{ $root.Values.dataStorageArchiveFrequency }}
+              --data-storage-mode={{ $root.Values.dataStorageMode }}
+              --data-storage-non-canonical-blocks-enabled={{ $root.Values.dataStorageNonCanonicalBlocksEnabled }}
+              --ee-endpoint={{ index $root.Values.global.executionEndpoints $i }}
+              --ee-jwt-secret-file=/secret/jwtsecret
+            {{- if $root.Values.builderEndpoint }}
+              --builder-endpoint={{ $root.Values.builderEndpoint }}
+            {{- end }}
               --p2p-enabled=true
-              --p2p-port={{ include "teku.p2pPort" . }}
-            {{- if .Values.p2pNodePort.enabled }}
+              --p2p-port={{ include "teku.p2pPort" $root }}
+            {{- if $root.Values.p2pNodePort.enabled }}
               --p2p-advertised-ip=$EXTERNAL_IP
               --p2p-advertised-port=$EXTERNAL_PORT
             {{- else }}
               --p2p-advertised-ip=$(POD_IP)
-              --p2p-advertised-port={{ include "teku.p2pPort" . }}
+              --p2p-advertised-port={{ include "teku.p2pPort" $root }}
             {{- end }}
-            {{- if .Values.restApi.enabled }}
-              --rest-api-enabled={{ .Values.restApi.enabled }}
-              --rest-api-host-allowlist={{ .Values.restApi.hostAllowList | join "," }}
-              --rest-api-interface={{ .Values.restApi.interface }}
-              --rest-api-port={{ .Values.restApi.port }}
-              --rest-api-cors-origins={{ .Values.restApi.corsOrigins | join "," }}
-              --rest-api-docs-enabled={{ .Values.restApi.docsEnabled }}
+            {{- if $root.Values.restApi.enabled }}
+              --rest-api-enabled={{ $root.Values.restApi.enabled }}
+              --rest-api-host-allowlist={{ $root.Values.restApi.hostAllowList | join "," }}
+              --rest-api-interface={{ $root.Values.restApi.interface }}
+              --rest-api-port={{ $root.Values.restApi.port }}
+              --rest-api-cors-origins={{ $root.Values.restApi.corsOrigins | join "," }}
+              --rest-api-docs-enabled={{ $root.Values.restApi.docsEnabled }}
             {{- end }}
-            {{- if .Values.metrics.enabled }}
-              --metrics-enabled={{ .Values.metrics.enabled }}
-              --metrics-categories={{ .Values.metrics.categories | join "," }}
-              --metrics-host-allowlist={{ .Values.metrics.hostAllowList | join "," }}
-              --metrics-interface={{ .Values.metrics.interface }}
-              --metrics-port={{ .Values.metrics.port }}
+            {{- if $root.Values.metrics.enabled }}
+              --metrics-enabled={{ $root.Values.metrics.enabled }}
+              --metrics-categories={{ $root.Values.metrics.categories | join "," }}
+              --metrics-host-allowlist={{ $root.Values.metrics.hostAllowList | join "," }}
+              --metrics-interface={{ $root.Values.metrics.interface }}
+              --metrics-port={{ $root.Values.metrics.port }}
             {{- end }}
-            {{- range .Values.extraFlags }}
+            {{- range $root.Values.extraFlags }}
               {{ . | quote }}
             {{- end }}
-        {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
+        {{- if or $root.Values.restApi.enabled $root.Values.metrics.enabled }}
           ports:
-          {{- if .Values.restApi.enabled }}
-            - name: {{ .Values.restApi.portName }}
-              containerPort: {{ .Values.restApi.port }}
+          {{- if $root.Values.restApi.enabled }}
+            - name: {{ $root.Values.restApi.portName }}
+              containerPort: {{ $root.Values.restApi.port }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.metrics.enabled }}
+          {{- if $root.Values.metrics.enabled }}
             - name: metrics
-              containerPort: {{ .Values.metrics.port }}
+              containerPort: {{ $root.Values.metrics.port }}
               protocol: TCP
           {{- end }}
-          {{- if .Values.p2pNodePort.enabled }}
+          {{- if $root.Values.p2pNodePort.enabled }}
             - name: p2p-tcp
-              containerPort: {{ include "teku.p2pPort" . }}
+              containerPort: {{ include "teku.p2pPort" $root }}
               protocol: TCP
             - name: p2p-udp
-              containerPort: {{ include "teku.p2pPort" . }}
+              containerPort: {{ include "teku.p2pPort" $root }}
               protocol: UDP
           {{- end }}
         {{- end }}
@@ -167,56 +177,62 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/teku
-            {{- if .Values.p2pNodePort.enabled }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+            {{- if $root.Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
             {{- end }}
           resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.restApi.enabled }}
+            {{- toYaml $root.Values.resources | nindent 12 }}
+      {{- if $root.Values.restApi.enabled }}
         - name: sidecar
-          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
-          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
+          image: "{{ $root.Values.sidecar.repository }}:{{ $root.Values.sidecar.tag }}"
+          imagePullPolicy: {{ $root.Values.sidecar.pullPolicy }}
           env:
             - name: SERVER_BINDADDR
-              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
+              value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.restApi.port | quote }}
+              value: {{ $root.Values.restApi.port | quote }}
           ports:
-            - containerPort: {{ .Values.sidecar.bindPort }}
+            - containerPort: {{ $root.Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if .Values.livenessProbe.enabled }}
+        {{- if or $root.Values.global.livenessProbe.enabled $root.Values.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ $root.Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ $root.Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ $root.Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ $root.Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ $root.Values.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path }}
-              port: {{ .Values.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+              path: {{ $root.Values.livenessProbe.httpGet.path }}
+              port: {{ $root.Values.livenessProbe.httpGet.port }}
+              scheme: {{ $root.Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.readinessProbe.enabled }}
+        {{- if or $root.Values.global.readinessProbe.enabled $root.Values.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ $root.Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ $root.Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ $root.Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ $root.Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ $root.Values.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path }}
-              port: {{ .Values.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+              path: {{ $root.Values.readinessProbe.httpGet.path }}
+              port: {{ $root.Values.readinessProbe.httpGet.port }}
+              scheme: {{ $root.Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.p2pNodePort.enabled }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" $root }}
+        {{- if $root.Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}
         {{- end }}
-  {{- if (not .Values.persistence.enabled) }}
+  {{- if (not $root.Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
   {{- else }}
@@ -224,15 +240,17 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "common.labels.standard" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
+          {{- include "common.labels.standard" $root | nindent 10 }}
+      {{- with $root.Values.persistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
       {{- end }}
       spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
+        accessModes: {{ $root.Values.persistence.accessModes }}
+        storageClassName: {{ $root.Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.persistence.size | quote }}
+            storage: {{ $root.Values.persistence.size | quote }}
   {{- end }}
+
+{{- end }}

@@ -2,13 +2,87 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+global:
+  ## Eth2 network ID
+  ##
+  network: mainnet
+
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
+  ##
+  JWTSecret: ""
+
+  ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
+  ## Uses the same endpoint to populate the deposit cache.
+  ## A separate Statefulset will be created for each specified address
+  ##
+  executionEndpoints: []
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+  
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+  
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+  
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
   repository: "busybox"
-  tag: "1.34"
+  tag: "1.35"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -26,15 +100,13 @@ image:
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.6.0"
+  tag: "22.8.0"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -52,13 +124,11 @@ securityContext:
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
 rbac:
-  ## @param rbac.create Specifies whether RBAC resources are to be created
+  ## Required ClusterRole rules
   ##
-  create: true
-  ## @param rbac.clusterRules Required ClusterRole rules
-  ## @default -- See `values.yaml`
   clusterRules:
     ## Required to obtain the nodes external IP
+    ##
     - apiGroups: [""]
       resources:
       - "nodes"
@@ -66,10 +136,11 @@ rbac:
       - "get"
       - "list"
       - "watch"
-  ## @param rbac.rules Required ClusterRole rules
-  ## @default -- See `values.yaml`
+  ## Required Role rules
+  ##
   rules:
     ## Required to get information about the serices nodePort.
+    ##
     - apiGroups: [""]
       resources:
       - "services"
@@ -95,6 +166,40 @@ sessionAffinity:
   # The session duration in seconds
   timeoutSeconds: 86400
 
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
+## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAt: 31500
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
+  initContainer:
+    image:
+      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
+      ##
+      repository: bitnami/kubectl
+      ## @param p2pNodePort.initContainer.tag Container tag
+      ##
+      tag: "1.24"
+      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
+      ##
+      pullPolicy: IfNotPresent
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -119,15 +224,6 @@ podDisruptionBudget:
   enabled: true
   maxUnavailable: 1
 
-## Vertical Pod Autoscaler config
-## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
-##
-verticalAutoscaler:
-  # If true a VPA object will be created for the StatefulSet
-  enabled: false
-  updateMode: Off
-  containerPolicies: {}
-
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
@@ -148,7 +244,6 @@ affinity: {}
 ## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
 livenessProbe:
-  enabled: true
   initialDelaySeconds: 900
   timeoutSeconds: 3
   periodSeconds: 30
@@ -160,7 +255,6 @@ livenessProbe:
     scheme: HTTP
 
 readinessProbe:
-  enabled: true
   initialDelaySeconds: 300
   timeoutSeconds: 3
   periodSeconds: 30
@@ -192,51 +286,18 @@ persistence:
 ## Teku contains a full Beacon node implementation and a validator
 ## client for participating in consensus.
 
-## Eth2 network ID
-## Options: mainnet, prater
-##
-network: "mainnet"
-
 # URLs for Eth1 nodes
 eth1Endpoints: []
+
+# URL for Execution Engine node
+eeEndpoint: ""
+
+# MEV-Boost Endpoint
+builderEndpoint: ""
 
 ## Extra flags for teku beacon chain node
 ##
 extraFlags: []
-
-## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
-## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
-## This is useful if you want to expose and announce your node to the Internet.
-##
-p2pNodePort:
-  ## @param p2pNodePort.enabled Expose P2P port via NodePort
-  ##
-  enabled: false
-  ## @param p2pNodePort.annotations
-  ##
-  annotations: {}
-  ## @param p2pNodePort.type
-  ## Options: NodePort, LoadBalancer
-  type: NodePort
-  ## @param p2pNodePort.startAt The ports allocation will start from this value
-  ##
-  startAt: 31500
-  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
-  ## @default -- See `values.yaml` for example
-  replicaToNodePort: {}
-  #  "0": 32345
-  #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.23"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 # Sets the frequency, in slots, at which to store
 # finalized states to disk. This option is ignored
@@ -271,10 +332,6 @@ restApi:
 ## Monitoring
 ##
 metrics:
-  ## Whether to enable metrics collection or not
-  ##
-  enabled: true
-
   # Metric categories to enable
   categories:
     - JVM
@@ -307,46 +364,40 @@ metrics:
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   ##
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ## The namespace in which the ServiceMonitor will be created
     ##
     namespace: ""
-    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ## The interval at which metrics should be scraped
     ##
     interval: 30s
-    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ## The timeout after which the scrape is ended
     ##
     scrapeTimeout: ""
-    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ## Metrics RelabelConfigs to apply to samples before scraping.
     ##
     relabellings: []
-    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []
-    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ## Specify honorLabels parameter to add the scrape endpoint
     ##
     honorLabels: false
-    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     ##
     additionalLabels: {}
   ## Custom PrometheusRule to be defined
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
   prometheusRule:
-    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.prometheusRule.default Create a default set of Alerts
+    ## Create a default set of Alerts
     ##
     default: true
-    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ## The namespace in which the prometheusRule will be created
     ##
     namespace: ""
-    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ## Additional labels for the prometheusRule
     ##
     additionalLabels: {}
-    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## Custom Prometheus rules
     ##
     rules: []
