@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  serviceAccount:
+    create: true
+
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
@@ -25,9 +29,6 @@ affinity: { }
 tolerations: [ ]
 
 serviceAccount:
-  ## Specifies whether a service account should be created
-  ##
-  create: true
   ## Annotations to add to the service account
   ##
   annotations: {}
