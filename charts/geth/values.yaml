@@ -165,10 +165,11 @@ terminalTotalDifficulty: ""
 authRpc:
   port: "8551"
   vhosts: "*"
+  addr: "0.0.0.0"
 
 ## RPC configuration.
 ##
-rpc:
+http:
   enabled: true
   port: "8545"
   api: "web3,eth,net,engine"

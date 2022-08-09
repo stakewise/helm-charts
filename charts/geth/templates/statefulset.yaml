@@ -105,17 +105,17 @@ spec:
               exec geth
           {{- if $root.Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
-              --authrpc.addr=0.0.0.0
+              --authrpc.addr={{ $root.Values.authRpc.addr }}
               --authrpc.port={{ $root.Values.authRpc.port }}
               --authrpc.vhosts={{ $root.Values.authRpc.vhosts }}
           {{- end }}
-          {{- if $root.Values.rpc.enabled }}
+          {{- if $root.Values.http.enabled }}
               --http
               --http.addr=0.0.0.0
-              --http.port={{ $root.Values.rpc.port }}
-              --http.corsdomain={{ $root.Values.rpc.corsDomain }}
-              --http.vhosts={{ $root.Values.rpc.vhosts }}
-              --http.api={{ $root.Values.rpc.api }}
+              --http.port={{ $root.Values.http.port }}
+              --http.corsdomain={{ $root.Values.http.corsDomain }}
+              --http.vhosts={{ $root.Values.http.vhosts }}
+              --http.api={{ $root.Values.http.api }}
           {{- end }}
           {{- if $root.Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
@@ -141,7 +141,7 @@ spec:
           {{- range $root.Values.extraFlags }}
               {{ . | quote }}
           {{- end }}
-          {{- if $root.Values.metrics.enabled }}
+          {{- if $root.Values.global.metrics.enabled }}
           {{- range $root.Values.metrics.flags }}
               {{ . | quote }}
           {{- end }}
@@ -156,15 +156,15 @@ spec:
             - name: authrpc
               containerPort: {{ $root.Values.authRpc.port }}
           {{- end }}
-          {{- if $root.Values.rpc.enabled }}
-            - name: rpc
-              containerPort: {{ $root.Values.rpc.port }}
+          {{- if $root.Values.http.enabled }}
+            - name: http
+              containerPort: {{ $root.Values.http.port }}
           {{- end }}
           {{- if $root.Values.ws.enabled }}
             - name: ws
               containerPort: {{ $root.Values.ws.port }}
           {{- end }}
-          {{- if $root.Values.metrics.enabled }}
+          {{- if $root.Values.globalmetrics.enabled }}
             - name: metrics
               containerPort: {{ $root.Values.metrics.port }}
           {{- end }}
@@ -192,7 +192,7 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-      {{- if $root.Values.rpc.enabled }}
+      {{- if $root.Values.http.enabled }}
         - name: sidecar
           image: "{{ $root.Values.sidecar.repository }}:{{ $root.Values.sidecar.tag }}"
           imagePullPolicy: {{ $root.Values.sidecar.pullPolicy }}
@@ -200,7 +200,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ $root.Values.rpc.port | quote }}
+              value: {{ $root.Values.http.port | quote }}
           ports:
             - containerPort: {{ $root.Values.sidecar.bindPort }}
               name: sidecar

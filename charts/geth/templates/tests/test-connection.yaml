@@ -1,4 +1,4 @@
-{{- if .Values.rpc.enabled }}
+{{- if .Values.http.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -12,8 +12,8 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      {{- if .Values.rpc.enabled }}
-      args: ['{{ include "common.names.fullname" . }}:{{ .Values.rpc.port }}']
+      {{- if .Values.http.enabled }}
+      args: ['{{ include "common.names.fullname" . }}:{{ .Values.http.port }}']
       {{- end }}
   restartPolicy: Never
 {{- end }}
