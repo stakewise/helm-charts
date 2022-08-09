@@ -30,7 +30,7 @@ spec:
       protocol: TCP
       name: json-ws
   {{- end }}
-  {{- if $root.Values.metrics.enabled }}
+  {{- if $root.Values.global.metrics.enabled }}
     - port: {{ $root.Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
