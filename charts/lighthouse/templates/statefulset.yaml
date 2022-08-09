@@ -1,5 +1,6 @@
 {{- $root := . -}}
-{{- range $i, $e := until (len $root.Values.global.executionEndpoints) }}
+{{- $endpoints := uniq .Values.global.executionEndpoints -}}
+{{- range $i, $e := until (len $endpoints) }}
 ---
 kind: StatefulSet
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
@@ -117,7 +118,7 @@ spec:
               --http-address={{ $root.Values.http.address }}
               --http-allow-origin={{ $root.Values.http.allowOrigin }}
             {{- end}}
-              --execution-endpoint={{ index $root.Values.global.executionEndpoints $i }}
+              --execution-endpoint={{ index $endpoints $i }}
               --execution-jwt=/secret/jwtsecret
               --datadir=/data
               --network={{ $root.Values.global.network }}

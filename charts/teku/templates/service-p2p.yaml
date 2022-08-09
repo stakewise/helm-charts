@@ -1,5 +1,6 @@
 {{- if .Values.p2pNodePort.enabled -}}
-{{- range $i, $e := until (len .Values.global.executionEndpoints) }}
+{{- $endpoints := uniq .Values.global.executionEndpoints -}}
+{{- range $i, $e := until (len $endpoints) }}
 {{- $port := add $.Values.p2pNodePort.startAt $i -}}
 {{- if hasKey $.Values.p2pNodePort.replicaToNodePort ($i | toString) -}}
   {{ $port = index $.Values.p2pNodePort.replicaToNodePort ($i | toString) }}

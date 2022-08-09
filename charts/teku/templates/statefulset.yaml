@@ -1,5 +1,6 @@
 {{- $root := . -}}
-{{- range $i, $e := until (len $root.Values.global.executionEndpoints) }}
+{{- $endpoints := uniq .Values.global.executionEndpoints -}}
+{{- range $i, $e := until (len $endpoints) }}
 ---
 kind: StatefulSet
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
@@ -9,7 +10,7 @@ metadata:
     {{- include "common.labels.standard" $root | nindent 4 }}
     replicaID: {{ $i | quote }}
 spec:
-  replicas: {{ $root.Values.global.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" $root | nindent 6 }}
@@ -116,7 +117,7 @@ spec:
               --data-storage-archive-frequency={{ $root.Values.dataStorageArchiveFrequency }}
               --data-storage-mode={{ $root.Values.dataStorageMode }}
               --data-storage-non-canonical-blocks-enabled={{ $root.Values.dataStorageNonCanonicalBlocksEnabled }}
-              --ee-endpoint={{ index $root.Values.global.executionEndpoints $i }}
+              --ee-endpoint={{ index $endpoints $i }}
               --ee-jwt-secret-file=/secret/jwtsecret
             {{- if $root.Values.builderEndpoint }}
               --builder-endpoint={{ $root.Values.builderEndpoint }}

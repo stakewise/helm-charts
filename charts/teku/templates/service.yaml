@@ -1,6 +1,7 @@
 {{- if or .Values.restApi.enabled .Values.metrics.enabled }}
 {{- $root := . -}}
-{{- range $i, $e := until (len $root.Values.global.executionEndpoints) }}
+{{- $endpoints := uniq .Values.global.executionEndpoints -}}
+{{- range $i, $e := until (len $endpoints) }}
 ---
 apiVersion: v1
 kind: Service
