@@ -30,6 +30,12 @@ spec:
       protocol: TCP
       name: json-ws
   {{- end }}
+  {{- if $root.Values.global.JWTSecret }}
+    - port: {{ $root.Values.jsonrpc.engine.port }}
+      targetPort: engine
+      protocol: TCP
+      name: engine
+  {{- end }}
   {{- if $root.Values.global.metrics.enabled }}
     - port: {{ $root.Values.metrics.port }}
       targetPort: metrics

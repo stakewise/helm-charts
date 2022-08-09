@@ -117,6 +117,7 @@ spec:
               --JsonRpc.Host={{ $root.Values.jsonrpc.host }}
               --JsonRpc.Port={{ $root.Values.jsonrpc.ports.rest }}
               --JsonRpc.WebSocketsPort={{ $root.Values.jsonrpc.ports.websocket }}
+              --JsonRpc.AdditionalRpcUrls={{ $root.Values.jsonrpc.additionalRpcUrls }}
           {{- end }}
           {{- if $root.Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
@@ -160,6 +161,11 @@ spec:
             - name: json-ws
               containerPort: {{ $root.Values.jsonrpc.ports.websocket }}
               protocol: TCP
+          {{- end }}
+          {{- if $root.Values.global.JWTSecret }}
+            - name: engine
+              protocol: TCP
+              containerPort: {{ $root.Values.jsonrpc.engine.port }}
           {{- end }}
           {{- if $root.Values.global.metrics.enabled }}
             - name: metrics
