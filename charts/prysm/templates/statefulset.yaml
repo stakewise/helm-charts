@@ -1,6 +1,5 @@
 {{- $root := . -}}
-{{- $endpoints := uniq .Values.global.executionEndpoints -}}
-{{- range $i, $e := until (len $endpoints) }}
+{{- range $i, $e := until (len .Values.global.executionEndpoints) }}
 ---
 kind: StatefulSet
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
@@ -125,7 +124,7 @@ spec:
             - "--rpc-port={{ $root.Values.rpc.port }}"
             - "--accept-terms-of-use"
             - "--config-file=/config/config.yaml"
-            - "--http-web3provider={{ index $endpoints $i }}"
+            - "--http-web3provider={{ index $root.Values.global.executionEndpoints $i }}"
             - "--jwt-secret=/secret/jwtsecret"
           {{- if $root.Values.httpMevRelay }}
             - "--http-mev-relay={{ $root.Values.httpMevRelay }}"
