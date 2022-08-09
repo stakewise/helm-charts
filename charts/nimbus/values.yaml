@@ -2,7 +2,81 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
-replicaCount: 1
+global:
+  ## Eth2 network ID
+  ##
+  network: mainnet
+
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
+  ##
+  JWTSecret: ""
+
+  ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
+  ## Uses the same endpoint to populate the deposit cache.
+  ## A separate Statefulset will be created for each specified address
+  ##
+  executionEndpoints: []
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+  
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+  
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+  
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
@@ -24,15 +98,41 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v22.6.0"
+  tag: "multiarch-v22.7.0"
 
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
 imagePullSecrets: []
+
+## Provide a name in place of lighthouse for `app:` labels
+##
 nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
 fullnameOverride: ""
 
+# REST Server settings
+rest:
+  enabled: true
+  # Port of the REST server
+  port: "5052"
+  # Port name for the respective k8s service
+  portName: "rest"
+  # Listening address of the REST server
+  address: "0.0.0.0"
+  # Limit the access to the REST API to a particular hostname
+  allowOrigin: "*"
+
+## Extra flags to pass to the node
+##
+extraFlags: []
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -46,34 +146,49 @@ securityContext:
   fsGroup: 1000
   runAsUser: 1000
 
-service:
-  type: ClusterIP
-
-## Defines whether the service must be headless
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
-svcHeadless: false
+rbac:
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    ##
+    - apiGroups: [""]
+      resources:
+      - "nodes"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
+  ## Required Role rules
+  ##
+  rules:
+    ## Required to get information about the serices nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+      - "services"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
 
-## Configure session affinity for validator clients to hit the same beacon node
-## for the period specified in `timeoutSeconds`
-## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
-sessionAffinity:
-  # Whether to enable session affinity or not
-  enabled: true
-  # The session duration in seconds
-  timeoutSeconds: 86400
+nodeSelector: {}
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
 
 ## Used to assign priority to pods
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
@@ -96,27 +211,23 @@ verticalAutoscaler:
   updateMode: Off
   containerPolicies: {}
 
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
-nodeSelector: {}
-
-## Tolerations for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
-tolerations: {}
-
-## Affinity for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-##
-affinity: {}
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 ## Configure liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
 ## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
 livenessProbe:
-  enabled: true
   initialDelaySeconds: 900
   timeoutSeconds: 3
   periodSeconds: 30
@@ -128,8 +239,7 @@ livenessProbe:
     scheme: HTTP
 
 readinessProbe:
-  enabled: true
-  initialDelaySeconds: 60
+  initialDelaySeconds: 300
   timeoutSeconds: 3
   periodSeconds: 30
   failureThreshold: 30
@@ -139,50 +249,53 @@ readinessProbe:
     port: sidecar
     scheme: HTTP
 
-## If false, data ownership will not be reset at startup
-## This allows the geth node to be run with an arbitrary user
+## Defines whether the service must be headless
 ##
-initChownData: true
+svcHeadless: false
 
-## Whether or not to allocate persistent volume disk for the data directory.
-## In case of pod failure, the pod data directory will still persist.
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
 ##
-persistence:
+sessionAffinity:
+  # Whether to enable session affinity or not
   enabled: true
-  storageClassName: ""
-  accessModes:
-    - ReadWriteOnce
-  size: 300Gi
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
+## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
   annotations: {}
-
-
-## Nimbus: an Ethereum 1.0 and 2.0 Client for Resource-Restricted Devices
-##
-
-## Eth2 network ID
-##
-network: "mainnet"
-
-# RPC Server settings
-rpc:
-  enabled: true
-  # HTTP port for the JSON-RPC service
-  port: "9190"
-  # Listening address of the RPC server
-  address: 0.0.0.0
-# REST Server settings
-rest:
-  enabled: true
-  # Port of the REST server
-  port: "5052"
-  # Port name for the respective k8s service
-  portName: "rest"
-  # Listening address of the REST server
-  address: "0.0.0.0"
-
-## Extra flags to pass to the node
-##
-extraFlags: []
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAt: 31600
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
+  initContainer:
+    image:
+      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
+      ##
+      repository: bitnami/kubectl
+      ## @param p2pNodePort.initContainer.tag Container tag
+      ##
+      tag: "1.24"
+      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
+      ##
+      pullPolicy: IfNotPresent
 
 ## Monitoring
 ##
@@ -217,7 +330,7 @@ metrics:
     scrapeTimeout: ""
     ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
     ##
-    relabellings: []
+    relabelings: []
     ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []
@@ -246,3 +359,19 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ##
     rules: []
+
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 300Gi
+  annotations: {}
