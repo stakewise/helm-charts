@@ -164,7 +164,7 @@ spec:
             - name: ws
               containerPort: {{ $root.Values.ws.port }}
           {{- end }}
-          {{- if $root.Values.globalmetrics.enabled }}
+          {{- if $root.Values.global.metrics.enabled }}
             - name: metrics
               containerPort: {{ $root.Values.metrics.port }}
           {{- end }}
