@@ -121,6 +121,12 @@ spec:
             {{- if $root.Values.builderEndpoint }}
               --builder-endpoint={{ $root.Values.builderEndpoint }}
             {{- end }}
+            {{- if $root.Values.merge.enabled }}
+              --validators-proposer-default-fee-recipient={{ $root.Values.merge.feeRecipient }}
+            {{- end }}
+            {{- if $root.Values.global.checkPointSync.enabled }}
+              --initial-state={{ $root.Values.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
+            {{- end }}
               --p2p-enabled=true
               --p2p-port={{ include "teku.p2pPort" $root }}
             {{- if $root.Values.p2pNodePort.enabled }}
@@ -138,8 +144,8 @@ spec:
               --rest-api-cors-origins={{ $root.Values.restApi.corsOrigins | join "," }}
               --rest-api-docs-enabled={{ $root.Values.restApi.docsEnabled }}
             {{- end }}
-            {{- if $root.Values.metrics.enabled }}
-              --metrics-enabled={{ $root.Values.metrics.enabled }}
+            {{- if $root.Values.global.metrics.enabled }}
+              --metrics-enabled={{ $root.Values.global.metrics.enabled }}
               --metrics-categories={{ $root.Values.metrics.categories | join "," }}
               --metrics-host-allowlist={{ $root.Values.metrics.hostAllowList | join "," }}
               --metrics-interface={{ $root.Values.metrics.interface }}

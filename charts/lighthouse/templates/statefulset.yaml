@@ -117,6 +117,12 @@ spec:
               --http-address={{ $root.Values.http.address }}
               --http-allow-origin={{ $root.Values.http.allowOrigin }}
             {{- end}}
+            {{- if $root.Values.global.checkPointSync.enabled }}
+              --checkpoint-sync-url={{ $root.Values.global.checkPointSync.url }}
+            {{- end }}
+            {{- if $root.Values.merge.enabled }}
+              --suggested-fee-recipient={{ $root.Values.merge.feeRecipient }}
+            {{- end }}
               --execution-endpoint={{ index $root.Values.global.executionEndpoints $i }}
               --execution-jwt=/secret/jwtsecret
               --datadir=/data
@@ -134,7 +140,7 @@ spec:
               --enr-tcp-port={{ include "lighthouse.p2pPort" $root }}
               --enr-udp-port={{ include "lighthouse.p2pPort" $root }}
             {{- end }}
-            {{- if $root.Values.metrics.enabled }}
+            {{- if $root.Values.global.metrics.enabled }}
             {{- range $root.Values.metrics.flags }}
               {{ . }}
             {{- end }}
