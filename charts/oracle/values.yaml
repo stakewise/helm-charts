@@ -66,8 +66,8 @@ settings:
   ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
   ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
   ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
-  pyIpfsHttpClientDefaultUsername: ""
-  pyIpfsHttpClientDefaultPassword: ""
+  infuraIpfsClientUsername: ""
+  infuraIpfsClientPassword: ""
 
   sentryDsn: ""
 
