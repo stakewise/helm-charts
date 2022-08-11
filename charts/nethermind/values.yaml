@@ -132,10 +132,13 @@ jsonrpc:
       - Parity
       - Health
       - Engine
-  host: 0.0.0.0
+  host: "0.0.0.0"
   ports:
-    rest: 8545
-    websocket: 8546
+    rest: "8545"
+    websocket: "8546"
+  engine:
+    port: "8551"
+  additionalRpcUrls: "http://0.0.0.0:8551|http;ws|net;eth;subscribe;engine;web3;client"
 
 merge:
   # Defines whether the Merge plugin is enabled bundles are allowed.

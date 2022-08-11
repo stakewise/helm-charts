@@ -110,25 +110,34 @@ fullnameOverride: ""
 # empty string means not to start the listener.
 # Do not expose to public network.
 # Serves remote database interface (default: "127.0.0.1:9090")
-privateApiAddr: 127.0.0.1:9090
-# HTTP-RPC server listening interface
-httpAddr: 0.0.0.0
-# Comma separated list of virtual hostnames from which to accept requests (server enforced).
-# Accepts '*' wildcard
-httpVhosts: "*"
-# Comma separated list of domains from which to accept cross origin requests (browser enforced)
-httpCorsDomain: "*"
-# API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
-# Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
-httpApi: "eth,erigon,web3,net,txpool,engine"
+privateApiAddr: "127.0.0.1:9090"
+
+# http rpc endpoint settings
+http:
+  enabled: true
+  port: "8545"
+  # HTTP-RPC server listening interface
+  addr: "0.0.0.0"
+  # Comma separated list of virtual hostnames from which to accept requests (server enforced).
+  # Accepts '*' wildcard
+  vhosts: "*"
+  # Comma separated list of domains from which to accept cross origin requests (browser enforced)
+  corsDomain: "*"
+  # API's offered over the HTTP-RPC interface: eth,erigon,web3,net,debug,trace,txpool,db.
+  # Supported methods: https://github.com/ledgerwatch/erigon/tree/devel/cmd/rpcdaemon
+  api: "eth,erigon,web3,net,txpool,engine"
+
 # Manually specify TerminalTotalDifficulty, overriding the bundled setting
 terminalTotalDifficulty: ""
+
+grpcPort: "9090"
 
 ## AuthRPC configuration.
 ##
 authRpc:
   port: "8551"
   vhosts: "*"
+  addr: "0.0.0.0"
 
 ## Extra flags for mainnet network
 ##
@@ -189,15 +198,6 @@ rbac:
 ## Defines whether the service must be headless
 ##
 svcHeadless: false
-
-service:
-  type: ClusterIP
-  port:
-    # HTTP-RPC server listening port
-    rpc: 8545
-    grpc: 9090
-    # HTTP-RPC server listening port for the engineAPI
-    engine: 8551
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
 ## This will generate a service for each replica, with a port binding via NodePort.

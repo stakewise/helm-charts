@@ -1,6 +1,6 @@
 {{- $root := . -}}
 {{- range $i, $e := until (int $root.Values.global.replicaCount) }}
-{{- if or $root.Values.rpc.enabled $root.Values.ws.enabled }}
+{{- if or $root.Values.http.enabled $root.Values.ws.enabled }}
 ---
 apiVersion: v1
 kind: Service
@@ -26,17 +26,17 @@ spec:
       port: {{ $root.Values.authRpc.port }}
       targetPort: authrpc
   {{- end }}
-  {{- if $root.Values.rpc.enabled }}
-    - name: rpc
-      port: {{ $root.Values.rpc.port }}
-      targetPort: rpc
+  {{- if $root.Values.http.enabled }}
+    - name: http
+      port: {{ $root.Values.http.port }}
+      targetPort: http
   {{- end }}
   {{- if $root.Values.ws.enabled }}
     - name: ws
       port: {{ $root.Values.ws.port }}
       targetPort: ws
   {{- end }}
-  {{- if $root.Values.metrics.enabled }}
+  {{- if $root.Values.global.metrics.enabled }}
     - name: metrics
       port: {{ $root.Values.metrics.port }}
       targetPort: metrics

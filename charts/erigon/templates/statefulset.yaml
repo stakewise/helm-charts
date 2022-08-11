@@ -109,21 +109,23 @@ spec:
               --override.terminaltotaldifficulty={{ $root.Values.terminalTotalDifficulty }}
           {{- end }}
               --private.api.addr={{ $root.Values.privateApiAddr }}
-              --http.addr={{ $root.Values.httpAddr }}
-              --http.vhosts={{ $root.Values.httpVhosts }}
-              --http.corsdomain={{ $root.Values.httpCorsDomain }}
-              --http.api={{ $root.Values.httpApi }}
-              --http.port={{ $root.Values.service.port.rpc }}
+          {{- if $root.Values.http.enabled}}
+              --http.addr={{ $root.Values.http.addr }}
+              --http.vhosts={{ $root.Values.http.vhosts }}
+              --http.corsdomain={{ $root.Values.http.corsDomain }}
+              --http.api={{ $root.Values.http.api }}
+              --http.port={{ $root.Values.http.port }}
+          {{- end }}
           {{- if $root.Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
-              --authrpc.addr=0.0.0.0
+              --authrpc.addr={{ $root.Values.authRpc.addr }}
               --authrpc.port={{ $root.Values.authRpc.port }}
               --authrpc.vhosts={{ $root.Values.authRpc.vhosts }}
           {{- end }}
           {{- range $root.Values.extraFlags }}
               {{ . }}
           {{- end }}
-          {{- if $root.Values.metrics.enabled }}
+          {{- if $root.Values.global.metrics.enabled }}
               --metrics
               --metrics.addr={{ $root.Values.metrics.addr }}
               --metrics.port={{ $root.Values.metrics.port }}
@@ -137,16 +139,18 @@ spec:
           ports:
             - name: grpc
               protocol: TCP
-              containerPort: {{ $root.Values.service.port.grpc }}
-            - name: rpc
+              containerPort: {{ $root.Values.grpcPort }}
+          {{- if $root.Values.http.enabled }}
+            - name: http
               protocol: TCP
-              containerPort: {{ $root.Values.service.port.rpc }}
-            {{- if $root.Values.global.JWTSecret }}
+              containerPort: {{ $root.Values.http.port }}
+          {{- end }}
+          {{- if $root.Values.global.JWTSecret }}
             - name: authrpc
               protocol: TCP
               containerPort: {{ $root.Values.authRpc.port }}
-            {{- end }}
-          {{- if $root.Values.metrics.enabled }}
+          {{- end }}
+          {{- if $root.Values.global.metrics.enabled }}
             - name: metrics
               protocol: TCP
               containerPort: {{ $root.Values.metrics.port }}
@@ -180,7 +184,7 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ $root.Values.service.port.rpc | quote }}
+              value: {{ $root.Values.http.port | quote }}
           ports:
             - containerPort: {{ $root.Values.sidecar.bindPort }}
               name: sidecar
