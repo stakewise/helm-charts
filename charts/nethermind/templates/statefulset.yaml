@@ -117,7 +117,7 @@ spec:
               --JsonRpc.Host={{ $root.Values.jsonrpc.host }}
               --JsonRpc.Port={{ $root.Values.jsonrpc.ports.rest }}
               --JsonRpc.WebSocketsPort={{ $root.Values.jsonrpc.ports.websocket }}
-              --JsonRpc.AdditionalRpcUrls={{ $root.Values.jsonrpc.additionalRpcUrls }}
+              --JsonRpc.AdditionalRpcUrls="http://{{ $root.Values.jsonrpc.engine.host }}:{{ $root.Values.jsonrpc.engine.port }}|http;ws|net;eth;subscribe;engine;web3;client"
           {{- end }}
           {{- if $root.Values.global.JWTSecret }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret

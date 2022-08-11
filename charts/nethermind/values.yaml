@@ -138,7 +138,7 @@ jsonrpc:
     websocket: "8546"
   engine:
     port: "8551"
-  additionalRpcUrls: "http://0.0.0.0:8551|http;ws|net;eth;subscribe;engine;web3;client"
+    host: "0.0.0.0"
 
 merge:
   # Defines whether the Merge plugin is enabled bundles are allowed.
