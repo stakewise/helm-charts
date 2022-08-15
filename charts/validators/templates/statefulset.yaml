@@ -88,8 +88,8 @@ spec:
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
               cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
-              echo "validators-external-signer-public-keys: $(cat /data/validator_keys.csv)" > /data/config;
-              echo "validators-external-signer-public-keys: $(cat /data/validator_keys.csv)" >> /data/config_gnosis_prysm;
+              cat /data/signer_keys.yml > /data/config;
+              cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
