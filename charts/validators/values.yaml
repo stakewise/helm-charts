@@ -2,6 +2,9 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  imagePullSecrets: []
+
 ## Provide a name in place of operator for `app:` labels
 ##
 nameOverride: ""
@@ -34,7 +37,7 @@ initImageBusybox:
 ##
 cliImage:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.1.10"
+  tag: "v1.2.3"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -86,6 +89,9 @@ validatorsKeyIndex: 0
 ##
 validatorsCount: 0
 
+global:
+  imagePullSecrets: []
+
 ## Default fee recipient for all validator keys.
 ##
 suggestedFeeRecipient: ""
@@ -97,7 +103,7 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.1.4-rc.0"
+    tag: "v2.1.4"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
