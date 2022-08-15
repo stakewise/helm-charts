@@ -89,9 +89,6 @@ validatorsKeyIndex: 0
 ##
 validatorsCount: 0
 
-global:
-  imagePullSecrets: []
-
 ## Default fee recipient for all validator keys.
 ##
 suggestedFeeRecipient: ""
