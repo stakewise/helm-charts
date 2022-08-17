@@ -134,7 +134,7 @@ spec:
               --enr-tcp-port={{ include "lighthouse.p2pPort" $root }}
               --enr-udp-port={{ include "lighthouse.p2pPort" $root }}
             {{- end }}
-            {{- if $root.Values.metrics.enabled }}
+            {{- if $root.Values.global.metrics.enabled }}
             {{- range $root.Values.metrics.flags }}
               {{ . }}
             {{- end }}
@@ -151,7 +151,7 @@ spec:
             - containerPort: {{ $root.Values.http.port }}
               protocol: TCP
               name: {{ $root.Values.http.portName }}
-          {{- if $root.Values.metrics.enabled }}
+          {{- if $root.Values.global.metrics.enabled }}
             - containerPort: {{ $root.Values.metrics.port }}
               name: metrics
               protocol: TCP
