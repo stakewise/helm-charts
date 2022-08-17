@@ -1,4 +1,4 @@
-{{- if or .Values.restApi.enabled .Values.metrics.enabled }}
+{{- if or .Values.restApi.enabled .Values.global.metrics.enabled }}
 {{- $root := . -}}
 {{- range $i, $e := until (len .Values.global.executionEndpoints) }}
 ---
@@ -27,7 +27,7 @@ spec:
       protocol: TCP
       name: {{ $root.Values.restApi.portName }}
   {{- end }}
-  {{- if $root.Values.metrics.enabled }}
+  {{- if $root.Values.global.metrics.enabled }}
     - port: {{ $root.Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
