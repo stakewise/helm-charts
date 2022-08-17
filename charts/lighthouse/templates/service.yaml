@@ -8,7 +8,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" $root | nindent 4 }}
     repliaID: {{ $i | quote }}
-{{- if and $root.Values.metrics.enabled $root.Values.metrics.svcAnnotations }}
+{{- if and $root.Values.global.metrics.enabled $root.Values.metrics.svcAnnotations }}
   annotations:
     {{ toYaml $root.Values.metrics.svcAnnotations | nindent 4 | trim }}
 {{- end }}
@@ -30,7 +30,7 @@ spec:
     - name: {{ $root.Values.http.portName }}
       port: {{ $root.Values.http.port }}
       targetPort: {{ $root.Values.http.portName }}
-  {{- if $root.Values.metrics.enabled }}
+  {{- if $root.Values.global.metrics.enabled }}
     - name: metrics
       port: {{ $root.Values.metrics.port }}
       targetPort: metrics
