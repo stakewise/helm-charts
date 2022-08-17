@@ -172,7 +172,7 @@ spec:
           {{- end }}
           {{- with $root.Values.resources }}
           resources:
-            {{ toYaml . | nindent 16 | trim }}
+            {{ toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
             - name: data
