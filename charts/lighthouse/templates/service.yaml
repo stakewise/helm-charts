@@ -7,7 +7,7 @@ metadata:
   name: {{ include "common.names.fullname" $root }}-{{ $i }}
   labels:
     {{- include "common.labels.standard" $root | nindent 4 }}
-    repliaID: {{ $i | quote }}
+    replicaID: {{ $i | quote }}
 {{- if and $root.Values.global.metrics.enabled $root.Values.metrics.svcAnnotations }}
   annotations:
     {{ toYaml $root.Values.metrics.svcAnnotations | nindent 4 | trim }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     {{- include "common.labels.matchLabels" $root | nindent 4 }}
-    repliaID: {{ $i | quote }}
+    replicaID: {{ $i | quote }}
 {{- if $root.Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
