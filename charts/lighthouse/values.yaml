@@ -102,7 +102,7 @@ sidecar:
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   repository: "sigp/lighthouse"
-  tag: "v2.5.1"
+  tag: "v3.0.0"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
