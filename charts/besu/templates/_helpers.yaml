@@ -1,0 +1,3 @@
+{{- define "besu.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
