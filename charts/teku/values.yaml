@@ -266,7 +266,7 @@ readinessProbe:
     scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
-## This allows the geth node to be run with an arbitrary user
+## This allows the node to be run with an arbitrary user
 ##
 initChownData: true
 
