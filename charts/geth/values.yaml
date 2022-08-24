@@ -95,7 +95,7 @@ sidecar:
 ##
 image:
   repository: "ethereum/client-go"
-  tag: "v1.10.22"
+  tag: "v1.10.23"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry

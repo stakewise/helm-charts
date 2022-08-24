@@ -100,7 +100,7 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v2.1.4"
+    tag: "v3.0.0"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
@@ -161,7 +161,6 @@ flags:
     - "--accept-terms-of-use"
     - "--disable-rewards-penalties-logging"
     - "--disable-account-metrics"
-    - "--enable-doppelganger"
   lighthouse:
     - "lighthouse"
     - "vc"
