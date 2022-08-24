@@ -157,7 +157,7 @@ sidecar:
 ##
 image:
   repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-  tag: "v2.1.4"
+  tag: "v3.0.0"
   pullPolicy: IfNotPresent
 imageGnosis:
   repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
