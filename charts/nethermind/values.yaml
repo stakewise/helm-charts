@@ -96,7 +96,7 @@ image:
   repository: nethermind/nethermind
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.13.6"
+  tag: "1.14.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -139,6 +139,13 @@ jsonrpc:
   engine:
     port: "8551"
     host: "0.0.0.0"
+    modules:
+      - Net
+      - Eth
+      - Subscribe
+      - Engine
+      - Web3
+      - Client
 
 merge:
   # Defines whether the Merge plugin is enabled bundles are allowed.
