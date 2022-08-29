@@ -94,7 +94,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2022.08.02"
+  tag: "v2022.08.03"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
