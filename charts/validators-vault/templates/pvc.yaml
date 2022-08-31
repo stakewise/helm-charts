@@ -1,0 +1,22 @@
+{{- if .Values.persistence.enabled }}
+{{- $root := . -}}
+{{- $step := .Values.validatorsIndexStart }}
+{{- range (untilStep (int .Values.validatorsIndexStart ) (int .Values.validatorsIndexEnd) 1) }}
+  {{- $step = int (add1 $step) }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: data-validator{{$step}}
+  labels:
+    {{- include "validators.labels" $root | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
+spec:
+  accessModes: {{ $root.Values.persistence.accessModes }}
+  storageClassName: {{ $root.Values.persistence.storageClassName }}
+  resources:
+    requests:
+      storage: {{ $root.Values.persistence.size | quote }}
+{{- end }}
+{{- end }}

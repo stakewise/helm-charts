@@ -1,0 +1,207 @@
+{{- if .Values.enabled }}
+{{- $root := . -}}
+{{- $counter := 0 }}
+{{- $step := .Values.validatorsIndexStart }}
+{{- range (untilStep (int .Values.validatorsIndexStart ) (int .Values.validatorsIndexEnd) 1) }}
+  {{- $step = int (add1 $step) }}
+{{ $rpcEndpoints := list }}
+{{- if $.Values.beaconChainRpcEndpointsRandomized }}
+{{- $rpcList := list }}
+{{- range (untilStep $counter (len $.Values.beaconChainRpcEndpointsRandomized) 1) }}
+{{ $rpcList = append $rpcList (index $.Values.beaconChainRpcEndpointsRandomized .) }}
+{{- end }}
+{{ $rpcList = append $rpcList $.Values.beaconChainRpcEndpointsRandomized }}
+{{ $rpcEndpoints = include "flatten" $rpcList }}
+{{- if ge $counter (len $.Values.beaconChainRpcEndpointsRandomized) }}
+  {{- $counter = 1 }}
+{{- else }}
+  {{ $counter = int (add1 $counter) }}
+{{- end }}
+{{- end }}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "validators.fullname" $root }}-validator{{$step}}
+  labels:
+    {{- include "validator.labels" $root | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "validators.selectorLabels" $root | nindent 6 }}
+  serviceName: {{ template "validators.fullname" $root }}
+  template:
+    metadata:
+      labels:
+        {{- include "validators.selectorLabels" $root | nindent 8 }}
+      annotations:
+        checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
+    spec:
+    {{- with $root.Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ . }}
+    {{- end }}
+    {{- with $root.Values.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with $root.Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: "validator{{$step}}"
+      priorityClassName: {{ $root.Values.priorityClassName | quote }}
+      initContainers:
+        - name: init-validator
+          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: VAULT_ADDR
+              value: {{ $root.Values.vault.endpoint | quote }}
+            - name: NETWORK_ID
+              value: {{ $root.Values.network | quote }}
+            - name: VALIDATOR_TYPE
+              value: {{ $root.Values.type | quote }}
+            - name: VALIDATORS_MOUNT_PATH
+              value: {{ $root.Values.vault.validatorsMountPath | quote }}
+            - name: KUBERNETES_AUTH_NAME
+              value: {{ $root.Values.vault.kubernetesAuthName | quote }}
+            - name: SERVICE_ACCOUNT
+              value: "validator{{$step}}"
+            - name: REIMPORT
+              value: {{ $root.Values.reimportKeystores | quote }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: configs
+              mountPath: "/mnt/configs"
+          {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
+            - name: configs-gnosis-prysm
+              mountPath: "/data/configs-gnosis-prysm"
+          {{- end }}
+            - name: validator-init
+              mountPath: /data/scripts
+      {{- if $.Values.persistence.enabled }}
+        {{- include "init-validator-info" $root | nindent 8 }}
+      {{- end }}
+      {{- if and $.Values.persistence.enabled $.Values.initChownData }}
+        {{- include "init-chown" $root | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: validator
+          image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          {{- if (eq $root.Values.type "teku") }}
+          securityContext:
+            runAsUser: 0
+          {{- end }}
+          args:
+          {{- range (pluck $root.Values.type $root.Values.flags | first) }}
+            - {{ . | quote }}
+          {{- end -}}
+          {{- if $root.Values.merge.enabled }}
+          {{- if (eq $root.Values.type "teku") }}
+            - "--validators-proposer-default-fee-recipient={{ $root.Values.merge.feeRecipient }}"
+          {{- if $root.Values.mevBoost.enabled }}
+            - "--validators-proposer-blinded-blocks-enabled=true"
+            - "--validators-builder-registration-default-enabled=true"
+            - "--Xvalidators-builder-registration-default-gas-limit={{ $root.Values.mevBoost.gasLimit }}"
+            - "--Xvalidators-builder-registration-sending-batch-size={{ $root.Values.mevBoost.batchSize }}"
+          {{- end }}
+          {{- end }}
+          {{- if (eq $root.Values.type "lighthouse") }}
+            - "--suggested-fee-recipient={{ $root.Values.merge.feeRecipient }}"
+          {{- if $root.Values.mevBoost.enabled }}
+            - "--private-tx-proposals"
+          {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
+            - "--{{ $root.Values.network }}"
+          {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
+            - "--config-file /data/configs-gnosis-prysm/config.yaml"
+            - "--chain-config-file /data/configs-gnosis-prysm/config.yaml"
+          {{- else if (eq $root.Values.type "lighthouse") }}
+            - "--network={{ $root.Values.network }}"
+          {{- end }}
+          {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
+            - {{ . | quote }}
+          {{- end -}}
+        {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if eq $.Values.type "prysm" }}
+            - "--beacon-rpc-provider={{ $rpcEndpoints }}"
+          {{- else if eq $.Values.type "lighthouse" }}
+            - "--beacon-nodes={{ $rpcEndpoints }}"
+          {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if gt $beaconChainRpcEndpointsLen 1 }}
+          {{- fail "Teku supports only one beacon node host, please specify one host." }}
+          {{- else }}
+            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+          {{- end }}
+          {{- end }}
+        {{- else }}
+          {{- include "beacon-rpc-node" $ | nindent 12 }}
+        {{- end }}
+          {{- include "validator-graffiti" $ | nindent 12 }}
+          {{- if $root.Values.metrics.enabled }}
+            {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
+            - {{ . | quote }}
+            {{- end }}
+          {{- end }}
+        {{- if $root.Values.metrics.enabled }}
+          ports:
+            - containerPort: {{ $root.Values.metrics.port }}
+              name: metrics
+              protocol: TCP
+        {{- end }}
+        {{- with $root.Values.resources }}
+          resources:
+            {{ toYaml . | nindent 16 | trim }}
+        {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: configs
+              mountPath: "/mnt/configs"
+        {{- with (pluck $root.Values.type $root.Values.readinessProbe | first) }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- with (pluck $root.Values.type $root.Values.livenessProbe | first) }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+        {{- end }}
+      volumes:
+        - name: configs
+          configMap:
+            name: {{ template "validators.fullname" $root }}-configs
+      {{- if and (eq $root.Values.network "gnosis") (eq $root.Values.type "prysm") }}
+        - name: configs-gnosis-prysm
+          configMap:
+            name: {{ template "validators.fullname" $root }}-configs-gnosis-prysm
+      {{- end }}
+        - name: validator-init
+          configMap:
+            name: {{ template "validators.fullname" $root }}-init
+{{- if (not $root.Values.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+{{- else }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: data-validator{{$step}}
+{{- end }}
+
+{{- end }}
+{{- end }}

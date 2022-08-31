@@ -1,0 +1,26 @@
+{{- if .Values.verticalAutoscaler.enabled }}
+{{- $root := . -}}
+{{- $step := .Values.validatorsIndexStart }}
+{{- range (untilStep (int .Values.validatorsIndexStart ) (int .Values.validatorsIndexEnd) 1) }}
+  {{- $step = int (add1 $step) }}
+---
+apiVersion: autoscaling.k8s.io/v1beta2
+kind: VerticalPodAutoscaler
+metadata:
+  name: {{ template "validators.fullname" $root }}-validator{{$step}}
+  labels:
+    {{- include "validators.labels" $root | nindent 4 }}
+spec:
+  targetRef:
+    apiVersion: "apps/v1"
+    kind: StatefulSet
+    name: {{ template "validators.fullname" $root }}-validator-{{$step}}
+  updatePolicy:
+    updateMode: {{ $root.Values.verticalAutoscaler.updateMode | default "Off" | quote }}
+  {{- if $root.Values.verticalAutoscaler.containerPolicies }}
+  resourcePolicy:
+    containerPolicies:
+      {{ tpl $root.Values.verticalAutoscaler.containerPolicies $root | nindent 6 | trim }}
+  {{- end }}
+{{- end }}
+{{- end }}
