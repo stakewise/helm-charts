@@ -25,6 +25,13 @@ global:
   ##
   imagePullSecrets: []
 
+  ## To get Teku up and running in only a few minutes
+  ## from a recent finalized checkpoint state rather than syncing from genesis.
+  ##
+  checkPointSync:
+    enabled: false
+    url: ""
+
   ## Service account
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ## Additional settings could be made in non-global section.
@@ -298,6 +305,13 @@ builderEndpoint: ""
 ## Extra flags for teku beacon chain node
 ##
 extraFlags: []
+
+merge:
+  # Defines whether the Merge plugin is enabled bundles are allowed.
+  enabled: false
+  # Account to be used by the block author.
+  # If it is not specified the address zero will be used.
+  feeRecipient: ""
 
 # Sets the frequency, in slots, at which to store
 # finalized states to disk. This option is ignored

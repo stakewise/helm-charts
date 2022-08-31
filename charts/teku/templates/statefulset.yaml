@@ -121,6 +121,12 @@ spec:
             {{- if $root.Values.builderEndpoint }}
               --builder-endpoint={{ $root.Values.builderEndpoint }}
             {{- end }}
+            {{- if $root.Values.merge.enabled }}
+              --validators-proposer-default-fee-recipient={{ $root.Values.merge.feeRecipient }}
+            {{- end }}
+            {{- if $root.Values.global.checkPointSync.enabled }}
+              --initial-state={{ $root.Values.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
+            {{- end }}
               --p2p-enabled=true
               --p2p-port={{ include "teku.p2pPort" $root }}
             {{- if $root.Values.p2pNodePort.enabled }}
