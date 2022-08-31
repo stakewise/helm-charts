@@ -87,8 +87,6 @@ data:
                 echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
             fi
         done <${VAULT}/keystores.txt
-
-        echo "$(cat ${VAULT}/keystores.txt)"
     
         if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
           echo "No keys available to start. Check that Vault is running and there are keys in it"
