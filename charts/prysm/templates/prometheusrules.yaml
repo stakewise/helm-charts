@@ -16,15 +16,16 @@ metadata:
     {{- end }}
 spec:
   groups:
-  {{- with .Values.metrics.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}
+  {{- range $i, $e := until (len .Values.global.executionEndpoints) }}
+  {{- with $.Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}-{{ $i }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if .Values.metrics.prometheusRule.default }}
-    - name: {{ include "common.names.fullname" $ }}-default
+  {{- if $.Values.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-{{ $i }}-default
       rules:
         - alert: PrysmBeaconNodeDown
-          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          expr: up{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} == 0
           for: 1m
           labels:
             severity: critical
@@ -32,7 +33,7 @@ spec:
             summary: Prysm beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: Prysm50SlotsBehind
-          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
+          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" $ }}-{{ $i }}'}-beacon_head_slot{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} > 50
           for: 2m
           labels:
             severity: critical
@@ -40,7 +41,7 @@ spec:
             summary: Prysm beacon node is out of sync
             description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: PrysmParticipationRateLessThen66Percent
-          expr: beacon_prev_epoch_target_gwei{job='{{ include "common.names.fullname" . }}'}/beacon_prev_epoch_active_gwei{job='{{ include "common.names.fullname" . }}'}*100 < 66
+          expr: beacon_prev_epoch_target_gwei{job='{{ include "common.names.fullname" $ }}-{{ $i }}'}/beacon_prev_epoch_active_gwei{job='{{ include "common.names.fullname" $ }}-{{ $i }}'}*100 < 66
           for: 5m
           labels:
             severity: critical
@@ -48,12 +49,13 @@ spec:
             summary: Prysm beacon node participation rate less then 66%
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: PrysmBeaconNodeRestarted
-          expr: (time()-process_start_time_seconds{job='{{ include "common.names.fullname" . }}'})/3600 < 0.1
+          expr: (time()-process_start_time_seconds{job='{{ include "common.names.fullname" $ }}-{{ $i }}'})/3600 < 0.1
           for: 1m
           labels:
             severity: warning
           annotations:
             summary: Prysm beacon node was restarted
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- end }}
   {{- end }}
 {{- end }}
