@@ -62,6 +62,10 @@ fullnameOverride: ""
 ## Options: mainnet, prater, gnosis
 network: "mainnet"
 
+## Sets logging verbosity.
+## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
+loggingLevel: "INFO"
+
 ## Number of epochs to keep when pruning the slashing protection database.
 ##
 pruningEpochToKeep: 100
