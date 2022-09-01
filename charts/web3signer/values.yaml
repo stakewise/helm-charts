@@ -60,7 +60,7 @@ fullnameOverride: ""
 
 ## Network
 ## Options: mainnet, prater, gnosis
-network: "prater"
+network: "mainnet"
 
 ## Number of epochs to keep when pruning the slashing protection database.
 ##
