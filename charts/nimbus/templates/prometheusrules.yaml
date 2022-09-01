@@ -16,20 +16,22 @@ metadata:
     {{- end }}
 spec:
   groups:
-  {{- with .Values.metrics.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}
+  {{- range $i, $e := until (len .Values.global.executionEndpoints) }}
+  {{- with $.Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}-{{ $i }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if .Values.metrics.prometheusRule.default }}
-    - name: {{ include "common.names.fullname" $ }}-default
+  {{- if $.Values.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-{{ $i }}-default
       rules:
         - alert: NimbusBeaconNodeDown
-          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          expr: up{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} == 0
           for: 1m
           labels:
             severity: critical
           annotations:
             summary: Nimbus beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- end }}
   {{- end }}
 {{- end }}
