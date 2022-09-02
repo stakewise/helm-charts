@@ -150,6 +150,7 @@ spec:
           {{- else }}
             - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
           {{- end }}
+          {{- end }}
         {{- else }}
           {{- include "beacon-rpc-node" $ | nindent 12 }}
         {{- end }}
