@@ -72,7 +72,7 @@ spec:
           env:
             - name: WEB3SIGNER_URL
               value: {{ $root.Values.web3signerEndpoint }}
-          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}"]
+          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}", "--network", "{{ $root.Values.network }}"]
           volumeMounts:
             - name: data
               mountPath: /data
@@ -85,11 +85,13 @@ spec:
             - sh
             - -c
             - >
+              ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
               cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
+              cat /data/proposerConfig.json;
               echo "" >>
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
@@ -116,12 +118,14 @@ spec:
             - "--config-file /data/config_gnosis_prysm"
             - "--chain-config-file /data/config_gnosis_prysm"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- end }}
 
             {{- if eq $root.Values.type "teku" }}
