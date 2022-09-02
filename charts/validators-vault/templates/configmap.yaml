@@ -85,7 +85,7 @@ data:
         jq -c '.[]' ${VAULT}/keystores.json | while read key; do
             key_name=$(echo $key | jq --raw-output '.[1]')
             key_content=$(echo $key | jq --raw-output '.[2]')
-            echo $key_content > $key_name
+            echo $key_content > ${VAULT_KEYSTORES}/$key_name
         done
 
         if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
