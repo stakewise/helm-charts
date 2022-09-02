@@ -81,9 +81,8 @@ data:
         echo ${PASSWORD} > ${VAULT_PASSWORD}
     
         # Preparing keystores for import
-        echo "$(vault kv get -field=keystore -version=1 -format=json ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT})" 2>&1 > ${VAULT}/keystores.json
-        cat ${VAULT}/keystores.json
-        jq -c '.[]' ${VAULT}/keystore.json | while read key; do
+        echo "$(vault kv get -field=keystore -version=1 -format=json ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT})" > ${VAULT}/keystores.json
+        jq -c '.[]' ${VAULT}/keystores.json | while read key; do
             key_name=$(echo $key | jq --raw-output '.[1]')
             key_content=$(echo $key | jq --raw-output '.[2]')
             echo $key_content > $key_name
