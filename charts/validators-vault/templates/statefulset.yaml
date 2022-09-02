@@ -143,12 +143,12 @@ spec:
             - "--beacon-rpc-provider={{ $rpcEndpoints }}"
           {{- else if eq $.Values.type "lighthouse" }}
             - "--beacon-nodes={{ $rpcEndpoints }}"
+          {{- else if eq $.Values.type "teku" }}
           {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
           {{- if gt $beaconChainRpcEndpointsLen 1 }}
-          {{- fail "Teku supports only one beacon node host, please specify one host." }}
+            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
           {{- else }}
             - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
-          {{- end }}
           {{- end }}
         {{- else }}
           {{- include "beacon-rpc-node" $ | nindent 12 }}

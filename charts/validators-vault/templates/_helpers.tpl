@@ -108,9 +108,9 @@ Validator beacon node
 {{- else if eq $.Values.type "teku" }}
 {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpoints }}
 {{- if gt $beaconChainRpcEndpointsLen 1 }}
-{{- fail "Teku supports only one beacon node host, please specify one host." }}
+- "--beacon-node-api-endpoints={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else }}
-- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints }}"
 {{- end }}
 {{- end }}
 {{- end }}
