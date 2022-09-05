@@ -95,7 +95,7 @@ Validator beacon node
 {{- if gt $beaconChainRpcEndpointsLen 1 }}
 - "--beacon-node-api-endpoints={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else }}
-- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints }}"
+- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}
 {{- end }}
 {{- end }}

@@ -171,3 +171,20 @@ data:
     # 2**9 (= 512)
     # assert EPOCHS_PER_SYNC_COMMITTEE_PERIOD * SLOTS_PER_EPOCH <= SLOTS_PER_HISTORICAL_ROOT
     EPOCHS_PER_SYNC_COMMITTEE_PERIOD: 512
+
+{{- if .Values.feeOverride }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "validators.fullname" . }}-override-fee-recipient
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+data:
+  feeOverride.json: |-
+    {{- .Values.feeOverride | nindent 4 }}
+{{- end }}

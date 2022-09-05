@@ -4,6 +4,7 @@
 
 global:
   imagePullSecrets: []
+  network: mainnet
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -201,6 +202,11 @@ beaconChainRpcEndpointsRandomized: []
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
 ##
 graffiti: ""
+
+## Override fees for solo validators
+## used for stakewise solo validators only
+##
+feeOverride: ""
 
 ## Monitoring
 ##
