@@ -22,7 +22,7 @@ image:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/validator-monitor
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.0.7"
+  tag: "v1.0.0"
 
 imagePullSecrets: []
 nameOverride: ""
