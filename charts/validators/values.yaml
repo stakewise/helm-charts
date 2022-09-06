@@ -100,7 +100,7 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v3.0.0"
+    tag: "v3.1.0"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
