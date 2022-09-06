@@ -274,24 +274,22 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ## e.g:
     ## rules:
-    ##   prysm:
-    ##     - alert: PrysmValidatorHourlyEarningLessOrEqual0
-    ##       expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
-    ##       for: 5m
-    ##       labels:
-    ##         severity: critical
-    ##       annotations:
-    ##         summary: Prysm validator hourly earning <= 0
-    ##         description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##     - alert: PrysmValidatorAlotOfErrorsLastHour
-    ##       expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
-    ##       for: 5m
-    ##       labels:
-    ##         severity: warning
-    ##       annotations:
-    ##         summary: Many validator errors or warnings last hour
-    ##         description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##   lighthouse: []
+    ##   - alert: PrysmValidatorHourlyEarningLessOrEqual0
+    ##     expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+    ##     for: 5m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm validator hourly earning <= 0
+    ##       description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmValidatorAlotOfErrorsLastHour
+    ##     expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
+    ##     for: 5m
+    ##     labels:
+    ##       severity: warning
+    ##     annotations:
+    ##       summary: Many validator errors or warnings last hour
+    ##       description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
     ##
     rules: {}
 
