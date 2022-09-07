@@ -120,6 +120,9 @@ spec:
             {{- if $root.Values.global.checkPointSync.enabled }}
               --checkpoint-sync-url={{ $root.Values.global.checkPointSync.url }}
             {{- end }}
+            {{- if $root.Values.builderEndpoint }}
+              --builder={{ $root.Values.builderEndpoint }}
+            {{- end }}
             {{- if $root.Values.merge.enabled }}
               --suggested-fee-recipient={{ $root.Values.merge.feeRecipient }}
             {{- end }}

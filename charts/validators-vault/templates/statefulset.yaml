@@ -116,14 +116,12 @@ spec:
           {{- if $root.Values.mevBoost.enabled }}
             - "--validators-proposer-blinded-blocks-enabled=true"
             - "--validators-builder-registration-default-enabled=true"
-            - "--Xvalidators-builder-registration-default-gas-limit={{ $root.Values.mevBoost.gasLimit }}"
-            - "--Xvalidators-builder-registration-sending-batch-size={{ $root.Values.mevBoost.batchSize }}"
           {{- end }}
           {{- end }}
           {{- if (eq $root.Values.type "lighthouse") }}
             - "--suggested-fee-recipient={{ $root.Values.merge.feeRecipient }}"
           {{- if $root.Values.mevBoost.enabled }}
-            - "--private-tx-proposals"
+            - "--builder-proposals"
           {{- end }}
           {{- end }}
           {{- end }}
@@ -143,10 +141,9 @@ spec:
             - "--beacon-rpc-provider={{ $rpcEndpoints }}"
           {{- else if eq $.Values.type "lighthouse" }}
             - "--beacon-nodes={{ $rpcEndpoints }}"
-          {{- else if eq $.Values.type "teku" }}
           {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
           {{- if gt $beaconChainRpcEndpointsLen 1 }}
-            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
+          {{- fail "Teku supports only one beacon node host, please specify one host." }}
           {{- else }}
             - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
           {{- end }}

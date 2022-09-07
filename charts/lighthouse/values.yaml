@@ -143,6 +143,9 @@ http:
 ##
 targetPeers: 80
 
+# MEV-Boost Endpoint
+builderEndpoint: ""
+
 ## Extra flags for lighthouse beacon chain node
 ##
 extraFlags: []
