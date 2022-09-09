@@ -205,6 +205,10 @@ spec:
               value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
               value: {{ $root.Values.jsonrpc.ports.rest | quote }}
+            - name: CLIENT_AUTHORIZATIONTYPE
+              value: "{{ $root.Values.sidecar.authorizationType }}"
+            - name: CLIENT_JWTSECRET
+              value: "{{ $root.Values.global.JWTSecret }}"
           ports:
             - containerPort: {{ $root.Values.sidecar.bindPort }}
               name: sidecar
