@@ -1,4 +1,3 @@
-{{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -23,6 +22,9 @@ data:
       curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth-clients/merge-testnets/main/sepolia/genesis.ssz"
     fi
 {{- end }}
+  execution-endpoints.txt: |-
+{{- range $i, $e := .Values.global.executionEndpoints }}
+    {{ . }}
 {{- end }}
 
 {{- if eq .Values.global.network "gnosis" }}

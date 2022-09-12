@@ -83,18 +83,9 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  repository: "busybox"
-  tag: "1.35"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
   pullPolicy: IfNotPresent
-
-## Sidecar image is used to perform Liveness/Readiness probes.
-##
-sidecar:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-  tag: "v1.0.3"
-  pullPolicy: IfNotPresent
-  bindAddr: "0.0.0.0"
-  bindPort: 3000
 
 ## Besu image
 ##
@@ -102,7 +93,7 @@ image:
   repository: hyperledger/besu
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.7.1"
+  tag: "22.7.2"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -114,6 +105,11 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "execution"
 
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -156,7 +152,7 @@ service:
 
 ## Defines whether the service must be headless
 ##
-svcHeadless: false
+svcHeadless: true
 
 ## Configure session affinity for validator clients to hit the same beacon node
 ## for the period specified in `timeoutSeconds`
@@ -164,7 +160,7 @@ svcHeadless: false
 ##
 sessionAffinity:
   # Whether to enable session affinity or not
-  enabled: true
+  enabled: false
   # The session duration in seconds
   timeoutSeconds: 86400
 
@@ -190,17 +186,6 @@ p2pNodePort:
   replicaToNodePort: {}
   #  "0": 32345
   #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.24"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -239,6 +224,18 @@ tolerations: {}
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - besu
+##       topologyKey: kubernetes.io/hostname
+##
 affinity: {}
 
 ## Configure liveness and readiness probes
@@ -246,26 +243,18 @@ affinity: {}
 ## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
 livenessProbe:
-  initialDelaySeconds: 900
+  initialDelaySeconds: 60
   timeoutSeconds: 3
   periodSeconds: 30
   failureThreshold: 3
   successThreshold: 1
-  httpGet:
-    path: /eth2/liveness
-    port: sidecar
-    scheme: HTTP
 
 readinessProbe:
-  initialDelaySeconds: 300
+  initialDelaySeconds: 60
   timeoutSeconds: 3
   periodSeconds: 30
   failureThreshold: 30
   successThreshold: 2
-  httpGet:
-    path: /eth2/readiness
-    port: sidecar
-    scheme: HTTP
 
 ## If false, data ownership will not be reset at startup
 ## This allows the node to be run with an arbitrary user
@@ -286,7 +275,10 @@ persistence:
 
 ## Besu Settings
 
-syncMode: "fast"
+## Sync Mode
+## ref: https://besu.hyperledger.org/en/stable/public-networks/how-to/connect/sync-node
+##
+syncMode: "X_SNAP"
 
 ## Extra flags for besu node
 ##

@@ -77,8 +77,8 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  repository: "busybox"
-  tag: "1.35"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -120,6 +120,11 @@ serviceAccount:
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
+
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "execution"
 
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -198,16 +203,18 @@ podDisruptionBudget:
   enabled: true
   maxUnavailable: 1
 
-## Configure session affinity for to hit the same geth node
+## Defines whether the service must be headless
+##
+svcHeadless: true
+
+## Configure session affinity for validator clients to hit the same beacon node
 ## for the period specified in `timeoutSeconds`
-## https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
 ##
 sessionAffinity:
-  ## Whether to enable session affinity or not
-  ##
-  enabled: true
-  ## The session duration in seconds
-  ##
+  # Whether to enable session affinity or not
+  enabled: false
+  # The session duration in seconds
   timeoutSeconds: 86400
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
@@ -221,6 +228,9 @@ p2pNodePort:
   ## @param p2pNodePort.annotations
   ##
   annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
   startAt: 31100
@@ -229,17 +239,6 @@ p2pNodePort:
   replicaToNodePort: {}
   #  "0": 32345
   #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.24"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 ## Monitoring
 ##
@@ -332,6 +331,18 @@ tolerations: {}
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - geth
+##       topologyKey: kubernetes.io/hostname
 ##
 affinity: {}
 
