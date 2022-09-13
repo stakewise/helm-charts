@@ -16,16 +16,15 @@ metadata:
     {{- end }}
 spec:
   groups:
-  {{- range $i, $e := until (len .Values.global.executionEndpoints) }}
-  {{- with $.Values.metrics.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}-{{ $i }}
+  {{- with .Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}
-  {{- if $.Values.metrics.prometheusRule.default }}
-    - name: {{ include "common.names.fullname" $ }}-{{ $i }}-default
+  {{- if .Values.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
       rules:
         - alert: TekuBeaconNodeDown
-          expr: up{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} == 0
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
           for: 1m
           labels:
             severity: critical
@@ -33,13 +32,12 @@ spec:
             summary: Teku beacon node is down
             description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
         - alert: Teku50SlotsBehind
-          expr: beacon_slot{job='{{ include "common.names.fullname" $ }}-{{ $i }}'}-beacon_head_slot{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} > 50
+          expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
           for: 2m
           labels:
             severity: critical
           annotations:
             summary: Teku beacon node is out of sync
             description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- end }}
   {{- end }}
 {{- end }}

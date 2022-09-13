@@ -1,43 +1,45 @@
-{{- $root := . -}}
-{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
-{{- if or $root.Values.http.enabled }}
+{{- if .Values.http.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name:  {{ include "common.names.fullname" $root }}-{{ $i }}
+  name:  {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-{{- if $root.Values.svcHeadless }}
+{{- if .Values.svcHeadless }}
   clusterIP: None
+{{- end }}
+{{- if .Values.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: "ClusterIP"
   ports:
-    {{- if $root.Values.http.enabled }}
-    - port: {{ $root.Values.http.port }}
+    {{- if .Values.http.enabled }}
+    - port: {{ .Values.http.port }}
       targetPort: http
       protocol: TCP
       name: http
     {{- end }}
-    {{- if $root.Values.global.JWTSecret }}
-    - port: {{ $root.Values.authRpc.port }}
+    {{- if .Values.global.JWTSecret }}
+    - port: {{ .Values.authRpc.port }}
       targetPort: authrpc
       protocol: TCP
       name: authrpc
     {{- end }}
-    - port: {{ $root.Values.grpcPort }}
+    - port: {{ .Values.grpcPort }}
       targetPort: grpc
       protocol: TCP
       name: grpc
-  {{- if $root.Values.global.metrics.enabled }}
-    - port: {{ $root.Values.metrics.port }}
+  {{- if .Values.global.metrics.enabled }}
+    - port: {{ .Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   {{- end }}
   selector:
-    {{- include "common.labels.matchLabels" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
 {{- end }}

@@ -18,6 +18,9 @@ global:
   ## Uses the same endpoint to populate the deposit cache.
   ## A separate Statefulset will be created for each specified address
   ##
+  ## !!!!! WARNING !!!!!
+  ## NEVER CHANGE THE ORDER OF ENDPOINTS AS THIS MAY BREAK
+  ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
   executionEndpoints: []
 
   ## Credentials to fetch images from private registry
@@ -96,6 +99,11 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "consensus"
+
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
@@ -135,8 +143,8 @@ rbac:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  repository: "busybox"
-  tag: "1.35"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -191,17 +199,6 @@ p2pNodePort:
   replicaToNodePort: {}
   #  "0": 32345
   #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.24"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 ## Settings for gRPC (beacon client api)
 ##
@@ -258,6 +255,18 @@ tolerations: {}
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - prysm
+##       topologyKey: kubernetes.io/hostname
 ##
 affinity: {}
 
@@ -325,7 +334,7 @@ metrics:
 
 ## Defines whether the service must be headless
 ##
-svcHeadless: false
+svcHeadless: true
 
 ## Configure session affinity for validator clients to hit the same beacon node
 ## for the period specified in `timeoutSeconds`
@@ -333,7 +342,7 @@ svcHeadless: false
 ##
 sessionAffinity:
   # Whether to enable session affinity or not
-  enabled: true
+  enabled: false
   # The session duration in seconds
   timeoutSeconds: 86400
 

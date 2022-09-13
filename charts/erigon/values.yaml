@@ -77,8 +77,8 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  repository: "busybox"
-  tag: "1.35"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -94,7 +94,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2022.09.01"
+  tag: "v2022.09.01"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -152,7 +152,10 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
-podAnnotations: {}
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "execution"
 
 podSecurityContext:
   fsGroup: 1001
@@ -197,7 +200,17 @@ rbac:
 
 ## Defines whether the service must be headless
 ##
-svcHeadless: false
+svcHeadless: true
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: false
+  # The session duration in seconds
+  timeoutSeconds: 86400
 
 ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
 ## This will generate a service for each replica, with a port binding via NodePort.
@@ -210,6 +223,9 @@ p2pNodePort:
   ## @param p2pNodePort.annotations
   ##
   annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
   startAt: 31000
@@ -218,17 +234,6 @@ p2pNodePort:
   replicaToNodePort: {}
   #  "0": 32345
   #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.24"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -280,6 +285,18 @@ tolerations: []
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - erigon
+##       topologyKey: kubernetes.io/hostname
 ##
 affinity: {}
 

@@ -1,46 +1,43 @@
-{{- $root := . -}}
-{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
-{{- if or $root.Values.http.enabled $root.Values.ws.enabled }}
+{{- if or .Values.http.enabled .Values.ws.enabled }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.names.fullname" $root }}-{{ $i }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  selector:
-    {{- include "common.labels.matchLabels" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
-{{- if $root.Values.sessionAffinity.enabled }}
+{{- if .Values.svcHeadless }}
+  clusterIP: None
+{{- end }}
+{{- if .Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ $root.Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: ClusterIP
   ports:
-  {{- if $root.Values.global.JWTSecret }}
+  {{- if .Values.global.JWTSecret }}
     - name: authrpc
-      port: {{ $root.Values.authRpc.port }}
+      port: {{ .Values.authRpc.port }}
       targetPort: authrpc
   {{- end }}
-  {{- if $root.Values.http.enabled }}
+  {{- if .Values.http.enabled }}
     - name: http
-      port: {{ $root.Values.http.port }}
+      port: {{ .Values.http.port }}
       targetPort: http
   {{- end }}
-  {{- if $root.Values.ws.enabled }}
+  {{- if .Values.ws.enabled }}
     - name: ws
-      port: {{ $root.Values.ws.port }}
+      port: {{ .Values.ws.port }}
       targetPort: ws
   {{- end }}
-  {{- if $root.Values.global.metrics.enabled }}
+  {{- if .Values.global.metrics.enabled }}
     - name: metrics
-      port: {{ $root.Values.metrics.port }}
+      port: {{ .Values.metrics.port }}
       targetPort: metrics
   {{- end }}
-{{- end }}
-
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
 {{- end }}
