@@ -38,7 +38,7 @@ initImageBusybox:
 ##
 cliImage:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.2.6"
+  tag: "v1.2.7"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -93,6 +93,9 @@ validatorsCount: 0
 ## Default fee recipient for all validator keys.
 ##
 suggestedFeeRecipient: ""
+
+## Whether a builder should be used for proposalConfig
+enableBuilder: false
 
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
