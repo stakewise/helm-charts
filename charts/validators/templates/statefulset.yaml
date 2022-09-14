@@ -72,10 +72,18 @@ spec:
           env:
             - name: WEB3SIGNER_URL
               value: {{ $root.Values.web3signerEndpoint }}
-          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}"]
+          {{- if $root.Values.feeOverride }}
+          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}", "--network", "{{ $root.Values.network }}", "--solo-fees-file", "/fee/feeOverride.json"]
+          {{- else }}
+          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}", "--network", "{{ $root.Values.network }}"]
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if $root.Values.feeOverride }}
+            - name: fee-override
+              mountPath: /fee
+          {{- end }}
         - name: prepare
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
@@ -85,11 +93,13 @@ spec:
             - sh
             - -c
             - >
+              ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
               cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
+              cat /data/proposerConfig.json;
               echo "" >>
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
@@ -116,12 +126,14 @@ spec:
             - "--config-file /data/config_gnosis_prysm"
             - "--chain-config-file /data/config_gnosis_prysm"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-proposer-config=/data/proposerConfig.json"
             {{- end }}
 
             {{- if eq $root.Values.type "teku" }}
@@ -184,6 +196,11 @@ spec:
         - name: gnosis-prysm
           configMap:
             name: {{ template "validators.fullname" $root }}-gnosis-prysm
+      {{- if $root.Values.feeOverride }}
+        - name: fee-override
+          configMap:
+            name: {{ template "validators.fullname" $root }}-override-fee-recipient
+      {{- end }}
         - name: data
           emptyDir: {}
 
