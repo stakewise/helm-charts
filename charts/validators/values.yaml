@@ -38,7 +38,7 @@ initImageBusybox:
 ##
 cliImage:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "sha-0d8997d"
+  tag: "v1.2.6"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
