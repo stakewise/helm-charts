@@ -196,6 +196,12 @@ spec:
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
               value: {{ .Values.jsonrpc.ports.rest | quote }}
+          {{- if .Values.global.JWTSecret }}
+            - name: CLIENT_AUTHORIZATIONTYPE
+              value: "bearer"
+            - name: CLIENT_JWTSECRET
+              value: {{ .Values.global.JWTSecret | quote }}
+          {{- end }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
