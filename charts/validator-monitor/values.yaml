@@ -99,3 +99,20 @@ serviceMonitor:
   ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   ##
   additionalLabels: {}
+
+## Custom PrometheusRule to be defined
+## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+##
+prometheusRule:
+  ## Create a default set of Alerts
+  ##
+  default: true
+  ## The namespace in which the prometheusRule will be created
+  ##
+  namespace: ""
+  ## Additional labels for the prometheusRule
+  ##
+  additionalLabels: {}
+  ## Custom Prometheus rules
+  ##
+  rules: []
