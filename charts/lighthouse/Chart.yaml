@@ -1,6 +1,6 @@
 apiVersion: v2
 name: lighthouse
-version: 2.1.2
+version: 2.1.3
 kubeVersion: "^1.18.0-0"
 description: Rust Ethereum 2.0 Client.
 type: application

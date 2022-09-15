@@ -92,7 +92,7 @@ initImage:
 ##
 sidecar:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-  tag: "v1.0.3"
+  tag: "v1.0.5"
   pullPolicy: IfNotPresent
   bindAddr: "0.0.0.0"
   bindPort: 3000
