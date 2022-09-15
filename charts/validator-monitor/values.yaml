@@ -100,7 +100,7 @@ serviceMonitor:
   ##
   additionalLabels: {}
 
-## Custom PrometheusRule to be defined
+## Define custom PrometheusRule
 ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
 ##
 prometheusRule:
