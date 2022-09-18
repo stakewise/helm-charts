@@ -1,0 +1,34 @@
+{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ template "validators.fullname" . }}
+  {{- if .Values.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+  {{- if .Values.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
+  {{- end }}
+spec:
+  groups:
+  {{- with (pluck .Values.type .Values.metrics.prometheusRule.rules | first) }}
+    - name: {{ template "validators.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.metrics.prometheusRule.default }}
+    - name: {{ template "validators.fullname" $ }}-monitor
+      rules:
+        - alert: ValidatorMissedAttestations
+          expr: validator_effectiveness_status{job='{{ template "validators.fullname" $ }}-monitor'} == 0
+          for: 18m
+          labels:
+            severity: critical
+          annotations:
+            summary: Validator Missed Attestations
+            description: Wallet {{ printf "{{ $labels.wallet_id }}" }}. Validator index {{ printf "{{ $labels.validator_index }}" }}
+  {{- end }}
+{{- end }}

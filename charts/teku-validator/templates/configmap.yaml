@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "validators.fullname" . }}-configs
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+data:
+  keymanageropts.json: |-
+    {
+        "direct_eip_version": "EIP-2335",
+        "direct_version": "2"
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "validators.fullname" . }}-init
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+data:
+  validator-init.sh: |
+    #!/bin/bash
+    VAULT="/vault"
+    VAULT_KEYSTORES="${VAULT}/keystores"
+    VAULT_PASSWORD="${VAULT}/password.txt"
+    DATA="/data"
+    DATA_TEKU="${DATA}/teku"
+    SLASHING_PROTECTION_FILE="/data/slashing_protection.json"
+    TEKU_IMPORT_SLASHING_HISTORY="/opt/teku/bin/teku slashing-protection import --data-path=${DATA_TEKU} --from=${SLASHING_PROTECTION_FILE}"
+    TEKU_EXPORT_SLASHING_HISTORY=" /opt/teku/bin/teku slashing-protection export --data-path=${DATA_TEKU} --to=${SLASHING_PROTECTION_FILE}"
+    
+    if [ -d ${DATA_TEKU}/validator ]; then
+        [ "$(ls -A ${DATA_TEKU}/validator)" ] && echo "${DATA_TEKU}/validator is not empty." || export REIMPORT=true;
+    fi
+        
+    # Keys are reimported in two cases
+    # 1. Current keystores directory is empty
+    # 2. reimportKeystores value is set to true
+    if [[ "$REIMPORT" = "true" ]]; then
+        echo "Reimport has been set to true. Fetching keys from ${VAULT_ADDR}."
+        # Authorization in Vault
+        bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
+        KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+        VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_NAME}/login`
+        export VAULT_TOKEN="$(echo ${VAULT_CLIENT} | jq -r '.auth.client_token')"
+
+        # Get keystores password
+        rm -rf ${VAULT} || true && mkdir -p ${VAULT_KEYSTORES}
+        PASSWORD=$(vault kv get -field=password.txt -version=1  ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT}/password)
+        echo ${PASSWORD} > ${VAULT_PASSWORD}
+    
+        # Preparing keystores for import
+        echo "$(vault kv get -version=1 -field=keys  ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
+        while read line; do
+            if [[ "$line" =~ ^keystore.* ]]; then
+                echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
+            fi
+        done <${VAULT}/keystores.txt
+    
+        if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
+          echo "No keys available to start. Check that Vault is running and there are keys in it"
+          exit 1
+        fi
+    
+        # Remove old keystores
+        echo "Removing old keys"
+        rm -rf ${DATA_TEKU}/validator/keys \
+               ${DATA_TEKU}validator/passwords || true
+    
+        # Import keystores
+        mkdir -p ${DATA_TEKU}/validator/keys ${DATA_TEKU}/validator/passwords
+        cd ${VAULT_KEYSTORES}
+        for key in *; do
+            FILENAME=`echo ${key} | sed 's/.json//g'`
+            cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
+            cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
+            echo "Copy ${key}"
+        done
+    fi
+    
+    rm -rf ${VAULT} || true
