@@ -52,17 +52,17 @@ data:
 
         # Get keystores password
         rm -rf ${VAULT} || true && mkdir -p ${VAULT_KEYSTORES}
-        PASSWORD=$(vault kv get -field=password.txt -version=1  ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT}/password)
+        PASSWORD=$(vault kv get -field=password -version=1 ${VALIDATORS_MOUNT_PATH}/password)
         echo ${PASSWORD} > ${VAULT_PASSWORD}
     
         # Preparing keystores for import
-        echo "$(vault kv get -version=1 -field=keys  ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT}/keystores)" > ${VAULT}/keystores.txt
-        while read line; do
-            if [[ "$line" =~ ^keystore.* ]]; then
-                echo $line | awk '{ print substr($0, index($0,$2)) }' > ${VAULT_KEYSTORES}/`echo $line | awk '{print $1}'`
-            fi
-        done <${VAULT}/keystores.txt
-    
+        echo "$(vault kv get -field=keystore -version=1 -format=json ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT})" > ${VAULT}/keystores.json
+        jq -c '.[]' ${VAULT}/keystores.json | while read key; do
+            key_name=$(echo $key | jq --raw-output '.[1]')
+            key_content=$(echo $key | jq --raw-output '.[2]')
+            echo $key_content > ${VAULT_KEYSTORES}/$key_name
+        done
+
         if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
           echo "No keys available to start. Check that Vault is running and there are keys in it"
           exit 1
