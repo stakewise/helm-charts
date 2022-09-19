@@ -41,7 +41,7 @@ serviceAccount:
 ##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
-  tag: "v2.7.2"
+  tag: "v2.8.3"
   pullPolicy: IfNotPresent
 
 ## Configure resource requests and limits.
