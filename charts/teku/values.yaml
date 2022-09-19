@@ -103,7 +103,7 @@ image:
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.9.0"
+  tag: "22.9.1"
 
 imagePullSecrets: []
 nameOverride: ""
