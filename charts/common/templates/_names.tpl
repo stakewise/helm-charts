@@ -65,3 +65,14 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the name of the cluster role
+*/}}
+{{- define "common.names.clusterRoleName" -}}
+{{- if or .Values.global.rbac.create .Values.rbac.create }}
+{{- default (include "common.names.fullname" .) .Values.rbac.name }}
+{{- else }}
+{{- default "default" .Values.rbac.name }}
+{{- end }}
+{{- end }}
