@@ -48,7 +48,7 @@ data:
         PRYSM_EXECUTOR="prysm-validator"
         PRYSM_EXTRA_FLAGS="--${NETWORK_ID:-"mainnet"}"
         PRYSM_IMPORT="${PRYSM_EXECUTOR} accounts import ${PRYSM_EXTRA_FLAGS} --keys-dir=${VAULT_KEYSTORES} --account-password-file=${VAULT_PASSWORD} --wallet-dir=${DATA_PRYSM}/validators --wallet-password-file=${VAULT_PASSWORD} --accept-terms-of-use"
-        PRYSM_EXPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection-history export --accept-terms-of-use --datadir=${DATA_PRYSM} --slashing-protection-export-dir=${DATA}"
+        PRYSM_EXPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection-history export --accept-terms-of-use --${NETWORK_ID:-"mainnet"} --datadir=${DATA_PRYSM} --slashing-protection-export-dir=${DATA}"
         PRYSM_IMPORT_SLASHING_HISTORY="${PRYSM_EXECUTOR} slashing-protection-history import --accept-terms-of-use --${NETWORK_ID:-"mainnet"} --datadir=${DATA_PRYSM} --slashing-protection-json-file=${SLASHING_PROTECTION_FILE}"
         LIGHTHOUSE_EXECUTOR="lighthouse"
         LIGHTHOUSE_EXTRA_FLAGS="--network=${NETWORK_ID:-"mainnet"} --datadir=${DATA_LIGHTHOUSE}"
@@ -60,9 +60,13 @@ data:
     fi
     
     if [[ "$VALIDATOR_TYPE" = "prysm" ]] || [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
-        if [ -z "$(ls -A ${DATA}/${VALIDATOR_TYPE}/validators)" ]; then export REIMPORT=true; fi
+        if [ -d ${DATA}/${VALIDATOR_TYPE}/validators ]; then
+            [ "$(ls -A ${DATA}/${VALIDATOR_TYPE}/validators)" ] && echo "${DATA}/${VALIDATOR_TYPE}/validators is not empty. Skipping keys import." || export REIMPORT=true;
+        fi
     elif [[ "$VALIDATOR_TYPE" = "teku" ]]; then
-        if [ -z "$(ls -A ${DATA_TEKU}/validator)" ]; then export REIMPORT=true; fi
+        if [ -d ${DATA}/${VALIDATOR_TYPE}/validators ]; then
+            [ "$(ls -A ${DATA_TEKU}/validator)" ] && echo "${DATA_TEKU}/validator is not empty. Skipping keys import." || export REIMPORT=true;
+        fi
     fi
         
     # Keys are reimported in two cases
@@ -70,6 +74,7 @@ data:
     # 2. reimportKeystores value is set to true
     if [[ "$REIMPORT" = "true" ]]; then
         # Authorization in Vault
+        echo "Reimporting keys for ${VALIDATORS_MOUNT_PATH}/${SERVICE_ACCOUNT}..."
         bash -c 'while [[ "$(curl -s -o /dev/null -w ''%{http_code}'' ${VAULT_ADDR}/v1/sys/health)" != "200" ]]; do echo "Waiting for the vault to become available..." && sleep 5; done'
         KUBE_TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
         VAULT_CLIENT=`curl --silent --request POST --data '{"jwt": "'"${KUBE_TOKEN}"'", "role": "'"${SERVICE_ACCOUNT}"'"}' ${VAULT_ADDR}/v1/auth/${KUBERNETES_AUTH_NAME}/login`
@@ -87,18 +92,25 @@ data:
             key_content=$(echo $key | jq --raw-output '.[2]')
             echo $key_content > ${VAULT_KEYSTORES}/$key_name
         done
-
         if [ -z "$(ls -A ${VAULT_KEYSTORES})" ]; then
           echo "No keys available to start. Check that Vault is running and there are keys in it"
           exit 1
         fi
-    
-        # Remove old keystores
+
+        echo "Removing old keystores..."
+
+        # Remove old keystores for Lighthouse
         rm -rf ${DATA_LIGHTHOUSE}/validators/0* \
-               ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml \
-               ${DATA_PRYSM}/validators \
-               ${DATA_TEKU}/validator || true
+               ${DATA_LIGHTHOUSE}/validators/validator_definitions.yml
+
+        # Remove old keystores for Prysm
+        rm -rf ${DATA_PRYSM}/validators
+
+        # Remove old keystores for Teku
+        rm -rf ${DATA_TEKU}/validator/keys \
+               ${DATA_TEKU}/validator/passwords
     
+        echo "Importing new keystores..."
         # Import keystores
         if [[ "$VALIDATOR_TYPE" = "prysm" ]]; then
             touch ${DATA_PRYSM}/tosaccepted
@@ -113,7 +125,7 @@ data:
                 FILENAME=`echo ${key} | sed 's/.json//g'`
                 cp ${key} "${DATA_TEKU}/validator/keys/${FILENAME}.json"
                 cp ${VAULT_PASSWORD} "${DATA_TEKU}/validator/passwords/${FILENAME}.txt"
-                echo "Copy ${key}"
+                echo "Copied ${key}"
             done
         fi
     fi
@@ -188,11 +200,14 @@ data:
                         exit 1
                     fi
                 elif [[ "$VALIDATOR_TYPE" = "lighthouse" ]]; then
-                    test -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite && rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
-                    ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
-                    if [ $? -ne 0 ]; then
-                        echo "Failed to import slashing history database."
+                    if test -f "${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite"; then
+                        echo "File ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite exists"
+                        rm -f ${DATA_LIGHTHOUSE}/validators/slashing_protection.sqlite
+                        ${LIGHTHOUSE_IMPORT_SLASHING_HISTORY}
+                        if [ $? -ne 0 ]; then
+                            echo "Failed to import slashing history database."
                         exit 1
+                        fi
                     fi
                 else
                     echo "Wrong VALIDATOR_TYPE"

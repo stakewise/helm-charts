@@ -127,6 +127,7 @@ spec:
           {{- if $root.Values.global.metrics.enabled }}
               --Metrics.Enabled={{ $root.Values.global.metrics.enabled }}
               --Metrics.ExposePort={{ $root.Values.metrics.port }}
+              --Metrics.NodeName=$(POD_NAME)
           {{- end }}
           {{- if $root.Values.p2pNodePort.enabled }}
               --Network.ExternalIp=$EXTERNAL_IP
