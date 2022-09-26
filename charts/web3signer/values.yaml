@@ -193,3 +193,16 @@ serviceMonitor:
   ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   ##
   additionalLabels: {}
+
+vault:
+  enabled: false
+  validatorsNo: 1
+  validatorKeyNo: 5
+  keyType: "BLS"
+  tlsEnabled: "false"
+  keyPath: ""
+  tlsKnownServersPath: ""
+  serverHost: ""
+  serverPort: ""
+  timeout: 10000
+  token: ""

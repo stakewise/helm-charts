@@ -53,6 +53,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+        {{- if not .Values.vault.enabled }}
         - name: fetch-keys
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
@@ -78,6 +79,7 @@ spec:
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -122,6 +124,10 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            {{- if .Values.vault.enabled }}
+            - name: vault-configuration
+              mountPath: /data/keystore
+            {{- end }}
       volumes:
         - name: config
           configMap:
@@ -133,3 +139,8 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 128Mi
+        {{- if .Values.vault.enabled }}
+        - name: vault-configuration
+          configMap:
+            name: {{ include "common.names.fullname" . }}-vault
+        {{- end }}

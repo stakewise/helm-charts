@@ -43,3 +43,33 @@ data:
 {{ .Files.Get $path | indent 4 }}
 {{- end }}
 {{- end }}
+{{- if .Values.vault.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-vault
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  {{ $root := . }}
+  {{ range $validatorI, $e := until (.Values.vault.validatorsNo  | int) }}
+  {{- with $root }}
+  {{ range $keyI, $e := until (.Values.vault.validatorKeyNo  | int) }}
+  {{- with $root }}
+  validator_{{$validatorI}}_key_{{$keyI}}.yaml: |
+    type: "hashicorp"
+    keyType: {{ .Values.vault.keyType }}
+    tlsEnabled: {{ .Values.vault.tlsEnabled }}
+    keyPath: "{{ .Values.vault.keyPath }}/signing_keys_validator_{{ $validatorI }}"
+    keyName: "signing_key_{{ $keyI }}"
+    serverHost: {{ .Values.vault.serverHost }}
+    serverPort: {{ .Values.vault.serverPort }}
+    timeout: {{ .Values.vault.timeout }}
+    token: {{ .Values.vault.token }}
+  {{ end }}
+  {{ end }}
+  {{ end }}
+  {{ end }}
+
+{{- end }}

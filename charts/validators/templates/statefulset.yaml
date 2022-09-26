@@ -64,6 +64,7 @@ spec:
       serviceAccountName: "validators"
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
+        {{- if $root.Values.dbKeystoreUrl }}
         - name: get-configs
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
@@ -97,6 +98,7 @@ spec:
             - name: fee-override
               mountPath: /fee
           {{- end }}
+        {{- end }}
         - name: prepare
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
@@ -135,10 +137,16 @@ spec:
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- if not $root.Values.dbKeystoreUrl }}
+            - "--validators-external-signer-public-keys={{ $.Values.web3signerEndpoint }}/api/v1/eth2/publicKeys"
+            {{- end }}
             {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
             - "--config-file /data/config_gnosis_prysm"
             - "--chain-config-file /data/config_gnosis_prysm"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- if not $root.Values.dbKeystoreUrl }}
+            - "--validators-external-signer-public-keys={{ $.Values.web3signerEndpoint }}/api/v1/eth2/publicKeys"
+            {{- end }}
             - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
@@ -146,6 +154,9 @@ spec:
             - "--network=auto"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            {{- if not $root.Values.dbKeystoreUrl }}
+            - "--validators-external-signer-public-keys={{ $.Values.web3signerEndpoint }}/api/v1/eth2/publicKeys"
+            {{- end }}
             - "--validators-proposer-config=/data/proposerConfig.json"
             {{- end }}
 
