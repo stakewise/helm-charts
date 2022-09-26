@@ -97,6 +97,11 @@ spec:
           image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag | default $root.Chart.AppVersion }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           workingDir: /data/nethermind
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           command:
             - sh
             - -ac
