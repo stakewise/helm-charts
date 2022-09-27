@@ -120,3 +120,5 @@ settings:
   ## Max number of validators to register in a single transaction
   ##
   validatorsBatchSize: "10"
+
+  harbourMainnetSendTelegramNotifications: False

@@ -80,3 +80,5 @@ settings:
   ##
   oraclePrivateKey: ""
   awsRegion: ""
+
+  harbourMainnetSendTelegramNotifications: False
