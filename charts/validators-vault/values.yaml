@@ -170,6 +170,7 @@ flags:
     - "validator-client"
     - "--validator-keys=/data/teku/validator/keys:/data/teku/validator/passwords"
     - "--log-destination=CONSOLE"
+    - "--data-base-path=/data/teku"
   
 ## Validators extra flags
 ##
