@@ -194,7 +194,7 @@ spec:
 {{- else }}
         - name: data
           persistentVolumeClaim:
-            claimName: data-{{.Release.Namespace}}-validator{{$step}}
+            claimName: data-{{ $root.Release.Namespace }}-validator{{$step}}
 {{- end }}
 
 {{- end }}
