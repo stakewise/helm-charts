@@ -7,7 +7,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: data-validator{{$step}}
+  name: data-{{.Release.Namespace}}-validator{{$step}}
   labels:
     {{- include "validators.labels" $root | nindent 4 }}
   annotations:
