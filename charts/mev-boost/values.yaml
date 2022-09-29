@@ -4,7 +4,7 @@
 
 global:
   # Options: mainnet, goerli, ropsten, kiln, sepolia
-  network: "goerli"
+  network: "mainnet"
 
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -35,7 +35,7 @@ image:
   repository: flashbots/mev-boost
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.8.2"
+  tag: "v1.3.2"
 
 imagePullSecrets: []
 nameOverride: ""

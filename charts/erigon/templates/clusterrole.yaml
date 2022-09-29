@@ -2,7 +2,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.clusterRoleName" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 rules:

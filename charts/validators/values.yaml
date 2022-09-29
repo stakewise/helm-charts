@@ -4,6 +4,7 @@
 
 global:
   imagePullSecrets: []
+  network: mainnet
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -37,7 +38,7 @@ initImageBusybox:
 ##
 cliImage:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.2.4"
+  tag: "v1.2.7"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -93,6 +94,9 @@ validatorsCount: 0
 ##
 suggestedFeeRecipient: ""
 
+## Whether a builder should be used for proposalConfig
+enableBuilder: false
+
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
 ## ref: https://hub.docker.com/r/sigp/lighthouse
@@ -100,7 +104,7 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v3.0.0"
+    tag: "v3.1.0"
   prysmGnosis:
     repository: "ghcr.io/gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
@@ -109,7 +113,7 @@ image:
     tag: "v3.0.0"
   teku:
     repository: "consensys/teku"
-    tag: "22.8.1"
+    tag: "22.9.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -202,6 +206,11 @@ beaconChainRpcEndpointsRandomized: []
 ##
 graffiti: ""
 
+## Override fees for solo validators
+## used for stakewise solo validators only
+##
+feeOverride: ""
+
 ## Monitoring
 ##
 metrics:
@@ -274,24 +283,22 @@ metrics:
     ## @param metrics.prometheusRule.rules Custom Prometheus rules
     ## e.g:
     ## rules:
-    ##   prysm:
-    ##     - alert: PrysmValidatorHourlyEarningLessOrEqual0
-    ##       expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
-    ##       for: 5m
-    ##       labels:
-    ##         severity: critical
-    ##       annotations:
-    ##         summary: Prysm validator hourly earning <= 0
-    ##         description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##     - alert: PrysmValidatorAlotOfErrorsLastHour
-    ##       expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
-    ##       for: 5m
-    ##       labels:
-    ##         severity: warning
-    ##       annotations:
-    ##         summary: Many validator errors or warnings last hour
-    ##         description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##   lighthouse: []
+    ##   - alert: PrysmValidatorHourlyEarningLessOrEqual0
+    ##     expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+    ##     for: 5m
+    ##     labels:
+    ##       severity: critical
+    ##     annotations:
+    ##       summary: Prysm validator hourly earning <= 0
+    ##       description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+    ##   - alert: PrysmValidatorAlotOfErrorsLastHour
+    ##     expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
+    ##     for: 5m
+    ##     labels:
+    ##       severity: warning
+    ##     annotations:
+    ##       summary: Many validator errors or warnings last hour
+    ##       description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
     ##
     rules: {}
 

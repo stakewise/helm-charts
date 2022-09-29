@@ -13,6 +13,10 @@ Create chart name and version as used by the chart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
+{{- define "common.names.chartWithoutVersion" -}}
+{{- printf "%s" .Chart.Name | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
+{{- end -}}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
@@ -59,5 +63,16 @@ Create the name of the service account to use
 {{- default (include "common.names.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create the name of the cluster role
+*/}}
+{{- define "common.names.clusterRoleName" -}}
+{{- if or .Values.global.rbac.create .Values.rbac.create }}
+{{- default (include "common.names.fullname" .) .Values.rbac.name }}
+{{- else }}
+{{- default "default" .Values.rbac.name }}
 {{- end }}
 {{- end }}

@@ -1,58 +1,56 @@
-{{- $root := . -}}
-{{- range $i, $e := until (int $root.Values.global.replicaCount) }}
 ---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 metadata:
-  name: {{ include "common.names.fullname" $root }}-{{ $i }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    {{- include "common.labels.statefulset" . | nindent 4 }}
 spec:
+  replicas: {{ .Values.global.replicaCount }}
+  podManagementPolicy: "Parallel"
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" $root | nindent 6 }}
-      replicaID: {{ $i | quote }}
-  serviceName: {{ include "common.names.fullname" $root }}
-  replicas: 1
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
   template:
     metadata:
       labels:
-        {{- include "common.labels.matchLabels" $root | nindent 8 }}
-        replicaID: {{ $i | quote }}
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-    {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
+    {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-    {{- with $root.Values.affinity }}
+    {{- with .Values.affinity }}
       affinity:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-    {{- with $root.Values.tolerations }}
+    {{- with .Values.tolerations }}
       tolerations:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-    {{- with $root.Values.nodeSelector }}
+    {{- with .Values.nodeSelector }}
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-    {{- with $root.Values.securityContext }}
+    {{- with .Values.securityContext }}
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-      serviceAccountName: {{ include "common.names.serviceAccountName" $root }}
-      priorityClassName: {{ $root.Values.priorityClassName | quote }}
-      {{- if or (and $root.Values.persistence.enabled $root.Values.initChownData) ($root.Values.p2pNodePort.enabled) }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
       initContainers:
-        {{- if $root.Values.p2pNodePort.enabled }}
-        - name: init-nodeport
-          image: "{{ $root.Values.p2pNodePort.initContainer.image.repository }}:{{ $root.Values.p2pNodePort.initContainer.image.tag }}"
-          imagePullPolicy: {{ $root.Values.p2pNodePort.initContainer.image.pullPolicy }}
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
           env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: POD_NAME
               valueFrom:
                 fieldRef:
@@ -70,79 +68,77 @@ spec:
             - -c
             - >
               echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+          {{- if .Values.p2pNodePort.enabled }}
+            {{- if eq .Values.p2pNodePort.type "LoadBalancer" }}
+              until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
+              export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+            {{- else }}
               export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
               export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+            {{- end }}
               echo "EXTERNAL_PORT=$EXTERNAL_PORT" >  /env/init-nodeport;
               echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
               cat /env/init-nodeport;
+          {{- end }}
+          {{- if and .Values.persistence.enabled .Values.initChownData }}
+              mkdir -p /data && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data;
+          {{- end }}
           volumeMounts:
             - name: env-nodeport
               mountPath: /env
-        {{- end }}
-        {{- if and $root.Values.persistence.enabled $root.Values.initChownData }}
-        - name: init-chown
-          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
-          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          command: ["chown", "-R", "{{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }}", "/data"]
-          volumeMounts:
-            - name: data
-              mountPath: /data
-        {{- end }}
-      {{- end }}
       containers:
-        - name: {{ $root.Chart.Name }}
-          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
-          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sh
             - -ac
             - >
-            {{- if $root.Values.p2pNodePort.enabled }}
+            {{- if .Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
               exec geth
-          {{- if $root.Values.global.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
               --authrpc.jwtsecret=/secret/jwtsecret
-              --authrpc.addr={{ $root.Values.authRpc.addr }}
-              --authrpc.port={{ $root.Values.authRpc.port }}
-              --authrpc.vhosts={{ $root.Values.authRpc.vhosts }}
+              --authrpc.addr={{ .Values.authRpc.addr }}
+              --authrpc.port={{ .Values.authRpc.port }}
+              --authrpc.vhosts={{ .Values.authRpc.vhosts }}
           {{- end }}
-          {{- if $root.Values.http.enabled }}
+          {{- if .Values.http.enabled }}
               --http
               --http.addr=0.0.0.0
-              --http.port={{ $root.Values.http.port }}
-              --http.corsdomain={{ $root.Values.http.corsDomain }}
-              --http.vhosts={{ $root.Values.http.vhosts }}
-              --http.api={{ $root.Values.http.api }}
+              --http.port={{ .Values.http.port }}
+              --http.corsdomain={{ .Values.http.corsDomain }}
+              --http.vhosts={{ .Values.http.vhosts }}
+              --http.api={{ .Values.http.api }}
           {{- end }}
-          {{- if $root.Values.p2pNodePort.enabled }}
+          {{- if .Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
               --port=$EXTERNAL_PORT
           {{- else }}
               --nat=extip:$(POD_IP)
-              --port={{ include "geth.p2pPort" $root }}
+              --port={{ include "geth.p2pPort" . }}
           {{- end }}
-          {{- if $root.Values.ws.enabled }}
+          {{- if .Values.ws.enabled }}
               --ws
               --ws.addr=0.0.0.0
-              --ws.port={{ $root.Values.ws.port }}
-              --ws.origins={{ $root.Values.ws.origins }}
-              --ws.api={{ $root.Values.ws.api }}
+              --ws.port={{ .Values.ws.port }}
+              --ws.origins={{ .Values.ws.origins }}
+              --ws.api={{ .Values.ws.api }}
           {{- end }}
-          {{- if $root.Values.terminalTotalDifficulty }}
-              --override.terminaltotaldifficulty={{ $root.Values.terminalTotalDifficulty }}
+          {{- if .Values.terminalTotalDifficulty }}
+              --override.terminaltotaldifficulty={{ .Values.terminalTotalDifficulty }}
           {{- end }}
               --datadir=/data/ethereum
               --ethash.dagdir=/data/ethereum/.ethash
               --ipcdisable
-              --{{ $root.Values.global.network }}
-          {{- range $root.Values.extraFlags }}
+              --{{ .Values.global.network }}
+          {{- range .Values.extraFlags }}
               {{ . | quote }}
           {{- end }}
-          {{- if $root.Values.global.metrics.enabled }}
-          {{- range $root.Values.metrics.flags }}
+          {{- if .Values.global.metrics.enabled }}
+          {{- range .Values.metrics.flags }}
               {{ . | quote }}
           {{- end }}
           {{- end }}
@@ -152,95 +148,91 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-          {{- if $root.Values.global.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: authrpc
-              containerPort: {{ $root.Values.authRpc.port }}
+              containerPort: {{ .Values.authRpc.port }}
           {{- end }}
-          {{- if $root.Values.http.enabled }}
+          {{- if .Values.http.enabled }}
             - name: http
-              containerPort: {{ $root.Values.http.port }}
+              containerPort: {{ .Values.http.port }}
           {{- end }}
-          {{- if $root.Values.ws.enabled }}
+          {{- if .Values.ws.enabled }}
             - name: ws
-              containerPort: {{ $root.Values.ws.port }}
+              containerPort: {{ .Values.ws.port }}
           {{- end }}
-          {{- if $root.Values.global.metrics.enabled }}
+          {{- if .Values.global.metrics.enabled }}
             - name: metrics
-              containerPort: {{ $root.Values.metrics.port }}
+              containerPort: {{ .Values.metrics.port }}
           {{- end }}
-          {{- if $root.Values.p2pNodePort.enabled }}
+          {{- if .Values.p2pNodePort.enabled }}
             - name: p2p-tcp
-              containerPort: {{ include "geth.p2pPort" $root }}
+              containerPort: {{ include "geth.p2pPort" . }}
               protocol: TCP
             - name: p2p-udp
-              containerPort: {{ include "geth.p2pPort" $root }}
+              containerPort: {{ include "geth.p2pPort" . }}
               protocol: UDP
           {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-          {{- if $root.Values.global.JWTSecret }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
           {{- end }}
-          {{- if $root.Values.p2pNodePort.enabled }}
             - name: env-nodeport
               mountPath: /env
-          {{- end }}
-        {{- with $root.Values.resources }}
+        {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-      {{- if $root.Values.http.enabled }}
+      {{- if .Values.http.enabled }}
         - name: sidecar
-          image: "{{ $root.Values.sidecar.repository }}:{{ $root.Values.sidecar.tag }}"
-          imagePullPolicy: {{ $root.Values.sidecar.pullPolicy }}
+          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
           env:
             - name: SERVER_BINDADDR
-              value: "{{ $root.Values.sidecar.bindAddr }}:{{ $root.Values.sidecar.bindPort }}"
+              value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ $root.Values.http.port | quote }}
+              value: {{ .Values.http.port | quote }}
           ports:
-            - containerPort: {{ $root.Values.sidecar.bindPort }}
+            - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if or $root.Values.global.livenessProbe.enabled $root.Values.livenessProbe.enabled }}
+        {{- if or .Values.global.livenessProbe.enabled .Values.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ $root.Values.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ $root.Values.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ $root.Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ $root.Values.livenessProbe.failureThreshold }}
-            successThreshold: {{ $root.Values.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ $root.Values.livenessProbe.httpGet.path }}
-              port: {{ $root.Values.livenessProbe.httpGet.port }}
-              scheme: {{ $root.Values.livenessProbe.httpGet.scheme }}
+              path: {{ .Values.livenessProbe.httpGet.path }}
+              port: {{ .Values.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if or $root.Values.global.readinessProbe.enabled $root.Values.readinessProbe.enabled }}
+        {{- if or .Values.global.readinessProbe.enabled .Values.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ $root.Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ $root.Values.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ $root.Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ $root.Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ $root.Values.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ $root.Values.readinessProbe.httpGet.path }}
-              port: {{ $root.Values.readinessProbe.httpGet.port }}
-              scheme: {{ $root.Values.readinessProbe.httpGet.scheme }}
+              path: {{ .Values.readinessProbe.httpGet.path }}
+              port: {{ .Values.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
       volumes:
-        {{- if $root.Values.global.JWTSecret }}
+        {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" $root }}
+            secretName: {{ include "common.names.fullname" . }}
         {{- end }}
-        {{- if $root.Values.p2pNodePort.enabled }}
         - name: env-nodeport
           emptyDir: {}
-        {{- end }}
-{{- if (not $root.Values.persistence.enabled) }}
+{{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
 {{- else }}
@@ -248,17 +240,15 @@ spec:
     - metadata:
         name: data
         labels:
-          {{- include "common.labels.matchLabels" $root | nindent 10 }}
-      {{- with $root.Values.persistence.annotations }}
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
       {{- end }}
       spec:
-        accessModes: {{ $root.Values.persistence.accessModes }}
-        storageClassName: {{ $root.Values.persistence.storageClassName }}
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ $root.Values.persistence.size | quote }}
-{{- end }}
-
+            storage: {{ .Values.persistence.size | quote }}
 {{- end }}

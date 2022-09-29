@@ -20,3 +20,4 @@ data:
   AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
   VALIDATORS_BATCH_SIZE: {{ .Values.settings.validatorsBatchSize | quote }}
   VALIDATORS_FETCH_CHUNK_SIZE: {{ .Values.settings.validatorsFetchChunkSize | quote }}
+  HARBOUR_MAINNET_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.harbourMainnetSendTelegramNotifications | quote }}

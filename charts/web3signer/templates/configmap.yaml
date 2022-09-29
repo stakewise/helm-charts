@@ -9,6 +9,7 @@ data:
     data-path: "/data/web3signer"
     key-store-path: "/data/keystore"
     eth2.network: {{ .Values.network }}
+    logging: {{ .Values.loggingLevel }}
     eth2.slashing-protection-enabled: true
     eth2.slashing-protection-pruning-enabled: true
     eth2.slashing-protection-pruning-epochs-to-keep: {{ .Values.pruningEpochToKeep }}
