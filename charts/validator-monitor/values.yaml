@@ -2,6 +2,10 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+global:
+  serviceAccount:
+    create: true
+
 # Validator Monitor Settings
 # Options:
 # mainnet: https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet
@@ -18,15 +22,13 @@ image:
   repository: europe-west4-docker.pkg.dev/stakewiselabs/public/validator-monitor
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.0.7"
+  tag: "v1.0.0"
 
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
@@ -97,3 +99,20 @@ serviceMonitor:
   ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   ##
   additionalLabels: {}
+
+## Define custom PrometheusRule
+## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+##
+prometheusRule:
+  ## Create a default set of Alerts
+  ##
+  default: true
+  ## The namespace in which the prometheusRule will be created
+  ##
+  namespace: ""
+  ## Additional labels for the prometheusRule
+  ##
+  additionalLabels: {}
+  ## Custom Prometheus rules
+  ##
+  rules: []

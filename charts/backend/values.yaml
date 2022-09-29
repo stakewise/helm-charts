@@ -15,6 +15,8 @@ commonConf:
   soloPage: "https://app.stakewise.io/solo"
   stakingAprSamplesCount: "3"
 
+  validatorMaxPenaltyCount: "2"
+
   sendEmails: "False"
   ## Change to https://api.mailgun.net/v3
   ## if you are using Mailgun’s US region
@@ -45,7 +47,7 @@ commonConf:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
-  tag: "v2.4.4"
+  tag: "v2.4.12"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 

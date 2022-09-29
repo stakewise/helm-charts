@@ -1,41 +1,35 @@
 {{- if or .Values.restApi.enabled .Values.global.metrics.enabled }}
-{{- $root := . -}}
-{{- range $i, $e := until (len .Values.global.executionEndpoints) }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.names.fullname" $root }}-{{ $i }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  type: {{ $root.Values.service.type }}
-{{- if $root.Values.svcHeadless }}
+  type: {{ .Values.service.type }}
+{{- if .Values.svcHeadless }}
   clusterIP: None
 {{- end }}
-{{- if $root.Values.sessionAffinity.enabled }}
+{{- if .Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ $root.Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
 {{- end }}
   ports:
-  {{- if $root.Values.restApi.enabled }}
-    - port: {{ $root.Values.restApi.port }}
-      targetPort: {{ $root.Values.restApi.portName }}
+  {{- if .Values.restApi.enabled }}
+    - port: {{ .Values.restApi.port }}
+      targetPort: {{ .Values.restApi.portName }}
       protocol: TCP
-      name: {{ $root.Values.restApi.portName }}
+      name: {{ .Values.restApi.portName }}
   {{- end }}
-  {{- if $root.Values.global.metrics.enabled }}
-    - port: {{ $root.Values.metrics.port }}
+  {{- if .Values.global.metrics.enabled }}
+    - port: {{ .Values.metrics.port }}
       targetPort: metrics
       protocol: TCP
       name: metrics
   {{- end }}
   selector:
-    {{- include "common.labels.matchLabels" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
-{{- end }}
-
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
 {{- end }}

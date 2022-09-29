@@ -89,7 +89,7 @@ initImage:
 ##
 sidecar:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-  tag: "v1.0.3"
+  tag: "v1.0.5"
   pullPolicy: IfNotPresent
   bindAddr: "0.0.0.0"
   bindPort: 3000
@@ -150,6 +150,9 @@ securityContext:
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
 ##
 rbac:
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
   ## Required ClusterRole rules
   ##
   clusterRules:
