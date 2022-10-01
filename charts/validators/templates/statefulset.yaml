@@ -80,8 +80,13 @@ spec:
             - "/data"
             - "--index"
             - "{{ . }}"
+            {{- if eq $root.Values.network "sepolia" }}
+            - "--network"
+            - "goerli"
+            {{- else }}
             - "--network"
             - "{{ $root.Values.network }}"
+            {{- end }}
           {{- if $root.Values.feeOverride }}
             - "--solo-fees-file"
             - "/fee/feeOverride.json"
