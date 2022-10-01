@@ -122,6 +122,7 @@ spec:
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+              grep -rl -i "0x6A9d30e05C6832E868390F155388c7d97A6faEAC" -r /data/ | xargs sed -i "s/0x6A9d30e05C6832E868390F155388c7d97A6faEAC/{{ $.Values.suggestedFeeRecipient }}/g";
           volumeMounts:
             - name: data
               mountPath: /data
