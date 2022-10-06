@@ -102,7 +102,7 @@ spec:
               mountPath: /data
             - name: scripts
               mountPath: /data/scripts
-      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+      {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -141,7 +141,7 @@ spec:
             - "--terminal-total-difficulty-override={{ .Values.totalDifficultyOverride }}"
           {{- end }}
 
-          {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+          {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - "--genesis-state=/data/genesis.ssz"
           {{- end }}
 
@@ -263,7 +263,7 @@ spec:
           configMap:
             name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
-      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+      {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}
