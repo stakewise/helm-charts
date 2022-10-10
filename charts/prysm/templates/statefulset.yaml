@@ -140,7 +140,10 @@ spec:
           {{- if .Values.totalDifficultyOverride }}
             - "--terminal-total-difficulty-override={{ .Values.totalDifficultyOverride }}"
           {{- end }}
-
+          {{- if .Values.global.checkPointSync.enabled }}
+            - "--checkpoint-sync-url={{ .Values.global.checkPointSync.url }}"
+            - "--genesis-beacon-api-url={{ .Values.global.checkPointSync.url }}"
+          {{- end }}
           {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - "--genesis-state=/data/genesis.ssz"
           {{- end }}

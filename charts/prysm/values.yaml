@@ -23,6 +23,13 @@ global:
   ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
   executionEndpoints: []
 
+  ## To get Prysm up and running in only a few minutes
+  ## from a recent finalized checkpoint state rather than syncing from genesis.
+  ##
+  checkPointSync:
+    enabled: false
+    url: ""
+
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
