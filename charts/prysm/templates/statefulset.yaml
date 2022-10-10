@@ -129,8 +129,8 @@ spec:
             - "--accept-terms-of-use"
             - "--config-file=/config/config.yaml"
             - "--jwt-secret=/secret/jwtsecret"
-          {{- if .Values.httpMevRelay }}
-            - "--http-mev-relay={{ .Values.httpMevRelay }}"
+          {{- if .Values.builderEndpoint }}
+            - "--http-mev-relay={{ .Values.builderEndpoint }}"
           {{- end }}
 
           {{- if .Values.suggestedFeeRecipient }}

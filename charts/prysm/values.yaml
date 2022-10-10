@@ -225,7 +225,7 @@ eth1Endpoints: []
 
 ## MEV Boost endpoint
 ##
-httpMevRelay: ""
+builderEndpoint: ""
 
 ## Post bellatrix, this address will receive the transaction fees produced
 ## by any blocks from this node. Default to junk whilst bellatrix is in development state.
