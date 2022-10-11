@@ -132,7 +132,6 @@ jsonrpc:
       - Net
       - Parity
       - Health
-      - Engine
   host: "0.0.0.0"
   ports:
     rest: "8545"
