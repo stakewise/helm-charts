@@ -161,7 +161,7 @@ spec:
             - {{ . | quote }}
           {{- end }}
 
-          {{- if .Values.metrics.enabled }}
+          {{- if .Values.global.metrics.enabled }}
             - "--monitoring-port={{ .Values.metrics.port }}"
             - "--monitoring-host=0.0.0.0"
           {{- else }}
