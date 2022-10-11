@@ -196,7 +196,7 @@ spec:
               name: http
               protocol: TCP
           {{- end }}
-          {{- if .Values.metrics.enabled }}
+          {{- if .Values.global.metrics.enabled }}
             - containerPort: {{ .Values.metrics.port }}
               name: metrics
               protocol: TCP
