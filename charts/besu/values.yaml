@@ -34,7 +34,7 @@ global:
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
-  
+
   ## RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ## Additional settings could be made in non-global section.
@@ -43,7 +43,7 @@ global:
     ## Specifies whether RBAC resources are to be created
     ##
     create: true
-  
+
   ## Monitoring
   ## Additional settings could be made in non-global section.
   ##
@@ -68,7 +68,7 @@ global:
       ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: false
-  
+
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ## NB! readinessProbe and livenessProbe must be disabled before fully synced
@@ -110,6 +110,11 @@ serviceAccount:
 ##
 additionalLabels:
   client-type: "execution"
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 300
 
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
@@ -325,7 +330,7 @@ restApi:
 
 ## Monitoring
 ##
-metrics:  
+metrics:
   # Metrics network host to expose metrics for Prometheus
   host: "0.0.0.0"
 
