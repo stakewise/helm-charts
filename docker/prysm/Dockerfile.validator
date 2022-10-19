@@ -1,0 +1,13 @@
+FROM debian:bullseye-20221004
+
+ARG TARGETPLATFORM
+ARG VERSION
+
+RUN apt update -y && apt install -y wget
+
+ADD downloader.sh .
+RUN chmod +x downloader.sh
+
+RUN ./downloader.sh validator
+
+ENTRYPOINT ["/app/cmd/validator/validator"]
