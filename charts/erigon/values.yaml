@@ -20,7 +20,7 @@ global:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
   imagePullSecrets: []
-  
+
   ## Service account
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
   ## Additional settings could be made in non-global section.
@@ -37,7 +37,7 @@ global:
     ## Specifies whether RBAC resources are to be created
     ##
     create: true
-  
+
   ## Monitoring
   ## Additional settings could be made in non-global section.
   ##
@@ -62,7 +62,7 @@ global:
       ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: false
-  
+
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ## NB! readinessProbe and livenessProbe must be disabled before fully synced
@@ -94,7 +94,7 @@ image:
   repository: thorax/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v2022.09.03"
+  tag: "v2.28.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -156,6 +156,11 @@ serviceAccount:
 ##
 additionalLabels:
   client-type: "execution"
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 300
 
 podSecurityContext:
   fsGroup: 1001

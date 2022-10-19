@@ -1,10 +1,6 @@
 apiVersion: v2
-name: besu
-description: An enterprise-grade Java-based, Apache 2.0 licensed Ethereum client.
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
-home: https://stakewise.io/
-sources:
-  - https://github.com/hyperledger/besu
+name: contract-watcher
+description: A Helm chart for Contracts monitring
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -19,21 +15,15 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.0.6
+version: 1.0.0
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "22.7.6"
-
-keywords:
-  - ethereum
-  - blockchain
-  - besu
-  - p2p
+appVersion: "v0.0.2"
 
 dependencies:
-- name: common
-  repository: file://../common
-  version: 1.0.0
+  - name: common
+    version: 1.x.x
+    repository: "file://../common"
