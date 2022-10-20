@@ -175,6 +175,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            - name: JAVA_OPTS
+              value: {{ .Values.tekuJavaOpts | quote }}
           volumeMounts:
             - name: data
               mountPath: /data/teku

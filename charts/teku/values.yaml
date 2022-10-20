@@ -314,6 +314,8 @@ eeEndpoint: ""
 # MEV-Boost Endpoint
 builderEndpoint: ""
 
+tekuJavaOpts: "-Xmx3g"
+
 ## Extra flags for teku beacon chain node
 ##
 extraFlags: []
