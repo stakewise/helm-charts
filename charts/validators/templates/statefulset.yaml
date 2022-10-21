@@ -156,12 +156,9 @@ spec:
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
             - "--validators-proposer-config=/data/proposerConfig.json"
+            {{- if $root.Values.enableBuilder }}
+            - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
-
-            {{- if eq $root.Values.type "teku" }}
-            - "--validators-proposer-default-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
-            {{- else }}
-            - "--suggested-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
             {{- end }}
 
             {{- include "validator-graffiti" $ | nindent 12 }}
