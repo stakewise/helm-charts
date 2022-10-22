@@ -144,11 +144,11 @@ spec:
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
             - "--config-file /data/config_gnosis_prysm"
             - "--chain-config-file /data/config_gnosis_prysm"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
-            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
