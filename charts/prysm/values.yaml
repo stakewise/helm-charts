@@ -219,6 +219,13 @@ http:
   enabled: true
   port: "8080"
 
+## If set, prysm will perform a checkpoint sync via network request. For more information see here: https://docs.prylabs.network/docs/prysm-usage/checkpoint-sync#option-1-configure-checkpoint-sync-via-network-request
+## Respective public checkpoint sync endpoints can be found here: https://eth-clients.github.io/checkpoint-sync-endpoints/
+## It is not recommended to blindly trust any public beacon node.
+## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root 
+##
+checkpointSyncUrl: ""
+
 ## Ethereum 1 node endpoints.
 ##
 eth1Endpoints: []
