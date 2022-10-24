@@ -115,6 +115,9 @@ spec:
             {{- end }}
               exec /opt/teku/bin/teku
               --network={{ .Values.global.network }}
+            {{- if .Values.initialState }}
+              --initial-state={{ .Values.initialState }}/eth/v2/debug/beacon/states/finalized
+            {{- end }}
               --config-file=/data/teku/config.yaml
               --data-beacon-path=/data/teku/beacon
               --data-path=/data/teku

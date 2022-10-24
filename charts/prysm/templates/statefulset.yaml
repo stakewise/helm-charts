@@ -154,6 +154,11 @@ spec:
             - "--chain-config-file=/data/gnosis-config/config.yaml"
           {{- end }}
 
+          {{- if .Values.checkpointSyncUrl }}
+            - "--checkpoint-sync-url={{ .Values.checkpointSyncUrl }}"
+            - "--genesis-beacon-api-url={{ .Values.checkpointSyncUrl }}"
+          {{- end}}
+
           {{- range .Values.extraFlags }}
             - {{ . | quote }}
           {{- end }}

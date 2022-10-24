@@ -123,6 +123,9 @@ spec:
               --execution-jwt=/secret/jwtsecret
               --datadir=/data
               --network={{ .Values.global.network }}
+            {{- if .Values.checkpointSyncUrl }}
+              --checkpoint-sync-url={{ .Values.checkpointSyncUrl }}
+            {{- end}}
               --disable-upnp
               --disable-enr-auto-update
               --target-peers={{ .Values.targetPeers }}
