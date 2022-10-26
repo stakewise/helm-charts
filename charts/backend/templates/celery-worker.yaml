@@ -47,6 +47,9 @@ spec:
                 name: {{ include "common.names.fullname" . }}
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}-celery
+          env:
+            - name: DJANGO_SETTINGS_MODULE
+              value: "config.settings.celery_settings"
           {{- with .Values.celery.workerResources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
