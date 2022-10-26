@@ -116,6 +116,7 @@ spec:
               --http.vhosts={{ .Values.http.vhosts }}
               --http.api={{ .Values.http.api }}
           {{- end }}
+              --maxpeers={{ .Values.targetPeers }}
           {{- if .Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
               --port=$EXTERNAL_PORT

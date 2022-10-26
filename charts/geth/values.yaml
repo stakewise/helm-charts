@@ -98,6 +98,8 @@ image:
   tag: "v1.10.25"
   pullPolicy: IfNotPresent
 
+targetPeers: 100
+
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 ##
