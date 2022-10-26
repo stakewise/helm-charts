@@ -113,7 +113,7 @@ image:
     tag: "v3.1.2"
   teku:
     repository: "consensys/teku"
-    tag: "22.10.1"
+    tag: "22.10.2"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
