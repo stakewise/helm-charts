@@ -119,7 +119,7 @@ spec:
               --maxpeers={{ .Values.targetPeers }}
           {{- if .Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
-              --port=$EXTERNAL_PORT
+              --port={{ include "geth.p2pPort" . }}
           {{- else }}
               --nat=extip:$(POD_IP)
               --port={{ include "geth.p2pPort" . }}
