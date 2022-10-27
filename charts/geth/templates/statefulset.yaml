@@ -170,10 +170,10 @@ spec:
           {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
             - name: p2p-tcp
-              containerPort: {{ .Values.p2pNodePort.startAt }}
+              containerPort: {{ include "geth.p2pPort" . }}
               protocol: TCP
             - name: p2p-udp
-              containerPort: {{ .Values.p2pNodePort.startAt }}
+              containerPort: {{ include "geth.p2pPort" . }}
               protocol: UDP
           {{- end }}
           volumeMounts:
