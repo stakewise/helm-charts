@@ -119,7 +119,7 @@ spec:
               --maxpeers={{ .Values.targetPeers }}
           {{- if .Values.p2pNodePort.enabled }}
               --nat=extip:$EXTERNAL_IP
-              --port={{ include "geth.p2pPort" . }}
+              --port=$EXTERNAL_PORT
           {{- else }}
               --nat=extip:$(POD_IP)
               --port={{ include "geth.p2pPort" . }}
@@ -170,10 +170,10 @@ spec:
           {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
             - name: p2p-tcp
-              containerPort: {{ include "geth.p2pPort" . }}
+              containerPort: {{ .Values.p2pNodePort.startAt }}
               protocol: TCP
             - name: p2p-udp
-              containerPort: {{ include "geth.p2pPort" . }}
+              containerPort: {{ .Values.p2pNodePort.startAt }}
               protocol: UDP
           {{- end }}
           volumeMounts:
