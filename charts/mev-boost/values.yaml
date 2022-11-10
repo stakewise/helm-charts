@@ -35,7 +35,7 @@ image:
   repository: flashbots/mev-boost
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.3.2"
+  tag: "1.4.0"
 
 imagePullSecrets: []
 nameOverride: ""
