@@ -35,6 +35,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - -{{ .Values.global.network }}
+            - -relay-check
             - -relays
             - {{ pluck .Values.global.network .Values.relays | first }}
             - -addr
