@@ -126,8 +126,6 @@ spec:
           {{- end }}
           {{- if .Values.p2pNodePort.enabled }}
               --Network.ExternalIp=$EXTERNAL_IP
-              --Network.P2PPort=$EXTERNAL_PORT
-              --Network.DiscoveryPort=$EXTERNAL_PORT
           {{- else }}
               --Network.ExternalIp=$(POD_IP)
               --Network.P2PPort={{ include "nethermind.p2pPort" . }}
