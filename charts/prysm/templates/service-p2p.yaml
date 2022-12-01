@@ -25,7 +25,7 @@ spec:
     - name: p2p-tcp
       port: {{ include "prysm.p2pPort" $ }}
       protocol: TCP
-      targetPort: p2p-tcp
+      targetPort: {{ $port }}
       nodePort: {{ $port }}
   {{- if eq $.Values.p2pNodePort.type "NodePort" }}
     - name: p2p-udp
