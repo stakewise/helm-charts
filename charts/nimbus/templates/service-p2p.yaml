@@ -12,7 +12,7 @@ metadata:
   name: {{ include "common.names.fullname" $ }}-{{ $i }}
   labels:
     {{- include "common.labels.standard" $ | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
     type: p2p
   {{- with $.Values.p2pNodePort.annotations }}
   annotations:
@@ -25,7 +25,7 @@ spec:
     - name: p2p-tcp
       port: {{ include "nimbus.p2pPort" $ }}
       protocol: TCP
-      targetPort: p2p-tcp
+      targetPort: {{ $port }}
       nodePort: {{ $port }}
   {{- if eq $.Values.p2pNodePort.type "NodePort" }}
     - name: p2p-udp
@@ -36,7 +36,7 @@ spec:
   {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
-    replicaID: {{ $i | quote }}
+    statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"
 
 {{- end }}
 {{- end }}

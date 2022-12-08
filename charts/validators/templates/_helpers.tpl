@@ -90,6 +90,8 @@ Validator beacon node
 - "--beacon-rpc-provider={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- else if eq $.Values.type "nimbus" }}
+- "--beacon-node={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
 {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpoints }}
 {{- if gt $beaconChainRpcEndpointsLen 1 }}
@@ -105,7 +107,7 @@ Validator graffiti
 */}}
 {{- define "validator-graffiti" -}}
 {{- if $.Values.graffiti }}
-{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") }}
+{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") (eq $.Values.type "nimbus") }}
 - "--graffiti={{ $.Values.graffiti }}"
 {{- else if eq $.Values.type "teku" }}
 - "--validators-graffiti={{ $.Values.graffiti }}"

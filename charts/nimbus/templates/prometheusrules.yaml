@@ -1,5 +1,5 @@
 {{- if and (or .Values.global.metrics.enabled .Values.metrics.enabled)
-  (or .Values.global.metrics.prometheusRule.enabled .Values.metrics.prometheusRule.enabled) }}
+           (or .Values.global.metrics.prometheusRule.enabled .Values.metrics.prometheusRule.enabled) }}
 apiVersion: monitoring.coreos.com/v1
 kind: PrometheusRule
 metadata:
@@ -16,22 +16,8 @@ metadata:
     {{- end }}
 spec:
   groups:
-  {{- range $i, $e := until (len .Values.global.executionEndpoints) }}
-  {{- with $.Values.metrics.prometheusRule.rules }}
-    - name: {{ include "common.names.fullname" $ }}-{{ $i }}
+  {{- with .Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
-  {{- end }}
-  {{- if $.Values.metrics.prometheusRule.default }}
-    - name: {{ include "common.names.fullname" $ }}-{{ $i }}-default
-      rules:
-        - alert: NimbusBeaconNodeDown
-          expr: up{job='{{ include "common.names.fullname" $ }}-{{ $i }}'} == 0
-          for: 1m
-          labels:
-            severity: critical
-          annotations:
-            summary: Nimbus beacon node is down
-            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
-  {{- end }}
   {{- end }}
 {{- end }}

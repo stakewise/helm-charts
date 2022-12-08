@@ -1,40 +1,33 @@
-{{- if or .Values.rest.enabled .Values.global.metrics.enabled }}
-{{- $root := . -}}
-{{- range $i, $e := until (len .Values.global.executionEndpoints) }}
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "common.names.fullname" $root }}-{{ $i }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
-spec:
-  type: "ClusterIP"
-{{- if $root.Values.svcHeadless }}
-  clusterIP: None
+    {{- include "common.labels.standard" . | nindent 4 }}
+{{- if and .Values.global.metrics.enabled .Values.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.metrics.svcAnnotations | nindent 4 | trim }}
 {{- end }}
-{{- if $root.Values.sessionAffinity.enabled }}
+spec:
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- if .Values.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ $root.Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+{{- if .Values.svcHeadless }}
+  clusterIP: None
 {{- end }}
   ports:
-  {{- if $root.Values.rest.enabled }}
-    - port: {{ $root.Values.rest.port }}
-      targetPort: {{ $root.Values.rest.portName }}
-      protocol: TCP
-      name: {{ $root.Values.rest.portName }}
-  {{- end }}
-  {{- if $root.Values.metrics.enabled }}
-    - port: {{ $root.Values.metrics.port }}
+    - name: {{ .Values.http.portName }}
+      port: {{ .Values.http.port }}
+      targetPort: {{ .Values.http.portName }}
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics
+      port: {{ .Values.metrics.port }}
       targetPort: metrics
-      protocol: TCP
-      name: metrics
   {{- end }}
-  selector:
-    {{- include "common.labels.matchLabels" $root | nindent 4 }}
-    replicaID: {{ $i | quote }}
-{{- end }}
-{{- end }}

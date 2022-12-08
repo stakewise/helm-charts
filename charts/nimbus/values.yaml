@@ -18,6 +18,9 @@ global:
   ## Uses the same endpoint to populate the deposit cache.
   ## A separate Statefulset will be created for each specified address
   ##
+  ## !!!!! WARNING !!!!!
+  ## NEVER CHANGE THE ORDER OF ENDPOINTS AS THIS MAY BREAK
+  ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
   executionEndpoints: []
 
   ## Credentials to fetch images from private registry
@@ -81,8 +84,8 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  repository: "busybox"
-  tag: "1.35"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -94,18 +97,20 @@ sidecar:
   bindAddr: "0.0.0.0"
   bindPort: 3000
 
+## Nimbus beacon node image version
+## ref: https://hub.docker.com/r/statusim/nimbus-eth2
 image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v22.7.0"
+  tag: "multiarch-v22.11.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 ##
 imagePullSecrets: []
 
-## Provide a name in place of lighthouse for `app:` labels
+## Provide a name in place of nimbus for `app:` labels
 ##
 nameOverride: ""
 
@@ -113,19 +118,25 @@ nameOverride: ""
 ##
 fullnameOverride: ""
 
-# REST Server settings
-rest:
+## Rest API Settings
+##
+http:
+  # Enables Beacon Rest API
   enabled: true
   # Port of the REST server
   port: "5052"
   # Port name for the respective k8s service
-  portName: "rest"
+  portName: "http"
   # Listening address of the REST server
   address: "0.0.0.0"
-  # Limit the access to the REST API to a particular hostname
+  # Access-Control-Allow-Origin response HTTP header
   allowOrigin: "*"
 
-## Extra flags to pass to the node
+## The target number of peers.
+##
+targetPeers: 80
+
+## Extra flags for nimbus beacon chain node
 ##
 extraFlags: []
 
@@ -139,12 +150,17 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "consensus"
+
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
 securityContext:
-  fsGroup: 1000
-  runAsUser: 1000
+  fsGroup: 1001
+  runAsUser: 1001
 
 ## RBAC configuration.
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
@@ -191,6 +207,18 @@ tolerations: {}
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - nimbus
+##       topologyKey: kubernetes.io/hostname
+##
 affinity: {}
 
 ## Used to assign priority to pods
@@ -214,21 +242,13 @@ verticalAutoscaler:
   updateMode: Off
   containerPolicies: {}
 
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
 ## Configure liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-## NB! readinessProbe and livenessProbe must be disabled before genesis
 ##
 livenessProbe:
   initialDelaySeconds: 900
@@ -254,7 +274,7 @@ readinessProbe:
 
 ## Defines whether the service must be headless
 ##
-svcHeadless: false
+svcHeadless: true
 
 ## Configure session affinity for validator clients to hit the same beacon node
 ## for the period specified in `timeoutSeconds`
@@ -262,7 +282,7 @@ svcHeadless: false
 ##
 sessionAffinity:
   # Whether to enable session affinity or not
-  enabled: true
+  enabled: false
   # The session duration in seconds
   timeoutSeconds: 86400
 
@@ -282,84 +302,62 @@ p2pNodePort:
   type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
-  startAt: 31600
+  startAt: 31300
   ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
   ## @default -- See `values.yaml` for example
   replicaToNodePort: {}
   #  "0": 32345
   #  "3": 32348
-  initContainer:
-    image:
-      ## @param p2pNodePort.initContainer.repository Container image to fetch nodeport information
-      ##
-      repository: bitnami/kubectl
-      ## @param p2pNodePort.initContainer.tag Container tag
-      ##
-      tag: "1.24"
-      ## @param p2pNodePort.initContainer.pullPolicy Container pull policy
-      ##
-      pullPolicy: IfNotPresent
 
 ## Monitoring
 ##
 metrics:
-  ## Whether to enable metrics collection or not
-  ##
-  enabled: true
-  
-  # Listening address of the metrics server
-  address: "0.0.0.0"
+  # Prometheus exporter port
+  port: 5054
 
-  ## Listening HTTP port of the metrics server
-  ##
-  port: 8008
+  # Extra flags to pass for collecting metrics
+  flags:
+    - "--metrics"
+    - "--metrics-port=5054"
+    - "--metrics-address=0.0.0.0"
 
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator
   ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
   ##
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+    ## The namespace in which the ServiceMonitor will be created
     ##
     namespace: ""
-    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+    ## The interval at which metrics should be scraped
     ##
     interval: 30s
-    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+    ## The timeout after which the scrape is ended
     ##
     scrapeTimeout: ""
-    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+    ## Metrics RelabelConfigs to apply to samples before scraping.
     ##
-    relabelings: []
-    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
     ##
     metricRelabelings: []
-    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+    ## Specify honorLabels parameter to add the scrape endpoint
     ##
     honorLabels: false
-    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
     ##
     additionalLabels: {}
   ## Custom PrometheusRule to be defined
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
   prometheusRule:
-    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-    ##
-    enabled: false
-    ## @param metrics.prometheusRule.default Create a default set of Alerts
-    ##
-    default: true
-    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+    ## The namespace in which the prometheusRule will be created
     ##
     namespace: ""
-    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+    ## Additional labels for the prometheusRule
     ##
     additionalLabels: {}
-    ## @param metrics.prometheusRule.rules Custom Prometheus rules
+    ## Custom Prometheus rules
     ##
     rules: []
 
@@ -376,5 +374,5 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 300Gi
+  size: 250Gi
   annotations: {}
