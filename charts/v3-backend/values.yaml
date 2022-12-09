@@ -2,12 +2,9 @@ global:
   serviceAccount:
     create: true
 
-## Common configuration for all the containers (server.common_conf)
+## Application settings
 ##
-commonConf:
-  environment: "staging"
-  debug: "false"
-  secretKey: ""
+settings:
   ## Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
   ##
   network: goerli
@@ -52,7 +49,7 @@ commonConf:
   postgres:
     host: localhost
     port: "5432"
-    db: backend-v3
+    db: v3-backend
     user: ""
     password: ""
 

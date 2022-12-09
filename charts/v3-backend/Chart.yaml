@@ -1,5 +1,5 @@
 apiVersion: v2
-name: backend
+name: v3-backend
 version: 3.0.0
 appVersion: v3.0.0
 kubeVersion: "^1.18.0-0"
@@ -11,7 +11,7 @@ keywords:
   - staking
 home: https://stakewise.io/
 sources:
-  - https://github.com/tsudmi/backend/
+  - https://github.com/stakewise/v3-backend/
 dependencies:
   - name: common
     version: 1.x.x
