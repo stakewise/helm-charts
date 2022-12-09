@@ -1,0 +1,50 @@
+kind: Deployment
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+metadata:
+  name: {{ include "common.names.fullname" . }}-worker
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    component: "worker"
+spec:
+  replicas: {{ default 1 .Values.worker.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      component: "worker"
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        component: "worker"
+      annotations:
+        checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
+        checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.worker.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.worker.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      priorityClassName: {{ .Values.worker.priorityClassName | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash", "./scripts/worker.sh"]
+          envFrom:
+            - secretRef:
+                name: {{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}
+          {{- with .Values.worker.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}

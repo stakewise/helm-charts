@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  NETWORK: {{ .Values.settings.network | quote }}
+  SENTRY_DSN: {{ .Values.settings.sentryDsn | quote }}
+
+  GCP_STORAGE_CONTENT_BUCKET: {{ .Values.settings.gcpStorageContentBucket | quote }}
+
+  SEND_EMAILS: {{ .Values.settings.sendEmails | quote }}
+  MAILGUN_SENDER_DOMAIN: {{ .Values.settings.mailgunSenderDomain | quote }}
+  MAILGUN_API_URL: {{ .Values.settings.mailgunApiUrl | quote }}
+  DEFAULT_FROM_EMAIL: {{ .Values.settings.defaultFromEmail | quote }}
+
+  IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoints | quote }}
+  IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
+
+  EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
+  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  
+  SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
+
+  REDIS_HOST: {{ .Values.settings.redis.host | quote }}
+  REDIS_PORT: {{ .Values.settings.redis.port | quote }}
+  REDIS_DB: {{ .Values.settings.redis.db | quote }}
+
+  POSTGRES_HOST: {{ .Values.settings.postgres.host | quote }}
+  POSTGRES_PORT: {{ .Values.settings.postgres.port | quote }}
+  POSTGRES_DB: {{ .Values.settings.postgres.db | quote }}
+  POSTGRES_USER: {{ .Values.settings.postgres.user | quote }}

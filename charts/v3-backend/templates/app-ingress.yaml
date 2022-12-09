@@ -1,0 +1,39 @@
+{{- if .Values.app.ingress.enabled }}
+{{ $fullName := include "common.names.fullname" . }}
+{{ $ingressPath := .Values.app.ingress.path }}
+apiVersion: {{ include "common.capabilities.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ include "common.names.fullname" . }}-app
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    component: "app"
+    {{- with .Values.app.ingress.labels }}
+    {{ toYaml . | nindent 4 | trim }}
+    {{- end }}
+  {{- with .Values.app.ingress.annotations }}
+  annotations:
+    {{ toYaml . | nindent 4 | trim }}
+  {{- end }}
+spec:
+  {{- if and .Values.app.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.app.ingress.className }}
+  {{- end }}
+  {{- with .Values.app.ingress.tls }}
+  tls:
+    {{ toYaml . | nindent 4 | trim }}
+  {{- end }}
+  rules:
+    {{- range .Values.app.ingress.hosts }}
+    - host: {{ . }}
+      http:
+        paths:
+          - pathType: ImplementationSpecific
+            path: {{ $ingressPath }}
+            backend:
+              service:
+                name: {{ $fullName }}-app
+                port:
+                  name: http
+    {{- end }}
+{{- end }}

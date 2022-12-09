@@ -1,0 +1,29 @@
+apiVersion: v2
+name: v3-backend
+version: 3.0.0
+appVersion: v3.0.0
+kubeVersion: "^1.18.0-0"
+description: The StakeWise backend application.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/stakewise/v3-backend/
+dependencies:
+  - name: common
+    version: 1.x.x
+    repository: "file://../common"
+  - name: postgresql
+    version: 11.6.0
+    repository: https://charts.bitnami.com/bitnami/
+    condition: postgresql.enabled
+  - name: redis
+    version: 17.3.14
+    repository: https://charts.bitnami.com/bitnami/
+    condition: redis.enabled
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
