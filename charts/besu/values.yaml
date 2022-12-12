@@ -188,7 +188,7 @@ p2pNodePort:
   type: NodePort
   ## @param p2pNodePort.startAt The ports allocation will start from this value
   ##
-  startAt: 31500
+  startAt: 31600
   ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
   ## @default -- See `values.yaml` for example
   replicaToNodePort: {}

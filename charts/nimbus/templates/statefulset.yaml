@@ -99,7 +99,7 @@ spec:
               mountPath: /configs
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sh
@@ -125,11 +125,10 @@ spec:
               --max-peers={{ .Values.targetPeers }}
               --enr-auto-update=true
             {{- if .Values.p2pNodePort.enabled }}
-              --listen-address=0.0.0.0
-              --tcp-port=$EXTERNAL_PORT
-              --udp-port=$EXTERNAL_PORT
+              --nat=extip:$EXTERNAL_IP
+              --tcp-port={{ include "nimbus.p2pPort" . }}
+              --udp-port={{ include "nimbus.p2pPort" . }}
             {{- else }}
-              --listen-address=0.0.0.0
               --tcp-port={{ include "nimbus.p2pPort" . }}
               --udp-port={{ include "nimbus.p2pPort" . }}
             {{- end }}
