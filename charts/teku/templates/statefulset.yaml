@@ -163,6 +163,10 @@ spec:
           {{- end }}
         {{- end }}
           env:
+          {{- if .Values.javaOpts.enabled }}
+            - name: JAVA_OPTS
+              value: {{ .Values.javaOpts.limits.maxHeapSize }}
+          {{- end }}
             - name: POD_IP
               valueFrom:
                 fieldRef:
