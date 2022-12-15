@@ -55,7 +55,7 @@ settings:
 
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/v3-backend"
-  tag: "vaults"
+  tag: "master"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -79,6 +79,69 @@ app:
   ## "Host" Header value to pass with the request for Host verification.
   ##
   probesHostHeader: "api-v3.stakewise.io"
+
+  serviceType: ClusterIP
+  servicePort: "8000"
+
+  ## Configure ingress
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/ingress/
+  ##
+  ingress:
+    enabled: true
+    className: ""
+    annotations: {}
+    tls: []
+    path: "/"
+    hosts: []
+
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 1024Mi
+
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 65534
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: []
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  affinity: {}
+
+  ## used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
+  priorityClassName: ""
+
+admin:
+  ## How many api pods to run simultaneously.
+  ##
+  replicaCount: 1
+
+  ## Enable pod disruption budget.
+  ## ref: https://kubernetes.io/docs/concepts/workloads/pods/disruptions/
+  ##
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
+  ## "Host" Header value to pass with the request for Host verification.
+  ##
+  probesHostHeader: "admin-v3.stakewise.io"
 
   serviceType: ClusterIP
   servicePort: "8000"

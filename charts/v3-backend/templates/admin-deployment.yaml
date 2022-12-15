@@ -1,0 +1,60 @@
+kind: Deployment
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+metadata:
+  name: {{ include "common.names.fullname" . }}-admin
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    component: "admin"
+spec:
+  replicas: {{ default 1 .Values.admin.replicaCount }}
+  minReadySeconds: 15
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      component: "admin"
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        component: "admin"
+      annotations:
+        checksum/common-secret: {{ include (print $.Template.BasePath "/common-secret.yaml") . | sha256sum }}
+        checksum/common-configmap: {{ include (print $.Template.BasePath "/common-configmap.yaml") . | sha256sum }}
+    spec:
+      {{- with .Values.admin.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.admin.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      priorityClassName: {{ .Values.admin.priorityClassName | quote }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["bash", "./scripts/admin.sh"]
+          envFrom:
+            - secretRef:
+                name: {{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}
+          {{- with .Values.admin.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.admin.servicePort }}
+              protocol: TCP
