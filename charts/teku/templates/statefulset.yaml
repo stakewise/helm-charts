@@ -163,9 +163,9 @@ spec:
           {{- end }}
         {{- end }}
           env:
-          {{- if .Values.javaOpts.enabled }}
+          {{- if .Values.javaOpts.maxHeapSize }}
             - name: JAVA_OPTS
-              value: {{ .Values.javaOpts.limits.maxHeapSize }}
+              value: {{ .Values.javaOpts.maxHeapSize }}
           {{- end }}
             - name: POD_IP
               valueFrom:
