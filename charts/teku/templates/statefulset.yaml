@@ -163,7 +163,7 @@ spec:
           {{- end }}
         {{- end }}
           env:
-          {{- if .Values.javaOpts.maxHeapSize }}
+          {{- if .Values.javaOpts.enabled }}
             - name: JAVA_OPTS
               value: {{ .Values.javaOpts.maxHeapSize }}
           {{- end }}

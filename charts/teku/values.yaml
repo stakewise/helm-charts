@@ -213,12 +213,12 @@ resources: {}
   #   memory: 128Mi
 
 javaOpts:
-  # This option is used to set java specific values like the heap size.
+  enabled: false
+  # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
   # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
-  # The Xms option stands for the initial memory allocation pool of the JVM.
   # https://docs.teku.consensys.net/en/stable/HowTo/Get-Started/Manage-Memory/
-  # example for kubernetes resources less than 8Gi
-  # maxHeapSize: "-Xmx3g"
+  # Example for kubernetes resources less than 8Gi memory:
+  # maxHeapSize: "-Xmx2g"
   maxHeapSize: ""
 
 ## Used to assign priority to pods
