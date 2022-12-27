@@ -25,10 +25,10 @@ initImage:
   pullPolicy: IfNotPresent
 
 image:
-  repository: ipfs/go-ipfs
+  repository: ipfs/kubo
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.15.0"
+  tag: "v0.17.0"
 
 imagePullSecrets: []
 nameOverride: ""
