@@ -23,10 +23,6 @@ data:
   
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
 
-  REDIS_HOST: {{ .Values.settings.redis.host | quote }}
-  REDIS_PORT: {{ .Values.settings.redis.port | quote }}
-  REDIS_DB: {{ .Values.settings.redis.db | quote }}
-
   POSTGRES_HOST: {{ .Values.settings.postgres.host | quote }}
   POSTGRES_PORT: {{ .Values.settings.postgres.port | quote }}
   POSTGRES_DB: {{ .Values.settings.postgres.db | quote }}

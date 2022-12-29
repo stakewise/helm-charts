@@ -4,9 +4,12 @@ dependencies:
   version: 1.0.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
-  version: 11.6.0
-- name: redis
+  version: 12.1.6
+- name: rabbitmq
   repository: https://charts.bitnami.com/bitnami/
-  version: 17.3.14
-digest: sha256:d210899412b20f3f94f6ba6be74bfc922c3dc617ec6d829d7570f630b81ad566
-generated: "2022-12-06T13:38:08.99552+04:00"
+  version: 11.3.0
+- name: memcached
+  repository: https://charts.bitnami.com/bitnami/
+  version: 6.3.2
+digest: sha256:9c1fe65d5741f34f68164b877413ed6b457a0900c4cba8dad5bf524635d1f63e
+generated: "2022-12-29T09:38:14.063258+04:00"
