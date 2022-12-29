@@ -17,13 +17,17 @@ dependencies:
     version: 1.x.x
     repository: "file://../common"
   - name: postgresql
-    version: 11.6.0
+    version: 12.1.6
     repository: https://charts.bitnami.com/bitnami/
     condition: postgresql.enabled
-  - name: redis
-    version: 17.3.14
+  - name: rabbitmq
+    version: 11.3.0
     repository: https://charts.bitnami.com/bitnami/
-    condition: redis.enabled
+    condition: rabbitmq.enabled
+  - name: memcached
+    version: 6.3.2
+    repository: https://charts.bitnami.com/bitnami/
+    condition: memcached.enabled
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
