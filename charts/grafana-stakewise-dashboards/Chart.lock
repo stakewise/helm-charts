@@ -1,6 +1,6 @@
 dependencies:
 - name: common
-  repository: file://../common
+  repository: https://charts.stakewise.io/
   version: 1.0.0
-digest: sha256:07cebde439abe4ba19bb28e844b7419dab83c7f613886416aaf3ec08e8059144
-generated: "2022-04-20T16:28:22.724706135+03:00"
+digest: sha256:240ef37303ced86ae2d060d674837717c50a97acc373fbfaf1b39b26e932baa4
+generated: "2023-01-09T12:35:59.03531+04:00"

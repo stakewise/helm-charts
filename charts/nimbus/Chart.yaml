@@ -20,5 +20,5 @@ appVersion: multiarch-v22.11.0
 
 dependencies:
 - name: common
-  repository: file://../common
-  version: 1.0.0
+  repository: https://charts.stakewise.io/
+  version: 1.x.x

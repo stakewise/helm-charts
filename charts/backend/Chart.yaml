@@ -15,17 +15,17 @@ sources:
 dependencies:
   - name: common
     version: 1.x.x
-    repository: "file://../common"
+    repository: https://charts.stakewise.io/
   - name: postgresql
-    version: 11.6.0
+    version: 12.1.7
     repository: https://charts.bitnami.com/bitnami/
     condition: postgresql.enabled
   - name: rabbitmq
-    version: 9.0.0
+    version: 11.3.1
     repository: https://charts.bitnami.com/bitnami/
     condition: rabbitmq.enabled
   - name: memcached
-    version: 6.0.21
+    version: 6.3.3
     repository: https://charts.bitnami.com/bitnami/
     condition: memcached.enabled
 maintainers:
