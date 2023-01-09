@@ -1,6 +1,6 @@
 dependencies:
 - name: common
-  repository: file://../common
+  repository: https://charts.stakewise.io/
   version: 1.0.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
@@ -11,5 +11,5 @@ dependencies:
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
   version: 6.3.2
-digest: sha256:9c1fe65d5741f34f68164b877413ed6b457a0900c4cba8dad5bf524635d1f63e
-generated: "2022-12-29T09:38:14.063258+04:00"
+digest: sha256:4e5b5c0b9e721d4a3e1723abbeb59ad5b917d35014a1c9ad5fe319eb84e41495
+generated: "2023-01-09T12:38:19.753996+04:00"

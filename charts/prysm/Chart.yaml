@@ -20,5 +20,5 @@ icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/imag
 
 dependencies:
 - name: common
-  repository: file://../common
-  version: 1.0.0
+  repository: https://charts.stakewise.io/
+  version: 1.x.x

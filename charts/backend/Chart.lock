@@ -1,15 +1,15 @@
 dependencies:
 - name: common
-  repository: file://../common
+  repository: https://charts.stakewise.io/
   version: 1.0.0
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami/
-  version: 11.6.0
+  version: 12.1.7
 - name: rabbitmq
   repository: https://charts.bitnami.com/bitnami/
-  version: 9.0.0
+  version: 11.3.1
 - name: memcached
   repository: https://charts.bitnami.com/bitnami/
-  version: 6.0.21
-digest: sha256:8de1598dfd521d2059f4380340d538899b5306a8ec1e8f891a2701c482a33463
-generated: "2022-06-02T18:06:25.795689015+03:00"
+  version: 6.3.3
+digest: sha256:8ff615f63dea1dd8305cda3157e7d6fe3156c9e4d6c689629f3136144b043432
+generated: "2023-01-09T12:34:41.000787+04:00"

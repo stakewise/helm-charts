@@ -34,12 +34,12 @@ sources:
 dependencies:
   - name: common
     version: 1.x.x
-    repository: "file://../common"
+    repository: https://charts.stakewise.io/
   - name: postgresql
     version: 12.1.6
     repository: https://charts.bitnami.com/bitnami/
     condition: postgresql.enabled
   - name: ipfs
     version: 1.x.x
-    repository: "file://../ipfs"
+    repository: https://charts.stakewise.io/
     condition: ipfs.enabled

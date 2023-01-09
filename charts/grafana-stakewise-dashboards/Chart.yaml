@@ -25,5 +25,5 @@ appVersion: "1.0.0"
 
 dependencies:
 - name: common
-  repository: file://../common
+  repository: https://charts.stakewise.io/
   version: 1.0.0
