@@ -41,6 +41,7 @@ graph:
   # How many simultaneous connections to allow to the store.
   # Due to implementation details, this value may not be strictly adhered to
   storeConnectionPoolSize: 25
+  graphAllowNonDeterministricIpfs: "true"
   
 
 serviceAccount:
