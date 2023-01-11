@@ -268,7 +268,7 @@ spec:
           configMap:
             name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
-      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}
