@@ -5,6 +5,8 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
+  LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
+  NETWORK: {{ .Values.settings.network | quote }}
   IPFS_LOCAL_CLIENT_ENDPOINT: {{ .Values.settings.ipfsLocalClientEndpoint | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}

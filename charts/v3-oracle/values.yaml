@@ -82,6 +82,11 @@ ingress:
   #      - chart-example.local
 
 settings:
+  logLevel: "INFO"
+  ## Possible values: goerli, perm_goerli, gnosis, mainnet
+  ##
+  network: "mainnet"
+
   oraclePrivateKey:  ""
   sentryDsn: ""
 
