@@ -1,0 +1,25 @@
+apiVersion: v2
+name: oracle
+version: 2.8.10
+appVersion: v2.8.10
+kubeVersion: "^1.14.0-0"
+description: The StakeWise application for submitting off-chain data to smart contracts.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/stakewise/oracle/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+
+dependencies:
+- name: common
+  repository: https://charts.stakewise.io/
+  version: 1.x.x
+- name: ipfs
+  repository: file://../ipfs
+  version: 1.x.x
