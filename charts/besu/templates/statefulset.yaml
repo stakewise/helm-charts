@@ -117,7 +117,7 @@ spec:
             {{- if .Values.engineRpc.enabled }}
               --engine-rpc-enabled={{ .Values.engineRpc.enabled }}
               --engine-host-allowlist={{ .Values.engineRpc.hostAllowList }}
-              --engine-jwt-secret={{ .Values.global.JWTSecret }}
+              --engine-jwt-secret=/secret/jwtsecret
               --engine-rpc-port={{ .Values.engineRpc.port | join "," }}
             {{- end }}
             {{- if .Values.global.metrics.enabled }}
