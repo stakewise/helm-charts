@@ -5,11 +5,6 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
-  LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
-  NETWORK: {{ .Values.settings.network | quote }}
-  IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
-  IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
-  IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
   IPFS_LOCAL_CLIENT_ENDPOINT: {{ .Values.settings.ipfsLocalClientEndpoint | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}

@@ -82,11 +82,6 @@ ingress:
   #      - chart-example.local
 
 settings:
-  logLevel: "INFO"
-  ## Possible values: goerli, perm_goerli, gnosis, mainnet
-  ##
-  network: "mainnet"
-
   oraclePrivateKey:  ""
   sentryDsn: ""
 
@@ -103,9 +98,6 @@ settings:
   ## IPFS Settings
   ##
   ipfsLocalClientEndpoint: ""
-  ipfsPinEndpoints: "/dns/ipfs.infura.io/tcp/5001/https"
-  ipfsFetchEndpoints: "https://gateway.pinata.cloud,http://cloudflare-ipfs.com,https://ipfs.io"
-  ipfsPinataPinEndpoint: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
   infuraIpfsClientUsername: ""
   infuraIpfsClientPassword: ""
   ipfsPinataApiKey: ""
