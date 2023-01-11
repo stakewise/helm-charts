@@ -7,7 +7,7 @@ metadata:
 data:
   entrypoint.sh: |
     #!/bin/sh
-{{- if eq .Values.global.network "prater" }}
+{{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") }}
     if ! [ -f /data/genesis.ssz ]; then
       curl --output /data/genesis.ssz "https://raw.githubusercontent.com/eth2-clients/eth2-networks/32dcce003694ea17e04bc17cc56de2f7909a1d95/shared/prater/genesis.ssz"
     fi
