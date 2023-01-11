@@ -116,7 +116,7 @@ spec:
             {{- end }}
             {{- if .Values.engineRpc.enabled }}
               --engine-rpc-enabled={{ .Values.engineRpc.enabled }}
-              --engine-host-allowlist={{ .Values.engineRpc.hostAllowList }}
+              --engine-host-allowlist={{ .Values.engineRpc.hostAllowList | join "," }}
               --engine-jwt-secret=/secret/jwtsecret
               --engine-rpc-port={{ .Values.engineRpc.port | join "," }}
             {{- end }}
