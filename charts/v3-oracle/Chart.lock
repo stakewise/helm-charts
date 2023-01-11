@@ -1,0 +1,9 @@
+dependencies:
+- name: common
+  repository: https://charts.stakewise.io/
+  version: 1.0.0
+- name: ipfs
+  repository: file://../ipfs
+  version: 1.1.0
+digest: sha256:faa75b4ccd8b88f0fc6f20fb89bd4eb4a5273e6a31ce4eeedcdb23d921dade24
+generated: "2023-01-11T11:41:45.00773+04:00"
