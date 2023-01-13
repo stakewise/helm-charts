@@ -103,8 +103,8 @@ settings:
   ## IPFS Settings
   ##
   ipfsLocalClientEndpoint: ""
-  infuraIpfsClientUsername: ""
-  infuraIpfsClientPassword: ""
+  ipfsInfuraClientUsername: ""
+  ipfsInfuraClientPassword: ""
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
 
