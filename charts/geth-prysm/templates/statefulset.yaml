@@ -380,7 +380,7 @@ spec:
                   fieldPath: status.podIP
           ports:
             - containerPort: {{ .Values.prysm.rpc.port }}
-              name: {{ .Values.prysm.rpc.portName }}
+              name: {{ .Values.prysm.rpc.portName }}-prysm
               protocol: TCP
           {{- if .Values.prysm.p2pNodePort.enabled }}
             - name: p2p-tcp-prysm
@@ -392,12 +392,12 @@ spec:
           {{- end }}
           {{- if .Values.prysm.http.enabled }}
             - containerPort: {{ .Values.prysm.http.port }}
-              name: http
+              name: http-prysm
               protocol: TCP
           {{- end }}
           {{- if .Values.global.metrics.enabled }}
             - containerPort: {{ .Values.prysm.metrics.port }}
-              name: metrics
+              name: metrics-prysm
               protocol: TCP
           {{- end }}
           volumeMounts:

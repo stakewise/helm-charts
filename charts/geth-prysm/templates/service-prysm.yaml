@@ -21,9 +21,9 @@ spec:
   clusterIP: None
 {{- end }}
   ports:
-    - name: {{ .Values.prysm.rpc.portName }}
+    - name: {{ .Values.prysm.rpc.portName }}-geth
       port: {{ .Values.prysm.rpc.port }}
-      targetPort: {{ .Values.prysm.rpc.portName }}
+      targetPort: {{ .Values.prysm.rpc.portName }}-geth
   {{- if .Values.prysm.http.enabled }}
     - name: http-prysm
       port: {{ .Values.prysm.http.port }}
