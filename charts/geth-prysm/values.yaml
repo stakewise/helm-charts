@@ -131,6 +131,9 @@ global:
           key: ethereumValidators
           property: jwt
 
+  service:
+    svcHeadless: true
+
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
