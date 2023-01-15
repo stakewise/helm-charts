@@ -134,6 +134,12 @@ global:
   service:
     svcHeadless: true
 
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
+
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##

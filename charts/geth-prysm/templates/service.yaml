@@ -10,11 +10,11 @@ metadata:
     {{ toYaml .Values.prysm.metrics.svcAnnotations | nindent 4 | trim }}
 {{- end }}
 spec:
-{{- if .Values.global.service.sessionAffinity.enabled }}
+{{- if .Values.global.sessionAffinity.enabled }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ .Values.global.service.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.global.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: ClusterIP
 {{- if .Values.global.service.svcHeadless }}
