@@ -1,0 +1,42 @@
+{{- if and (or .Values.global.metrics.enabled .Values.geth.metrics.enabled)
+    (or .Values.global.metrics.serviceMonitor.enabled .Values.geth.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}
+  {{- if .Values.geth.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.geth.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.geth.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.geth.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+      path: /debug/metrics/prometheus
+      {{- if .Values.geth.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.geth.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.geth.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.geth.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.geth.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.geth.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.geth.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.geth.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.geth.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.geth.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}
