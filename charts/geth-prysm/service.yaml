@@ -1,0 +1,81 @@
+{{- if or .Values.geth.http.enabled .Values.geth.ws.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+{{- if .Values.geth.svcHeadless }}
+  clusterIP: None
+{{- end }}
+{{- if .Values.geth.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.geth.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+  ports:
+  {{- if .Values.global.JWTSecret }}
+    - name: authrpc-geth
+      port: {{ .Values.geth.authRpc.port }}
+      targetPort: authrpc-geth
+  {{- end }}
+  {{- if .Values.geth.http.enabled }}
+    - name: http-geth
+      port: {{ .Values.geth.http.port }}
+      targetPort: http-geth
+  {{- end }}
+  {{- if .Values.geth.ws.enabled }}
+    - name: ws-geth
+      port: {{ .Values.geth.ws.port }}
+      targetPort: ws-geth
+  {{- end }}
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics-geth
+      port: {{ .Values.geth.metrics.port }}
+      targetPort: metrics-geth
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+{{- if and .Values.prysm.metrics.enabled .Values.prysm.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.prysm.metrics.svcAnnotations | nindent 4 | trim }}
+{{- end }}
+spec:
+{{- if .Values.prysm.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.prysm.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+{{- if .Values.prysm.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  ports:
+    - name: {{ .Values.prysm.rpc.portName }}-geth
+      port: {{ .Values.prysm.rpc.port }}
+      targetPort: {{ .Values.prysm.rpc.portName }}-geth
+  {{- if .Values.prysm.http.enabled }}
+    - name: http-prysm
+      port: {{ .Values.prysm.http.port }}
+      targetPort: http-prysm
+  {{- end }}
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics-prysm
+      port: {{ .Values.prysm.metrics.port }}
+      targetPort: metrics-prysm
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
