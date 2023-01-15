@@ -14,10 +14,10 @@ spec:
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.prysm.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: ClusterIP
-{{- if .Values.svcHeadless }}
+{{- if .Values.prysm.svcHeadless }}
   clusterIP: None
 {{- end }}
   ports:

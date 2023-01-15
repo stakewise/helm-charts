@@ -14,7 +14,7 @@ spec:
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
-      timeoutSeconds: {{ .Values.sessionAffinity.timeoutSeconds }}
+      timeoutSeconds: {{ .Values.geth.sessionAffinity.timeoutSeconds }}
 {{- end }}
   type: ClusterIP
   ports:
