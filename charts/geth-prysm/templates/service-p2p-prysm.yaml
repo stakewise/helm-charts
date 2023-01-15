@@ -22,16 +22,16 @@ spec:
   type: {{ $.Values.prysm.p2pNodePort.type }}
   externalTrafficPolicy: Local
   ports:
-    - name: p2p-tcp
+    - name: p2p-tcp-prysm
       port: {{ include "prysm.p2pPort" $ }}
       protocol: TCP
-      targetPort: p2p-tcp
+      targetPort: p2p-tcp-prysm
       nodePort: {{ $port }}
   {{- if eq $.Values.prysm.p2pNodePort.type "NodePort" }}
-    - name: p2p-udp
+    - name: p2p-udp-prysm
       port: {{ include "prysm.p2pPort" $ }}
       protocol: UDP
-      targetPort: p2p-udp
+      targetPort: p2p-udp-prysm
       nodePort: {{ $port }}
   {{- end }}
   selector:

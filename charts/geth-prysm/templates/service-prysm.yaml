@@ -25,12 +25,12 @@ spec:
       port: {{ .Values.prysm.rpc.port }}
       targetPort: {{ .Values.prysm.rpc.portName }}
   {{- if .Values.prysm.http.enabled }}
-    - name: http
+    - name: http-prysm
       port: {{ .Values.prysm.http.port }}
       targetPort: http
   {{- end }}
   {{- if .Values.global.metrics.enabled }}
-    - name: metrics
+    - name: metrics-prysm
       port: {{ .Values.prysm.metrics.port }}
       targetPort: metrics
   {{- end }}

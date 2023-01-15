@@ -22,13 +22,13 @@ spec:
   type: {{ $.Values.geth.p2pNodePort.type }}
   externalTrafficPolicy: Local
   ports:
-    - name: p2p-tcp
+    - name: p2p-tcp-geth
       port: {{ include "geth.p2pPort" $ }}
       protocol: TCP
       targetPort: {{ $port }}
       nodePort: {{ $port }}
   {{- if eq $.Values.geth.p2pNodePort.type "NodePort" }}
-    - name: p2p-udp
+    - name: p2p-udp-geth
       port: {{ include "geth.p2pPort" $ }}
       protocol: UDP
       targetPort: {{ $port }}

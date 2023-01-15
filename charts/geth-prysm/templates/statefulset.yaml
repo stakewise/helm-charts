@@ -229,26 +229,26 @@ spec:
                   fieldPath: status.podIP
           ports:
           {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
-            - name: authrpc
+            - name: authrpc-geth
               containerPort: {{ .Values.geth.authRpc.port }}
           {{- end }}
           {{- if .Values.geth.http.enabled }}
-            - name: http
+            - name: http-geth
               containerPort: {{ .Values.geth.http.port }}
           {{- end }}
           {{- if .Values.geth.ws.enabled }}
-            - name: ws
+            - name: ws-geth
               containerPort: {{ .Values.geth.ws.port }}
           {{- end }}
           {{- if .Values.global.metrics.enabled }}
-            - name: metrics
+            - name: metrics-geth
               containerPort: {{ .Values.geth.metrics.port }}
           {{- end }}
           {{- if .Values.geth.p2pNodePort.enabled }}
-            - name: p2p-tcp
+            - name: p2p-tcp-geth
               containerPort: {{ include "geth.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp
+            - name: p2p-udp-geth
               containerPort: {{ include "geth.p2pPort" . }}
               protocol: UDP
           {{- end }}
@@ -383,10 +383,10 @@ spec:
               name: {{ .Values.prysm.rpc.portName }}
               protocol: TCP
           {{- if .Values.prysm.p2pNodePort.enabled }}
-            - name: p2p-tcp
+            - name: p2p-tcp-prysm
               containerPort: {{ include "prysm.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp
+            - name: p2p-udp-prysm
               containerPort: {{ include "prysm.p2pPort" . }}
               protocol: UDP
           {{- end }}

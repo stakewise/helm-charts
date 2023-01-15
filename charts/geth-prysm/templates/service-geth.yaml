@@ -19,22 +19,22 @@ spec:
   type: ClusterIP
   ports:
   {{- if .Values.global.JWTSecret }}
-    - name: authrpc
+    - name: authrpc-geth
       port: {{ .Values.geth.authRpc.port }}
       targetPort: authrpc
   {{- end }}
   {{- if .Values.geth.http.enabled }}
-    - name: http
+    - name: http-geth
       port: {{ .Values.geth.http.port }}
       targetPort: http
   {{- end }}
   {{- if .Values.geth.ws.enabled }}
-    - name: ws
+    - name: ws-geth
       port: {{ .Values.geth.ws.port }}
       targetPort: ws
   {{- end }}
   {{- if .Values.global.metrics.enabled }}
-    - name: metrics
+    - name: metrics-geth
       port: {{ .Values.geth.metrics.port }}
       targetPort: metrics
   {{- end }}
