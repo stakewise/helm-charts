@@ -42,6 +42,8 @@ graph:
   # Due to implementation details, this value may not be strictly adhered to
   storeConnectionPoolSize: 25
   graphAllowNonDeterministricIpfs: "true"
+  # Maximum size for a file that can be retrieved (in bytes, defaults to 1MiB)
+  graphMaxIpfsFileBytes: "1048576"
   
 
 serviceAccount:
