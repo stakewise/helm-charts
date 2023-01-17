@@ -1,0 +1,93 @@
+global:
+  replicaCount: 2
+
+  nodeSelector:
+    layer: executionandbeacon
+    network: ethereum
+
+  tolerations:
+    - key: "layer"
+      value: "executionandbeacon"
+      effect: "NoSchedule"
+    - key: "network"
+      value: "ethereum"
+      effect: "NoSchedule"
+
+nethermind:
+  image:
+    repository: "nethermind/nethermind"
+    pullPolicy: IfNotPresent
+    tag: 1.16.0-unstable
+
+  initImage:
+    repository: "bitnami/kubectl"
+    tag: "1.23.15"
+    pullPolicy: Always
+
+  p2pNodePort:
+    enabled: true
+    startAt: 31300
+
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+
+  global:
+    network: mainnet
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+
+  persistence:
+    enabled: true
+    storageClassName: "gp3"
+    size: 1000Gi
+
+  resources:
+    requests:
+      memory: 10000Mi
+
+prysm:
+  image:
+    repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+    pullPolicy: IfNotPresent
+    tag: v3.2.0
+
+  initImage:
+    repository: "bitnami/kubectl"
+    tag: "1.23.15"
+    pullPolicy: Always
+
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
+
+  global:
+    network: mainnet
+
+    checkPointSync:
+      enabled: true
+      url: https://mainnet-checkpoint-sync.attestant.io
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+      prometheusRule:
+        enabled: true
+
+  suggestedFeeRecipient: "0x237DeE529A47750bEcdFa8A59a1D766e3e7B5F91"
+  builderEndpoint: http://mev-boost-eth-validators.ethereum:18550
+  
+  persistence:
+    enabled: true
+    storageClassName: "gp3"
+    size: 300Gi
+
+  resources:
+    requests:
+      memory: 10000Mi
