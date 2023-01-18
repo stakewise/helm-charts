@@ -1,0 +1,94 @@
+apiVersion: {{ include "common.capabilities.deployment.apiVersion" . }}
+kind: Deployment
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+       {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with (concat .Values.imagePullSecrets .Values.global.imagePullSecrets) }}
+        imagePullSecrets:
+          {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - args:
+          - run
+          command:
+          - /usr/local/bin/charon
+          env:
+          - name: KUBERNETES_CLUSTER_DOMAIN
+            value: {{ .Values.kubernetesClusterDomain }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "common.names.fullname" . }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          imagePullPolicy: Always
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 3620
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 3620
+            initialDelaySeconds: 5
+            periodSeconds: 3
+          volumeMounts:
+            - mountPath: /charon/validator_keys
+              name: validator-keys
+            - mountPath: /charon/charon-enr-private-key
+              name: charon-enr-private-key
+            - mountPath: /charon/cluster-lock
+              name: cluster-lock
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: validator-keys
+          projected:
+            sources:
+            - secret:
+                name: {{ include "common.names.fullname" . }}-{{ .Values.charon.secrets.validatorKeys }}
+        - name: charon-enr-private-key
+          projected:
+            sources:
+            - secret:
+                name: {{ include "common.names.fullname" . }}-{{ .Values.charon.secrets.enrPrivateKey }}
+        - name: cluster-lock
+          projected:
+            sources:
+            - secret:
+                name: {{ include "common.names.fullname" . }}-{{ .Values.charon.secrets.clusterlock }}
