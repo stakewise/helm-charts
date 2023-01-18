@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+  {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  CHARON_VALIDATOR_API_ADDRESS: {{ .Values.charon.config.validatorApiAddress }}
+  CHARON_P2P_TCP_ADDRESS: {{ .Values.charon.config.p2pTcpAddress }}
+  CHARON_MONITORING_ADDRESS: {{ .Values.charon.config.monitoringAddress }}
+  CHARON_P2P_UDP_ADDRESS: {{ .Values.charon.config.p2pUdpAddress }}
+  CHARON_P2P_BOOTNODE_RELAY: {{ .Values.charon.config.p2pBootnodeRelay | quote }}
+  CHARON_P2P_BOOTNODES: {{ .Values.charon.config.p2pBootnodes }}
+  CHARON_BEACON_NODE_ENDPOINTS: {{ .Values.charon.config.beaconNodeEndpoints }}
+  CHARON_PRIVATE_KEY_FILE: {{ .Values.charon.config.privateKeyFile }}
+  CHARON_LOCK_FILE: {{ .Values.charon.config.charonLockFile }}
+  CHARON_LOG_LEVEL: {{ .Values.charon.config.logLevel }}
+  CHARON_NO_VERIFY: {{ .Values.charon.config.noVerify | quote }}

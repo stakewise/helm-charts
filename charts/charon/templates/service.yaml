@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: {{ .Values.service.ports.validatorApi.name }}
+      protocol: {{ .Values.service.ports.validatorApi.protocol }}
+      port: {{ .Values.service.ports.validatorApi.port }}
+      targetPort: {{ .Values.service.ports.validatorApi.targetPort }}
+    - name: {{ .Values.service.ports.p2pTcp.name }}
+      protocol: {{ .Values.service.ports.p2pTcp.protocol }}
+      port: {{ .Values.service.ports.p2pTcp.port }}
+      targetPort: {{ .Values.service.ports.monitoring.targetPort }}
+    - name: {{ .Values.service.ports.monitoring.name }}
+      protocol: {{ .Values.service.ports.monitoring.protocol }}
+      port: {{ .Values.service.ports.monitoring.port }}
+      targetPort: {{ .Values.service.ports.monitoring.targetPort }}
+    - name: {{ .Values.service.ports.p2pUdp.name }}
+      protocol: {{ .Values.service.ports.p2pUdp.protocol }}
+      port: {{ .Values.service.ports.p2pUdp.port }}
+      targetPort: {{ .Values.service.ports.p2pUdp.targetPort }}
+  selector:
+   {{- include "common.labels.matchLabels" . | nindent 4 }}
