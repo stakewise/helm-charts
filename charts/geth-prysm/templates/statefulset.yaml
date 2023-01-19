@@ -309,7 +309,7 @@ spec:
               scheme: {{ .Values.geth.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
-        - name: prysm
+        - name: prysm-beacon
         {{- if ne .Values.global.network "gnosis" }}
           image: "{{ .Values.prysm.image.repository }}:{{ .Values.prysm.image.tag }}"
           imagePullPolicy: {{ .Values.prysm.image.pullPolicy }}
