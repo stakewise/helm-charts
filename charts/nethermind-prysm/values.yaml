@@ -125,7 +125,7 @@ global:
     enabled: false
     secretStoreRef: secretStoreRef
     data:
-      - secretKey: jwt
+      - secretKey: JWT_SECRET
         remoteRef:
           key: ethereumValidators
           property: jwt

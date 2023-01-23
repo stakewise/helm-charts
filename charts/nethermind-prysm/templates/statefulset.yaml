@@ -195,7 +195,7 @@ spec:
           {{- end }}
           {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
               {{- if .Values.global.externalSecrets.enabled }}
-              --JsonRpc.JwtSecretFile=/external-secrets/jwt
+              --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
               {{- else }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
               {{- end }}
@@ -291,8 +291,16 @@ spec:
           {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
             - name: CLIENT_AUTHORIZATIONTYPE
               value: "bearer"
+            {{- if .Values.global.externalSecrets.enabled }}
+            - name: CLIENT_JWTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ include "common.names.fullname" . }}
+                  key: JWT_SECRET
+            {{- else }}
             - name: CLIENT_JWTSECRET
               value: {{ .Values.global.JWTSecret | quote }}
+            {{- end }}
           {{- end }}
           ports:
             - containerPort: {{ .Values.nethermind.sidecar.bindPort }}
@@ -338,7 +346,7 @@ spec:
             - "--accept-terms-of-use"
             - "--config-file=/config/config.yaml"
           {{- if .Values.global.externalSecrets.enabled }}
-            - "--jwt-secret=/external-secrets/jwt"
+            - "--jwt-secret=/external-secrets/JWT_SECRET"
           {{- else }}
             - "--jwt-secret=/secret/jwtsecret"
           {{- end }}
