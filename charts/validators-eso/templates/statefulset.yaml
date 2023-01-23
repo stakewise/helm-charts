@@ -72,10 +72,15 @@ spec:
           env:
             - name: WEB3SIGNER_URL
               value: {{ $root.Values.web3signerEndpoint }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
           args:
             - "sync-validator-keys"
             - "--db-url"
-            - "{{ $root.Values.dbKeystoreUrl }}"
+            - "$(ESO_DB_KEYSTORE_URL)"
             - "--output-dir"
             - "/data"
             - "--index"

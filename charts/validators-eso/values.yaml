@@ -41,9 +41,13 @@ cliImage:
   tag: "v1.2.7"
   pullPolicy: IfNotPresent
 
-## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
-##
-dbKeystoreUrl: ""
+externalSecrets:
+  secretStoreRef: secretStoreRef
+  data:
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
