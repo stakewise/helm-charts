@@ -207,6 +207,15 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+javaOpts:
+  enabled: false
+  # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
+  # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
+  # https://besu.hyperledger.org/en/stable/public-networks/how-to/configure-jvm/manage-memory/
+  # Example for kubernetes resources less than 8Gi memory:
+  # maxHeapSize: "-Xmx3g"
+  maxHeapSize: ""
+
 ## Used to assign priority to pods
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##

@@ -129,6 +129,11 @@ spec:
               {{ . | quote }}
             {{- end }}
         {{- if or .Values.restApi.enabled .Values.global.metrics.enabled }}
+          env:
+          {{- if .Values.javaOpts.enabled }}
+            - name: BESU_OPTS
+              value: {{ .Values.javaOpts.maxHeapSize }}
+          {{- end }}
           ports:
           {{- if .Values.restApi.enabled }}
             - name: {{ .Values.restApi.portName }}
