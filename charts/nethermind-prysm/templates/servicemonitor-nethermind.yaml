@@ -3,7 +3,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "common.names.fullname" . }}
+  name: {{ template "common.names.fullname" . }}-nethermind
   {{- if .Values.nethermind.metrics.serviceMonitor.namespace }}
   namespace: {{ .Values.nethermind.metrics.serviceMonitor.namespace }}
   {{- else }}
