@@ -1,0 +1,75 @@
+# Default values for oracle.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  serviceAccount:
+    create: true
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 1800
+
+## Affinity Settings
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: { }
+
+## Toleration Settings
+## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
+##
+tolerations: [ ]
+
+serviceAccount:
+  ## Annotations to add to the service account
+  ##
+  annotations: {}
+  ## The name of the service account to use.
+  ## If not set and create is true, a name is generated using the fullname template
+  ##
+  name: ""
+
+## Docker image
+##
+image:
+  repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/v3-keeper"
+  tag: "master"
+  pullPolicy: IfNotPresent
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources:
+  requests:
+    cpu: 10m
+    memory: 200Mi
+
+## Used to assign priority to pod
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+settings:
+  logLevel: "INFO"
+  ## Possible values: goerli, perm_goerli, gnosis, mainnet
+  ##
+  network: "mainnet"
+  executionEndpoint: ""
+  sentryDsn: ""
+
+  ## Credentials
+  ##
+  privateKey: ""
