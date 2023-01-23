@@ -16,10 +16,10 @@ metadata:
     {{- end }}
 spec:
   endpoints:
-    - port: metrics
+    - port: metrics-neth
       path: /metrics
-      {{- if .Values.metrics.serviceMonitor.interval }}
-      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      {{- if .Values.nethermind.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.nethermind.metrics.serviceMonitor.interval }}
       {{- end }}
       {{- if .Values.nethermind.metrics.serviceMonitor.scrapeTimeout }}
       scrapeTimeout: {{ .Values.nethermind.metrics.serviceMonitor.scrapeTimeout }}
