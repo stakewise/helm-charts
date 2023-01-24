@@ -192,7 +192,7 @@ spec:
               --JsonRpc.Host={{ .Values.nethermind.jsonrpc.host }}
               --JsonRpc.Port={{ .Values.nethermind.jsonrpc.ports.rest }}
               --JsonRpc.WebSocketsPort={{ .Values.nethermind.jsonrpc.ports.websocket }}
-              --JsonRpc.MaxBatchSize=10000
+              --JsonRpc.MaxBatchSize=1000
               --JsonRpc.MaxBatchResponseBodySize=1000000000
           {{- end }}
           {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
