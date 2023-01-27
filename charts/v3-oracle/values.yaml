@@ -109,7 +109,7 @@ settings:
   ipfsPinataSecretKey: ""
 
   # PostgreSQL Settings
-  postgresHostname: "localhost"
+  postgresHost: ""
   postgresPort: "5432"
   postgresDb: "oracle"
   postgresUser: "postgres"
