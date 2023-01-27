@@ -13,5 +13,5 @@ data:
   POSTGRES_DB: {{ .Values.settings.postgresDb | quote }}
   POSTGRES_PORT: {{ .Values.settings.postgresPort | quote }}
   POSTGRES_USER: {{ .Values.settings.postgresUser | quote }}
-  POSTGRES_HOSTNAME: {{ .Values.settings.postgresHostname | quote }}
+  POSTGRES_HOST: {{ .Values.settings.postgresHost | quote }}
   RSA_PRIVATE_KEY_PATH: "/secret/rsakey"
