@@ -209,8 +209,6 @@ spec:
         {{- if and .Values.lighthouse.persistence.enabled .Values.lighthouse.initChownData }}
               mkdir -p /data && chown -R {{ .Values.lighthouse.securityContext.runAsUser }}:{{ .Values.lighthouse.securityContext.runAsUser }} /data;
         {{- end }}
-              EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
-              echo ${EE} > /data/ee.txt;
               echo "Pod will connect to the ${EE} endpoint";
           volumeMounts:
             - name: env-nodeport-lighthouse
@@ -552,7 +550,7 @@ spec:
             {{- if .Values.lighthouse.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
-              EE=`cat /data/ee.txt`;
+              EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
               echo "Pod will connect to the ${EE} endpoint";
               exec lighthouse
               bn
@@ -567,22 +565,26 @@ spec:
               --checkpoint-sync-url={{ .Values.global.checkPointSync.url }}
             {{- end }}
             {{- if .Values.lighthouse.builderEndpoint }}
-              --builder={{ .Values.builderEndpoint }}
+              --builder={{ .Values.lighthouse.builderEndpoint }}
             {{- end }}
             {{- if .Values.lighthouse.merge.enabled }}
-              --suggested-fee-recipient={{ .Values.merge.feeRecipient }}
+              --suggested-fee-recipient={{ .Values.lighthouse.merge.feeRecipient }}
             {{- end }}
             {{- if eq .Values.global.network "gnosis" }}
               --eth1-endpoints=${EE}
             {{- else }}
               --execution-endpoint=${EE}
+              {{- if .Values.global.externalSecrets.enabled }}
+              --execution-jwt=/external-secrets/JWT_SECRET
+              {{- else }}
               --execution-jwt=/secret/jwtsecret
+              {{- end }}
             {{- end }}
               --datadir=/data
               --network={{ .Values.global.network }}
               --disable-upnp
               --disable-enr-auto-update
-              --target-peers={{ .Values.targetPeers }}
+              --target-peers={{ .Values.lighthouse.targetPeers }}
               --discovery-port={{ include "lighthouse.p2pPort" . }}
             {{- if .Values.lighthouse.p2pNodePort.enabled }}
               --enr-address=$EXTERNAL_IP
@@ -635,7 +637,8 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        - name: sidecar
+      {{- if .Values.lighthouse.http.enabled }}
+        - name: sidecar-lighthouse
           image: "{{ .Values.lighthouse.sidecar.repository }}:{{ .Values.lighthouse.sidecar.tag }}"
           imagePullPolicy: {{ .Values.lighthouse.sidecar.pullPolicy }}
           env:
@@ -671,6 +674,7 @@ spec:
               port: {{ .Values.readinessProbe.httpGet.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
         {{- end }}
+      {{- end }}
     {{- end }}
       volumes:
       {{- if .Values.global.JWTSecret }}
