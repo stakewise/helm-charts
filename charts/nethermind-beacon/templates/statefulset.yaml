@@ -92,6 +92,7 @@ spec:
           volumeMounts:
             - name: env-nodeport-nethermind
               mountPath: /env
+    {{- if .Values.prysm.enabled }}
         - name: init-prysm
           image: "{{ .Values.prysm.initImage.repository }}:{{ .Values.prysm.initImage.tag }}"
           imagePullPolicy: {{ .Values.prysm.initImage.pullPolicy }}
@@ -162,6 +163,7 @@ spec:
             - name: scripts-prysm
               mountPath: /data/scripts
       {{- end }}
+    {{- end }}
       containers:
         - name: nethermind
           image: "{{ .Values.nethermind.image.repository }}:{{ .Values.nethermind.image.tag | default .Chart.AppVersion }}"
@@ -331,6 +333,7 @@ spec:
               scheme: {{ .Values.nethermind.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
+    {{- if .Values.prysm.enabled }}
         - name: prysm-beacon
         {{- if ne .Values.global.network "gnosis" }}
           image: "{{ .Values.prysm.image.repository }}:{{ .Values.prysm.image.tag }}"
@@ -483,14 +486,17 @@ spec:
               scheme: {{ .Values.prysm.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
+    {{- end }}
       volumes:
       {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
           secret:
             secretName: {{ include "common.names.fullname" . }}
       {{- end }}
+      {{- if .Values.prysm.enabled }}
         - name: config-prysm
           emptyDir: {}
+      {{- end }}
       {{- if .Values.global.externalSecrets.enabled }}
         - name: external-secrets
           secret:
@@ -501,10 +507,12 @@ spec:
           configMap:
             name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
+      {{- if .Values.prysm.enabled }}
       {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: scripts-prysm
           configMap:
             name: {{ include "common.names.fullname" . }}
+      {{- end }}
       {{- end }}
 {{- if (not .Values.prysm.persistence.enabled) }}
         - name: data-prysm
@@ -527,6 +535,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.nethermind.persistence.size | quote }}
+    {{- if .Values.prysm.enabled }}
     - metadata:
         name: data-prysm
         labels:
@@ -541,6 +550,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.prysm.persistence.size | quote }}
+    {{- end }}
 
 
 

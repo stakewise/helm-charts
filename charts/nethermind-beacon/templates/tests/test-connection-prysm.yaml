@@ -1,3 +1,4 @@
+{{- if .Values.prysm.enabled }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -13,3 +14,4 @@ spec:
       command: ['wget']
       args: ['{{ include "common.names.fullname" . }}:{{ .Values.prysm.rpc.port }}']
   restartPolicy: Never
+{{- end }}
