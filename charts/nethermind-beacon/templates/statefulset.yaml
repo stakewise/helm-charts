@@ -628,9 +628,16 @@ spec:
           volumeMounts:
             - name: data-lighthouse
               mountPath: /data
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
+          {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
+          {{- end }}
             - name: env-nodeport-lighthouse
               mountPath: /env
         {{- with .Values.resources }}
