@@ -9,6 +9,7 @@ data:
   SENTRY_DSN: {{ .Values.settings.sentryDsn | quote }}
 
   GCP_STORAGE_CONTENT_BUCKET: {{ .Values.settings.gcpStorageContentBucket | quote }}
+  GCP_STORAGE_DOMAIN_ALIAS: {{ .Values.settings.gcpStorageDomainAlias | quote }}
 
   SEND_EMAILS: {{ .Values.settings.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.settings.mailgunSenderDomain | quote }}
