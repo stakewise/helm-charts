@@ -1,0 +1,35 @@
+{{- if .Values.lighthouse.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}-beacon
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+{{- if and .Values.lighthouse.global.metrics.enabled .Values.lighthouse.metrics.svcAnnotations }}
+  annotations:
+    {{ toYaml .Values.lighthouse.metrics.svcAnnotations | nindent 4 | trim }}
+{{- end }}
+spec:
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- if .Values.lighthouse.sessionAffinity.enabled }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: {{ .Values.lighthouse.sessionAffinity.timeoutSeconds }}
+{{- end }}
+  type: ClusterIP
+{{- if .Values.lighthouse.svcHeadless }}
+  clusterIP: None
+{{- end }}
+  ports:
+    - name: {{ .Values.lighthouse.http.portName }}
+      port: {{ .Values.lighthouse.http.port }}
+      targetPort: {{ .Values.lighthouse.http.portName }}
+  {{- if .Values.global.metrics.enabled }}
+    - name: metrics-beacon
+      port: {{ .Values.lighthouse.metrics.port }}
+      targetPort: metrics-beacon
+  {{- end }}
+{{- end }}
