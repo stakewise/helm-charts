@@ -214,7 +214,7 @@ spec:
               echo ${EE} > /data/ee.txt;
               echo "Pod will connect to the ${EE} endpoint";
           volumeMounts:
-            - name: env-nodeport
+            - name: env-nodeport-lighthouse
               mountPath: /env
             - name: data-lighthouse
               mountPath: /data
