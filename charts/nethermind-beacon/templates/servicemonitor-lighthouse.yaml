@@ -1,0 +1,44 @@
+{{- if .Values.lighthouse.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.lighthouse.metrics.enabled)
+    (or .Values.global.metrics.serviceMonitor.enabled .Values.lighthouse.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-beacon
+  {{- if .Values.lighthouse.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.lighthouse.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.lighthouse.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.lighthouse.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-beacon
+      path: /metrics
+      {{- if .Values.lighthouse.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.lighthouse.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.lighthouse.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.lighthouse.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.lighthouse.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.lighthouse.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.lighthouse.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}
+{{- end }}
