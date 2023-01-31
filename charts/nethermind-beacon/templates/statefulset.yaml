@@ -209,8 +209,7 @@ spec:
         {{- if and .Values.lighthouse.persistence.enabled .Values.lighthouse.initChownData }}
               mkdir -p /data && chown -R {{ .Values.lighthouse.securityContext.runAsUser }}:{{ .Values.lighthouse.securityContext.runAsUser }} /data;
         {{- end }}
-              INDEX=$((${HOSTNAME##*-}+1));
-              EE=$(sed "${INDEX}q;d" /configs/execution-endpoints.txt);
+              EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
               echo ${EE} > /data/ee.txt;
               echo "Pod will connect to the ${EE} endpoint";
           volumeMounts:
@@ -218,8 +217,6 @@ spec:
               mountPath: /env
             - name: data-lighthouse
               mountPath: /data
-            - name: configs-lighthouse
-              mountPath: /configs
     {{- end }}
       containers:
         - name: nethermind
