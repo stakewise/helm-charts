@@ -561,8 +561,8 @@ spec:
               --http-address={{ .Values.lighthouse.http.address }}
               --http-allow-origin={{ .Values.lighthouse.http.allowOrigin }}
             {{- end}}
-            {{- if .Values.global.checkPointSync.enabled }}
-              --checkpoint-sync-url={{ .Values.global.checkPointSync.url }}
+            {{- if .Values.lighthouse.global.checkPointSync.enabled }}
+              --checkpoint-sync-url={{ .Values.lighthouse.global.checkPointSync.url }}
             {{- end }}
             {{- if .Values.lighthouse.builderEndpoint }}
               --builder={{ .Values.lighthouse.builderEndpoint }}
@@ -570,7 +570,7 @@ spec:
             {{- if .Values.lighthouse.merge.enabled }}
               --suggested-fee-recipient={{ .Values.lighthouse.merge.feeRecipient }}
             {{- end }}
-            {{- if eq .Values.global.network "gnosis" }}
+            {{- if eq .Values.lighthouse.global.network "gnosis" }}
               --eth1-endpoints=${EE}
             {{- else }}
               --execution-endpoint=${EE}
@@ -581,7 +581,7 @@ spec:
               {{- end }}
             {{- end }}
               --datadir=/data
-              --network={{ .Values.global.network }}
+              --network={{ .Values.lighthouse.global.network }}
               --disable-upnp
               --disable-enr-auto-update
               --target-peers={{ .Values.lighthouse.targetPeers }}
