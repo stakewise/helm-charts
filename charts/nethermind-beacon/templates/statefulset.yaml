@@ -614,7 +614,7 @@ spec:
               name: {{ .Values.lighthouse.http.portName }}
           {{- if .Values.lighthouse.global.metrics.enabled }}
             - containerPort: {{ .Values.lighthouse.metrics.port }}
-              name: metrics-lighthouse
+              name: metrics-beacon
               protocol: TCP
           {{- end }}
           {{- if .Values.lighthouse.p2pNodePort.enabled }}
@@ -709,6 +709,10 @@ spec:
 {{- end }}
         - name: env-nodeport-nethermind
           emptyDir: {}
+      {{- if .Values.lighthouse.enabled }}
+        - name: env-nodeport-lighthouse
+          emptyDir: {}
+      {{- end }}
   volumeClaimTemplates:
     - metadata:
         name: data-nethermind
