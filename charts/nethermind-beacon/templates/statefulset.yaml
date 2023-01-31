@@ -1,0 +1,547 @@
+---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.statefulset" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- with (concat .Values.prysm.imagePullSecrets .Values.prysm.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.global.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.nethermind.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.global.terminationGracePeriodSeconds }}
+    {{- end }}
+      serviceAccountName: {{ include "common.names.fullname" . }}
+      priorityClassName: {{ .Values.global.priorityClassName | quote }}
+      initContainers:
+        - name: init-nethermind
+          image: "{{ .Values.nethermind.initImage.repository }}:{{ .Values.nethermind.initImage.tag }}"
+          imagePullPolicy: {{ .Values.nethermind.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+          {{- if .Values.nethermind.p2pNodePort.enabled }}
+            {{- if eq .Values.nethermind.p2pNodePort.type "LoadBalancer" }}
+              until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
+              export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+            {{- else }}
+              export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+            {{- end }}
+              echo "EXTERNAL_PORT=$EXTERNAL_PORT" >  /env/init-nodeport;
+              echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+              cat /env/init-nodeport;
+          {{- end }}
+          {{- if and .Values.nethermind.persistence.enabled .Values.initChownData }}
+              mkdir -p /data && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data;
+          {{- end }}
+          volumeMounts:
+            - name: env-nodeport-nethermind
+              mountPath: /env
+        - name: init-prysm
+          image: "{{ .Values.prysm.initImage.repository }}:{{ .Values.prysm.initImage.tag }}"
+          imagePullPolicy: {{ .Values.prysm.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+          {{- if .Values.prysm.p2pNodePort.enabled }}
+              {{- if eq .Values.prysm.p2pNodePort.type "LoadBalancer" }}
+              until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
+              export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+              {{- else }}
+              export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+              {{- end }}
+              echo "p2p-host-ip: $EXTERNAL_IP"   > /config/config.yaml;
+              echo "p2p-tcp-port: $EXTERNAL_PORT" >> /config/config.yaml;
+              echo "p2p-udp-port: $EXTERNAL_PORT" >> /config/config.yaml;
+          {{- else }}
+              echo "p2p-host-ip: $POD_IP"   > /config/config.yaml;
+              echo 'p2p-tcp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
+              echo 'p2p-udp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
+          {{- end }}
+              EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
+              echo "http-web3provider: ${EE}" >> /config/config.yaml;
+              echo "Pod will connect to the ${EE} endpoint";
+              cat /config/config.yaml;
+          {{- if and .Values.prysm.persistence.enabled .Values.prysm.initChownData }}
+              chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data | true;
+          {{- end }}
+          volumeMounts:
+            - name: config-prysm
+              mountPath: /config
+            - name: data-prysm
+              mountPath: /data
+            - name: scripts-prysm
+              mountPath: /data/scripts
+      {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+        - name: download-genesis-state
+          image: "curlimages/curl:latest"
+          imagePullPolicy: {{ .Values.prysm.initImage.pullPolicy }}
+          command: ['/bin/sh', '/data/scripts/entrypoint.sh']
+          volumeMounts:
+            - name: data-prysm
+              mountPath: /data
+            - name: scripts-prysm
+              mountPath: /data/scripts
+      {{- end }}
+      containers:
+        - name: nethermind
+          image: "{{ .Values.nethermind.image.repository }}:{{ .Values.nethermind.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.nethermind.image.pullPolicy }}
+          workingDir: /data/nethermind
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command:
+            - sh
+            - -ac
+            - >
+            {{- if .Values.nethermind.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+            {{- end }}
+              exec /nethermind/Nethermind.Runner
+          {{- if eq .Values.global.network "gnosis" }}
+              --config=xdai
+          {{- else }}
+              --config={{ .Values.global.network }}
+          {{- end }}
+              --datadir=/data/nethermind
+          {{- if .Values.nethermind.jsonrpc.enabled }}
+              --JsonRpc.Enabled={{ .Values.nethermind.jsonrpc.enabled }}
+              --JsonRpc.EnabledModules={{ .Values.nethermind.jsonrpc.modules | join "," }}
+              --JsonRpc.Host={{ .Values.nethermind.jsonrpc.host }}
+              --JsonRpc.Port={{ .Values.nethermind.jsonrpc.ports.rest }}
+              --JsonRpc.WebSocketsPort={{ .Values.nethermind.jsonrpc.ports.websocket }}
+          {{- end }}
+          {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+              {{- if .Values.global.externalSecrets.enabled }}
+              --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
+              {{- else }}
+              --JsonRpc.JwtSecretFile=/secret/jwtsecret
+              {{- end }}
+              --JsonRpc.EnginePort={{ .Values.nethermind.jsonrpc.engine.port }}
+              --JsonRpc.EngineHost={{ .Values.nethermind.jsonrpc.engine.host }}
+              --JsonRpc.EngineEnabledModules={{ .Values.nethermind.jsonrpc.engine.modules | join "," }}
+          {{- end }}
+          {{- if .Values.global.metrics.enabled }}
+              --Metrics.Enabled={{ .Values.global.metrics.enabled }}
+              --Metrics.ExposePort={{ .Values.nethermind.metrics.port }}
+              --Metrics.NodeName=$(POD_NAME)
+          {{- end }}
+          {{- if .Values.nethermind.p2pNodePort.enabled }}
+              --Network.ExternalIp=$EXTERNAL_IP
+              --Network.P2PPort=$EXTERNAL_PORT
+              --Network.DiscoveryPort=$EXTERNAL_PORT
+          {{- else }}
+              --Network.ExternalIp=$(POD_IP)
+              --Network.P2PPort={{ include "nethermind.p2pPort" . }}
+              --Network.DiscoveryPort={{ include "nethermind.p2pPort" . }}
+          {{- end }}
+          {{-  if .Values.nethermind.merge.enabled }}
+              --Merge.Enabled=true
+              {{- if .Values.nethermind.merge.feeRecipient }}
+              --Merge.FeeRecipient={{ .Values.nethermind.merge.feeRecipient }}
+              {{- end }}
+              {{- if .Values.nethermind.merge.builderRelayUrl }}
+              --Merge.BuilderRelayUrl={{ .Values.nethermind.merge.builderRelayUrl }}
+              {{- end }}
+              {{- if .Values.nethermind.merge.finalTotalDifficulty }}
+              --Merge.FinalTotalDifficulty={{ .Values.nethermind.merge.finalTotalDifficulty }}
+              {{- end }}
+              {{- if .Values.nethermind.merge.terminalTotalDifficulty }}
+              --Merge.TerminalTotalDifficulty={{ .Values.nethermind.merge.terminalTotalDifficulty }}
+              {{- end }}
+          {{- end }}
+          {{- range .Values.nethermind.extraFlags }}
+              {{ . | quote }}
+          {{- end }}
+          ports:
+          {{- if .Values.nethermind.jsonrpc.enabled }}
+            - name: json-rest-neth
+              containerPort: {{ .Values.nethermind.jsonrpc.ports.rest }}
+              protocol: TCP
+            - name: json-ws-neth
+              containerPort: {{ .Values.nethermind.jsonrpc.ports.websocket }}
+              protocol: TCP
+          {{- end }}
+          {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            - name: engine-neth
+              protocol: TCP
+              containerPort: {{ .Values.nethermind.jsonrpc.engine.port }}
+          {{- end }}
+          {{- if .Values.global.metrics.enabled }}
+            - name: metrics-neth
+              containerPort: {{ .Values.nethermind.metrics.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.nethermind.p2pNodePort.enabled }}
+            - name: p2p-tcp-neth
+              containerPort: {{ include "nethermind.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-neth
+              containerPort: {{ include "nethermind.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
+          volumeMounts:
+            - name: data-nethermind
+              mountPath: /data/nethermind
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
+          {{- if .Values.global.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
+            - name: env-nodeport-nethermind
+              mountPath: /env
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.nethermind.jsonrpc.enabled }}
+        - name: sidecar
+          image: "{{ .Values.nethermind.sidecar.repository }}:{{ .Values.nethermind.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.nethermind.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.nethermind.sidecar.bindAddr }}:{{ .Values.nethermind.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.nethermind.jsonrpc.ports.rest | quote }}
+          {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            - name: CLIENT_AUTHORIZATIONTYPE
+              value: "bearer"
+            {{- if .Values.global.externalSecrets.enabled }}
+            - name: CLIENT_JWTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ include "common.names.fullname" . }}
+                  key: JWT_SECRET
+            {{- else }}
+            - name: CLIENT_JWTSECRET
+              value: {{ .Values.global.JWTSecret | quote }}
+            {{- end }}
+          {{- end }}
+          ports:
+            - containerPort: {{ .Values.nethermind.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if .Values.nethermind.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.nethermind.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.nethermind.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.nethermind.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nethermind.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.nethermind.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.nethermind.livenessProbe.httpGet.path }}
+              port: {{ .Values.nethermind.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.nethermind.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.nethermind.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.nethermind.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.nethermind.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.nethermind.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.nethermind.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.nethermind.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.nethermind.readinessProbe.httpGet.path }}
+              port: {{ .Values.nethermind.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.nethermind.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+        - name: prysm-beacon
+        {{- if ne .Values.global.network "gnosis" }}
+          image: "{{ .Values.prysm.image.repository }}:{{ .Values.prysm.image.tag }}"
+          imagePullPolicy: {{ .Values.prysm.image.pullPolicy }}
+        {{- else }}
+          image: "{{ .Values.prysm.imageGnosis.repository }}:{{ .Values.prysm.imageGnosis.tag }}"
+          imagePullPolicy: {{ .Values.prysm.imageGnosis.pullPolicy }}
+        {{- end }}
+          args:
+            - "--datadir=/data"
+            - "--rpc-host={{ .Values.prysm.rpc.host }}"
+            - "--rpc-port={{ .Values.prysm.rpc.port }}"
+            - "--accept-terms-of-use"
+            - "--config-file=/config/config.yaml"
+          {{- if .Values.global.externalSecrets.enabled }}
+            - "--jwt-secret=/external-secrets/JWT_SECRET"
+          {{- else }}
+            - "--jwt-secret=/secret/jwtsecret"
+          {{- end }}
+          {{- if .Values.prysm.builderEndpoint }}
+            - "--http-mev-relay={{ .Values.prysm.builderEndpoint }}"
+          {{- end }}
+
+          {{- if .Values.prysm.suggestedFeeRecipient }}
+            - "--suggested-fee-recipient={{ .Values.prysm.suggestedFeeRecipient }}"
+          {{- end }}
+
+          {{- if .Values.prysm.totalDifficultyOverride }}
+            - "--terminal-total-difficulty-override={{ .Values.prysm.totalDifficultyOverride }}"
+          {{- end }}
+          {{- if .Values.prysm.global.checkPointSync.enabled }}
+            - "--checkpoint-sync-url={{ .Values.prysm.global.checkPointSync.url }}"
+            - "--genesis-beacon-api-url={{ .Values.prysm.global.checkPointSync.url }}"
+          {{- end }}
+          {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+            - "--genesis-state=/data/genesis.ssz"
+          {{- end }}
+
+          {{- if ne .Values.global.network "gnosis" }}
+            - "--{{ .Values.global.network }}"
+          {{- else }}
+            - "--contract-deployment-block=19469077"
+            - "--bootstrap-node=/data/gnosis-config/bootnodes.yaml"
+            - "--config-file=/data/gnosis-config/config.yaml"
+            - "--chain-config-file=/data/gnosis-config/config.yaml"
+          {{- end }}
+
+          {{- range .Values.prysm.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+
+          {{- if .Values.global.metrics.enabled }}
+            - "--monitoring-port={{ .Values.prysm.metrics.port }}"
+            - "--monitoring-host=0.0.0.0"
+          {{- else }}
+            - "--disable-monitoring"
+          {{- end }}
+
+          {{- if .Values.prysm.http.enabled }}
+            - "--grpc-gateway-host=0.0.0.0"
+            - "--grpc-gateway-port={{ .Values.prysm.http.port }}"
+          {{- else }}
+            - "--disable-grpc-gateway"
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          ports:
+            - containerPort: {{ .Values.prysm.rpc.port }}
+              name: {{ .Values.prysm.rpc.portName }}-prysm
+              protocol: TCP
+          {{- if .Values.prysm.p2pNodePort.enabled }}
+            - name: p2p-tcp-prysm
+              containerPort: {{ include "prysm.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-prysm
+              containerPort: {{ include "prysm.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
+          {{- if .Values.prysm.http.enabled }}
+            - containerPort: {{ .Values.prysm.http.port }}
+              name: http-prysm
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.global.metrics.enabled }}
+            - containerPort: {{ .Values.prysm.metrics.port }}
+              name: metrics-prysm
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data-prysm
+              mountPath: /data
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
+          {{- if .Values.global.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
+            - name: config-prysm
+              mountPath: /config
+          {{- if eq .Values.global.network "gnosis" }}
+            - name: gnosis-config-prysm
+              mountPath: /data/gnosis-config
+          {{- end }}
+        {{- with .Values.prysm.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+      {{- if .Values.prysm.http.enabled }}
+        - name: sidecar-prysm
+          image: "{{ .Values.prysm.sidecar.repository }}:{{ .Values.prysm.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.prysm.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.prysm.sidecar.bindAddr }}:{{ .Values.prysm.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.prysm.http.port | quote }}
+          ports:
+            - containerPort: {{ .Values.prysm.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if or .Values.prysm.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.prysm.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.prysm.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.prysm.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.prysm.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.prysm.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.prysm.livenessProbe.httpGet.path }}
+              port: {{ .Values.prysm.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.prysm.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.prysm.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.prysm.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.prysm.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.prysm.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.prysm.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.prysm.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.prysm.readinessProbe.httpGet.path }}
+              port: {{ .Values.prysm.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.prysm.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+      volumes:
+      {{- if .Values.global.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+      {{- end }}
+        - name: config-prysm
+          emptyDir: {}
+      {{- if .Values.global.externalSecrets.enabled }}
+        - name: external-secrets
+          secret:
+            secretName: eso-{{ include "common.names.fullname" . }}
+      {{- end }}
+      {{- if eq .Values.global.network "gnosis" }}
+        - name: gnosis-config-prysm
+          configMap:
+            name: {{ include "common.names.fullname" . }}-gnosis
+      {{- end }}
+      {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
+        - name: scripts-prysm
+          configMap:
+            name: {{ include "common.names.fullname" . }}
+      {{- end }}
+{{- if (not .Values.prysm.persistence.enabled) }}
+        - name: data-prysm
+          emptyDir: {}
+{{- end }}
+        - name: env-nodeport-nethermind
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: data-nethermind
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.nethermind.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.nethermind.persistence.accessModes }}
+        storageClassName: {{ .Values.nethermind.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.nethermind.persistence.size | quote }}
+    - metadata:
+        name: data-prysm
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.prysm.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.prysm.persistence.accessModes }}
+        storageClassName: {{ .Values.prysm.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.prysm.persistence.size | quote }}
+
+
+
+

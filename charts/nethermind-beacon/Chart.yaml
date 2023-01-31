@@ -1,0 +1,26 @@
+apiVersion: v2
+name: nethermind-beacon
+version: 0.1.0
+appVersion: 0.1.0
+kubeVersion: "^1.18.0-0"
+description: Nethermind and Beacon
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - nethermind
+  - prysm
+  - p2p
+home: https://www.ethereum.org/
+sources:
+  - https://github.com/NethermindEth/nethermind
+  - https://github.com/prysmaticlabs/prysm
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+
+dependencies:
+  - name: common
+    repository: file://../common
+    version: 1.0.0

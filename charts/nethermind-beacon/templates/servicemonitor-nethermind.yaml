@@ -1,0 +1,42 @@
+{{- if and (or .Values.global.metrics.enabled .Values.nethermind.metrics.enabled)
+    (or .Values.global.metrics.serviceMonitor.enabled .Values.nethermind.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-nethermind
+  {{- if .Values.nethermind.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.nethermind.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.nethermind.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.nethermind.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-neth
+      path: /metrics
+      {{- if .Values.nethermind.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.nethermind.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.nethermind.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.nethermind.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.nethermind.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.nethermind.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.nethermind.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.nethermind.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.nethermind.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.nethermind.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}

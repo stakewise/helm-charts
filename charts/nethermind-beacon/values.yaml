@@ -1,0 +1,731 @@
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  replicaCount: 1
+
+  ## Eth2 network ID
+  ##
+  network: mainnet
+
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
+  ##
+  JWTSecret: "secret"
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+  ## To get Prysm up and running in only a few minutes
+  ## from a recent finalized checkpoint state rather than syncing from genesis.
+  ##
+  checkPointSync:
+    enabled: false
+    url: ""
+
+  ## Enable pod disruption budget
+  ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb
+  ##
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: 1
+
+  ## Node labels for pod assignment
+  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
+  ##
+  nodeSelector: {}
+
+  ## Tolerations for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  ##
+  tolerations: {}
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  ## Example:
+  ## affinity:
+  ##   podAntiAffinity:
+  ##     requiredDuringSchedulingIgnoredDuringExecution:
+  ##     - labelSelector:
+  ##         matchExpressions:
+  ##         - key: app.kubernetes.io/name
+  ##           operator: In
+  ##           values:
+  ##           - prysm
+  ##       topologyKey: kubernetes.io/hostname
+  ##
+  affinity: {}
+
+  ## Used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
+  priorityClassName: ""
+
+
+  ## Termination Grace Period
+  ## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+  ##
+  terminationGracePeriodSeconds: 300
+
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+
+  externalSecrets:
+    enabled: false
+    secretStoreRef: secretStoreRef
+    data:
+      - secretKey: JWT_SECRET
+        remoteRef:
+          key: ethereumValidators
+          property: jwt
+
+  service:
+    svcHeadless: true
+
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    ##
+    - apiGroups: [""]
+      resources:
+      - "nodes"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
+  ## Required Role rules
+  ##
+  rules:
+    ## Required to get information about the serices nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+      - "services"
+      verbs:
+      - "get"
+      - "list"
+      - "watch"
+
+nethermind:
+  ## Init image is used to chown data volume, initialise genesis, etc.
+  ##
+  initImage:
+    repository: "bitnami/kubectl"
+    tag: "1.24"
+    pullPolicy: IfNotPresent
+
+  ## Sidecar image is used to perform Liveness/Readiness probes.
+  ##
+  sidecar:
+    repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+    tag: "v1.0.5"
+    pullPolicy: IfNotPresent
+    bindAddr: "0.0.0.0"
+    bindPort: 3000
+    authorizationType: "bearer"
+
+  ## Nethermind Image
+  ##
+  image:
+    repository: nethermind/nethermind
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "1.14.3"
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: [ ]
+  nameOverride: ""
+  fullnameOverride: ""
+
+  ## Nethermind Settings
+  ##
+
+  ## Extra flags to pass to the node
+  ##
+  extraFlags: [ ]
+
+  jsonrpc:
+    enabled: true
+    # Defines which RPC modules should be enabled.
+    # Built in modules are: Admin, Baseline, Clique, Consensus,
+    #                       Db, Debug, Deposit, Erc20, Eth, Evm,
+    #                       Health Mev, NdmConsumer, NdmProvider,
+    #                       Net, Nft, Parity, Personal, Proof, Subscribe,
+    #                       Trace, TxPool, Vault, Web3.
+    modules:
+      - Eth
+      - Subscribe
+      - Trace
+      - TxPool
+      - Web3
+      - Personal
+      - Proof
+      - Net
+      - Parity
+      - Health
+    host: "0.0.0.0"
+    ports:
+      rest: "8545"
+      websocket: "8546"
+    engine:
+      port: "8551"
+      host: "0.0.0.0"
+      modules:
+        - Net
+        - Eth
+        - Subscribe
+        - Engine
+        - Web3
+        - Client
+
+  merge:
+    # Defines whether the Merge plugin is enabled bundles are allowed.
+    enabled: false
+    # Account to be used by the block author.
+    # If it is not specified the address zero will be used.
+    feeRecipient: ""
+    # URL to Builder Relay. If set when building blocks nethermind will send them to the relay.
+    builderRelayUrl: ""
+    # Final total difficulty is total difficulty of the last PoW block.
+    # FinalTotalDifficulty >= TerminalTotalDifficulty.
+    finalTotalDifficulty: ""
+    # Terminal total difficulty used for transition process.
+    terminalTotalDifficulty: ""
+
+  serviceAccount:
+    # Annotations to add to the service account
+    annotations: { }
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
+  ## Additional labels for all resources
+  ##
+  additionalLabels:
+    client-type: "execution"
+
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ##
+  rbac:
+    # The name of the cluster role to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+    ## Required ClusterRole rules
+    ##
+    clusterRules:
+      ## Required to obtain the nodes external IP
+      ##
+      - apiGroups: [ "" ]
+        resources:
+          - "nodes"
+        verbs:
+          - "get"
+          - "list"
+          - "watch"
+    ## Required Role rules
+    ##
+    rules:
+      ## Required to get information about the serices nodePort.
+      ##
+      - apiGroups: [ "" ]
+        resources:
+          - "services"
+        verbs:
+          - "get"
+          - "list"
+          - "watch"
+
+  service:
+    type: ClusterIP
+
+  ## Defines whether the service must be headless
+  ##
+  svcHeadless: true
+
+  ## Configure session affinity for validator clients to hit the same beacon node
+  ## for the period specified in `timeoutSeconds`
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
+
+  ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+  ## This will generate a service for each replica, with a port binding via NodePort.
+  ## This is useful if you want to expose and announce your node to the Internet.
+  ##
+  p2pNodePort:
+    ## @param p2pNodePort.enabled Expose P2P port via NodePort
+    ##
+    enabled: false
+    ## @param p2pNodePort.annotations
+    ##
+    annotations: { }
+    ## @param p2pNodePort.type
+    ## Options: NodePort, LoadBalancer
+    type: NodePort
+    ## @param p2pNodePort.startAt The ports allocation will start from this value
+    ##
+    startAt: 31200
+    ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+    ## @default -- See `values.yaml` for example
+    replicaToNodePort: { }
+    #  "0": 32345
+    #  "3": 32348
+
+  resources: { }
+    # We usually recommend not to specify default resources and to leave this as a conscious
+    # choice for the user. This also increases chances charts run on environments with little
+    # resources, such as Minikube. If you do want to specify resources, uncomment the following
+    # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+    # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+  ## Used to assign priority to pods
+  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  ##
+  priorityClassName: ""
+
+  ## Vertical Pod Autoscaler config
+  ## ref: https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler
+  ##
+  verticalAutoscaler:
+    # If true a VPA object will be created for the StatefulSet
+    enabled: false
+    updateMode: Off
+    containerPolicies: { }
+
+  ## Affinity for pod assignment
+  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  ##
+  ## Example:
+  ## affinity:
+  ##   podAntiAffinity:
+  ##     requiredDuringSchedulingIgnoredDuringExecution:
+  ##     - labelSelector:
+  ##         matchExpressions:
+  ##         - key: app.kubernetes.io/name
+  ##           operator: In
+  ##           values:
+  ##           - nethermind
+  ##       topologyKey: kubernetes.io/hostname
+  ##
+  affinity: { }
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before genesis
+  ##
+  livenessProbe:
+    initialDelaySeconds: 900
+    timeoutSeconds: 3
+    periodSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /eth1/liveness
+      port: sidecar
+      scheme: HTTP
+
+  readinessProbe:
+    initialDelaySeconds: 60
+    timeoutSeconds: 3
+    periodSeconds: 30
+    failureThreshold: 30
+    successThreshold: 2
+    httpGet:
+      path: /eth1/readiness
+      port: sidecar
+      scheme: HTTP
+
+  ## If false, data ownership will not be reset at startup
+  ## This allows the nethermind node to be run with an arbitrary user
+  ##
+  initChownData: true
+
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of pod failure, the pod data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 250Gi
+    annotations: { }
+
+  ## Monitoring
+  ##
+  metrics:
+    ## Metrics port to expose metrics for Prometheus
+    ##
+    port: 8008
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## The namespace in which the ServiceMonitor will be created
+      ##
+      namespace: ""
+      ## The interval at which metrics should be scraped
+      ##
+      interval: 30s
+      ## The timeout after which the scrape is ended
+      ##
+      scrapeTimeout: ""
+      ## Metrics RelabelConfigs to apply to samples before scraping.
+      ##
+      relabellings: [ ]
+      ## Metrics RelabelConfigs to apply to samples before ingestion.
+      ##
+      metricRelabelings: [ ]
+      ## Specify honorLabels parameter to add the scrape endpoint
+      ##
+      honorLabels: false
+      ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+      ##
+      additionalLabels: { }
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a default set of Alerts
+      ##
+      default: true
+      ## The namespace in which the prometheusRule will be created
+      ##
+      namespace: ""
+      ## Additional labels for the prometheusRule
+      ##
+      additionalLabels: { }
+      ## Custom Prometheus rules
+      ##
+      rules: [ ]
+
+prysm:
+  enabled: False
+
+  ## Provide a name in place of prysm for `app:` labels
+  ##
+  nameOverride: ""
+  
+  ## Provide a name to substitute for the full names of resources
+  ##
+  fullnameOverride: ""
+  
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ##
+  serviceAccount:
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+  
+  ## Additional labels for all resources
+  ##
+  additionalLabels:
+    client-type: "consensus"
+  
+  ## Init image is used to chown data volume, initialise genesis, etc.
+  ##
+  initImage:
+    repository: "bitnami/kubectl"
+    tag: "1.24"
+    pullPolicy: IfNotPresent
+  
+  ## Sidecar image is used to perform Liveness/Readiness probes.
+  ##
+  sidecar:
+    repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+    tag: "v1.0.5"
+    pullPolicy: IfNotPresent
+    bindAddr: "0.0.0.0"
+    bindPort: 3001
+  
+  ## Configuration for prysm eth v2 beacon chain node
+  ## ref: https://docs.prylabs.network/docs/getting-started/
+  ##
+  
+  ## Prysm beacon node image version
+  ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
+  ##
+  image:
+    repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+    tag: "v3.1.0"
+    pullPolicy: IfNotPresent
+  imageGnosis:
+    repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
+    tag: "v2.1.2-gbc"
+    pullPolicy: IfNotPresent
+  
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+  
+  ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort/LoadBalancer.
+  ## This will generate a service for each replica, with a port binding via NodePort/LoadBalancer.
+  ## This is useful if you want to expose and announce your node to the Internet.
+  ##
+  p2pNodePort:
+    ## @param p2pNodePort.enabled Expose P2P port via NodePort
+    ##
+    enabled: false
+    ## @param p2pNodePort.annotations
+    ##
+    annotations: {}
+    ## @param p2pNodePort.type
+    ## Options: NodePort, LoadBalancer
+    type: NodePort
+    ## @param p2pNodePort.startAt The ports allocation will start from this value
+    ##
+    startAt: 31400
+    ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+    ## @default -- See `values.yaml` for example
+    replicaToNodePort: {}
+    #  "0": 32345
+    #  "3": 32348
+  
+  ## Settings for gRPC (beacon client api)
+  ##
+  rpc:
+    # Port number for beacon client rpc connection
+    port: "4000"
+    # Host on which the RPC server should listen
+    host: "0.0.0.0"
+    # Port name for the respective k8s service
+    portName: "rpc"
+  
+  ## HTTP Port
+  ##
+  http:
+    enabled: true
+    port: "8080"
+  
+  ## Ethereum 1 node endpoints.
+  ##
+  eth1Endpoints: []
+  
+  ## MEV Boost endpoint
+  ##
+  builderEndpoint: ""
+  
+  ## Post bellatrix, this address will receive the transaction fees produced
+  ## by any blocks from this node. Default to junk whilst bellatrix is in development state.
+  ## Validator client can override this value through the preparebeaconproposer api. 
+  ##
+  suggestedFeeRecipient: ""
+  
+  ## Sets the total difficulty to manual overrides the default
+  ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you
+  ## have a clear understanding that community has decided to override the terminal difficulty.
+  ## Incorrect usage will result in your node experience consensus failure.
+  totalDifficultyOverride: ""
+  
+  ## Extra flags for prysm beacon chain node
+  ##
+  extraFlags:
+    # p2p options
+    - "--p2p-max-peers=160"
+    - "--enable-peer-scorer"
+  
+  ## Monitoring
+  ##
+  metrics:
+    ## Prometheus exporter port
+    ##
+    port: 9090
+  
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## The namespace in which the ServiceMonitor will be created
+      ##
+      namespace: ""
+      ## The interval at which metrics should be scraped
+      ##
+      interval: 30s
+      ## The timeout after which the scrape is ended
+      ##
+      scrapeTimeout: ""
+      ## Metrics RelabelConfigs to apply to samples before scraping.
+      ##
+      relabellings: []
+      ## Metrics RelabelConfigs to apply to samples before ingestion.
+      ##
+      metricRelabelings: []
+      ## Specify honorLabels parameter to add the scrape endpoint
+      ##
+      honorLabels: false
+      ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+      ##
+      additionalLabels: {}
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a default set of Alerts
+      ##
+      default: true
+      ## The namespace in which the prometheusRule will be created
+      ##
+      namespace: ""
+      ## Additional labels for the prometheusRule
+      ##
+      additionalLabels: {}
+      ## Custom Prometheus rules
+      ##
+      rules: []
+  
+  ## Defines whether the service must be headless
+  ##
+  svcHeadless: true
+  
+  ## Configure session affinity for validator clients to hit the same beacon node
+  ## for the period specified in `timeoutSeconds`
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+  ##
+  sessionAffinity:
+    # Whether to enable session affinity or not
+    enabled: false
+    # The session duration in seconds
+    timeoutSeconds: 86400
+  
+  ## Configure resource requests and limits.
+  ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+  ##
+  resources: {}
+  
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before genesis
+  ##
+  livenessProbe:
+    enabled: true
+    initialDelaySeconds: 900
+    timeoutSeconds: 3
+    periodSeconds: 30
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /eth2/liveness
+      port: sidecar
+      scheme: HTTP
+  
+  readinessProbe:
+    enabled: true
+    initialDelaySeconds: 300
+    timeoutSeconds: 3
+    periodSeconds: 30
+    failureThreshold: 30
+    successThreshold: 2
+    httpGet:
+      path: /eth2/readiness
+      port: sidecar
+      scheme: HTTP
+  
+  ## If false, data ownership will not be reset at startup
+  ## This allows the nethermind node to be run with an arbitrary user
+  ##
+  initChownData: true
+  
+  ## Whether or not to allocate persistent volume disk for the data directory.
+  ## In case of pod failure, the pod data directory will still persist.
+  ##
+  persistence:
+    enabled: true
+    storageClassName: ""
+    accessModes:
+      - ReadWriteOnce
+    size: 300Gi
+    annotations: {}
