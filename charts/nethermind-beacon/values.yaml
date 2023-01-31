@@ -489,7 +489,7 @@ nethermind:
       rules: [ ]
 
 prysm:
-  enabled: False
+  enabled: false
 
   ## Provide a name in place of prysm for `app:` labels
   ##
