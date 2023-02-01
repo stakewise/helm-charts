@@ -834,7 +834,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.teku.restApi.enabled }}
-        - name: sidecar
+        - name: sidecar-teku
           image: "{{ .Values.teku.sidecar.repository }}:{{ .Values.teku.sidecar.tag }}"
           imagePullPolicy: {{ .Values.teku.sidecar.pullPolicy }}
           env:

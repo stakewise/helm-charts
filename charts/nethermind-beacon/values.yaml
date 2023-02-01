@@ -1239,7 +1239,7 @@ teku:
     tag: "v1.0.5"
     pullPolicy: IfNotPresent
     bindAddr: "0.0.0.0"
-    bindPort: 3000
+    bindPort: 3003
 
   ## Teku image
   ##
