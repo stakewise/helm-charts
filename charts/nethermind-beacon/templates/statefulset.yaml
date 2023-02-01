@@ -675,10 +675,10 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if .Values.lighthouse.p2pNodePort.enabled }}
-            - name: p2p-tcp-lighthouse
+            - name: p2p-tcp-lh
               containerPort: {{ include "lighthouse.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp-lighthouse
+            - name: p2p-udp-lh
               containerPort: {{ include "lighthouse.p2pPort" . }}
               protocol: UDP
           {{- end }}
