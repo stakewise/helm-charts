@@ -628,7 +628,7 @@ spec:
             {{- if .Values.lighthouse.builderEndpoint }}
               --builder={{ .Values.lighthouse.builderEndpoint }}
             {{- end }}
-            {{- if .Values.lighthouse.merge.enabled }}
+            {{- if .Values.lighthouse.merge.feeRecipient }}
               --suggested-fee-recipient={{ .Values.lighthouse.merge.feeRecipient }}
             {{- end }}
             {{- if eq .Values.lighthouse.global.network "gnosis" }}
@@ -768,7 +768,7 @@ spec:
             {{- if .Values.builderEndpoint }}
               --builder-endpoint={{ .Values.teku.builderEndpoint }}
             {{- end }}
-            {{- if .Values.teku.merge.enabled }}
+            {{- if .Values.teku.merge.feeRecipient }}
               --validators-proposer-default-fee-recipient={{ .Values.teku.merge.feeRecipient }}
             {{- end }}
             {{- if .Values.teku.global.checkPointSync.enabled }}
