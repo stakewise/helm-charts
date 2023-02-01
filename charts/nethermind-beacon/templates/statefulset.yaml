@@ -871,7 +871,7 @@ spec:
               scheme: {{ .Values.teku.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
-    {{- end }
+    {{- end }}
       volumes:
       {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
