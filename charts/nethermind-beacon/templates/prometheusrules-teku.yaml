@@ -1,0 +1,45 @@
+{{- if .Values.teku.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.teku.metrics.enabled)
+           (or .Values.global.metrics.prometheusRule.enabled .Values.teku.metrics.prometheusRule.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-beacon
+  {{- if .Values.teku.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.teku.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.teku.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.teku.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.teku.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.teku.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: TekuBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Teku beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: Teku50SlotsBehind
+          expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Teku beacon node is out of sync
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- end }}
+{{- end }}
+{{- end }}

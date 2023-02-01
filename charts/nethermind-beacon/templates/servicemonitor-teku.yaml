@@ -1,0 +1,44 @@
+{{- if .Values.teku.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.teku.metrics.enabled)
+    (or .Values.global.metrics.serviceMonitor.enabled .Values.teku.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-beacon
+  {{- if .Values.teku.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.teku.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.teku.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.teku.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-beacon
+      path: /metrics
+      {{- if .Values.teku.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.teku.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.teku.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.teku.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.teku.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.teku.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.teku.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.teku.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.teku.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.teku.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}
+{{- end }}

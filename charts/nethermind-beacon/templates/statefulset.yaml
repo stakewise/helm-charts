@@ -216,6 +216,67 @@ spec:
             - name: data-lighthouse
               mountPath: /data
     {{- end }}
+    {{- if .Values.teku.enabled }}
+        - name: init-teku
+          image: "{{ .Values.teku.initImage.repository }}:{{ .Values.teku.initImage.tag }}"
+          imagePullPolicy: {{ .Values.teku.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+          {{- if .Values.teku.p2pNodePort.enabled }}
+            {{- if eq .Values.teku.p2pNodePort.type "LoadBalancer" }}
+              until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
+              export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+            {{- else }}
+              export EXTERNAL_PORT=$(kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+              export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+            {{- end }}
+              echo "p2p-enabled: true" > /data/config.yaml;
+              echo 'p2p-port: {{ include "teku.p2pPort" . }}' >> /data/config.yaml;
+              echo "p2p-advertised-port: $EXTERNAL_PORT" >> /data/config.yaml;
+              echo "p2p-advertised-ip: $EXTERNAL_IP" >> /data/config.yaml;
+          {{- else }}
+              echo "p2p-enabled: true" > /data/config.yaml;
+              echo 'p2p-port: {{ include "teku.p2pPort" . }}' >> /data/config.yaml;
+              echo 'p2p-advertised-port: {{ include "teku.p2pPort" . }}' >> /data/config.yaml;
+              echo "p2p-advertised-ip: $POD_IP" >> /data/config.yaml;
+          {{- end }}
+              EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
+              echo "ee-endpoint: ${EE}" >> /data/config.yaml;
+              echo "Pod will connect to the ${EE} endpoint";
+              cat /data/config.yaml;
+          {{- if and .Values.teku.persistence.enabled .Values.tekuinitChownData }}
+              chown -R {{ .Values.teku.securityContext.runAsUser }}:{{ .Values.teku.securityContext.runAsUser }} /data | true;
+          {{- end }}
+          volumeMounts:
+            - name: env-nodeport-teku
+              mountPath: /env
+            - name: data-teku
+              mountPath: /data
+    {{- end }}
       containers:
         - name: nethermind
           image: "{{ .Values.nethermind.image.repository }}:{{ .Values.nethermind.image.tag | default .Chart.AppVersion }}"
@@ -683,6 +744,134 @@ spec:
         {{- end }}
       {{- end }}
     {{- end }}
+    {{- if .Values.teku.enabled }}
+        - name: beacon-teku
+          image: "{{ .Values.teku.image.repository }}:{{ .Values.teku.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.teku.image.pullPolicy }}
+          command:
+            - sh
+            - -ac
+            - >
+              exec /opt/teku/bin/teku
+              --network={{ .Values.teku.global.network }}
+              --config-file=/data/teku/config.yaml
+              --data-beacon-path=/data/teku/beacon
+              --data-path=/data/teku
+              --data-storage-archive-frequency={{ .Values.teku.dataStorageArchiveFrequency }}
+              --data-storage-mode={{ .Values.teku.dataStorageMode }}
+              --data-storage-non-canonical-blocks-enabled={{ .Values.teku.dataStorageNonCanonicalBlocksEnabled }}
+              {{- if .Values.global.externalSecrets.enabled }}                                                                                                                                                                                                                                                                       {{- else }}
+              --ee-jwt-secret-file=/external-secrets/JWT_SECRET
+              {{- end }}
+            {{- if .Values.builderEndpoint }}
+              --builder-endpoint={{ .Values.teku.builderEndpoint }}
+            {{- end }}
+            {{- if .Values.teku.merge.enabled }}
+              --validators-proposer-default-fee-recipient={{ .Values.teku.merge.feeRecipient }}
+            {{- end }}
+            {{- if .Values.teku.global.checkPointSync.enabled }}
+              --initial-state={{ .Values.teku.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
+            {{- end }}
+            {{- if .Values.teku.restApi.enabled }}
+              --rest-api-enabled={{ .Values.teku.restApi.enabled }}
+              --rest-api-host-allowlist={{ .Values.teku.restApi.hostAllowList | join "," }}
+              --rest-api-interface={{ .Values.teku.restApi.interface }}
+              --rest-api-port={{ .Values.teku.restApi.port }}
+              --rest-api-cors-origins={{ .Values.teku.restApi.corsOrigins | join "," }}
+              --rest-api-docs-enabled={{ .Values.teku.restApi.docsEnabled }}
+            {{- end }}
+            {{- if .Values.teku.global.metrics.enabled }}
+              --metrics-enabled={{ .Values.teku.global.metrics.enabled }}
+              --metrics-categories={{ .Values.teku.metrics.categories | join "," }}
+              --metrics-host-allowlist={{ .Values.teku.metrics.hostAllowList | join "," }}
+              --metrics-interface={{ .Values.teku.metrics.interface }}
+              --metrics-port={{ .Values.teku.metrics.port }}
+            {{- end }}
+            {{- range .Values.teku.extraFlags }}
+              {{ . | quote }}
+            {{- end }}
+        {{- if or .Values.teku.restApi.enabled .Values.teku.global.metrics.enabled }}
+          ports:
+          {{- if .Values.teku.restApi.enabled }}
+            - name: {{ .Values.teku.restApi.portName }}
+              containerPort: {{ .Values.teku.restApi.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.teku.global.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.teku.metrics.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.teku.p2pNodePort.enabled }}
+            - name: p2p-tcp
+              containerPort: {{ include "teku.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp
+              containerPort: {{ include "teku.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
+        {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: JAVA_OPTS
+              value: {{ .Values.teku.tekuJavaOpts | quote }}
+          volumeMounts:
+            - name: data-teku
+              mountPath: /data/teku
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+            - name: env-nodeport
+              mountPath: /env
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.teku.restApi.enabled }}
+        - name: sidecar
+          image: "{{ .Values.teku.sidecar.repository }}:{{ .Values.teku.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.teku.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.teku.sidecar.bindAddr }}:{{ .Values.teku.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.teku.restApi.port | quote }}
+          ports:
+            - containerPort: {{ .Values.teku.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if or .Values.teku.global.livenessProbe.enabled .Values.teku.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.teku.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.teku.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.teku.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.teku.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.teku.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.teku.livenessProbe.httpGet.path }}
+              port: {{ .Values.teku.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.teku.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if or .Values.teku.global.readinessProbe.enabled .Values.teku.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.teku.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.teku.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.teku.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.teku.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.teku.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.teku.readinessProbe.httpGet.path }}
+              port: {{ .Values.teku.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.teku.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+    {{- end }
       volumes:
       {{- if .Values.global.JWTSecret }}
         - name: jwtsecret
@@ -718,6 +907,10 @@ spec:
           emptyDir: {}
       {{- if .Values.lighthouse.enabled }}
         - name: env-nodeport-lighthouse
+          emptyDir: {}
+      {{- end }}
+      {{- if .Values.teku.enabled }}
+        - name: env-nodeport-teku
           emptyDir: {}
       {{- end }}
   volumeClaimTemplates:
@@ -766,6 +959,22 @@ spec:
         resources:
           requests:
             storage: {{ .Values.lighthouse.persistence.size | quote }}
+    {{- end }}
+    {{- if .Values.teku.enabled }}
+    - metadata:
+        name: data-teku
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.teku.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.teku.persistence.accessModes }}
+        storageClassName: {{ .Values.teku.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.teku.persistence.size | quote }}
     {{- end }}
 
 
