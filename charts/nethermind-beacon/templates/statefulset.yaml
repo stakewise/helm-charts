@@ -628,8 +628,8 @@ spec:
             {{- if .Values.lighthouse.builderEndpoint }}
               --builder={{ .Values.lighthouse.builderEndpoint }}
             {{- end }}
-            {{- if .Values.lighthouse.merge.feeRecipient }}
-              --suggested-fee-recipient={{ .Values.lighthouse.merge.feeRecipient }}
+            {{- if .Values.lighthouse.suggestedFeeRecipient }}
+              --suggested-fee-recipient={{ .Values.lighthouse.suggestedFeeRecipient }}
             {{- end }}
             {{- if eq .Values.lighthouse.global.network "gnosis" }}
               --eth1-endpoints=${EE}
@@ -765,11 +765,11 @@ spec:
               {{- else }}
               --ee-jwt-secret-file=/secret/jwtsecret
               {{- end }}
-            {{- if .Values.builderEndpoint }}
+            {{- if .Values.teku.builderEndpoint }}
               --builder-endpoint={{ .Values.teku.builderEndpoint }}
             {{- end }}
-            {{- if .Values.teku.merge.feeRecipient }}
-              --validators-proposer-default-fee-recipient={{ .Values.teku.merge.feeRecipient }}
+            {{- if .Values.teku.suggestedFeeRecipient }}
+              --validators-proposer-default-fee-recipient={{ .Values.teku.suggestedFeeRecipient }}
             {{- end }}
             {{- if .Values.teku.global.checkPointSync.enabled }}
               --initial-state={{ .Values.teku.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
