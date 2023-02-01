@@ -829,7 +829,7 @@ spec:
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
-            - name: env-nodeport
+            - name: env-nodeport-teku
               mountPath: /env
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
