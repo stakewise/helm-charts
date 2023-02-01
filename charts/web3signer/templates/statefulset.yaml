@@ -86,6 +86,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml
+            - --logging={{ .Values.loggingLevel }}
             - eth2
           env:
             - name: JAVA_OPTS
