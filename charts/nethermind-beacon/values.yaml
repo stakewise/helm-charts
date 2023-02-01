@@ -193,7 +193,7 @@ nethermind:
   ##
   sidecar:
     repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.5"
+    tag: "v1.0.6"
     pullPolicy: IfNotPresent
     bindAddr: "0.0.0.0"
     bindPort: 3000
@@ -525,7 +525,7 @@ prysm:
   ##
   sidecar:
     repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.5"
+    tag: "v1.0.6"
     pullPolicy: IfNotPresent
     bindAddr: "0.0.0.0"
     bindPort: 3001
@@ -830,7 +830,7 @@ lighthouse:
   ##
   sidecar:
     repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.5"
+    tag: "v1.0.6"
     pullPolicy: IfNotPresent
     bindAddr: "0.0.0.0"
     bindPort: 3002
@@ -1231,7 +1231,7 @@ teku:
   ##
   sidecar:
     repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.5"
+    tag: "v1.0.6"
     pullPolicy: IfNotPresent
     bindAddr: "0.0.0.0"
     bindPort: 3003
