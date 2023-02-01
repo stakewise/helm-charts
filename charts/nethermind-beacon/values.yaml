@@ -123,7 +123,9 @@ global:
 
   externalSecrets:
     enabled: false
-    secretStoreRef: secretStoreRef
+    secretStoreRef: 
+      name: secretStoreRef
+      kind: SecretStore
     data:
       - secretKey: JWT_SECRET
         remoteRef:
