@@ -632,11 +632,10 @@ spec:
               --suggested-fee-recipient={{ .Values.lighthouse.suggestedFeeRecipient }}
             {{- end }}
               --execution-endpoint=${EE}
-              {{- if .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
               --execution-jwt=/external-secrets/JWT_SECRET
-              {{- else }}
+            {{- else }}
               --execution-jwt=/secret/jwtsecret
-              {{- end }}
             {{- end }}
               --datadir=/data
               --network={{ .Values.lighthouse.global.network }}
