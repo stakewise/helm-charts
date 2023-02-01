@@ -87,6 +87,7 @@ spec:
           args:
             - --config-file=/config/config.yaml
             - --logging={{ .Values.loggingLevel }}
+            - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
           env:
             - name: JAVA_OPTS

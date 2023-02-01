@@ -36,6 +36,8 @@ dbKeystoreUrl: ""
 ##
 decryptionKey: ""
 
+idleTimeout: 30
+
 ## Flyawy image is used to apply database migrations
 ##
 flywayImage:
