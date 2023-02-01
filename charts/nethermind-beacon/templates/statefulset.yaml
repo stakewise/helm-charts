@@ -720,27 +720,27 @@ spec:
               protocol: TCP
         {{- if or .Values.lighthouse.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.lighthouse.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.lighthouse.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.lighthouse.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.lighthouse.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.lighthouse.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.livenessProbe.httpGet.path }}
-              port: {{ .Values.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.livenessProbe.httpGet.scheme }}
+              path: {{ .Values.lighthouse.livenessProbe.httpGet.path }}
+              port: {{ .Values.lighthouse.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.lighthouse.livenessProbe.httpGet.scheme }}
         {{- end }}
         {{- if .Values.lighthouse.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.lighthouse.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.lighthouse.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.lighthouse.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.lighthouse.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.lighthouse.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.readinessProbe.httpGet.path }}
-              port: {{ .Values.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.readinessProbe.httpGet.scheme }}
+              path: {{ .Values.lighthouse.readinessProbe.httpGet.path }}
+              port: {{ .Values.lighthouse.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.lighthouse.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
     {{- end }}
