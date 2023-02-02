@@ -28,13 +28,11 @@ spec:
       protocol: TCP
       targetPort: p2p-tcp-beacon
       nodePort: {{ $port }}
-  {{- if eq $.Values.lighthouse.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-beacon
       port: {{ include "lighthouse.p2pPort" $ }}
       protocol: UDP
       targetPort: p2p-udp-beacon
       nodePort: {{ $port }}
-  {{- end }}
   selector:
     {{- include "common.labels.matchLabels" $ | nindent 4 }}
     statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"

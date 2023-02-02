@@ -521,10 +521,10 @@ spec:
               name: {{ .Values.prysm.rpc.portName }}-prysm
               protocol: TCP
           {{- if .Values.prysm.p2pNodePort.enabled }}
-            - name: p2p-tcp-prysm
+            - name: p2p-tcp-beacon
               containerPort: {{ include "prysm.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp-prysm
+            - name: p2p-udp-beacon
               containerPort: {{ include "prysm.p2pPort" . }}
               protocol: UDP
           {{- end }}
@@ -675,10 +675,10 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if .Values.lighthouse.p2pNodePort.enabled }}
-            - name: p2p-tcp-lh
+            - name: p2p-tcp-beacon
               containerPort: {{ include "lighthouse.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp-lh
+            - name: p2p-udp-beacon
               containerPort: {{ include "lighthouse.p2pPort" . }}
               protocol: UDP
           {{- end }}
@@ -801,10 +801,10 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if .Values.teku.p2pNodePort.enabled }}
-            - name: p2p-tcp
+            - name: p2p-tcp-beacon
               containerPort: {{ include "teku.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp
+            - name: p2p-udp-beacon
               containerPort: {{ include "teku.p2pPort" . }}
               protocol: UDP
           {{- end }}
