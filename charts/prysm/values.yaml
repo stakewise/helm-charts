@@ -146,6 +146,7 @@ rbac:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
+  registry: ""
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent
@@ -153,7 +154,8 @@ initImage:
 ## Sidecar image is used to perform Liveness/Readiness probes.
 ##
 sidecar:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/public/ethnode-sidecar"
   tag: "v1.0.6"
   pullPolicy: IfNotPresent
   bindAddr: "0.0.0.0"
@@ -167,11 +169,13 @@ sidecar:
 ## ref: https://gcr.io/prysmaticlabs/prysm/beacon-chain
 ##
 image:
-  repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+  registry: "gcr.io"
+  repository: "prysmaticlabs/prysm/beacon-chain"
   tag: "v3.2.0"
   pullPolicy: IfNotPresent
 imageGnosis:
-  repository: "ghcr.io/gnosischain/gbc-prysm-beacon-chain"
+  registry: "ghcr.io"
+  repository: "gnosischain/gbc-prysm-beacon-chain"
   tag: "v2.1.2-gbc"
   pullPolicy: IfNotPresent
 

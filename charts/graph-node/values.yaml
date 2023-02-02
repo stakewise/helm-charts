@@ -9,6 +9,7 @@ global:
 replicaCount: 1
 
 image:
+  registry: ""
   repository: graphprotocol/graph-node
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

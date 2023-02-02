@@ -40,7 +40,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -54,7 +54,7 @@ spec:
             - name: data
               mountPath: /data
         - name: fetch-keys
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          image: "{{ .Values.cliImage.registry }}/{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -66,7 +66,7 @@ spec:
             - name: data
               mountPath: /data
         - name: migrations
-          image: "{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
+          image: "{{ .Values.flywayImage.registry }}/{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
           imagePullPolicy: {{ .Values.flywayImage.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -82,7 +82,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml

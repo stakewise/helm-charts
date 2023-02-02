@@ -72,7 +72,7 @@ Update permissions on files inside /data directory
 */}}
 {{- define "init-chown" -}}
 - name: init-chown
-  image: "{{ .Values.initImageBusybox.repository }}:{{ .Values.initImageBusybox.tag }}"
+  image: "{{ .Values.initImageBusybox.registry }}/{{ .Values.initImageBusybox.repository }}:{{ .Values.initImageBusybox.tag }}"
   imagePullPolicy: {{ .Values.initImageBusybox.pullPolicy }}
   securityContext:
     runAsUser: 0

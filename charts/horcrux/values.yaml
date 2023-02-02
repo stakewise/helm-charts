@@ -3,6 +3,7 @@ securityContext:
   runAsUser: 1001
 
 image:
+  registry: ""
   repository: "stakewiselabs/bls-horcrux"
   tag: "v1.0.0"
   pullPolicy: IfNotPresent
