@@ -13,6 +13,7 @@ data:
   GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: {{ .Values.graph.graphAllowNonDeterministricIpfs | quote }}
   GRAPH_MAX_IPFS_FILE_BYTES: {{ .Values.graph.graphMaxIpfsFileBytes | quote }}
   GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
+  GRAPH_GRAPHQL_DISABLE_BOOL_FILTERS: {{ .Values.graph.graphGraphqlDisableBoolFilters | quote }}
   ipfs: {{ .Values.graph.ipfsUrl | quote }}
   ethereum: {{ .Values.graph.ethereumNode | quote }}
 

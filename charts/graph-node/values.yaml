@@ -44,6 +44,7 @@ graph:
   graphAllowNonDeterministricIpfs: "true"
   # Maximum size for a file that can be retrieved (in bytes, defaults to 1MiB)
   graphMaxIpfsFileBytes: "1048576"
+  graphGraphqlDisableBoolFilters: "false"
   
 
 serviceAccount:
