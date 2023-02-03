@@ -796,7 +796,7 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if .Values.teku.global.metrics.enabled }}
-            - name: metrics
+            - name: metrics-beacon
               containerPort: {{ .Values.teku.metrics.port }}
               protocol: TCP
           {{- end }}
