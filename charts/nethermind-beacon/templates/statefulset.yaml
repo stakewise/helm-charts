@@ -246,6 +246,7 @@ spec:
             - >
               echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
           {{- if .Values.teku.p2pNodePort.enabled }}
+            echo "kubectl get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}'";
             {{- if eq .Values.teku.p2pNodePort.type "LoadBalancer" }}
               until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer gets an IP" && sleep 10; done;
               export EXTERNAL_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
