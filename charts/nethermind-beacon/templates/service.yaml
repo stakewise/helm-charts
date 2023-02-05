@@ -48,6 +48,11 @@ spec:
       port: {{ .Values.prysm.http.port }}
       targetPort: http-beacon
   {{- end }}
+  {{- if .Values.lighthouse.enabled }}
+    - name: {{ .Values.lighthouse.http.portName }}
+      port: {{ .Values.lighthouse.http.port }}
+      targetPort: {{ .Values.lighthouse.http.portName }}
+  {{- end }}
   {{- if .Values.teku.restApi.enabled }}
     - name: {{ .Values.teku.restApi.portName }}
       port: {{ .Values.teku.restApi.port }}
