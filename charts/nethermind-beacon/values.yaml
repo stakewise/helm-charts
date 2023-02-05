@@ -28,6 +28,12 @@ global:
     # Specifies whether a service account should be created
     create: true
 
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+
   ## RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ## Additional settings could be made in non-global section.
@@ -140,16 +146,6 @@ global:
     enabled: false
     # The session duration in seconds
     timeoutSeconds: 86400
-
-## Service account
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
-serviceAccount:
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
 
 ## RBAC configuration.
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
@@ -270,13 +266,6 @@ nethermind:
     finalTotalDifficulty: ""
     # Terminal total difficulty used for transition process.
     terminalTotalDifficulty: ""
-
-  serviceAccount:
-    # Annotations to add to the service account
-    annotations: { }
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
 
   ## Additional labels for all resources
   ##
@@ -403,6 +392,7 @@ nethermind:
   ## NB! readinessProbe and livenessProbe must be disabled before genesis
   ##
   livenessProbe:
+    enabled: true
     initialDelaySeconds: 900
     timeoutSeconds: 3
     periodSeconds: 30
@@ -414,6 +404,7 @@ nethermind:
       scheme: HTTP
 
   readinessProbe:
+    enabled: true
     initialDelaySeconds: 60
     timeoutSeconds: 3
     periodSeconds: 30
@@ -500,16 +491,6 @@ prysm:
   ## Provide a name to substitute for the full names of resources
   ##
   fullnameOverride: ""
-
-  ## Service account
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-  ##
-  serviceAccount:
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
 
   ## Additional labels for all resources
   ##
@@ -740,13 +721,6 @@ lighthouse:
     ##
     network: mainnet
 
-    ## JSON Web Token (JWT) authentication is used to secure the communication
-    ## between the beacon node and execution client. You can generate a JWT using
-    ## a command line tool, for example:
-    ## openssl rand -hex 32 > token.txt
-    ##
-    JWTSecret: ""
-
     ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
     ## Uses the same endpoint to populate the deposit cache.
     ## A separate Statefulset will be created for each specified address
@@ -767,14 +741,6 @@ lighthouse:
     checkPointSync:
       enabled: false
       url: ""
-
-    ## Service account
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-    ## Additional settings could be made in non-global section.
-    ##
-    serviceAccount:
-      # Specifies whether a service account should be created
-      create: true
     
     ## RBAC configuration.
     ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
@@ -809,17 +775,6 @@ lighthouse:
         ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
         ##
         enabled: false
-    
-    ## Configure liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    ## NB! readinessProbe and livenessProbe must be disabled before fully synced
-    ## Additional settings could be made in non-global section.
-    ##
-    livenessProbe:
-      enabled: true
-
-    readinessProbe:
-      enabled: true
 
   ## Init image is used to chown data volume, initialise genesis, etc.
   ##
@@ -887,16 +842,6 @@ lighthouse:
   ## Extra flags for lighthouse beacon chain node
   ##
   extraFlags: []
-
-  ## Service account
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-  ##
-  serviceAccount:
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
 
   ## Additional labels for all resources
   ##
@@ -999,6 +944,7 @@ lighthouse:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ##
   livenessProbe:
+    enabled: true
     initialDelaySeconds: 900
     timeoutSeconds: 3
     periodSeconds: 30
@@ -1010,6 +956,7 @@ lighthouse:
       scheme: HTTP
 
   readinessProbe:
+    enabled: true
     initialDelaySeconds: 300
     timeoutSeconds: 3
     periodSeconds: 30
@@ -1141,13 +1088,6 @@ teku:
     ##
     network: mainnet
 
-    ## JSON Web Token (JWT) authentication is used to secure the communication
-    ## between the beacon node and execution client. You can generate a JWT using
-    ## a command line tool, for example:
-    ## openssl rand -hex 32 > token.txt
-    ##
-    JWTSecret: ""
-
     ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
     ## Uses the same endpoint to populate the deposit cache.
     ## A separate Statefulset will be created for each specified address
@@ -1168,14 +1108,6 @@ teku:
     checkPointSync:
       enabled: false
       url: ""
-
-    ## Service account
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-    ## Additional settings could be made in non-global section.
-    ##
-    serviceAccount:
-      # Specifies whether a service account should be created
-      create: true
 
     ## RBAC configuration.
     ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
@@ -1211,17 +1143,6 @@ teku:
         ##
         enabled: false
 
-    ## Configure liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    ## NB! readinessProbe and livenessProbe must be disabled before fully synced
-    ## Additional settings could be made in non-global section.
-    ##
-    livenessProbe:
-      enabled: true
-
-    readinessProbe:
-      enabled: true
-
   ## Init image is used to chown data volume, initialise genesis, etc.
   ##
   initImage:
@@ -1249,13 +1170,6 @@ teku:
   imagePullSecrets: []
   nameOverride: ""
   fullnameOverride: ""
-
-  serviceAccount:
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
 
   ## Additional labels for all resources
   ##
@@ -1397,6 +1311,7 @@ teku:
   ## NB! readinessProbe and livenessProbe must be disabled before genesis
   ##
   livenessProbe:
+    enabled: true
     initialDelaySeconds: 900
     timeoutSeconds: 3
     periodSeconds: 30
@@ -1408,6 +1323,7 @@ teku:
       scheme: HTTP
 
   readinessProbe:
+    enabled: true
     initialDelaySeconds: 300
     timeoutSeconds: 3
     periodSeconds: 30

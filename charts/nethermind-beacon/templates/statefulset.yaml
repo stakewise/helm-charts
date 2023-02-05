@@ -844,7 +844,7 @@ spec:
             - containerPort: {{ .Values.teku.sidecar.bindPort }}
               name: sidecar
               protocol: TCP
-        {{- if or .Values.teku.global.livenessProbe.enabled .Values.teku.livenessProbe.enabled }}
+        {{- if .Values.teku.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.teku.livenessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.teku.livenessProbe.timeoutSeconds }}
@@ -856,7 +856,7 @@ spec:
               port: {{ .Values.teku.livenessProbe.httpGet.port }}
               scheme: {{ .Values.teku.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if or .Values.teku.global.readinessProbe.enabled .Values.teku.readinessProbe.enabled }}
+        {{- if .Values.teku.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.teku.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.teku.readinessProbe.timeoutSeconds }}
