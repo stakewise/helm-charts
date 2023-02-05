@@ -28,12 +28,6 @@ global:
     # Specifies whether a service account should be created
     create: true
 
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
-
   ## RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ## Additional settings could be made in non-global section.
@@ -146,6 +140,16 @@ global:
     enabled: false
     # The session duration in seconds
     timeoutSeconds: 86400
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
 
 ## RBAC configuration.
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
