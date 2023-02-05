@@ -48,6 +48,12 @@ spec:
       port: {{ .Values.prysm.http.port }}
       targetPort: http-beacon
   {{- end }}
+  {{- if .Values.teku.restApi.enabled }}
+    - name: {{ .Values.teku.restApi.portName }}
+      port: {{ .Values.teku.restApi.port }}
+      targetPort: {{ .Values.teku.restApi.portName }}
+      protocol: TCP
+  {{- end }}
   {{- if .Values.global.metrics.enabled }}
     - name: metrics-beacon
       {{- if .Values.prysm.enabled }}
