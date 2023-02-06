@@ -1,0 +1,15 @@
+{{- define "geth.p2pPort" -}}
+{{- printf "30303" -}}
+{{- end -}}
+{{- define "nethermind.p2pPort" -}}
+{{- printf "30303" -}}
+{{- end -}}
+{{- define "prysm.p2pPort" -}}
+{{- printf "13000" -}}
+{{- end -}}
+{{- define "lighthouse.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
+{{- define "teku.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}

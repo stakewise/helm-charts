@@ -1,0 +1,37 @@
+{{- if .Values.nethermind.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.nethermind.metrics.enabled)
+           (or .Values.global.metrics.prometheusRule.enabled .Values.nethermind.metrics.prometheusRule.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-execution
+  {{- if .Values.nethermind.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.nethermind.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.nethermind.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.nethermind.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.nethermind.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.nethermind.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: NethermindNodeDown
+          expr: up{job="{{ include "common.names.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Nethermind Node {{ printf "{{ $labels.instance }}" }} down
+            description: Nethermind Node {{ printf "{{ $labels.instance }}" }} is down
+  {{- end }}
+{{- end }}
+{{- end }}

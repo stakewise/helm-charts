@@ -1,0 +1,37 @@
+{{- if .Values.geth.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.geth.metrics.enabled)
+           (or .Values.global.metrics.prometheusRule.enabled .Values.geth.metrics.prometheusRule.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-execution
+  {{- if .Values.geth.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.geth.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.geth.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.geth.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.geth.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.geth.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: GethNodeDown
+          expr: up{job="{{ include "common.names.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
+            description: Geth Node {{ printf "{{ $labels.instance }}" }} is down
+  {{- end }}
+{{- end }}
+{{- end }}

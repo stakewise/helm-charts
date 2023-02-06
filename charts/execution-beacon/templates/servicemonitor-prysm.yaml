@@ -1,0 +1,44 @@
+{{- if .Values.prysm.enabled }}
+{{- if and (or .Values.global.metrics.enabled .Values.prysm.metrics.enabled)
+    (or .Values.global.metrics.serviceMonitor.enabled .Values.prysm.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-beacon
+  {{- if .Values.prysm.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.prysm.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.prysm.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.prysm.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-beacon
+      path: /metrics
+      {{- if .Values.prysm.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.prysm.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.prysm.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.prysm.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.prysm.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.prysm.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.prysm.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.prysm.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.prysm.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.prysm.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}
+{{- end }}

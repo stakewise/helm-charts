@@ -1,0 +1,45 @@
+{{- if .Values.nethermind.enabled }}
+{{- if .Values.nethermind.p2pNodePort.enabled -}}
+{{- range $i, $e := until (int .Values.global.replicaCount) }}
+{{- $port := add $.Values.nethermind.p2pNodePort.startAt $i -}}
+{{- if hasKey $.Values.nethermind.p2pNodePort.replicaToNodePort ($i | toString) -}}
+  {{ $port = index $.Values.nethermind.p2pNodePort.replicaToNodePort ($i | toString) }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-execution-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+    pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+    type: p2p
+    client: execution
+  {{- with $.Values.nethermind.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.nethermind.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp-exec
+      port: {{ include "nethermind.p2pPort" $ }}
+      protocol: TCP
+      targetPort: {{ $port }}
+      nodePort: {{ $port }}
+  {{- if eq $.Values.nethermind.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp-exec
+      port: {{ include "nethermind.p2pPort" $ }}
+      protocol: UDP
+      targetPort: {{ $port }}
+      nodePort: {{ $port }}
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+
+{{- end }}
+{{- end }}
+{{- end }}

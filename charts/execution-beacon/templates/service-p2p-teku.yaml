@@ -1,0 +1,43 @@
+{{- if .Values.teku.enabled }}
+{{- if .Values.teku.p2pNodePort.enabled -}}
+{{- range $i, $e := until (int .Values.global.replicaCount) }}
+{{- $port := add $.Values.teku.p2pNodePort.startAt $i -}}
+{{- if hasKey $.Values.teku.p2pNodePort.replicaToNodePort ($i | toString) -}}
+  {{ $port = index $.Values.teku.p2pNodePort.replicaToNodePort ($i | toString) }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-beacon-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+    pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+    type: p2p
+    client: beacon
+  {{- with $.Values.teku.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.teku.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp-beacon
+      port: {{ include "lighthouse.p2pPort" $ }}
+      protocol: TCP
+      targetPort: p2p-tcp-beacon
+      nodePort: {{ $port }}
+    - name: p2p-udp-beacon
+      port: {{ include "lighthouse.p2pPort" $ }}
+      protocol: UDP
+      targetPort: p2p-udp-beacon
+      nodePort: {{ $port }}
+  selector:
+    {{- include "common.labels.matchLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+
+{{- end }}
+{{- end }}
+{{- end }}
