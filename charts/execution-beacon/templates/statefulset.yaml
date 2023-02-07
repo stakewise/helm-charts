@@ -555,7 +555,7 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.nethermind.jsonrpc.enabled }}
-        - name: sidecar
+        - name: sidecar-execution
           image: "{{ .Values.nethermind.sidecar.repository }}:{{ .Values.nethermind.sidecar.tag }}"
           imagePullPolicy: {{ .Values.nethermind.sidecar.pullPolicy }}
           env:
