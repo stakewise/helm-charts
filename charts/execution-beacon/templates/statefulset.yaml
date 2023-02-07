@@ -373,7 +373,7 @@ spec:
               --port=$EXTERNAL_PORT
           {{- else }}
               --nat=extip:$(POD_IP)
-              --port={{ include "geth.geth.p2pPort" . }}
+              --port={{ include "geth.p2pPort" . }}
           {{- end }}
           {{- if .Values.geth.ws.enabled }}
               --ws
