@@ -22,9 +22,9 @@ spec:
 {{- end }}
   ports:
   {{- if and .Values.geth.enabled .Values.global.JWTSecret }}
-    - name: authrpc-execution
+    - name: authrpc-exec
       port: {{ .Values.geth.authRpc.port }}
-      targetPort: authrpc-execution
+      targetPort: authrpc-exec
   {{- end }}
   {{- if and .Values.geth.enabled .Values.geth.http.enabled }}
     - name: http-execution

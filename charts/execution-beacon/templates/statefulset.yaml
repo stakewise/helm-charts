@@ -404,7 +404,7 @@ spec:
                   fieldPath: status.podIP
           ports:
           {{- if .Values.global.JWTSecret }}
-            - name: authrpc-execution
+            - name: authrpc-exec
               containerPort: {{ .Values.geth.authRpc.port }}
           {{- end }}
           {{- if .Values.geth.http.enabled }}
