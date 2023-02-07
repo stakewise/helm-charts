@@ -799,7 +799,7 @@ spec:
               --execution-jwt=/secret/jwtsecret
             {{- end }}
               --datadir=/data
-              --network={{ .Values.lighthouse.global.network }}
+              --network={{ .Values.global.network }}
               --disable-upnp
               --disable-enr-auto-update
               --target-peers={{ .Values.lighthouse.targetPeers }}
@@ -910,7 +910,7 @@ spec:
             - -ac
             - >
               exec /opt/teku/bin/teku
-              --network={{ .Values.teku.global.network }}
+              --network={{ .Values.global.network }}
               --config-file=/data/teku/config.yaml
               --data-beacon-path=/data/teku/beacon
               --data-path=/data/teku
