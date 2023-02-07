@@ -193,7 +193,11 @@ spec:
               echo 'p2p-tcp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
               echo 'p2p-udp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
           {{- end }}
+              {{ .Values.geth.enabled }}
+              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
+              {{ end }}
               echo "http-web3provider: ${EE}" >> /config/config.yaml;
               echo "Pod will connect to the ${EE} endpoint";
               cat /config/config.yaml;
@@ -319,7 +323,11 @@ spec:
               echo 'p2p-advertised-port: {{ include "teku.p2pPort" . }}' >> /data/config.yaml;
               echo "p2p-advertised-ip: $POD_IP" >> /data/config.yaml;
           {{- end }}
+              {{ .Values.geth.enabled }}
+              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
+              {{ end }}
               echo "ee-endpoint: ${EE}" >> /data/config.yaml;
               echo "Pod will connect to the ${EE} endpoint";
               cat /data/config.yaml;
@@ -807,7 +815,11 @@ spec:
             {{- if .Values.lighthouse.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
+              {{ .Values.geth.enabled }}
+              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
+              {{ end }}
               echo "Pod will connect to the ${EE} endpoint";
               exec lighthouse
               bn
