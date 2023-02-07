@@ -681,9 +681,9 @@ spec:
           {{- if .Values.prysm.totalDifficultyOverride }}
             - "--terminal-total-difficulty-override={{ .Values.prysm.totalDifficultyOverride }}"
           {{- end }}
-          {{- if .Values.prysm.global.checkPointSync.enabled }}
-            - "--checkpoint-sync-url={{ .Values.prysm.global.checkPointSync.url }}"
-            - "--genesis-beacon-api-url={{ .Values.prysm.global.checkPointSync.url }}"
+          {{- if .Values.global.checkPointSync.enabled }}
+            - "--checkpoint-sync-url={{ .Values.global.checkPointSync.url }}"
+            - "--genesis-beacon-api-url={{ .Values.global.checkPointSync.url }}"
           {{- end }}
           {{- if or (eq .Values.global.network "mainnet") (eq .Values.global.network "prater") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - "--genesis-state=/data/genesis.ssz"
@@ -830,8 +830,8 @@ spec:
               --http-address={{ .Values.lighthouse.http.address }}
               --http-allow-origin={{ .Values.lighthouse.http.allowOrigin }}
             {{- end}}
-            {{- if .Values.lighthouse.global.checkPointSync.enabled }}
-              --checkpoint-sync-url={{ .Values.lighthouse.global.checkPointSync.url }}
+            {{- if .Values.global.checkPointSync.enabled }}
+              --checkpoint-sync-url={{ .Values.global.checkPointSync.url }}
             {{- end }}
             {{- if .Values.lighthouse.builderEndpoint }}
               --builder={{ .Values.lighthouse.builderEndpoint }}
@@ -975,8 +975,8 @@ spec:
             {{- if .Values.teku.suggestedFeeRecipient }}
               --validators-proposer-default-fee-recipient={{ .Values.teku.suggestedFeeRecipient }}
             {{- end }}
-            {{- if .Values.teku.global.checkPointSync.enabled }}
-              --initial-state={{ .Values.teku.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
+            {{- if .Values.global.checkPointSync.enabled }}
+              --initial-state={{ .Values.global.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
             {{- end }}
             {{- if .Values.teku.restApi.enabled }}
               --rest-api-enabled={{ .Values.teku.restApi.enabled }}

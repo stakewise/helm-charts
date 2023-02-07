@@ -987,13 +987,6 @@ lighthouse:
     ## NEVER CHANGE THE ORDER OF ENDPOINTS AS THIS MAY BREAK
     ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
     executionEndpoints: []
-
-    ## To get Lighthouse up and running in only a few minutes
-    ## from a recent finalized checkpoint state rather than syncing from genesis.
-    ##
-    checkPointSync:
-      enabled: false
-      url: ""
     
     ## Monitoring
     ## Additional settings could be made in non-global section.
@@ -1292,13 +1285,6 @@ teku:
     ## NEVER CHANGE THE ORDER OF ENDPOINTS AS THIS MAY BREAK
     ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
     executionEndpoints: []
-
-    ## To get Teku up and running in only a few minutes
-    ## from a recent finalized checkpoint state rather than syncing from genesis.
-    ##
-    checkPointSync:
-      enabled: false
-      url: ""
 
     ## Monitoring
     ## Additional settings could be made in non-global section.
