@@ -53,9 +53,9 @@ spec:
   {{- end }}
   {{- if and .Values.nethermind.enabled (or .Values.global.JWTSecret .Values.global.externalSecrets.enabled) }}
     - port: {{ .Values.nethermind.jsonrpc.engine.port }}
-      targetPort: engine-execution
+      targetPort: engine-exec
       protocol: TCP
-      name: engine-execution
+      name: engine-exec
   {{- end }}
   {{- if and .Values.nethermind.enabled  .Values.global.metrics.enabled }}
     - port: {{ .Values.nethermind.metrics.port }}

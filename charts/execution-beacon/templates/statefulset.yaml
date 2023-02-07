@@ -520,7 +520,7 @@ spec:
               protocol: TCP
           {{- end }}
           {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
-            - name: engine-execution
+            - name: engine-exec
               protocol: TCP
               containerPort: {{ .Values.nethermind.jsonrpc.engine.port }}
           {{- end }}
