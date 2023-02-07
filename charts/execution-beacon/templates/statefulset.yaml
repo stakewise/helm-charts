@@ -193,8 +193,8 @@ spec:
               echo 'p2p-tcp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
               echo 'p2p-udp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
           {{- end }}
-              {{ .Values.geth.enabled }}
-              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ if .Values.geth.enabled }}
+              EE=http://localhost:{{ .Values.geth.authRpc.port }};
               {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
               {{ end }}
@@ -323,8 +323,8 @@ spec:
               echo 'p2p-advertised-port: {{ include "teku.p2pPort" . }}' >> /data/config.yaml;
               echo "p2p-advertised-ip: $POD_IP" >> /data/config.yaml;
           {{- end }}
-              {{ .Values.geth.enabled }}
-              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ if .Values.geth.enabled }}
+              EE=http://localhost:{{ .Values.geth.authRpc.port }};
               {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
               {{ end }}
@@ -815,8 +815,8 @@ spec:
             {{- if .Values.lighthouse.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
-              {{ .Values.geth.enabled }}
-              EE=http://localhost:{{ Values.geth.authRpc.port }};
+              {{ if .Values.geth.enabled }}
+              EE=http://localhost:{{ .Values.geth.authRpc.port }};
               {{ else }}
               EE=http://localhost:{{ .Values.nethermind.jsonrpc.engine.port }};
               {{ end }}
