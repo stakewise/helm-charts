@@ -512,10 +512,10 @@ spec:
           {{- end }}
           ports:
           {{- if .Values.nethermind.jsonrpc.enabled }}
-            - name: json-rest-execution
+            - name: json-rest-exec
               containerPort: {{ .Values.nethermind.jsonrpc.ports.rest }}
               protocol: TCP
-            - name: json-ws-execution
+            - name: json-ws-exec
               containerPort: {{ .Values.nethermind.jsonrpc.ports.websocket }}
               protocol: TCP
           {{- end }}

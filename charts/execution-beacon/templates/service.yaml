@@ -43,13 +43,13 @@ spec:
   {{- end }}
   {{- if and .Values.nethermind.enabled .Values.nethermind.jsonrpc.enabled }}
     - port: {{ .Values.nethermind.jsonrpc.ports.rest }}
-      targetPort: json-rest-execution
+      targetPort: json-rest-exec
       protocol: TCP
-      name: json-rest-execution
+      name: json-rest-exec
     - port: {{ .Values.nethermind.jsonrpc.ports.websocket }}
-      targetPort: json-ws-execution
+      targetPort: json-ws-exec
       protocol: TCP
-      name: json-ws-execution
+      name: json-ws-exec
   {{- end }}
   {{- if and .Values.nethermind.enabled (or .Values.global.JWTSecret .Values.global.externalSecrets.enabled) }}
     - port: {{ .Values.nethermind.jsonrpc.engine.port }}
