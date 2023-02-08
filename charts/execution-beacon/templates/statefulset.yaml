@@ -416,7 +416,7 @@ spec:
               containerPort: {{ .Values.geth.ws.port }}
           {{- end }}
           {{- if .Values.global.metrics.enabled }}
-            - name: metrics-execution
+            - name: metrics-exec
               containerPort: {{ .Values.geth.metrics.port }}
           {{- end }}
           {{- if .Values.geth.p2pNodePort.enabled }}
@@ -568,7 +568,7 @@ spec:
               containerPort: {{ .Values.nethermind.jsonrpc.engine.port }}
           {{- end }}
           {{- if .Values.global.metrics.enabled }}
-            - name: metrics-execution
+            - name: metrics-exec
               containerPort: {{ .Values.nethermind.metrics.port }}
               protocol: TCP
           {{- end }}

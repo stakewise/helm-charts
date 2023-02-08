@@ -37,9 +37,9 @@ spec:
       targetPort: ws-execution
   {{- end }}
   {{- if and .Values.geth.enabled .Values.global.metrics.enabled }}
-    - name: metrics-execution
+    - name: metrics-exec
       port: {{ .Values.geth.metrics.port }}
-      targetPort: metrics-execution
+      targetPort: metrics-exec
   {{- end }}
   {{- if and .Values.nethermind.enabled .Values.nethermind.jsonrpc.enabled }}
     - port: {{ .Values.nethermind.jsonrpc.ports.rest }}
@@ -59,9 +59,9 @@ spec:
   {{- end }}
   {{- if and .Values.nethermind.enabled  .Values.global.metrics.enabled }}
     - port: {{ .Values.nethermind.metrics.port }}
-      targetPort: metrics-execution
+      targetPort: metrics-exec
       protocol: TCP
-      name: metrics-execution
+      name: metrics-exec
   {{- end }}
   {{- if and .Values.prysm.enabled .Values.prysm.http.enabled }}
     - name: http-beacon

@@ -17,7 +17,7 @@ metadata:
     {{- end }}
 spec:
   endpoints:
-    - port: metrics-execution
+    - port: metrics-exec
       path: /metrics
       {{- if .Values.nethermind.metrics.serviceMonitor.interval }}
       interval: {{ .Values.nethermind.metrics.serviceMonitor.interval }}
