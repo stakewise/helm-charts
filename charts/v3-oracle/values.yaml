@@ -13,6 +13,13 @@ securityContext:
   fsGroup: 1001
   runAsUser: 1001
 
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  repository: "busybox"
+  tag: "1.34"
+  pullPolicy: IfNotPresent
+
 fullnameOverride: ""
 
 ## Termination Grace Period
@@ -108,9 +115,17 @@ settings:
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
 
-  # PostgreSQL Settings
-  postgresHost: ""
-  postgresPort: "5432"
-  postgresDb: "oracle"
-  postgresUser: "postgres"
-  postgresPassword: ""
+## If false, data ownership will not be reset at startup
+## This allows the geth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
