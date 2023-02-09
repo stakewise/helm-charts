@@ -146,7 +146,7 @@ rbac:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  registry: ""
+  registry: "docker.io"
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent

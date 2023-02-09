@@ -84,7 +84,7 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  registry: ""
+  registry: "docker.io"
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent
@@ -106,7 +106,7 @@ sidecar:
 ## Lighthouse beacon node image version
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
-  registry: ""
+  registry: "docker.io"
   repository: "sigp/lighthouse"
   tag: "v3.4.0"
   pullPolicy: IfNotPresent

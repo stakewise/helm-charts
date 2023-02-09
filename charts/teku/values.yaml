@@ -84,7 +84,7 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  registry: ""
+  registry: "docker.io"
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent
@@ -102,7 +102,7 @@ sidecar:
 ## Teku image
 ##
 image:
-  registry: ""
+  registry: "docker.io"
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

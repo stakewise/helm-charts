@@ -84,7 +84,7 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
-  registry: ""
+  registry: "docker.io"
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent
@@ -102,7 +102,7 @@ sidecar:
 ## Nimbus beacon node image version
 ## ref: https://hub.docker.com/r/statusim/nimbus-eth2
 image:
-  registry: ""
+  registry: "docker.io"
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.

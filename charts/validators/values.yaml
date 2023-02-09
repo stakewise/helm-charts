@@ -30,7 +30,7 @@ rbac:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImageBusybox:
-  registry: ""
+  registry: "docker.io"
   repository: "busybox"
   tag: "1.35"
   pullPolicy: IfNotPresent
@@ -113,11 +113,11 @@ image:
     repository: "gnosischain/gbc-prysm-validator"
     tag: "v2.1.2-gbc"
   lighthouse:
-    registry: ""
+    registry: "docker.io"
     repository: "sigp/lighthouse"
     tag: "v3.4.0"
   teku:
-    registry: ""
+    registry: "docker.io"
     repository: "consensys/teku"
     tag: "23.1.0"
 
