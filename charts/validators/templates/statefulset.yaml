@@ -124,7 +124,7 @@ spec:
               mountPath: /mnt/gnosis-prysm
       containers:
         - name: validator
-          image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
+          image: "{{ (pluck $root.Values.type $root.Values.image | first ).registry }}/{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
