@@ -423,7 +423,7 @@ spec:
             - name: p2p-tcp-exec
               containerPort: {{ include "geth.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp-execution
+            - name: p2p-udp-exec
               containerPort: {{ include "geth.p2pPort" . }}
               protocol: UDP
           {{- end }}
@@ -576,7 +576,7 @@ spec:
             - name: p2p-tcp-exec
               containerPort: {{ include "nethermind.p2pPort" . }}
               protocol: TCP
-            - name: p2p-udp-execution
+            - name: p2p-udp-exec
               containerPort: {{ include "nethermind.p2pPort" . }}
               protocol: UDP
           {{- end }}
