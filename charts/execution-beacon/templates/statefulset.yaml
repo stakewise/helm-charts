@@ -436,6 +436,11 @@ spec:
           volumeMounts:
             - name: data-execution
               mountPath: /data/ethereum
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
           {{- if .Values.global.JWTSecret }}
             - name: jwtsecret
               mountPath: /secret
