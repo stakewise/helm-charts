@@ -359,6 +359,12 @@ spec:
               --authrpc.port={{ .Values.geth.authRpc.port }}
               --authrpc.vhosts={{ .Values.geth.authRpc.vhosts }}
           {{- end }}
+          {{- if .Values.global.externalSecrets.enabled }}
+              --authrpc.jwtsecret=/external-secrets/JWT_SECRET
+              --authrpc.addr={{ .Values.geth.authRpc.addr }}
+              --authrpc.port={{ .Values.geth.authRpc.port }}
+              --authrpc.vhosts={{ .Values.geth.authRpc.vhosts }}
+          {{- end }}
           {{- if .Values.geth.http.enabled }}
               --http
               --http.addr=0.0.0.0
