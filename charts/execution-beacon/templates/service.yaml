@@ -63,6 +63,11 @@ spec:
       protocol: TCP
       name: metrics-exec
   {{- end }}
+  {{- if .Values.prysm.enabled }}
+    - name: {{ .Values.prysm.rpc.portName }}-beacon
+      port: {{ .Values.prysm.rpc.port }}
+      targetPort: {{ .Values.prysm.rpc.portName }}
+  {{- end }}
   {{- if and .Values.prysm.enabled .Values.prysm.http.enabled }}
     - name: http-beacon
       port: {{ .Values.prysm.http.port }}
