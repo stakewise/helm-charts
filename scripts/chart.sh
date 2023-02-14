@@ -5,7 +5,7 @@ set -o nounset
 set -o pipefail
 
 readonly HELM_URL=https://get.helm.sh
-readonly HELM_TARBALL=helm-v3.7.1-linux-amd64.tar.gz
+readonly HELM_TARBALL=helm-v3.11.1-linux-amd64.tar.gz
 readonly REPO_URL=https://charts.stakewise.io/
 readonly GCS_BUCKET=gs://stakewise-charts
 
