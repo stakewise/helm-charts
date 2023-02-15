@@ -270,7 +270,7 @@ spec:
         {{- end }}
               echo "Pod will connect to the ${EE} endpoint";
           volumeMounts:
-            - name: env-nodeport-execution
+            - name: env-nodeport-beacon
               mountPath: /env
             - name: data-beacon
               mountPath: /data
