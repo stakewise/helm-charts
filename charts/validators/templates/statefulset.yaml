@@ -65,7 +65,7 @@ spec:
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
         - name: get-configs
-          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          image: "{{ $root.Values.cliImage.registry }}/{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -98,7 +98,7 @@ spec:
               mountPath: /fee
           {{- end }}
         - name: prepare
-          image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
+          image: "{{ $root.Values.initImageBusybox.registry }}/{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
           securityContext:
             runAsUser: 0
@@ -124,7 +124,7 @@ spec:
               mountPath: /mnt/gnosis-prysm
       containers:
         - name: validator
-          image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
+          image: "{{ (pluck $root.Values.type $root.Values.image | first ).registry }}/{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}

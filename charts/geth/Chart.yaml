@@ -1,6 +1,6 @@
 apiVersion: v2
 name: geth
-version: 2.1.9
+version: 2.1.10
 kubeVersion: "^1.18.0-0"
 description: Official Golang implementation of the Ethereum v1 protocol.
 type: application

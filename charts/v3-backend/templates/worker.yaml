@@ -36,7 +36,7 @@ spec:
       priorityClassName: {{ .Values.worker.priorityClassName | quote }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["bash", "./scripts/worker.sh"]
           envFrom:

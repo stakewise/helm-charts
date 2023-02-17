@@ -10,7 +10,8 @@ global:
 replicaCount: 1
 
 image:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/private/contract-watcher
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/private/contract-watcher"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v0.0.2"

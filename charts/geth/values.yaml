@@ -77,6 +77,7 @@ global:
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
+  registry: "docker.io"
   repository: "bitnami/kubectl"
   tag: "1.24"
   pullPolicy: IfNotPresent
@@ -84,7 +85,8 @@ initImage:
 ## Sidecar image is used to perform Liveness/Readiness probes.
 ##
 sidecar:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/public/ethnode-sidecar"
   tag: "v1.0.6"
   pullPolicy: IfNotPresent
   bindAddr: "0.0.0.0"
@@ -94,6 +96,7 @@ sidecar:
 ## ref: https://hub.docker.com/r/ethereum/client-go/tags/
 ##
 image:
+  registry: "docker.io"
   repository: "ethereum/client-go"
   tag: "v1.10.26"
   pullPolicy: IfNotPresent

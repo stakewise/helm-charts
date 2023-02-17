@@ -44,7 +44,7 @@ spec:
       priorityClassName: {{ .Values.api.priorityClassName | quote }}
       initContainers:
         - name: migrate-db
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["python", "manage.py", "migrate", "--no-input"]
           envFrom:
@@ -59,7 +59,7 @@ spec:
               value: "config.settings.api_settings"
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           envFrom:
             - secretRef:

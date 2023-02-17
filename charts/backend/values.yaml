@@ -46,7 +46,8 @@ commonConf:
   multisigOwnersTelegramChatId: ""
 
 image:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/backend"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/private/backend"
   tag: "v2.4.23"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]

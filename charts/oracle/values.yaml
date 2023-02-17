@@ -40,7 +40,8 @@ serviceAccount:
 ## Docker image
 ##
 image:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/oracle"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/public/oracle"
   tag: "v2.8.10"
   pullPolicy: IfNotPresent
 

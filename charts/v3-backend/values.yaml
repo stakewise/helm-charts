@@ -52,7 +52,8 @@ settings:
     password: ""
 
 image:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/v3-backend"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/private/v3-backend"
   tag: "master"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
