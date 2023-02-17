@@ -27,13 +27,13 @@ spec:
     - name: p2p-tcp-beacon
       port: {{ include "prysm.p2pPort" $ }}
       protocol: TCP
-      targetPort: p2p-tcp-beacon
+      targetPort: {{ $port }}
       nodePort: {{ $port }}
   {{- if eq $.Values.prysm.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-beacon
       port: {{ include "prysm.p2pPort" $ }}
       protocol: UDP
-      targetPort: p2p-udp-beacon
+      targetPort: {{ $port }}
       nodePort: {{ $port }}
   {{- end }}
   selector:
