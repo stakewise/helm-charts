@@ -5,7 +5,8 @@
 replicaCount: 1
 
 image:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/whitelist
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/public/whitelist"
   pullPolicy: IfNotPresent
   ## Overrides the image tag whose default is the chart appVersion.
   ##
@@ -109,6 +110,7 @@ affinity: {}
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
+  registry: "docker.io"
   repository: "busybox"
   tag: "1.34"
   pullPolicy: IfNotPresent

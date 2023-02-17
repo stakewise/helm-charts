@@ -43,7 +43,7 @@ spec:
       priorityClassName: {{ .Values.priorityClassName | quote }}
       initContainers:
         - name: init
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsNonRoot: false
@@ -116,7 +116,7 @@ spec:
       containers:
         - name: {{ include "common.names.fullname" . }}
         {{- if ne .Values.global.network "gnosis" }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
         {{- else }}
           image: "{{ .Values.imageGnosis.repository }}:{{ .Values.imageGnosis.tag }}"
@@ -221,7 +221,7 @@ spec:
         {{- end }}
       {{- if .Values.http.enabled }}
         - name: sidecar
-          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          image: "{{ .Values.sidecar.registry }}/{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
           env:
             - name: SERVER_BINDADDR

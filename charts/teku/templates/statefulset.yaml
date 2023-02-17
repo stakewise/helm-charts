@@ -41,7 +41,7 @@ spec:
         {{- toYaml .Values.securityContext | nindent 8 }}
       initContainers:
         - name: init
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsNonRoot: false
@@ -102,7 +102,7 @@ spec:
               mountPath: /configs
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sh
@@ -181,7 +181,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.restApi.enabled }}
         - name: sidecar
-          image: "{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
+          image: "{{ .Values.sidecar.registry }}/{{ .Values.sidecar.repository }}:{{ .Values.sidecar.tag }}"
           imagePullPolicy: {{ .Values.sidecar.pullPolicy }}
           env:
             - name: SERVER_BINDADDR
