@@ -107,6 +107,10 @@ metricsPort: 9000
 ##
 web3signerJavaOpts: "-Xmx1g -Xms1g"
 
+## Enables the key manager API.
+##
+keyManagerApiEnabled: "false"
+
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
