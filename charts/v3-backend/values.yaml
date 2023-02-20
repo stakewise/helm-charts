@@ -31,6 +31,7 @@ settings:
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
 
+  ipfsLocalClientEndpoint: ""
   ipfsPinataPinEndpoints: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
   ipfsFetchEndpoints: '["http://cloudflare-ipfs.com","https://ipfs.io","https://gateway.pinata.cloud"]'
   ipfsInfuraClientUsername: ""

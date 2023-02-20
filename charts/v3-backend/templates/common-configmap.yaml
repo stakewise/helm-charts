@@ -24,6 +24,8 @@ data:
   
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
 
+  IPFS_LOCAL_CLIENT_ENDPOINT: {{ .Values.settings.ipfsLocalClientEndpoint | quote }}
+
   POSTGRES_HOST: {{ .Values.settings.postgres.host | quote }}
   POSTGRES_PORT: {{ .Values.settings.postgres.port | quote }}
   POSTGRES_DB: {{ .Values.settings.postgres.db | quote }}
