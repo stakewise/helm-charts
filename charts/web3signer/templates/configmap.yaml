@@ -18,6 +18,7 @@ data:
     eth2.slashing-protection-db-username: {{ .Values.dbUsername }}
     eth2.slashing-protection-db-password: {{ .Values.dbPassword }}
     eth2.slashing-protection-db-url: {{ .Values.dbUrl }}
+    eth2.key-manager-api-enabled: {{ .Values.keyManagerApiEnabled }}
     metrics-enabled: true
     metrics-host: "0.0.0.0"
     metrics-port: {{ .Values.metricsPort }}
@@ -27,6 +28,7 @@ data:
     http-listen-host: "0.0.0.0"
     http-listen-port: {{ .Values.httpPort }}
     http-host-allowlist: ["*"]
+
 
 ---
 apiVersion: v1
