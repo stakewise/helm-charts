@@ -4,6 +4,6 @@ dependencies:
   version: 1.0.0
 - name: ipfs
   repository: file://../ipfs
-  version: 1.1.0
-digest: sha256:faa75b4ccd8b88f0fc6f20fb89bd4eb4a5273e6a31ce4eeedcdb23d921dade24
-generated: "2023-01-11T11:41:45.00773+04:00"
+  version: 1.1.1
+digest: sha256:1c84c5de9037077f89885c87f88d0fc45ea5cbf2f2ad2f8c936fc86f6c3a5bf0
+generated: "2023-02-17T22:13:28.196807+04:00"
