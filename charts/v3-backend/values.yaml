@@ -30,6 +30,7 @@ settings:
   gcpStorageContentBucket: ""
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
+  gcpStorageExitSignaturesBucket: ""
 
   ipfsLocalClientEndpoint: ""
   ipfsPinataPinEndpoints: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
