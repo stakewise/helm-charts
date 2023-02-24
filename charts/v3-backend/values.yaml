@@ -38,6 +38,7 @@ settings:
   ipfsInfuraClientPassword: ""
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
+  ipfsWeb3StorageToken: ""
 
   executionEndpoints: ""
   consensusEndpoints: ""
