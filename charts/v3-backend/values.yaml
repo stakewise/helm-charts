@@ -8,6 +8,8 @@ settings:
   ## Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
   ##
   network: goerli
+  logLevel: "INFO"
+  celeryConcurrency: "8"
 
   sendEmails: "False"
   ## Change to https://api.mailgun.net/v3
