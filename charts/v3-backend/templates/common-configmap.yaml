@@ -7,6 +7,8 @@ metadata:
 data:
   NETWORK: {{ .Values.settings.network | quote }}
   SENTRY_DSN: {{ .Values.settings.sentryDsn | quote }}
+  LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
+  CELERY_CONCURRENCY: {{ .Values.settings.celeryConcurrency | quote }}
 
   GCP_STORAGE_CONTENT_BUCKET: {{ .Values.settings.gcpStorageContentBucket | quote }}
   GCP_STORAGE_DOMAIN_ALIAS: {{ .Values.settings.gcpStorageDomainAlias | quote }}
