@@ -50,7 +50,7 @@ serviceAccount:
 ##
 image:
   repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/v3-oracle"
-  tag: "master"
+  tag: "v0.1.0"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
