@@ -286,3 +286,8 @@ memcached:
   architecture: standalone
   auth:
     enabled: false
+
+## IPFS Server
+##
+ipfs:
+  enabled: true

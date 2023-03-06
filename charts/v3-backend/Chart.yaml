@@ -28,6 +28,10 @@ dependencies:
     version: 6.3.2
     repository: https://charts.bitnami.com/bitnami/
     condition: memcached.enabled
+  - name: ipfs
+    version: 1.x.x
+    repository: https://charts.stakewise.io/
+    condition: ipfs.enabled
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
