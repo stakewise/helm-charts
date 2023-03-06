@@ -5,6 +5,14 @@
 global:
   serviceAccount:
     create: true
+  postgresql:
+    host: graph-node-postgresql
+    port: "5432"
+    auth:
+      postgresPassword: "graph"
+      username: "postgres"
+      password: "graph"
+      database: "graph"
 
 replicaCount: 1
 
@@ -13,7 +21,7 @@ image:
   repository: graphprotocol/graph-node
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.29.0"
+  tag: "v0.30.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -28,9 +36,9 @@ graph:
   # Options: debug, error, info, warn, or trace
   graphLog: "info"
   # IPFS URL
-  ipfsUrl: graph-node-ipfs:5001
+  ipfsUrl: ""
   # Ethereum Node Address
-  ethereumNode: mainnet:http://erigon.chain:8545
+  ethereumNode: "mainnet:http://ethereum-node:8545"
   # "instant" or "synced". Synced will only switch a named subgraph to a new deployment once it has synced,
   # making the new deployment the "Pending" version
   experimentalSubgraphVersionSwitchingMode: "synced"
@@ -46,7 +54,6 @@ graph:
   # Maximum size for a file that can be retrieved (in bytes, defaults to 1MiB)
   graphMaxIpfsFileBytes: "1048576"
   graphGraphqlDisableBoolFilters: "false"
-  
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -140,12 +147,9 @@ postgresql:
     runAsUser: 1001
   rbac:
     create: false
-  postgresqlHost: graph-node-postgresql
-  postgresqlPort: "5432"
-  postgresqlUsername: "postgres"
-  postgresqlPassword: "graph"
+  auth:
+    enabled: false
   usePasswordFile: true
-  postgresqlDatabase: graph
   postgresqlDataDir: /bitnami/postgresql/data
   primaryAsStandBy:
     enabled: false
