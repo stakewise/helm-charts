@@ -1,8 +1,8 @@
 apiVersion: v2
 name: v3-backend
-version: 3.0.8
-appVersion: v0.0.3
-kubeVersion: "^1.18.0-0"
+version: 3.0.9
+appVersion: v0.1.1
+kubeVersion: "^1.20.0-0"
 description: The StakeWise backend application.
 type: application
 keywords:
@@ -28,6 +28,10 @@ dependencies:
     version: 6.3.2
     repository: https://charts.bitnami.com/bitnami/
     condition: memcached.enabled
+  - name: ipfs
+    version: 1.x.x
+    repository: https://charts.stakewise.io/
+    condition: ipfs.enabled
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
