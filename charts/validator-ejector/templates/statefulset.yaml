@@ -82,10 +82,12 @@ spec:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
           {{- end }}
+          {{- if .Values.ejector.runMetrics }}
           ports:
             - name: metrics
               containerPort: {{ .Values.ejector.httpPort }}
               protocol: TCP
+          {{- if .Values.ejector.runHealthCheck }}
           livenessProbe:
             httpGet:
               path: /metrics
@@ -104,6 +106,8 @@ spec:
             periodSeconds: 30
             failureThreshold: 3
             successThreshold: 1
+          {{- end }}
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
