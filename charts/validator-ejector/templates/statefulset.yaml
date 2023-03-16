@@ -55,6 +55,8 @@ spec:
               value: "{{ .Values.ejector.stakingModuleId }}"
             - name: OPERATOR_ID
               value: "{{ .Values.ejector.operatorId }}"
+            - name: MESSAGES_LOCATION
+              value: "{{ .Values.ejector.messagesLocation }}"
             - name: BLOCKS_PRELOAD
               value: "{{ .Values.ejector.blocksPreload }}"
             - name: BLOCKS_LOOP
