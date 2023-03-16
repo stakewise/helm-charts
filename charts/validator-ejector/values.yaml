@@ -6,7 +6,16 @@ global:
   serviceAccount:
     create: true
 
-replicaCount: 1
+  replicaCount: 1
+
+  externalSecrets:
+    enabled: false
+    secretStoreRef: secretStoreRef
+    data:
+      - secretKey: message
+        remoteRef:
+          key: validatorEjectorSecrets
+          property: message
 
 image:
   repository: lidofinance/validator-ejector
