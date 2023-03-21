@@ -57,6 +57,8 @@ spec:
               value: "{{ .Values.ejector.operatorId }}"
             - name: MESSAGES_LOCATION
               value: "{{ .Values.ejector.messagesLocation }}"
+            - name: ORACLE_ADDRESSES_ALLOWLIST
+              value: "{{ .Values.ejector.oracleAddressesAllowlist }}"
             - name: BLOCKS_PRELOAD
               value: "{{ .Values.ejector.blocksPreload }}"
             - name: BLOCKS_LOOP

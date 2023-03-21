@@ -38,6 +38,7 @@ ejector:
   ## Password to decrypt encrypted exit messages with. Needed only if you have encrypted 
   ## files in messages directory
   messagesPassword: "password"
+  oracleAddressesAllowlist: "['0x123']"
   ## Amount of blocks to load events from on start.
   ## Increase if daemon was not running for some time. Defaults to a day of blocks
   blocksPreload: 7200
