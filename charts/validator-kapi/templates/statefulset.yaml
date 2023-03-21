@@ -98,26 +98,3 @@ spec:
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - name: data-kapi
-              mountPath: /data
-      volumes:
-        {{- if (not .Values.geth.persistence.enabled) }}
-        - name: data-kapi
-          emptyDir: {}
-        {{- end }}
-  volumeClaimTemplates:
-    - metadata:
-        name: data-kapi
-        labels:
-          {{- include "common.labels.statefulset" . | nindent 10 }}
-      {{- with .Values.persistence.annotations }}
-        annotations:
-          {{ toYaml . | nindent 10 | trim }}
-      {{- end }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.size | quote }}

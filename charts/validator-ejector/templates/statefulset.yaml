@@ -116,7 +116,7 @@ spec:
             - name: data-ejector
               mountPath: /data
       volumes:
-        {{- if (not .Values.geth.persistence.enabled) }}
+        {{- if (not .Values.persistence.enabled) }}
         - name: data-ejector
           emptyDir: {}
         {{- end }}
