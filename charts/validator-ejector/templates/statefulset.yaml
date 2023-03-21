@@ -75,8 +75,6 @@ spec:
               value: "{{ .Values.ejector.loggerLevel }}"
             - name: LOGGER_FORMAT
               value: "{{ .Values.ejector.loggerFormat }}"
-            - name: LOGGER_SECRETS
-              value: "{{ .Values.ejector.loggerSecrets }}"
             - name: DRY_RUN
               value: "{{ .Values.ejector.dryRun }}"
           {{- if .Values.global.externalSecrets.enabled }}

@@ -12,10 +12,14 @@ global:
     enabled: false
     secretStoreRef: secretStoreRef
     data:
-      - secretKey: message
+      - secretKey: MESSAGES_PASSWORD
         remoteRef:
           key: validatorEjectorSecrets
           property: message
+      - secretKey: LOGGER_SECRETS
+        remoteRef:
+          key: validatorEjectorSecrets
+          property: loggerSecrets
 
 image:
   repository: lidofinance/validator-ejector
