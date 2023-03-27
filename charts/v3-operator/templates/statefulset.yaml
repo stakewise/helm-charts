@@ -9,7 +9,6 @@ spec:
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
   template:
     metadata:
       labels:
@@ -60,10 +59,6 @@ spec:
                 name: {{ include "common.names.fullname" . }}
             - secretRef:
                 name: {{ include "common.names.fullname" . }}
-          ports:
-            - name: http
-              containerPort: {{ .Values.service.ports.http }}
-              protocol: TCP
           volumeMounts:
           {{- if .Values.settings.depositData }}
             - name: deposit-data
