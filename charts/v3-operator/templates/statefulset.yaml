@@ -1,0 +1,113 @@
+kind: StatefulSet
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+      annotations:
+        checksum/v3-operator-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/v3-operator-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- if .Values.tolerations }}
+      tolerations:
+        {{ tpl .Values.tolerations . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.affinity }}
+      affinity:
+        {{ tpl .Values.affinity . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+      serviceAccountName: {{ include "common.names.fullname" . }}
+      priorityClassName: {{ .Values.priorityClassName | quote }}
+    {{- if .Values.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+    {{- end }}
+    {{- with .Values.image.pullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- if and .Values.persistence.enabled .Values.initChownData }}
+      initContainers:
+        - name: init-chown
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+    {{- end }}
+      containers:
+        - name: v3-operator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}
+            - secretRef:
+                name: {{ include "common.names.fullname" . }}
+          volumeMounts:
+          {{- if .Values.settings.depositData }}
+            - name: deposit-data
+              mountPath: /deposit
+              readOnly: true
+          {{- end }}
+          {{- if .Values.settings.keystoresPassword }}
+            - name: keystores-password
+              mountPath: /password
+              readOnly: true
+          {{- end }}
+          {{- with .Values.additionalMounts  }}
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+            - name: data
+              mountPath: /data
+          {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
+      volumes:
+      {{- with .Values.additionalVolumes }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.settings.depositData }}
+        - name: deposit-data
+          configMap:
+            name: {{ include "common.names.fullname" . }}-deposit-data
+            items:
+            - key: deposit_data.json
+              path: deposit_data.json
+      {{- end }}
+      {{- if .Values.settings.keystoresPassword }}
+        - name: keystores-password
+          secret:
+            secretName: {{ include "common.names.fullname" . }}-keystores-password
+            items:
+            - key: password.txt
+              path: password.txt
+      {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "common.labels.standard" . | nindent 10 }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}

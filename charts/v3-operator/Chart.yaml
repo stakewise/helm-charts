@@ -1,0 +1,22 @@
+apiVersion: v2
+name: v3-operator
+version: 3.0.1
+appVersion: v0.1.7
+kubeVersion: "^1.14.0-0"
+description: Operator hosted service for Stakewise V3 protocol.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - staking
+home: https://stakewise.io/
+sources:
+  - https://github.com/stakewise/v3-operator/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+
+dependencies:
+- name: common
+  repository: https://charts.stakewise.io/
+  version: 1.x.x

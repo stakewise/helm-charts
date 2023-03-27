@@ -1,0 +1,19 @@
+{{- if not .Values.settings.executionEndpoint }}
+{{- fail ".Values.settings.executionEndpoint is empty" }}
+{{- end }}
+
+{{- if not .Values.settings.consensusEndpoint }}
+{{- fail ".Values.settings.consensusEndpoint is empty" }}
+{{- end }}
+
+{{- if not .Values.settings.keystoresPassword }}
+{{- fail ".Values.settings.keystoresPassword is empty" }}
+{{- end }}
+
+{{- if not .Values.settings.operatorPrivateKey }}
+{{- fail ".Values.settings.operatorPrivateKey is empty" }}
+{{- end }}
+
+{{- if not .Values.settings.vaultContractAddress }}
+{{- fail ".Values.settings.vaultContractAddress is empty" }}
+{{- end }}
