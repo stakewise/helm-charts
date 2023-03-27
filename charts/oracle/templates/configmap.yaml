@@ -13,6 +13,7 @@ data:
   IPFS_PIN_ENDPOINTS: {{ .Values.settings.ipfsPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoint | quote }}
+  ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
   ETH2_ENDPOINT: {{ .Values.settings.eth2Endpoint | quote }}
   STAKEWISE_SUBGRAPH_URLS: {{ .Values.settings.stakewiseSubgraphUrls | quote }}
   ETHEREUM_SUBGRAPH_URLS: {{ .Values.settings.ethereumSubgraphUrls | quote }}
