@@ -72,8 +72,9 @@ settings:
 
   sentryDsn: ""
 
-  ## ETH2
+  ## Execution / Consensus Endpoints
   ##
+  eth1Endpoint: ""
   eth2Endpoint: ""
 
   enableHealthServer: "False"
