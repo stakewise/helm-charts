@@ -1,15 +1,14 @@
-# Oracle Helm Chart
+# Operator Helm Chart
 
-Kubernetes Helm chart for deploying oracle - the entity which is responsible for reading StakeWise pool validators data from beacon chain and submitting
-it to the [Oracles](https://github.com/stakewise/contracts/blob/master/contracts/Oracles.sol) smart contract.
+Kubernetes Helm chart for deploying v3-operator.
 
 ## Introduction
 
-Can be used to deploy StakeWise oracles on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+Can be used to deploy StakeWise operator on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
 
 ## Prerequisites
 
-- Kubernetes 1.14+
+- Kubernetes 1.19+
 - Helm 3
 
 ## Installing the Chart
@@ -22,7 +21,7 @@ $ kubectl create secret generic keystores --from-file=keystores/
 $ helm install my-release --set settings.network="goerli" stakewise/v3-operator
 ```
 
-The command deploys oracle on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists various ways to override default configuration during deployment.
+The command deploys v3-operator on the Kubernetes cluster in the default configuration. The [configuration](#configuration) section lists various ways to override default configuration during deployment.
 
 > **Tip**: List all releases using `helm list`
 
@@ -41,7 +40,7 @@ The command removes all the Kubernetes components associated with the chart and 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release stakewise/oracle --set settings.awsAccessKeyID="XXXXXXXX" --set settings.awsSecretAccessKey="XXXXXXXX"
+$ helm install my-release stakewise/v3-operator --set settings.network="XXXXXXXX" --set settings.executionEndpoint="XXXXXXXX" --set settings.consensusEndpoint="XXXXXXXX" --set settings.keystoresPassword="XXXXXXXX" --set settings.depositData="XXXXXXXX" --set settings.operatorPrivateKey="XXXXXXXX"
 ```
 
 The above command specifies the web3 endpoint.
@@ -49,7 +48,7 @@ The above command specifies the web3 endpoint.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-$ helm install my-release stakewise/oracle -f values.yaml
+$ helm install my-release stakewise/v3-operator -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)

@@ -1,4 +1,4 @@
-# Default values for oracle.
+# Default values for v3-operator.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -67,11 +67,6 @@ resources:
 ##
 priorityClassName: ""
 
-service:
-  type: ClusterIP
-  ports:
-    http: 8000
-
 settings:
   ## Possible values: goerli, gnosis, mainnet
   ##
@@ -94,8 +89,8 @@ settings:
   depositDataPath: "/deposit/deposit_data.json"
   depositData: ""
 
-  # Oracle Private Key
-  oraclePrivateKey: ""
+  # Operator Private Key
+  operatorPrivateKey: ""
 
 # Additonal volumes and mounts used to attach keystores from existing secret
 # Example:

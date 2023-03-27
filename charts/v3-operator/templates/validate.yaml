@@ -10,8 +10,8 @@
 {{- fail ".Values.settings.keystoresPassword is empty" }}
 {{- end }}
 
-{{- if not .Values.settings.oraclePrivateKey }}
-{{- fail ".Values.settings.oraclePrivateKey is empty" }}
+{{- if not .Values.settings.operatorPrivateKey }}
+{{- fail ".Values.settings.operatorPrivateKey is empty" }}
 {{- end }}
 
 {{- if not .Values.settings.vaultContractAddress }}
