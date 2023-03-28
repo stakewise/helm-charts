@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "posmoni.fullname" . }}
+  name: {{ include "ejector.fullname" . }}
   labels:
-    {{- include "posmoni.labels" . | nindent 4 }}
+    {{- include "ejector.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,4 +12,4 @@ spec:
       protocol: TCP
       name: metrics
   selector:
-    {{- include "posmoni.selectorLabels" . | nindent 4 }}
+    {{- include "ejector.selectorLabels" . | nindent 4 }}
