@@ -122,6 +122,7 @@ postgresql:
     runAsUser: 1001
   rbac:
     create: false
+  hostname: postgresql
   audit:
     logHostname: true
   auth:
