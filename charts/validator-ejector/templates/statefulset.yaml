@@ -87,7 +87,7 @@ spec:
             - name: VALIDATOR_EXIT_WEBHOOK
               value: "{{ .Values.ejector.validatorExitWebhook }}"
             - name: ORACLE_ADDRESSES_ALLOWLIST
-              value: "{{ quote .Values.ejector.oracleAddressesAllowlist }}"
+              value: {{ include oracleAllowList . }}
             - name: BLOCKS_PRELOAD
               value: "{{ .Values.ejector.blocksPreload }}"
             - name: BLOCKS_LOOP
