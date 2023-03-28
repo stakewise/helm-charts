@@ -65,5 +65,5 @@ Create the name of the service account to use
 Output of the expression will be a string with square brackets around the joined list
 */}}
 {{- define "ejector.oracleAllowList" -}}
-{{- printf "[%s]" (join "," .Values.ejector.oracleAddressesAllowlist) }}
+{{- printf "[%s]" (join "\",\"" .Values.ejector.oracleAddressesAllowlist) | quote  }}
 {{- end }}
