@@ -21,6 +21,11 @@ global:
           key: validatorEjectorSecrets
           property: loggerSecrets
 
+initImage:
+  repository: "bitnami/kubectl"
+  tag: "1.26"
+  pullPolicy: IfNotPresent
+
 image:
   repository: lidofinance/validator-ejector
   pullPolicy: IfNotPresent
@@ -42,6 +47,9 @@ ejector:
   ## Password to decrypt encrypted exit messages with. Needed only if you have encrypted 
   ## files in messages directory
   messagesPassword: "password"
+  ## POST validator info to an endpoint instead of sending out an exit message in order to initiate an exit. 
+  ## Required if you are using webhook mode
+  validatorExitWebhook: ""
   oracleAddressesAllowlist: "['0x123']"
   ## Amount of blocks to load events from on start.
   ## Increase if daemon was not running for some time. Defaults to a day of blocks

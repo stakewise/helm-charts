@@ -39,6 +39,33 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        - name: init-ejector
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          command:
+            - sh
+            - -c
+            - >
+              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+          {{- if and .Values.persistence.enabled .Values.initChownData }}
+              chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data | true;
+          {{- end }}
+              echo "Loading encrypted messages from eth-exit-messages"
+          volumeMounts:
+            - name: data-ejector
+              mountPath: /data
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
@@ -57,6 +84,8 @@ spec:
               value: "{{ .Values.ejector.operatorId }}"
             - name: MESSAGES_LOCATION
               value: "{{ .Values.ejector.messagesLocation }}"
+            - name: VALIDATOR_EXIT_WEBHOOK
+              value: "{{ .Values.ejector.validatorExitWebhook }}"
             - name: ORACLE_ADDRESSES_ALLOWLIST
               value: "{{ .Values.ejector.oracleAddressesAllowlist }}"
             - name: BLOCKS_PRELOAD
