@@ -129,6 +129,12 @@ postgresql:
     username: "postgres"
     password: "kapi"
     database: "kapi"
+    postgresPassword: "kapi-admin"
+    existingSecret: ""
+    secretKeys:
+      adminPasswordKey: ""
+      userPasswordKey: ""
+      replicationPasswordKey: ""
   service:
     ports:
       postgresql: 5432
