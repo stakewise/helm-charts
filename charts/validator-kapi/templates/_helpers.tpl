@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "ejector.name" -}}
+{{- define "kapi.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "ejector.fullname" -}}
+{{- define "kapi.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "ejector.chart" -}}
+{{- define "kapi.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "ejector.labels" -}}
-helm.sh/chart: {{ include "ejector.chart" . }}
-{{ include "ejector.selectorLabels" . }}
+{{- define "kapi.labels" -}}
+helm.sh/chart: {{ include "kapi.chart" . }}
+{{ include "kapi.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "ejector.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "ejector.name" . }}
+{{- define "kapi.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "kapi.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "ejector.serviceAccountName" -}}
+{{- define "kapi.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "ejector.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "kapi.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
