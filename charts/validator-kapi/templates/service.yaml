@@ -8,8 +8,8 @@ spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.kapi.port }}
-      targetPort: metrics
+      targetPort: api
       protocol: TCP
-      name: metrics
+      name: api
   selector:
     {{- include "kapi.selectorLabels" . | nindent 4 }}
