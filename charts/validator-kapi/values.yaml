@@ -33,10 +33,10 @@ global:
           key: validatorKapiSecrets
           property: dbPassword
 
-image:
-  repository: lidofinance/lido-keys-api
-  pullPolicy: IfNotPresent
-  tag: "stable"
+  image:
+    repository: lidofinance/lido-keys-api
+    pullPolicy: IfNotPresent
+    tag: "stable"
 
 kapi:
   env: "production"
