@@ -110,7 +110,7 @@ postgresql:
     image:
       registry: docker.io
       repository: bitnami/bitnami-shell
-      tag: 11-debian-11-r99
+      tag: 10-debian-10-r98
       pullPolicy: Always
     securityContext:
       runAsUser: 0
