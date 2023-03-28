@@ -51,15 +51,15 @@ spec:
               value: "{{ .Values.kapi.port }}"
             {{- with .Values.postgresql }}
             - name: DB_NAME
-              value: "{{ .postgresqlDatabase }}"
+              value: "{{ .auth.database }}"
             - name: DB_HOST
-              value: "{{ .postgresqlHost }}"
+              value: "postgresql"
             - name: DB_USER
-              value: "{{ .postgresqlUsername }}"
+              value: "{{ .auth.username }}"
             - name: DB_PASSWORD
-              value: "{{ .postgresqlPassword }}"
+              value: "{{ .auth.password }}"
             - name: DB_PORT
-              value: "{{ .postgresqlPort }}"
+              value: "{{ .service.ports.postgresql }}"
             {{- end }}
             - name: CORS_WHITELIST_REGEXP
               value: "{{ .Values.kapi.corsWhitelistRegexp }}"
