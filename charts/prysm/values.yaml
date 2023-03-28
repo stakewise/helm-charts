@@ -171,12 +171,12 @@ sidecar:
 image:
   registry: "gcr.io"
   repository: "prysmaticlabs/prysm/beacon-chain"
-  tag: "v3.2.2"
+  tag: "v4.0.0"
   pullPolicy: IfNotPresent
 imageGnosis:
   registry: "ghcr.io"
   repository: "gnosischain/gbc-prysm-beacon-chain"
-  tag: "v2.1.2-gbc"
+  tag: "v3.2.1-gbc"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
