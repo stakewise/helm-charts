@@ -100,6 +100,65 @@ service:
   type: ClusterIP
   port: 80
 
+## PostgreSQL Server
+## ref: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+##
+postgresql:
+  enabled: true
+  volumePermissions:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 11-debian-11-r99
+      pullPolicy: Always
+    securityContext:
+      runAsUser: 0
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  rbac:
+    create: false
+  postgresqlHost: kapi-node-postgresql
+  postgresqlPort: "5432"
+  postgresqlUsername: "postgres"
+  postgresqlPassword: "kapi"
+  usePasswordFile: true
+  postgresqlDatabase: kapi
+  postgresqlDataDir: /bitnami/postgresql/data
+  primaryAsStandBy:
+    enabled: false
+  postgresqlSharedPreloadLibraries: "pgaudit,pg_stat_statements"
+  shmVolume:
+    enabled: true
+    chmod:
+      enabled: true
+  persistence:
+    enabled: true
+    mountPath: /bitnami/postgresql
+    subPath: ''
+    accessModes:
+      - ReadWriteOnce
+    size: 20Gi
+    annotations: { }
+    selector: { }
+  readReplicas:
+    persistence:
+      enabled: true
+  resources:
+    requests:
+      memory: 384Mi
+      cpu: 250m
+  networkPolicy:
+    enabled: false
+  tls:
+    enabled: false
+  metrics:
+    enabled: true
+
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##

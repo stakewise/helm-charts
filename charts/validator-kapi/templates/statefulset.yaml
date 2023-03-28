@@ -49,6 +49,18 @@ spec:
               value: "{{ .Values.kapi.env }}"
             - name: PORT
               value: "{{ .Values.kapi.port }}"
+            {{- with .Values.postgresql }}
+            - name: DB_NAME
+              value: "{{ .postgresqlDatabase }}"
+            - name: DB_HOST
+              value: "{{ .postgresqlHost }}"
+            - name: DB_USER
+              value: "{{ .postgresqlUsername }}"
+            - name: DB_PASSWORD
+              value: "{{ .postgresqlPassword }}"
+            - name: DB_PORT
+              value: "{{ .postgresqlPort }}"
+            {{- end }}
             - name: CORS_WHITELIST_REGEXP
               value: "{{ .Values.kapi.corsWhitelistRegexp }}"
             - name: JOB_INTERVAL_REGISTRY
