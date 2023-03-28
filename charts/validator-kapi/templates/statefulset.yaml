@@ -67,7 +67,7 @@ spec:
               value: "{{ .Values.kapi.logFormat }}"
             - name: CHAIN_ID
               value: "{{ .Values.kapi.chainId }}"
-            - name: EL_PROVIDERS_URLS
+            - name: PROVIDERS_URLS
               value: "{{ .Values.kapi.execution }}"
             - name: CL_API_URLS
               value: "{{ .Values.kapi.consensus }}"
