@@ -49,6 +49,18 @@ spec:
               value: "{{ .Values.kapi.env }}"
             - name: PORT
               value: "{{ .Values.kapi.port }}"
+            - name: CORS_WHITELIST_REGEXP
+              value: "{{ .Values.kapi.corsWhitelistRegexp }}"
+            - name: JOB_INTERVAL_REGISTRY
+              value: "{{ .Values.kapi.jobIntervalRegistry }}"
+            - name: JOB_INTERVAL_VALIDATORS_REGISTRY
+              value: "{{ .Values.kapi.jobIntervalValidatorsRegistry }}"
+            - name: PROVIDER_JSON_RPC_MAX_BATCH_SIZE
+              value: "{{ .Values.kapi.providerJsonRpcMaxBatchSize }}"
+            - name: PROVIDER_CONCURRENT_REQUESTS
+              value: "{{ .Values.kapi.providerConcurrentRequests }}"
+            - name: PROVIDER_BATCH_AGGREGATION_WAIT_MS
+              value: "{{ .Values.kapi.providerBatchAggregationWaitMs }}"
             - name: LOG_LEVEL
               value: "{{ .Values.kapi.logLevel }}"
             - name: LOG_FORMAT

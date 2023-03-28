@@ -43,7 +43,15 @@ kapi:
   # Application port
   port: 3000
   # The number of seconds that each request will last in storage
+  corsWhitelistRegexp: ""
+  jobIntervalRegistry: "*/5 * * * * *"
+  jobIntervalValidatorsRegistry: "*/10 * * * * *"
   globlaThrottleTTL: 5
+  # FallbackProviderModule request policy parameters
+  # values below are default
+  providerJsonRpcMaxBatchSize: 100
+  providerConcurrentRequests: 5
+  providerBatchAggregationWaitMs: 10
   # The maximum number of requests within the TTL limit
   globalThrottleLimit: 100
   # Cache expiration time in seconds
