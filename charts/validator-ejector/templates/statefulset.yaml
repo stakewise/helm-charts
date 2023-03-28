@@ -40,8 +40,8 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: init-ejector
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
+          imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
           securityContext:
             runAsNonRoot: false
             runAsUser: 0
@@ -69,8 +69,8 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
           env:
             - name: EXECUTION_NODE
               value: "{{ .Values.ejector.execution }}"

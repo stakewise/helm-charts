@@ -21,15 +21,15 @@ global:
           key: validatorEjectorSecrets
           property: loggerSecrets
 
-initImage:
-  repository: "bitnami/kubectl"
-  tag: "1.26"
-  pullPolicy: IfNotPresent
+  initImage:
+    repository: "bitnami/kubectl"
+    tag: "1.26"
+    pullPolicy: IfNotPresent
 
-image:
-  repository: lidofinance/validator-ejector
-  pullPolicy: IfNotPresent
-  tag: "stable"
+  image:
+    repository: lidofinance/validator-ejector
+    pullPolicy: IfNotPresent
+    tag: "dev"
 
 ejector:
   ## Ethereum Consensus Node endpoint
