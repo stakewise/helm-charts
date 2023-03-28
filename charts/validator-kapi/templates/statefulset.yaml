@@ -57,7 +57,7 @@ spec:
             - name: DB_USER
               value: "{{ .auth.username }}"
             - name: DB_PASSWORD
-              value: "{{ .auth.password }}"
+              value: "{{ .auth.postgresPassword }}"
             - name: DB_PORT
               value: "{{ .service.ports.postgresql }}"
             {{- end }}
