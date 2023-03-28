@@ -122,6 +122,8 @@ postgresql:
     runAsUser: 1001
   rbac:
     create: false
+  audit:
+    logHostname: true
   auth:
     username: "postgres"
     password: "kapi"

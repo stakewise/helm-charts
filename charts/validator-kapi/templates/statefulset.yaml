@@ -53,7 +53,9 @@ spec:
             - name: DB_NAME
               value: "{{ .auth.database }}"
             - name: DB_HOST
-              value: "postgresql"
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.hostname
             - name: DB_USER
               value: "{{ .auth.username }}"
             - name: DB_PASSWORD
