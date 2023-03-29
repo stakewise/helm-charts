@@ -60,33 +60,36 @@ spec:
               value: {{ .Values.loader.STORAGE_LOCATION | quote }}
             - name: FETCH_INTERVAL
               value: {{ .Values.loader.FETCH_INTERVAL | quote }}
-        - name: init-ejector
-          image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
-          imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
-          securityContext:
-            runAsNonRoot: false
-            runAsUser: 0
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-            - name: POD_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-          command:
-            - sh
-            - -c
-            - >
-              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
-          {{- if and .Values.persistence.enabled .Values.initChownData }}
-              chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data | true;
-          {{- end }}
-              echo "Loading encrypted messages from eth-exit-messages"
           volumeMounts:
             - name: data-ejector
               mountPath: /data
+#        - name: init-ejector
+#          image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
+#          imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
+#          securityContext:
+#            runAsNonRoot: false
+#            runAsUser: 0
+#          env:
+#            - name: POD_NAME
+#              valueFrom:
+#                fieldRef:
+#                  fieldPath: metadata.name
+#            - name: POD_NAMESPACE
+#              valueFrom:
+#                fieldRef:
+#                  fieldPath: metadata.namespace
+#          command:
+#            - sh
+#            - -c
+#            - >
+#              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+#          {{- if and .Values.persistence.enabled .Values.initChownData }}
+#              chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data | true;
+#          {{- end }}
+#              echo "Loading encrypted messages from eth-exit-messages"
+#          volumeMounts:
+#            - name: data-ejector
+#              mountPath: /data
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
