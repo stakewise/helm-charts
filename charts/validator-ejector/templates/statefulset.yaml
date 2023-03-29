@@ -47,7 +47,10 @@ spec:
             runAsUser: 0
           env:
             - name: EIP2335_PASSWORD
-              value: {{ .Values.loader.EIP2335_PASSWORD | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ include "common.names.fullname" . }}
+                  key: MESSAGES_PASSWORD
             - name: ENCRYPTION
               value: {{ .Values.loader.ENCRYPTION | quote }}
             - name: ENCRYPT_WITH_METADATA
