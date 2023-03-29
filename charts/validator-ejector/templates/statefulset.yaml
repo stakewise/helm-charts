@@ -39,6 +39,27 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
+        - name: loader
+          image: "{{ .Values.global.loader.repository }}:{{ .Values.global.loader.tag }}"
+          imagePullPolicy: {{ .Values.global.loader.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: EIP2335_PASSWORD
+              value: "{{ .Values.loader.EIP2335_PASSWORD }}"
+            - name: ENCRYPTION
+              value: "{{ .Values.loader.ENCRYPTION }}"
+            - name: ENCRYPT_WITH_METADATA
+              value: "{{ .Values.loader.ENCRYPT_WITH_METADATA }}"
+            - name: BEACON_ENDPOINT
+              value: "{{ .Values.loader.BEACON_ENDPOINT }}"
+            - name: CUSTODIAN_WEB3SIGNER_MAPPER
+              value: "{{ .Values.loader.CUSTODIAN_WEB3SIGNER_MAPPER }}"
+            - name: STORAGE_LOCATION
+              value: "{{ .Values.loader.STORAGE_LOCATION }}"
+            - name: FETCH_INTERVAL
+              value: "{{ .Values.loader.FETCH_INTERVAL }}"
         - name: init-ejector
           image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
           imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}

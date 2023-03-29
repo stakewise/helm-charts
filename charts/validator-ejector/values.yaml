@@ -35,6 +35,20 @@ global:
     pullPolicy: IfNotPresent
     tag: "dev"
 
+  loader:
+    repository: nethermindeth/eth-exit-messages
+    pullPolicy: IfNotPresent
+    tag: "v0.0.15"
+
+loader:
+  EIP2335_PASSWORD: "test"
+  ENCRYPTION: "EIP2335"
+  ENCRYPT_WITH_METADATA: "false"
+  BEACON_ENDPOINT: "http://192.168.11.104:5052"
+  CUSTODIAN_WEB3SIGNER_MAPPER: '{"custodian1/second": "http://192.168.11.104:9110"}'
+  STORAGE_LOCATION: "local/"
+  FETCH_INTERVAL: "60"
+
 ejector:
   ## Ethereum Consensus Node endpoint
   consensus: "http://localhost:4000"
