@@ -51,7 +51,7 @@ spec:
             - name: ENCRYPTION
               value: {{ .Values.loader.ENCRYPTION | quote }}
             - name: ENCRYPT_WITH_METADATA
-              value: {{ .Values.loader.ENCRYPT_WITH_METADATA }}
+              value: {{ .Values.loader.ENCRYPT_WITH_METADATA | quote }}
             - name: BEACON_ENDPOINT
               value: {{ .Values.loader.BEACON_ENDPOINT | quote }}
             - name: CUSTODIAN_WEB3SIGNER_MAPPER
@@ -59,7 +59,7 @@ spec:
             - name: STORAGE_LOCATION
               value: {{ .Values.loader.STORAGE_LOCATION | quote }}
             - name: FETCH_INTERVAL
-              value: {{ .Values.loader.FETCH_INTERVAL }}
+              value: {{ .Values.loader.FETCH_INTERVAL | quote }}
         - name: init-ejector
           image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
           imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
