@@ -80,13 +80,22 @@ settings:
   # API endpoint for the consensus node
   consensusEndpoint: ""
 
+  # Absolute path to the password file for decrypting keystores
+  keystoresPasswordPath: "/password/password.txt"
+  # Password for keystores
+  # Optional if used from secrets. 
+  keystoresPassword: ""
+
   # Absolute path to the directory with all the encrypted keystores
   keystoresPath: "/keystores"
-  # Password for keystores
-  keystoresPassword: ""
 
   # Path to the deposit_data.json file
   depositDataPath: "/deposit/deposit_data.json"
+
+  # Optional if used from configmap.
+  # Example:
+  # depositData: |
+  #   [{"pubkey": "8f1bfd7272c47d70483e8bae70a8ebf316b8ae36f62e2b30e2a7c10bc9c8a307be86f6724cbd5f8ccca0efa48753e59a", "withdrawal_credentials":...
   depositData: ""
 
   # Operator Private Key
@@ -98,9 +107,19 @@ settings:
 #   - name: keystores
 #     secret:
 #       secretName: keystores
+#   - name: deposit-data
+#     configmap:
+#       name: deposit-data
+#       items:
+#         - key: deposit_data.json
+#           path: deposit_data.json
 # additionalMounts:
 #   - name: keystores
 #     mountPath: /keystores
+#   - name: keystores-password
+#     mountPath: /keystores-password
+#   - name: deposit-data
+#     mountPath: /deposit-data
 additionalVolumes: []
 additionalMounts: []
 
