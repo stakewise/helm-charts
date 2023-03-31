@@ -24,6 +24,7 @@ data:
 
     if [ -e "$repo/config" ]; then
       echo "Found IPFS fs-repo at $repo"
+      ipfs config Datastore.StorageMax {{ .Values.ipfs.datastoreStorageMax }}
     else
       case "$IPFS_PROFILE" in
         "") INIT_ARGS="" ;;
@@ -33,6 +34,9 @@ data:
       ipfs config Addresses.API /ip4/0.0.0.0/tcp/5001
       ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/8080
       ipfs config --json Peering.Peers {{ .Values.ipfs.peers }}
+      ipfs config Datastore.StorageMax {{ .Values.persistence.dataSize}}
+      ipfs config --json Addresses.NoAnnounce {{ .Values.ipfs.addressesNoAnnounce }}
+      ipfs config --json Swarm.AddrFilters {{ .Values.ipfs.swarmAddrFilters }}
 
       # Set up the swarm key, if provided
 
