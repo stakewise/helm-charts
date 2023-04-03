@@ -61,13 +61,10 @@ data:
 
     fi
 
-    echo "ipfs config --json Peering.Peers {{ .Values.ipfs.peers }}"
+    set -x
     ipfs config --json Peering.Peers {{ .Values.ipfs.peers }}
-    echo "ipfs config Datastore.StorageMax {{ .Values.ipfs.datastoreStorageMax}}"
     ipfs config Datastore.StorageMax {{ .Values.ipfs.datastoreStorageMax}}
-    echo "ipfs config --json Addresses.NoAnnounce {{ .Values.ipfs.addressesNoAnnounce }}"
     ipfs config --json Addresses.NoAnnounce {{ .Values.ipfs.addressesNoAnnounce }}
-    echo "ipfs config --json Swarm.AddrFilters {{ .Values.ipfs.swarmAddrFilters }}"
     ipfs config --json Swarm.AddrFilters {{ .Values.ipfs.swarmAddrFilters }}
 
     exec ipfs "$@"
