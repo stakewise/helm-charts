@@ -1,0 +1,160 @@
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.statefulset" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  podManagementPolicy: "Parallel"
+  serviceName: {{ include "common.names.fullname" . }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "common.names.serviceAccountName" . }}
+      {{- with .Values.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+      {{- end }}
+      initContainers:
+      {{- if and .Values.persistence.enabled .Values.initChownData }}
+        - name: init-chown
+          image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
+        - name: generate-config
+          image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - >
+              INDEX=$((${HOSTNAME##*-}));
+              mkdir -p /data/wallet/direct/accounts || true;
+              cp -f /keystore-${INDEX}/keystore-${INDEX}.json /data/wallet/direct/accounts/all-accounts.keystore.json;
+              echo "wallet-password-file: /keystore-${INDEX}/keystore-${INDEX}.txt" > /data/config.yaml;
+              cat /data/config.yaml;
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            {{- range $i := until (int .Values.replicaCount) }}
+            - name: keystore-{{ . }}
+              mountPath: /keystore-{{ . }}
+              readOnly: true
+          {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - "--accept-terms-of-use"
+            - "--{{ .Values.global.network }}"
+            - "--datadir=/data"
+            - "--config-file=/data/config.yaml"
+            - "--wallet-dir=/data/wallet"
+          {{- if .Values.global.beaconRestApiProvider }}
+            - "--beacon-rest-api-provider={{ .Values.global.beaconRestApiProvider }}"
+          {{- end }}
+          {{- if .Values.global.beaconRpcGatewayProvider }}
+            - "--beacon-rpc-gateway-provider={{ .Values.global.beaconRpcGatewayProvider }}"
+          {{- end }}
+          {{- if .Values.global.beaconRpcProvider }}
+            - "--beacon-rpc-provider={{ .Values.global.beaconRpcProvider }}"
+          {{- end }}
+          {{- if .Values.global.metrics.enabled }}
+            - "--monitoring-host={{ .Values.metrics.host }}"
+            - "--monitoring-port={{ .Values.metrics.port }}"
+          {{- end }}
+          {{- if .Values.rpc.enabled }}
+            - "--rpc=true"
+            - "--rpc-host={{ .Values.rpc.host }}"
+            - "--rpc-port={{ .Values.rpc.port }}"
+          {{- end }}
+          {{- range .Values.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+        {{- if or (.Values.global.metrics.enabled) (.Values.rpc.enabled) }}
+          ports:
+          {{- if.Values.global.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+          {{- end }}
+          {{- if.Values.rpc.enabled }}
+            - name: rpc
+              containerPort: {{ .Values.rpc.port }}
+              protocol: TCP
+          {{- end }}
+        {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- range $i := until (int .Values.replicaCount) }}
+            - name: keystore-{{ . }}
+              mountPath: /keystore-{{ . }}
+              readOnly: true
+          {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- range $i := until (int .Values.replicaCount) }}
+        - name: keystore-{{ . }}
+          secret:
+        {{- if $.Values.global.keystoreSecretName }}
+            secretName: {{ $.Values.global.keystoreSecretName }}-{{ . }}
+        {{- else }}
+            secretName: keystore-{{ . }}
+        {{- end }}
+      {{- end }}
+  {{- if (not .Values.persistence.enabled) }}
+        - name: data
+          emptyDir: {}
+  {{- else }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+  {{- end }}
