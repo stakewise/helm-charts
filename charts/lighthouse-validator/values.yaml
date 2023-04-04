@@ -1,0 +1,224 @@
+# Default values for lighthouse-validator.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  ## Network ID
+  ##
+  network: mainnet
+
+  ## If keystoreSecretName is not specified, the keystore files will be loaded from secrets
+  ## with the default pattern keystore-{index}.
+  ## For example, if keystoreSecretName is not specified and you are using replicaCount 1,
+  ## the keystore files will be loaded from the keystore-0 secret.
+  ## If keystoreSecretName is specified, the keystore files will be loaded from secrets
+  ## with the pattern {keystoreSecretName}-{index}.
+  ## For example, if you set keystoreSecretName to my-keystore,
+  ## the keystore files for validator replicaCount 1 will be loaded from the my-keystore-0 secret.
+  keystoreSecretName: ""
+
+  ## Beacon nodes REST API provider endpoint
+  beaconNodes: ""
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+  
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+  
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
+
+replicaCount: 1
+
+## Enables the RPC server for the validator client
+http:
+  address: 0.0.0.0
+  allowOrigin: "*"
+  port: 5062
+
+## Extra flags for lighthouse validator
+##
+## Example:
+## extraFlags:
+##   --graffiti="StakeWise"
+extraFlags: []
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  registry: "docker.io"
+  repository: "busybox"
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+image:
+  registry: "docker.io"
+  repository: sigp/lighthouse
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "v4.0.1"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+securityContext:
+  fsGroup: 1001
+  runAsUser: 1001
+
+service:
+  type: ClusterIP
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - lighthouse-validator
+##       topologyKey: kubernetes.io/hostname
+##
+affinity: {}
+
+## If false, data ownership will not be reset at startup
+## This allows the node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of pod failure, the pod data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 5Gi
+  annotations: {}
+
+## Monitoring
+##
+metrics:
+  address: 0.0.0.0
+  allowOrigin: "*"
+  ## Metrics port to expose metrics for Prometheus
+  ##
+  port: 8008
+
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## Custom Prometheus rules
+    ##
+    rules: []
