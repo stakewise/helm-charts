@@ -54,6 +54,8 @@ graph:
   # Maximum size for a file that can be retrieved (in bytes, defaults to 1MiB)
   graphMaxIpfsFileBytes: "1048576"
   graphGraphqlDisableBoolFilters: "false"
+  # extraEnv -- Additional container environment variables.
+  extraEnv: {}
 
 serviceAccount:
   # Specifies whether a service account should be created
