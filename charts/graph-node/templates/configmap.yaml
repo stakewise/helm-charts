@@ -1,28 +1,9 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-config
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
-  ETHEREUM_POLLING_INTERVAL: {{ .Values.graph.ethereumPollingInterval | quote }}
-  EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: {{ .Values.graph.experimentalSubgraphVersionSwitchingMode | quote }}
-  ETHEREUM_BLOCK_BATCH_SIZE: {{ .Values.graph.ethereumBlockBatchSize | quote }}
-  GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: {{ .Values.graph.graphEthereumMaxBlockRangeSize | quote }}
-  STORE_CONNECTION_POOL_SIZE: {{ .Values.graph.storeConnectionPoolSize | quote }}
-  GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: {{ .Values.graph.graphAllowNonDeterministricIpfs | quote }}
-  GRAPH_MAX_IPFS_FILE_BYTES: {{ .Values.graph.graphMaxIpfsFileBytes | quote }}
-  GRAPH_LOG: {{ .Values.graph.graphLog | quote }}
-  GRAPH_GRAPHQL_DISABLE_BOOL_FILTERS: {{ .Values.graph.graphGraphqlDisableBoolFilters | quote }}
-  {{- if not .Values.graph.ipfsUrl }}
-  ipfs: "{{ .Release.Name }}-ipfs:5001"
-  {{- else }}
-  ipfs: {{ .Values.graph.ipfsUrl | quote }}
-  {{- end }}
-  ethereum: {{ .Values.graph.ethereumNode | quote }}
-
-  {{- with .Values.global.postgresql }}
-  postgres_host: {{ .host | quote }}
-  postgres_user: {{ .auth.username | quote }}
-  postgres_db: {{ .auth.database | quote }}
-  {{- end }}
+  config.toml: |
+    {{ print (tpl .Values.graph.configTemplate $) | nindent 4 }}

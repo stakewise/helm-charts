@@ -17,52 +17,97 @@ global:
 replicaCount: 1
 
 image:
+  # -- Image for Graph Node
   registry: "docker.io"
   repository: graphprotocol/graph-node
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.30.0"
+  # -- Overrides the image tag
+  # @default -- Chart.appVersion
+  tag: ""
 
+# -- Pull secrets required to fetch the Image
 imagePullSecrets: []
+
 nameOverride: ""
 fullnameOverride: ""
 
-## Graph Node Configuration
+## -- Graph Node
 ##
 graph:
-  # How often to poll Ethereum for new blocks (in ms)
-  ethereumPollingInterval: 500
-  # Control log levels
-  # Options: debug, error, info, warn, or trace
-  graphLog: "info"
-  # IPFS URL
-  ipfsUrl: ""
-  # Ethereum Node Address
-  ethereumNode: "mainnet:http://ethereum-node:8545"
-  # "instant" or "synced". Synced will only switch a named subgraph to a new deployment once it has synced,
-  # making the new deployment the "Pending" version
-  experimentalSubgraphVersionSwitchingMode: "synced"
-  # Number of Ethereum blocks to request in parallel.
-  # Also limits other parallel requests such such as trace_filter
-  ethereumBlockBatchSize: 250
-  # Maximum number of blocks to scan for triggers in each request
-  graphEthereumMaxBlockRangeSize: 2000
-  # How many simultaneous connections to allow to the store.
-  # Due to implementation details, this value may not be strictly adhered to
-  storeConnectionPoolSize: 25
-  graphAllowNonDeterministricIpfs: "true"
-  # Maximum size for a file that can be retrieved (in bytes, defaults to 1MiB)
-  graphMaxIpfsFileBytes: "1048576"
-  graphGraphqlDisableBoolFilters: "false"
-  # extraEnv -- Additional container environment variables.
-  extraEnv: {}
+  # -- Blockchain configuration for Graph Node
+  chains:
+  # -- Ethereum Mainnet
+    mainnet:
+      # -- Enable this configuring graph-node with this chain
+      enabled: true
+      # -- The database shard to use for this chain
+      shard: primary
+      ## -- A list of JSON-RPC endpoints for this node
+      provider:
+        - 
+          # -- Label for the RPC endpoint
+          label: eth-mainnet
+          # -- URL for JSON-RPC endpoint
+          url: ""
+          # -- Data capabilities this node has
+          features: [archive, traces]
+
+  config:
+    ipfsUrl: ""
+    # Ethereum Node Address
+    ethereumNode: "mainnet:http://ethereum-node:8545"
+
+  # -- [Configuration for graph-node](https://github.com/graphprotocol/graph-node/blob/master/docs/config.md)
+  # @default -- See default template in [values.yaml](values.yaml)
+  configTemplate: |
+    # Store configuration
+    [store]
+      [store.primary]
+      connection = postgresql://{{ $.Values.global.postgresql.auth.username }}:{{ $.Values.global.postgresql.auth.password }}@{{ $.Values.global.postgresql.host }}:{{ $.Values.global.postgresql.port }}/{{ $.Values.global.postgresql.database }}
+      pool_size = 10
+      weight = 1
+    # Chain configuration
+    {{- $patchedChains := dict "ingestor" (print (include "common.names.fullname" $) "-block-ingestor" ) }}
+    {{- range $chainName, $chainValues := $.Values.graph.chains }}
+    {{- if $chainValues.enabled }}
+      {{- $_ := set $patchedChains $chainName (omit $chainValues "enabled") }}
+    {{- end }}
+    {{- end }}
+    {{ toToml (dict "chains" $patchedChains) }}
+    # Deployment rule configuration
+    [deployment]
+
+  # -- Additional CLI arguments to pass to Graph Node
+  extraArgs: []
+
+  # -- Additional container environment variables.
+  env:
+    # How often to poll Ethereum for new blocks (in ms)
+    ETHEREUM_POLLING_INTERVAL: "500"
+    # "instant" or "synced". Synced will only switch a named subgraph to a new deployment once it has synced,
+    # making the new deployment the "Pending" version
+    EXPERIMENTAL_SUBGRAPH_VERSION_SWITCHING_MODE: "synced"
+    # Number of Ethereum blocks to request in parallel.
+    # Also limits other parallel requests such such as trace_filter
+    ETHEREUM_BLOCK_BATCH_SIZE: "250"
+    # Maximum number of blocks to scan for triggers in each request
+    GRAPH_ETHEREUM_MAX_BLOCK_RANGE_SIZE: "2000"
+    # How many simultaneous connections to allow to the store.
+    # Due to implementation details, this value may not be strictly adhered to
+    STORE_CONNECTION_POOL_SIZE: "25"
+    GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: true
+    GRAPH_MAX_IPFS_FILE_BYTES: "1048576"
+    # Control log levels
+    # Options: debug, error, info, warn, or trace
+    GRAPH_LOG: "info"
+    GRAPH_GRAPHQL_DISABLE_BOOL_FILTERS: "false"
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
@@ -102,32 +147,32 @@ autoscaling:
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
 
-## Configure resource requests and limits.
+## -- Configure resource requests and limits.
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 resources: {}
 
-## Node labels for pod assignment
+## -- Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
 nodeSelector: {}
 
-## Tolerations for pod assignment
+## -- Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##
 tolerations: []
 
-## Affinity for pod assignment
+## -- Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
 affinity: {}
 
-## used to assign priority to pods
+## -- used to assign priority to pods
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
 
-## PostgreSQL Server
+## -- PostgreSQL Server
 ## ref: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
 ##
 postgresql:
@@ -183,12 +228,12 @@ postgresql:
   metrics:
     enabled: true
 
-## IPFS Server
+## -- IPFS Server
 ##
 ipfs:
   enabled: true
 
-## Prometheus Service Monitor
+## -- Prometheus Service Monitor
 ## ref: https://github.com/coreos/prometheus-operator
 ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
 ##
@@ -210,7 +255,7 @@ serviceMonitor:
   # Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
   additionalLabels: {}
 
-## Custom PrometheusRule to be defined
+## -- Custom PrometheusRule to be defined
 ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
 ##
 prometheusRule:
@@ -225,7 +270,7 @@ prometheusRule:
   # Custom Prometheus rules
   rules: []
 
-
+# -- Readiness probe
 readinessProbe:
   initialDelaySeconds: 60
   timeoutSeconds: 1
@@ -237,6 +282,7 @@ readinessProbe:
     port: http
     scheme: HTTP
 
+# -- Liveness probe
 livenessProbe:
   initialDelaySeconds: 60
   timeoutSeconds: 1
