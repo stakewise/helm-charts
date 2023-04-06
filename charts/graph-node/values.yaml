@@ -224,3 +224,26 @@ prometheusRule:
   additionalLabels: {}
   # Custom Prometheus rules
   rules: []
+
+
+readinessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 1
+  periodSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
+
+livenessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 1
+  periodSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /
+    port: http
+    scheme: HTTP
