@@ -27,6 +27,10 @@ spec:
       affinity:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
+    {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
     {{- with .Values.tolerations }}
       tolerations:
         {{ toYaml . | nindent 8 | trim }}
