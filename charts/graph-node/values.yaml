@@ -56,6 +56,10 @@ graph:
     ipfsUrl: ""
     # Ethereum Node Address
     ethereumNode: "mainnet:http://ethereum-node:8545"
+    deployment:
+      rule:
+        shard: primary
+        indexers: ["default"]
 
   # -- [Configuration for graph-node](https://github.com/graphprotocol/graph-node/blob/master/docs/config.md)
   # @default -- See default template in [values.yaml](values.yaml)
@@ -75,7 +79,7 @@ graph:
     {{- end }}
     {{ toToml (dict "chains" $patchedChains) }}
     # Deployment rule configuration
-    [deployment]
+    {{ toToml (dict "deployment" $.Values.graph.config.deployment) }}
 
   # -- Additional CLI arguments to pass to Graph Node
   extraArgs: []
