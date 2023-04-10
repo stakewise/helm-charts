@@ -39,7 +39,7 @@ graph:
   # -- Ethereum Mainnet
     mainnet:
       # -- Enable this configuring graph-node with this chain
-      enabled: true
+      enabled: false
       # -- The database shard to use for this chain
       shard: primary
       ## -- A list of JSON-RPC endpoints for this node
@@ -58,8 +58,8 @@ graph:
     ethereumNode: "mainnet:http://ethereum-node:8545"
     deployment:
       rule:
-        shard: primary
-        indexers: ["default"]
+        - shard: primary
+          indexers: ["default"]
 
   # -- [Configuration for graph-node](https://github.com/graphprotocol/graph-node/blob/master/docs/config.md)
   # @default -- See default template in [values.yaml](values.yaml)
@@ -67,7 +67,7 @@ graph:
     # Store configuration
     [store]
       [store.primary]
-      connection = postgresql://{{ $.Values.global.postgresql.auth.username }}:{{ $.Values.global.postgresql.auth.password }}@{{ $.Values.global.postgresql.host }}:{{ $.Values.global.postgresql.port }}/{{ $.Values.global.postgresql.database }}
+      connection = "postgresql://{{ $.Values.global.postgresql.auth.username }}:{{ $.Values.global.postgresql.auth.password }}@{{ $.Values.global.postgresql.host }}:{{ $.Values.global.postgresql.port }}/{{ $.Values.global.postgresql.database }}"
       pool_size = 10
       weight = 1
     # Chain configuration

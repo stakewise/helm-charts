@@ -99,5 +99,5 @@ spec:
             readOnly: true
       volumes:
         - name: config
-          configMap:
-            name: {{ template "common.names.fullname" . }}-config
+          secret:
+            secretName: {{ template "common.names.fullname" . }}-config

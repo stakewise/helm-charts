@@ -1,9 +1,9 @@
 apiVersion: v1
-kind: ConfigMap
+kind: Secret
 metadata:
   name: {{ include "common.names.fullname" . }}-config
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
+type: Opaque
 data:
-  config.toml: |
-    {{ print (tpl .Values.graph.configTemplate $) | nindent 4 }}
+  config.toml: {{ print (tpl .Values.graph.configTemplate $) | b64enc | quote }}
