@@ -52,14 +52,12 @@ graph:
           # -- Data capabilities this node has
           features: [archive, traces]
 
-  config:
-    ipfsUrl: ""
-    # Ethereum Node Address
-    ethereumNode: "mainnet:http://ethereum-node:8545"
-    deployment:
-      rule:
-        - shard: primary
-          indexers: ["default"]
+  ipfsUrl: ""
+  # -- Deployment rule configuration
+  deployment:
+    rule:
+      - shard: primary
+        indexers: ["default"]
 
   # -- [Configuration for graph-node](https://github.com/graphprotocol/graph-node/blob/master/docs/config.md)
   # @default -- See default template in [values.yaml](values.yaml)
@@ -67,7 +65,7 @@ graph:
     # Store configuration
     [store]
       [store.primary]
-      connection = "postgresql://{{ $.Values.global.postgresql.auth.username }}:{{ $.Values.global.postgresql.auth.password }}@{{ $.Values.global.postgresql.host }}:{{ $.Values.global.postgresql.port }}/{{ $.Values.global.postgresql.database }}"
+      connection = "postgresql://{{ $.Values.global.postgresql.auth.username }}:{{ $.Values.global.postgresql.auth.password }}@{{ $.Values.global.postgresql.host }}:{{ $.Values.global.postgresql.port }}/{{ $.Values.global.postgresql.auth.database }}"
       pool_size = 10
       weight = 1
     # Chain configuration
@@ -79,7 +77,7 @@ graph:
     {{- end }}
     {{ toToml (dict "chains" $patchedChains) }}
     # Deployment rule configuration
-    {{ toToml (dict "deployment" $.Values.graph.config.deployment) }}
+    {{ toToml (dict "deployment" $.Values.graph.deployment) }}
 
   # -- Additional CLI arguments to pass to Graph Node
   extraArgs: []

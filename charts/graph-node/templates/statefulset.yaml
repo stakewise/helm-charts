@@ -56,14 +56,12 @@ spec:
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: ipfs
-              {{- if not .Values.graph.config.ipfsUrl }}
+            - name: IPFS
+              {{- if not .Values.graph.ipfsUrl }}
               value: "{{ .Release.Name }}-ipfs:5001"
               {{- else }}
-              value: {{ .Values.graph.config.ipfsUrl | quote }}
+              value: {{ .Values.graph.ipfsUrl | quote }}
               {{- end }}
-            - name: ethereum
-              value: {{ .Values.graph.config.ethereumNode | quote }}
             {{- range $key, $value := .Values.graph.env }}
             - name: {{ $key }}
               value: "{{ $value }}"
