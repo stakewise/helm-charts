@@ -68,7 +68,7 @@ spec:
             {{- end }}
           envFrom:
             - secretRef:
-                name: {{ template "common.names.fullname" . }}-secret
+                name: {{ template "common.names.fullname" . }}-env
           ports:
             - name: http
               containerPort: {{ .Values.service.ports.http }}
