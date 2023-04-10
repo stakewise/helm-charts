@@ -1,0 +1,36 @@
+graph:
+  # -- Blockchain configuration for Graph Node
+  chains:
+  # -- Ethereum Mainnet
+    evmos:
+      # -- Enable this configuring graph-node with this chain
+      enabled: true
+      # -- The database shard to use for this chain
+      shard: primary
+      ## -- A list of JSON-RPC endpoints for this node
+      provider:
+        - 
+          # -- Label for the RPC endpoint
+          label: evmos
+          # -- URL for JSON-RPC endpoint
+          url: "https://eth.bd.evmos.org:8545"
+          # -- Data capabilities this node has
+          features: []
+
+    local:
+      # -- Enable this configuring graph-node with this chain
+      enabled: true
+      # -- The database shard to use for this chain
+      shard: primary
+      ## -- A list of JSON-RPC endpoints for this node
+      provider:
+        - 
+          # -- Label for the RPC endpoint
+          label: local
+          # -- URL for JSON-RPC endpoint
+          url: "http://host.docker.internal:7546"
+          # -- Data capabilities this node has
+          features: ["archive", "traces"]
+
+postgresql:
+  enabled: false

@@ -15,8 +15,9 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/graph-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/graph-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/config.toml: {{ print (tpl .Values.graph.configTemplate $) | sha256sum }}
+        checksum/graph-secret-env: {{ include (print $.Template.BasePath "/secret-env.yaml") . | sha256sum }}
+        checksum/graph-secret-config: {{ include (print $.Template.BasePath "/secret-config.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -45,20 +46,30 @@ spec:
       priorityClassName: {{ .Values.priorityClassName | quote }}
       containers:
         - name: {{ .Chart.Name }}
+          command:
+            - graph-node
+            - --config=/config/config.toml
+            {{- with .Values.graph.extraArgs }}
+              {{- toYaml (. | default list) | nindent 12 }}
+            {{- end }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-          {{- range $key, $value := .Values.graph.extraEnv }}
+            - name: IPFS
+              {{- if not .Values.graph.ipfsUrl }}
+              value: "{{ .Release.Name }}-ipfs:5001"
+              {{- else }}
+              value: {{ .Values.graph.ipfsUrl | quote }}
+              {{- end }}
+            {{- range $key, $value := .Values.graph.env }}
             - name: {{ $key }}
               value: "{{ $value }}"
-          {{- end }}
+            {{- end }}
           envFrom:
-            - configMapRef:
-                name: {{ template "common.names.fullname" . }}
             - secretRef:
-                name: {{ template "common.names.fullname" . }}
+                name: {{ template "common.names.fullname" . }}-env
           ports:
             - name: http
               containerPort: {{ .Values.service.ports.http }}
@@ -81,3 +92,11 @@ spec:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ template "common.names.fullname" . }}-config
