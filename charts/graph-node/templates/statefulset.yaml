@@ -16,7 +16,8 @@ spec:
     metadata:
       annotations:
         checksum/config.toml: {{ print (tpl .Values.graph.configTemplate $) | sha256sum }}
-        checksum/graph-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        checksum/graph-secret-env: {{ include (print $.Template.BasePath "/secret-env.yaml") . | sha256sum }}
+        checksum/graph-secret-config: {{ include (print $.Template.BasePath "/secret-config.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
