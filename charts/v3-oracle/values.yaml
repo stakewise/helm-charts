@@ -130,3 +130,6 @@ persistence:
   accessModes:
     - ReadWriteOnce
   size: 1Gi
+
+ipfs:
+  enabled: true
