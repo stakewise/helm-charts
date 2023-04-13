@@ -2,11 +2,8 @@ dependencies:
 - name: common
   repository: https://charts.stakewise.io/
   version: 1.0.0
-- name: postgresql
-  repository: https://charts.bitnami.com/bitnami/
-  version: 12.1.6
 - name: ipfs
-  repository: https://charts.stakewise.io/
-  version: 1.2.1
-digest: sha256:2b5d37a3b8ae6637cef6b437a1c3e040a65178ef619e0c71ab00e670b3a4f6ba
-generated: "2023-04-10T15:56:40.859711+04:00"
+  repository: file://../ipfs
+  version: 2.0.1
+digest: sha256:05144482745d129a805e6b0f51f84066fc1832269d5c1adfccde7e73cfd04dd5
+generated: "2023-04-13T12:05:19.938612+04:00"
