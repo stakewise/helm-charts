@@ -21,6 +21,6 @@ dependencies:
   repository: https://charts.stakewise.io/
   version: 1.x.x
 - name: ipfs
-  repository: file://../ipfs
-  version: 1.x.x
+  repository: https://charts.stakewise.io/
+  version: 2.x.x
   condition: ipfs.enabled
