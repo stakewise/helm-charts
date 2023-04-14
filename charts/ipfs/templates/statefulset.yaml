@@ -47,8 +47,13 @@ spec:
       {{- end }}
       containers:
         - name: {{ include "common.names.fullname" . }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args: [
+            "daemon",
+            "--mount-ipns=/data/ipns",
+            "--mount-ipfs=/data/ipfs"
+          ]
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
@@ -71,10 +76,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: {{ .Values.ipfs.path }}
-            - name: fuse-ipfs
-              mountPath: /ipfs
-            - name: fuse-ipns
-              mountPath: /ipns
             - name: entrypoint
               subPath: start_ipfs
               mountPath: /usr/local/bin/start_ipfs
@@ -102,10 +103,6 @@ spec:
 {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
-        - name: fuse-ipfs
-          emptyDir: {}
-        - name: fuse-ipns
-          emptyDir: {}
 {{- else }}
   volumeClaimTemplates:
     - metadata:
@@ -117,25 +114,5 @@ spec:
         storageClassName: {{ .Values.persistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.persistence.dataSize | quote }}
-    - metadata:
-        name: fuse-ipfs
-        labels:
-          {{- include "common.labels.standard" . | nindent 10 }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.fuseIpfsSize | quote }}
-    - metadata:
-        name: fuse-ipns
-        labels:
-          {{- include "common.labels.standard" . | nindent 10 }}
-      spec:
-        accessModes: {{ .Values.persistence.accessModes }}
-        storageClassName: {{ .Values.persistence.storageClassName }}
-        resources:
-          requests:
-            storage: {{ .Values.persistence.fuseIpnsSize | quote }}
+            storage: {{ .Values.persistence.size | quote }}
 {{- end }}
