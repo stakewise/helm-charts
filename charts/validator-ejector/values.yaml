@@ -48,6 +48,10 @@ loader:
   CUSTODIAN_WEB3SIGNER_MAPPER: '{"custodian1/second": "http://192.168.11.104:9110"}'
   STORAGE_LOCATION: "local/"
   FETCH_INTERVAL: "60"
+  SIGNER_MAPPER: '{}'
+  LOADER_MAPPER: '{}'
+  KEY_LOADER_TYPE: "WEB3SIGNER"
+  LidoKAPI_OPERATOR_ID: ""
 
 ejector:
   ## Ethereum Consensus Node endpoint

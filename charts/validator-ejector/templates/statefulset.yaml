@@ -63,6 +63,14 @@ spec:
               value: {{ .Values.loader.STORAGE_LOCATION | quote }}
             - name: FETCH_INTERVAL
               value: {{ .Values.loader.FETCH_INTERVAL | quote }}
+            - name: LOADER_MAPPER
+              value: {{ .Values.loader.LOADER_MAPPER | quote }}
+            - name: SIGNER_MAPPER
+              value: {{ .Values.loader.SIGNER_MAPPER | quote }}
+            - name: KEY_LOADER_TYPE
+              value: {{ .Values.loader.KEY_LOADER_TYPE | quote }}
+            - name: LidoKAPI_OPERATOR_ID
+              value: {{ .Values.loader.LidoKAPI_OPERATOR_ID | quote }}
           volumeMounts:
             - name: data-ejector
               mountPath: /data
