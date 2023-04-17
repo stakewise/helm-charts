@@ -69,6 +69,8 @@ spec:
               value: {{ .Values.loader.SIGNER_MAPPER | quote }}
             - name: KEY_LOADER_TYPE
               value: {{ .Values.loader.KEY_LOADER_TYPE | quote }}
+            - name: ENCRYPTION_TYPE
+              value: {{ .Values.loader.ENCRYPTION_TYPE | quote }}
             - name: LidoKAPI_OPERATOR_ID
               value: {{ .Values.loader.LidoKAPI_OPERATOR_ID | quote }}
           volumeMounts:
