@@ -32,6 +32,11 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: "v0.18.1"
 
+podMonitor:
+  enabled: true
+  labels:
+    release: prometheus-community
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

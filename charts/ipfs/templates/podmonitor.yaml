@@ -1,0 +1,26 @@
+{{- if $.Values.podMonitor }}
+{{- if and ( .Capabilities.APIVersions.Has "monitoring.coreos.com/v1" ) ( .Values.podMonitor.enabled ) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.podMonitor.labels }}
+    {{ toYaml .Values.podMonitor.labels | nindent 4}}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  jobLabel: component
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  podMetricsEndpoints:
+  - port: api
+    path: /debug/metrics/prometheus
+    scheme: http
+    interval: 30s
+{{- end}}
+{{- end}}
