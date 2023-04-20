@@ -115,7 +115,7 @@ image:
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
-    tag: "v4.0.1"
+    tag: "v4.1.0"
   teku:
     registry: "docker.io"
     repository: "consensys/teku"
