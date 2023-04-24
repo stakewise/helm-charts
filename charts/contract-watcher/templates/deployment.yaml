@@ -40,10 +40,8 @@ spec:
               value: {{ .Values.telegramApiToken | quote }}
             - name: TELEGRAM_RECEIVERS
               value: {{ .Values.telegramReceivers | quote }}
-            - name: DISCORD_WEBHOOK_ID
-              value: {{ .Values.discordWebhookId | quote }}
-            - name: DISCORD_WEBHOOK_TOKEN
-              value: {{ .Values.discordWebhookToken | quote }}
+            - name: DISCORD_WEBHOOK_URL
+              value: {{ .Values.discordWebhookUrl | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
