@@ -40,7 +40,8 @@ serviceAccount:
 ## Docker image
 ##
 image:
-  repository: "europe-west4-docker.pkg.dev/stakewiselabs/private/v3-keeper"
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/private/v3-keeper"
   tag: "v0.1.0"
   pullPolicy: IfNotPresent
 
