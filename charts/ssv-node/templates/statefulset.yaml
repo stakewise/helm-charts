@@ -67,6 +67,11 @@ spec:
             - containerPort: 12000
               name: discovery-udp
               protocol: UDP
+          {{- if .Values.metrics.enabled }}
+            - containerPort: {{ .Values.metrics.metricsAPIPort}}
+              name: metrics-tcp
+              protocol: TCP
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
