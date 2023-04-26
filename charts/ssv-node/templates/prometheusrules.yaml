@@ -1,0 +1,14 @@
+{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  groups:
+  {{- with .Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+{{- end }}

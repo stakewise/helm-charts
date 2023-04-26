@@ -29,3 +29,23 @@ spec:
       name: discovery-udp
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
+
+
+{{- if .Values.metrics.enabled  -}}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" . }}-metrics-tcp
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.metrics.metricsAPIPort }}
+      targetPort: metrics-tcp
+      protocol: TCP
+      name: metrics-tcp
+  selector:
+    {{- include "common.labels.matchLabels" . | nindent 4 }}
+{{- end }}
