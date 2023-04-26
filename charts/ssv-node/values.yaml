@@ -4,6 +4,10 @@
 
 replicaCount: 1
 
+global:
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImage:
@@ -31,8 +35,6 @@ registryContractAddr: 0x687fb596F3892904F879118e2113e1EEe8746C2E
 operatorPrivateKey: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
   # Annotations to add to the service account
   annotations: {}
   # The name of the service account to use.
