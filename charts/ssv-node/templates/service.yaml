@@ -11,6 +11,9 @@ spec:
       targetPort: discovery-tcp
       protocol: TCP
       name: discovery-tcp
+    {{- if and (eq .Values.service.type "NodePort") ( .Values.service.ports.discoveryTCP.nodePort ) }}
+      nodePort: {{ .Values.service.ports.discoveryTCP.nodePort }}
+    {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
 ---
@@ -27,11 +30,14 @@ spec:
       targetPort: discovery-udp
       protocol: UDP
       name: discovery-udp
+      {{- if and (eq .Values.service.type "NodePort") ( .Values.service.ports.discoveryUDP.nodePort ) }}
+      nodePort: {{ .Values.service.ports.discoveryUDP.nodePort }}
+      {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
 
 
-{{- if .Values.metrics.enabled  -}}
+{{ if .Values.metrics.enabled  -}}
 ---
 apiVersion: v1
 kind: Service
@@ -40,7 +46,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.metrics.service.type }}
   ports:
     - port: {{ .Values.metrics.metricsAPIPort }}
       targetPort: metrics-tcp
