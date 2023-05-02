@@ -53,6 +53,7 @@ loader:
   KEY_LOADER_TYPE: "WEB3SIGNER"
   ENCRYPTION_TYPE: "EIP2335"
   LidoKAPI_OPERATOR_ID: ""
+  LidoKAPI_KEYS_PERCENT: "5"
 
 ejector:
   ## Ethereum Consensus Node endpoint

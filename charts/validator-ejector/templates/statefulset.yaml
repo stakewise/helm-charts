@@ -73,6 +73,8 @@ spec:
               value: {{ .Values.loader.ENCRYPTION_TYPE | quote }}
             - name: LidoKAPI_OPERATOR_ID
               value: {{ .Values.loader.LidoKAPI_OPERATOR_ID | quote }}
+            - name: LidoKAPI_KEYS_PERCENT
+              value: {{ .Values.loader.LidoKAPI_KEYS_PERCENT | quote }}
           volumeMounts:
             - name: data-ejector
               mountPath: /data
