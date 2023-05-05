@@ -114,6 +114,7 @@ settings:
   awsAccessKeyID: ""
   awsSecretAccessKey: ""
   awsRegion: ""
+  awsBucketName: ""
 
   ## The chunk size for fetching validators' balances
   ##

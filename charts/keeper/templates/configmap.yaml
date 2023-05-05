@@ -11,5 +11,6 @@ data:
   HEALTH_SERVER_HOST: {{ .Values.settings.healthServerHost | quote }}
   HEALTH_SERVER_PORT: {{ .Values.settings.healthServerPort | quote }}
   KEEPER_ETH1_ENDPOINT: {{ .Values.settings.eth1Endpoint | quote }}
-  AWS_S3_REGION: {{ .Values.settings.awsRegion | quote }}
+  AWS_REGION: {{ .Values.settings.awsRegion | quote }}
+  AWS_BUCKET_NAME: {{ .Values.settings.awsBucketName | quote }}
   HARBOUR_MAINNET_SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.harbourMainnetSendTelegramNotifications | quote }}
