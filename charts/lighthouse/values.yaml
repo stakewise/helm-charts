@@ -153,6 +153,9 @@ targetPeers: 80
 ##
 extraFlags: []
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##

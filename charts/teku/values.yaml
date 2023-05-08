@@ -323,6 +323,9 @@ builderEndpoint: ""
 ##
 extraFlags: []
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 # Sets the frequency, in slots, at which to store
 # finalized states to disk. This option is ignored
 # if --data-storage-mode is set to PRUNE
