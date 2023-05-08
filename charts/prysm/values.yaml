@@ -257,6 +257,9 @@ extraFlags:
   - "--p2p-max-peers=160"
   - "--enable-peer-scorer"
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
