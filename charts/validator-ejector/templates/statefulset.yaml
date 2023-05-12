@@ -153,7 +153,7 @@ spec:
             - name: metrics
               containerPort: {{ .Values.ejector.httpPort }}
               protocol: TCP
-          {{- if .Values.ejector.runHealthCheck }}
+          {{- if .Values.ejector.runHealthCheckDISABLED }}
           livenessProbe:
             httpGet:
               path: /metrics
