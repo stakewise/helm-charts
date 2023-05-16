@@ -91,7 +91,7 @@ image:
   repository: prysmaticlabs/prysm/validator
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v4.0.3-hotfix"
+  tag: "v4.0.4"
 
 imagePullSecrets: []
 nameOverride: ""
