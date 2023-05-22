@@ -86,7 +86,7 @@ spec:
             - "--index"
             - "{{ . }}"
             - "--no-of-keys"
-            - {{ $root.Values.validatorsNoOfKeys }}
+            - "{{ $root.Values.validatorsNoOfKeys }}"
             {{- if eq $root.Values.network "sepolia" }}
             - "--network"
             - "goerli"
