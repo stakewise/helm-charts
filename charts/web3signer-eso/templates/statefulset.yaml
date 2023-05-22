@@ -64,7 +64,7 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2"]
           volumeMounts:
             - name: data
               mountPath: /data

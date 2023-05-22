@@ -37,8 +37,8 @@ initImageBusybox:
 ## CLI image is used to fetch public keys.
 ##
 cliImage:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.2.7"
+  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
+  tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
 externalSecrets:
