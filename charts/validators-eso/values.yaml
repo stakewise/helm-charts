@@ -106,6 +106,8 @@ validatorsKeyIndex: 0
 ##
 validatorsCount: 0
 
+validatorsNoOfKeys: 100
+
 ## Default fee recipient for all validator keys.
 ##
 suggestedFeeRecipient: ""
