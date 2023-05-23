@@ -643,15 +643,6 @@ spec:
               --disable-enr-auto-update
               --target-peers={{ .Values.lighthouse.targetPeers }}
               --discovery-port={{ include "lighthouse.p2pPort" . }}
-            {{- if .Values.lighthouse.p2pNodePort.enabled }}
-              --enr-address=$EXTERNAL_IP
-              --enr-tcp-port=$EXTERNAL_PORT
-              --enr-udp-port=$EXTERNAL_PORT
-            {{- else }}
-              --enr-address=$(POD_IP)
-              --enr-tcp-port={{ include "lighthouse.p2pPort" . }}
-              --enr-udp-port={{ include "lighthouse.p2pPort" . }}
-            {{- end }}
             {{- if .Values.lighthouse.global.metrics.enabled }}
             {{- range .Values.lighthouse.metrics.flags }}
               {{ . }}

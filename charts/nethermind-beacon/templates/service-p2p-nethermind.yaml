@@ -26,13 +26,13 @@ spec:
     - name: p2p-tcp-neth
       port: {{ include "nethermind.p2pPort" $ }}
       protocol: TCP
-      targetPort: {{ $port }}
+      targetPort: p2p-tcp-neth
       nodePort: {{ $port }}
   {{- if eq $.Values.nethermind.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-neth
       port: {{ include "nethermind.p2pPort" $ }}
       protocol: UDP
-      targetPort: {{ $port }}
+      targetPort: p2p-tcp-neth
       nodePort: {{ $port }}
   {{- end }}
   selector:
