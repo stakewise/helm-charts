@@ -1,0 +1,10 @@
+{{- if or .Values.global.rbac.create .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: {{ include "common.names.clusterRoleName" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+rules:
+{{- toYaml .Values.rbac.clusterRules | nindent 0 }}
+{{- end }}

@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-init
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  init.sh: |
+    #!/bin/sh
+{{- if or (and .Values.execution.persistence.enabled .Values.execution.initChownData) (and .Values.beacon.persistence.enabled .Values.beacon.initChownData) }}
+    mkdir -p /data && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data;
+{{- end }}
+    echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+{{- if .Values.global.p2pNodePort.enabled }}
+  {{- if eq .Values.global.p2pNodePort.type "LoadBalancer" }}
+      until [ -n "$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')" ]; do echo "Waiting for load balancer to get an IP" && sleep 10; done;
+      export EXTERNAL_EXECUTION_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "client=execution,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+      export EXTERNAL_BEACON_PORT=$(kubectl -n ${POD_NAMESPACE} get services -l "client=beacon,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+      export EXTERNAL_IP=$(kubectl -n ${POD_NAMESPACE} get svc/${POD_NAME} -o jsonpath='{.status.loadBalancer.ingress[0].ip}');
+  {{- else }}
+      export EXTERNAL_EXECUTION_PORT=$(kubectl get services -l "client=execution,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+      export EXTERNAL_BEACON_PORT=$(kubectl get services -l "client=beacon,pod in (${POD_NAME}), type in (p2p)" -o jsonpath='{.items[0].spec.ports[0].nodePort}');
+      export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
+  {{- end }}
+      echo "EXTERNAL_EXECUTION_PORT=$EXTERNAL_EXECUTION_PORT" >  /env/init-nodeport;
+      echo "EXTERNAL_BEACON_PORT=$EXTERNAL_BEACON_PORT" >> env/init-nodeport;
+      echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
+      cat /env/init-nodeport;
+  {{- if eq .Values.beacon.client "prysm" }}
+      echo "p2p-host-ip: $EXTERNAL_IP" > /data/beacon/config.yaml;
+      echo "p2p-tcp-port: $EXTERNAL_BEACON_PORT" >> /data/beacon/config.yaml;
+      echo "p2p-udp-port: $EXTERNAL_BEACON_PORT" >> /data/beacon/config.yaml;
+      echo "Updated Prysm config.yaml file at /data/beacon/config.yaml";
+  {{- else if eq .Values.beacon.client "teku" }}
+      echo "p2p-advertised-port: $EXTERNAL_BEACON_PORT" > /data/beacon/config.yaml;
+      echo "p2p-advertised-ip: $EXTERNAL_IP" >> /data/beacon/config.yaml;
+      echo "Saved Teku config.yaml file at /data/beacon/config.yaml";
+  {{- end }}
+      echo "Beacon client config:";
+      cat /data/beacon/config.yaml;
+{{- end }}
