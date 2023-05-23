@@ -94,6 +94,8 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml
+            - --logging={{ .Values.loggingLevel }}
+            - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
             - --slashing-protection-db-url=$(ESO_DB_URL)
             - --slashing-protection-db-username=$(ESO_DB_USERNAME)

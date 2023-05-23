@@ -122,7 +122,7 @@ spec:
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
-              echo "Replace goerli fee recipient";
+              echo "Replace gnosis fee recipient";
               grep -rl -i "0x6A9d30e05C6832E868390F155388c7d97A6faEAC" -r /data/ | xargs --no-run-if-empty sed -i "s/0x6A9d30e05C6832E868390F155388c7d97A6faEAC/{{ $.Values.suggestedFeeRecipient }}/g";
               echo "Replace mainnet fee recipient";
               grep -rl -i "0x6b333B20fBae3c5c0969dd02176e30802e2fbBdB" -r /data/ | xargs --no-run-if-empty sed -i "s/0x6b333B20fBae3c5c0969dd02176e30802e2fbBdB/{{ $.Values.suggestedFeeRecipient }}/g";

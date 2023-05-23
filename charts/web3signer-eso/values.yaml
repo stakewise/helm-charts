@@ -8,6 +8,8 @@ global:
 
 replicaCount: 3
 
+idleTimeout: 30
+
 image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
