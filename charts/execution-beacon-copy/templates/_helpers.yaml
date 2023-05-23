@@ -1,0 +1,24 @@
+{{- define "execution.p2pPort" -}}
+{{- printf "30303" -}}
+{{- end -}}
+{{- define "prysm.p2pPort" -}}
+{{- printf "13000" -}}
+{{- end -}}
+{{- define "lighthouse.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
+{{- define "teku.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
+{{- define "nimbus.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
+
+{{- define "beacon.p2pPort" -}}
+{{- $p2pPort := index (dict "lighthouse" (include "lighthouse.p2pPort" .) "teku" (include "teku.p2pPort" .) "prysm" (include "prysm.p2pPort" .) "nimbus" (include "nimbus.p2pPort" .)) .Values.beacon.client -}}
+{{- if $p2pPort -}}
+{{- $p2pPort -}}
+{{- else -}}
+{{- fail "Invalid beacon client specified" -}}
+{{- end }}
+{{- end -}}

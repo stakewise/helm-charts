@@ -1,0 +1,628 @@
+---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.statefulset" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  podManagementPolicy: "Parallel"
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+      annotations:
+        checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- with (concat .Values.global.imagePullSecrets .Values.global.imagePullSecrets) }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.global.affinity }}
+      affinity:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.tolerations }}
+      tolerations:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- with .Values.global.securityContext }}
+      securityContext:
+        {{ toYaml . | nindent 8 | trim }}
+    {{- end }}
+    {{- if .Values.global.terminationGracePeriodSeconds }}
+      terminationGracePeriodSeconds: {{ .Values.global.terminationGracePeriodSeconds }}
+    {{- end }}
+      serviceAccountName: {{ include "common.names.fullname" . }}
+      priorityClassName: {{ .Values.global.priorityClassName | quote }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
+          imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command: ['/bin/sh', '/scripts/init.sh']
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
+            - name: data-beacon
+              mountPath: /data/beacon
+            - name: env-nodeport
+              mountPath: /env
+            - name: scripts-init
+              mountPath: /scripts
+      containers:
+        - name: execution
+          image: "{{ index .Values.execution.imageMap .Values.execution.client }}"
+          imagePullPolicy: {{ .Values.execution.imagePullPolicy }}
+          command:
+            - sh
+            - -ac
+            - >
+              {{- if .Values.global.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+              {{- end }}
+            {{- if eq .Values.execution.client "nethermind" }}
+              exec /nethermind/Nethermind.Runner
+            {{- if eq .Values.global.network "gnosis" }}
+              --config=xdai
+            {{- else }}
+              --config={{ .Values.global.network }}
+            {{- end }}
+              --datadir=/data/execution
+            {{- if .Values.execution.jsonrpc.enabled }}
+              --JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
+              --JsonRpc.EnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+              --JsonRpc.Host={{ .Values.execution.jsonrpc.host }}
+              --JsonRpc.Port={{ .Values.execution.jsonrpc.http.port }}
+            {{- if .Values.execution.healthchecks.enabled }}
+              --HealthChecks.Enabled={{ .Values.execution.healthchecks.enabled }}
+              --HealthChecks.Slug={{ .Values.execution.healthchecks.slug }}
+              --HealthChecks.PollingInterval={{ .Values.execution.healthchecks.pollingInterval }}
+              --HealthChecks.MaxIntervalWithoutProcessedBlock={{ .Values.execution.healthchecks.maxIntervalWithoutProcessedBlock }}
+              --HealthChecks.MaxIntervalWithoutProducedBlock={{ .Values.execution.healthchecks.maxIntervalWithoutProducedBlock }}
+              --HealthChecks.LowStorageSpaceShutdownThreshold={{ .Values.execution.healthchecks.lowStorageSpaceShutdownThreshold }}
+              --HealthChecks.LowStorageSpaceWarningThreshold={{ .Values.execution.healthchecks.lowStorageSpaceWarningThreshold }}
+            {{- if .Values.execution.jsonrpc.websocket.enabled }}
+              --JsonRpc.WebSocketsPort={{ .Values.execution.jsonrpc.websocket.port }}
+            {{- end }}
+            {{- end }} 
+            {{- end }}
+            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
+              --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
+            {{- else }}
+              --JsonRpc.JwtSecretFile=/secret/jwtsecret
+            {{- end }}
+              --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
+              --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
+              --JsonRpc.EngineEnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
+              --Metrics.Enabled={{ .Values.execution.metrics.enabled }}
+              --Metrics.ExposePort={{ .Values.execution.metrics.port }}
+              --Metrics.NodeName=$POD_NAME
+            {{- end }}
+              --Network.MaxActivePeers={{ .Values.execution.targetPeers }}
+            {{- if .Values.global.p2pNodePort.enabled }}
+              --Network.ExternalIp=$EXTERNAL_IP
+              --Network.P2PPort=$EXTERNAL_EXECUTION_PORT
+              --Network.DiscoveryPort=$EXTERNAL_EXECUTION_PORT
+            {{- else }}
+              --Network.ExternalIp=$POD_IP
+              --Network.P2PPort={{ include "execution.p2pPort" . }}
+              --Network.DiscoveryPort={{ include "execution.p2pPort" . }}
+            {{- end }}
+            {{- if .Values.execution.terminalTotalDifficulty }}
+              --Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
+            {{- end }}
+            {{- else if eq .Values.execution.client "geth" }}
+              exec geth
+              --syncmode=snap
+              --datadir=/data/execution
+              --ethash.dagdir=/data/execution/.ethash
+              --ipcdisable
+              --{{ .Values.global.network }}
+            {{- if .Values.execution.jsonrpc.enabled }}
+              --authrpc.addr={{ .Values.execution.jsonrpc.host }}
+              --authrpc.port={{ .Values.execution.jsonrpc.engine.port }}
+              --authrpc.vhosts={{ .Values.execution.jsonrpc.engine.vhosts }}
+            {{- if .Values.global.externalSecrets.enabled }}
+              --authrpc.jwtsecret=/external-secrets/JWT_SECRET
+            {{- else }}
+              --authrpc.jwtsecret=/secret/jwtsecret
+            {{- end }}
+              --http
+              --http.addr={{ .Values.execution.jsonrpc.host }}
+              --http.port={{ .Values.execution.jsonrpc.http.port }}
+              --http.corsdomain={{ .Values.execution.jsonrpc.http.corsDomain }}
+              --http.vhosts={{ .Values.execution.jsonrpc.http.vhosts }}
+              --http.api={{ .Values.execution.jsonrpc.namespaces.geth | join "," }}
+            {{- if .Values.execution.jsonrpc.websocket.enabled }}
+              --ws
+              --ws.addr={{ .Values.execution.jsonrpc.host }}
+              --ws.port={{ .Values.execution.jsonrpc.websocket.port }}
+              --ws.origins={{ .Values.execution.jsonrpc.websocket.origins }}
+              --ws.api={{ .Values.execution.jsonrpc.namespaces.geth | join "," }}
+            {{- end }}
+            {{- end }}
+              --maxpeers={{ .Values.execution.targetPeers }}
+            {{- if .Values.global.p2pNodePort.enabled }}
+              --nat=extip:$EXTERNAL_IP
+              --port=$EXTERNAL_EXECUTION_PORT
+            {{- else }}
+              --nat=extip:$POD_IP
+              --port={{ include "execution.p2pPort" . }}
+            {{- end }}
+            {{- if .Values.execution.terminalTotalDifficulty }}
+              --override.geth.terminaltotaldifficulty={{ .Values.execution.terminalTotalDifficulty }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
+              --metrics
+              --metrics.port={{ .Values.execution.metrics.port }}
+              --metrics.addr={{ .Values.execution.metrics.host }}  
+            {{- end }}
+            {{- end }}
+            {{- range .Values.execution.extraFlags }}
+              {{ .  }}
+            {{- end }}
+            {{- range .Values.execution.metrics.flags }}
+              {{ .  }}
+            {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            {{- if .Values.execution.jsonrpc.enabled }}
+            - name: engine-exec
+              containerPort: {{ .Values.execution.jsonrpc.engine.port }}
+            - name: jsonrpc-exec
+              containerPort: {{ .Values.execution.jsonrpc.http.port }}
+            {{- if .Values.execution.jsonrpc.websocket.enabled }}
+            - name: ws-exec
+              containerPort: {{ .Values.execution.jsonrpc.websocket.port }}
+            {{- end }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
+            - name: metrics-exec
+              containerPort: {{ .Values.execution.metrics.port }}
+            {{- end }}
+            {{- if .Values.global.p2pNodePort.enabled }}
+            - name: p2p-tcp-exec
+              containerPort: {{ include "execution.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-exec
+              containerPort: {{ include "execution.p2pPort" . }}
+              protocol: UDP
+            {{- end }}
+          volumeMounts:
+            - name: data-execution
+              mountPath: /data/execution
+            {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+            {{- end }}
+            {{- if .Values.global.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+            {{- end }}
+            - name: env-nodeport
+              mountPath: /env
+        {{- with .Values.execution.resources }}
+        resources:
+          {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- if .Values.execution.jsonrpc.enabled }}
+        - name: sidecar-execution
+          image: "{{ .Values.execution.sidecar.repository }}:{{ .Values.execution.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.execution.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.execution.sidecar.bindAddr }}:{{ .Values.execution.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ .Values.execution.jsonrpc.http.port | quote }}
+          ports:
+            - containerPort: {{ .Values.execution.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+          {{- if .Values.execution.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.execution.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.execution.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.execution.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.execution.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.execution.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.execution.livenessProbe.httpGet.path }}
+              port: {{ .Values.execution.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.execution.livenessProbe.httpGet.scheme }}
+          {{- end }}
+          {{- if .Values.execution.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.execution.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.execution.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.execution.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.execution.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.execution.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.execution.readinessProbe.httpGet.path }}
+              port: {{ .Values.execution.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.execution.readinessProbe.httpGet.scheme }}
+          {{- end }}
+        {{- end }}
+        - name: beacon
+          image: "{{ index .Values.beacon.imageMap .Values.beacon.client }}"
+          imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
+          {{- if eq .Values.beacon.client "prysm" }}
+          args: 
+            - "--datadir=/data/beacon"
+            - "--execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}"
+            - "--{{ .Values.global.network }}"
+          {{- if .Values.beacon.restApi.enabled }}
+            - "--rpc-host={{ .Values.beacon.restApi.host }}"
+            - "--rpc-port={{ index .Values.beacon.restApi.portMap "prysm" }}"
+          {{- end }}
+          {{- if not .Values.global.p2pNodePort.enabled }}
+            - "--p2p-host-ip=$POD_IP"
+            - "--p2p-tcp-port={{ include "beacon.p2pPort" . }}"
+            - "--p2p-tcp-udp={{ include "beacon.p2pPort" . }}"
+          {{- end }}
+            - "--p2p-max-peers={{ index .Values.beacon.targetPeersMap .Values.beacon.client }}"
+            - "--enable-peer-scorer"
+            - "--accept-terms-of-use"
+            - "--config-file=/data/beacon/config.yaml"
+          {{- if .Values.global.externalSecrets.enabled }}
+            - "--jwt-secret=/external-secrets/JWT_SECRET"
+          {{- else }}
+            - "--jwt-secret=/secret/jwtsecret"
+          {{- end }}
+          {{- if .Values.beacon.builderEndpoint }}
+            - "--http-mev-relay={{ .Values.beacon.builderEndpoint }}"
+          {{- end }}
+          {{- if .Values.beacon.suggestedFeeRecipient }}
+            - "--suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}"
+          {{- end }}
+          {{- if .Values.beacon.totalDifficultyOverride }}
+            - "--terminal-total-difficulty-override={{ .Values.beacon.totalDifficultyOverride }}"
+          {{- end }}
+          {{- if .Values.beacon.checkPointSync.enabled }}
+            - "--checkpoint-sync-url={{ .Values.beacon.checkPointSync.url }}"
+            - "--genesis-beacon-api-url={{ .Values.beacon.checkPointSync.url }}"
+          {{- end }}
+          {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+            - "--monitoring-port={{ .Values.beacon.metrics.port }}"
+            - "--monitoring-host={{ .Values.beacon.metrics.host }}"
+          {{- else }}
+            - "--disable-monitoring"
+          {{- end }}
+          {{- if .Values.beacon.grpc.enabled }}
+            - "--grpc-gateway-host={{ .Values.beacon.grpc.host }}"
+            - "--grpc-gateway-port={{ .Values.beacon.grpc.port }}"
+          {{- else }}
+            - "--disable-grpc-gateway"
+          {{- end }}
+          {{- range .Values.beacon.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- else if eq .Values.beacon.client "teku" }}
+          command:
+            - sh
+            - -ac
+            - >
+              exec /opt/teku/bin/teku
+              --network={{ .Values.global.network }}
+              --config-file=/data/beacon/config.yaml
+              --data-beacon-path=/data/beacon/teku
+              --data-path=/data/beacon
+              --data-storage-archive-frequency={{ .Values.beacon.dataStorageArchiveFrequency }}
+              --data-storage-mode={{ .Values.beacon.dataStorageMode }}
+              --data-storage-non-canonical-blocks-enabled={{ .Values.beacon.dataStorageNonCanonicalBlocksEnabled }}
+              --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
+              {{- if .Values.global.externalSecrets.enabled }}
+              --ee-jwt-secret-file=/external-secrets/JWT_SECRET
+              {{- else }}
+              --ee-jwt-secret-file=/secret/jwtsecret
+              {{- end }}
+            {{- if .Values.beacon.builderEndpoint }}
+              --builder-endpoint={{ .Values.beacon.builderEndpoint }}
+            {{- end }}
+            {{- if .Values.beacon.suggestedFeeRecipient }}
+              --validators-proposer-default-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
+            {{- end }}
+            {{- if .Values.beacon.checkPointSync.enabled }}
+              --initial-state={{ .Values.beacon.checkPointSync.url }}/eth/v2/debug/beacon/states/finalized
+            {{- end }}
+            {{- if .Values.beacon.restApi.enabled }}
+              --rest-api-enabled={{ .Values.beacon.restApi.enabled }}
+              --rest-api-host-allowlist={{ .Values.beacon.restApi.hostAllowList | join "," }}
+              --rest-api-interface={{ .Values.beacon.restApi.host }}
+              --rest-api-port={{ index .Values.beacon.restApi.portMap "teku" }}
+              --rest-api-cors-origins={{ .Values.beacon.restApi.corsOrigins | join "," }}
+            {{- end }}
+            {{- if not .Values.global.p2pNodePort.enabled }}
+              --p2p-advertised-ip=$POD_IP"
+              --p2p-advertised-port={{ include "beacon.p2pPort" . }}"
+            {{- end }}
+              --p2p-enabled=true
+              --p2p-port={{ include "beacon.p2pPort" . }}
+            {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+              --metrics-enabled={{ .Values.beacon.metrics.enabled }}
+              --metrics-categories={{ .Values.beacon.metrics.categories | join "," }}
+              --metrics-host-allowlist={{ .Values.beacon.metrics.hostAllowList | join "," }}
+              --metrics-interface={{ .Values.beacon.metrics.host }}
+              --metrics-port={{ .Values.beacon.metrics.port }}
+            {{- end }}
+            {{- range .Values.beacon.extraFlags }}
+              {{ . | quote }}
+            {{- end }}
+          {{- else if eq .Values.beacon.client "lighthouse" }}
+          command:
+            - sh
+            - -ac
+            - >
+              {{- if .Values.global.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+              {{- end }}
+              exec lighthouse
+              bn
+              --staking
+              --proposer-only
+              --datadir=/data/beacon
+              --network={{ .Values.global.network }}
+              --disable-upnp
+              --target-peers={{ index .Values.beacon.targetPeersMap .Values.beacon.client }}
+            {{- if .Values.beacon.restApi.enabled }}
+              --http
+              --http-port={{ index .Values.beacon.restApi.portMap "lighthouse" }}
+              --http-address={{ .Values.beacon.restApi.host }}
+              --http-allow-origin={{ .Values.beacon.restApi.corsOrigins | join "," }}
+            {{- end}}
+            {{- if .Values.beacon.checkPointSync.enabled }}
+              --checkpoint-sync-url={{ .Values.beacon.checkPointSync.url }}
+            {{- end }}
+            {{- if .Values.beacon.builderEndpoint }}
+              --builder={{ .Values.beacon.builderEndpoint }}
+            {{- end }}
+            {{- if .Values.beacon.suggestedFeeRecipient }}
+              --suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
+            {{- end }}
+              --execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
+            {{- if .Values.global.externalSecrets.enabled }}
+              --execution-jwt=/external-secrets/JWT_SECRET
+            {{- else }}
+              --execution-jwt=/secret/jwtsecret
+            {{- end }}
+            {{- if .Values.global.p2pNodePort.enabled }}
+              --discovery-port=$EXTERNAL_BEACON_PORT
+              --port=$EXTERNAL_BEACON_PORT
+            {{- else }}
+              --discovery-port={{ include "beacon.p2pPort" . }}
+              --port={{ include "beacon.p2pPort" . }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+              --metrics
+              --metrics-port={{ .Values.beacon.metrics.port }}
+              --metrics-address={{ .Values.beacon.metrics.host }}
+            {{- range .Values.beacon.metrics.flags }}
+              {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- range .Values.beacon.extraFlags }}
+              {{ . }}
+            {{- end }}
+          {{- else if eq .Values.beacon.client "nimbus" }}
+          command:
+            - sh
+            - -ac
+            - >
+              {{- if .Values.global.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+              {{- end }}
+              exec /home/user/nimbus-eth2/build/nimbus_beacon_node
+              --network={{ .Values.global.network }}
+              --data-dir=/data/beacon
+            {{- if .Values.global.externalSecrets.enabled }}
+              --jwt-secret=/external-secrets/JWT_SECRET
+            {{- else }}
+              --jwt-secret=/secret/jwtsecret
+            {{- end }}
+              --non-interactive
+            {{- if .Values.beacon.restApi.enabled }}
+              --rest
+              --rest-port={{ index .Values.beacon.restApi.portMap .Values.beacon.client }}
+              --rest-address={{ .Values.beacon.restApi.host }}
+              --rest-allow-origin=={{ .Values.beacon.restApi.hostAllowList | join "," }}
+            {{- end}}
+              --web3-url=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
+              --max-peers={{ index .Values.beacon.targetPeersMap .Values.beacon.client }}
+              --enr-auto-update=true
+            {{- if .Values.global.p2pNodePort.enabled }}
+              --nat=extip:$EXTERNAL_IP
+              --tcp-port={{ include "beacon.p2pPort" . }}
+              --udp-port={{ include "beacon.p2pPort" . }}
+            {{- else }}
+              --tcp-port={{ include "beacon.p2pPort" . }}
+              --udp-port={{ include "beacon.p2pPort" . }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+              --metrics
+              --metrics-port={{ .Values.beacon.metrics.port }}
+              --metrics-address={{ .Values.beacon.metrics.host }}
+            {{- range .Values.beacon.metrics.flags }}
+              {{ . }}
+            {{- end }}
+            {{- end }}
+            {{- range .Values.beacon.extraFlags }}
+              {{ . }}
+            {{- end }}
+          {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          {{- if eq .Values.beacon.client "teku" }}
+            - name: JAVA_OPTS
+              value: {{ .Values.teku.tekuJavaOpts | quote }}
+          {{- end }} 
+          ports:
+          {{- if and (eq .Values.execution.client "prysm") .Values.beacon.grpc.enabled }}
+            - containerPort: {{ .Values.beacon.grpc.port }}
+              name: {{ .Values.beacon.grpc.portName }}-beacon
+              protocol: TCP
+          {{- end }}
+          {{- if .Values.global.p2pNodePort.enabled }}
+            - name: p2p-tcp-beacon
+              containerPort: {{ include "beacon.p2pPort" . }}
+              protocol: TCP
+            - name: p2p-udp-beacon
+              containerPort: {{ include "beacon.p2pPort" . }}
+              protocol: UDP
+          {{- end }}
+          {{- if .Values.beacon.restApi.enabled }}
+            - containerPort: {{ index .Values.beacon.restApi.portMap .Values.beacon.client }}
+              name: http-beacon
+              protocol: TCP
+          {{- end }}
+          {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
+            - containerPort: {{ .Values.beacon.metrics.port }}
+              name: metrics-beacon
+              protocol: TCP
+          {{- end }}
+          volumeMounts:
+            - name: data-beacon
+              mountPath: /data/beacon
+          {{- if .Values.global.externalSecrets.enabled }}
+            - name: external-secrets
+              mountPath: /external-secrets
+              readOnly: true
+          {{- end }}
+          {{- if .Values.global.JWTSecret }}
+            - name: jwtsecret
+              mountPath: /secret
+              readOnly: true
+          {{- end }}
+            - name: env-nodeport
+              mountPath: /env
+        {{- with .Values.beacon.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+        {{- if .Values.beacon.restApi.enabled }}
+        - name: sidecar-beacon
+          image: "{{ .Values.beacon.sidecar.repository }}:{{ .Values.beacon.sidecar.tag }}"
+          imagePullPolicy: {{ .Values.beacon.sidecar.pullPolicy }}
+          env:
+            - name: SERVER_BINDADDR
+              value: "{{ .Values.beacon.sidecar.bindAddr }}:{{ .Values.beacon.sidecar.bindPort }}"
+            - name: CLIENT_PORT
+              value: {{ index .Values.beacon.restApi.portMap .Values.beacon.client | quote }}
+          ports:
+            - containerPort: {{ .Values.beacon.sidecar.bindPort }}
+              name: sidecar
+              protocol: TCP
+        {{- if or .Values.beacon.livenessProbe.enabled }}
+          livenessProbe:
+            initialDelaySeconds: {{ .Values.beacon.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.beacon.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.beacon.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.beacon.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.beacon.livenessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.beacon.livenessProbe.httpGet.path }}
+              port: {{ .Values.beacon.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.beacon.livenessProbe.httpGet.scheme }}
+        {{- end }}
+        {{- if .Values.beacon.readinessProbe.enabled }}
+          readinessProbe:
+            initialDelaySeconds: {{ .Values.beacon.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.beacon.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.beacon.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.beacon.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.beacon.readinessProbe.successThreshold }}
+            httpGet:
+              path: {{ .Values.beacon.readinessProbe.httpGet.path }}
+              port: {{ .Values.beacon.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.beacon.readinessProbe.httpGet.scheme }}
+        {{- end }}
+      {{- end }}
+      volumes:
+        - name: scripts-init
+          configMap:
+            name: {{ include "common.names.fullname" . }}-init
+      {{- if .Values.global.JWTSecret }}
+        - name: jwtsecret
+          secret:
+            secretName: {{ include "common.names.fullname" . }}
+      {{- end }}
+      {{- if .Values.global.externalSecrets.enabled }}
+        - name: external-secrets
+          secret:
+            secretName: eso-{{ include "common.names.fullname" . }}
+      {{- end }}
+        - name: env-nodeport
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: data-execution
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.execution.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.execution.persistence.accessModes }}
+        storageClassName: {{ .Values.execution.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.execution.persistence.size | quote }}
+    - metadata:
+        name: data-beacon
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.beacon.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.beacon.persistence.accessModes }}
+        storageClassName: {{ .Values.beacon.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.beacon.persistence.size | quote }}

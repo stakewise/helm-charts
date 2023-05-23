@@ -1,0 +1,17 @@
+{{- $jwtSecret := .Values.global.JWTSecret }}
+{{- $regex := "^[0-9a-f]{64}$" }}
+{{- if and $jwtSecret (not (regexMatch $regex $jwtSecret)) }}
+{{- fail "global.JWTSecret must be a 32-byte long hex string" }}
+{{- end }}
+
+{{- $address := .Values.beacon.suggestedFeeRecipient }}
+{{- $regex := "^0x[a-fA-F0-9]{40}$" }}
+{{- if not $address }}
+{{- fail "beacon.suggestedFeeRecipient is required" }}
+{{- else if not (regexMatch $regex $address) }}
+{{- fail "beacon.suggestedFeeRecipient must be a valid Ethereum address (0x string)" }}
+{{- end }}
+
+# validate checkpoint
+# validate builderEndpoint
+# validate storagesize for mainnet

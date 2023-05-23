@@ -1,0 +1,153 @@
+{{- if and (or .Values.execution.metrics.enabled .Values.beacon.metrics.enabled)
+           (or .Values.execution.metrics.prometheusRule.enabled .Values.beacon.metrics.prometheusRule.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-execution
+  {{- if .Values.execution.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.execution.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.execution.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.execution.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.execution.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.execution.metrics.prometheusRule.default }}
+  {{- if eq .Values.execution.client "geth" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: GethNodeDown
+          expr: up{job="{{ include "common.names.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Geth Node {{ printf "{{ $labels.instance }}" }} down
+            description: Geth Node {{ printf "{{ $labels.instance }}" }} is down
+  {{- else if eq .Values.execution.client "nethermind" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: NethermindNodeDown
+          expr: up{job="{{ include "common.names.fullname" . }}"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Nethermind Node {{ printf "{{ $labels.instance }}" }} down
+            description: Nethermind Node {{ printf "{{ $labels.instance }}" }} is down
+  {{- end }}
+  {{- end }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}-beacon
+  {{- if .Values.beacon.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.beacon.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.beacon.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.beacon.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.beacon.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.beacon.metrics.prometheusRule.default }}
+  {{- if eq .Values.beacon.client "lighthouse" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: LighthouseBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lighthouse beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: LighthouseBeaconNodeIsNotConnectedToEth1Node
+          expr: sync_eth1_connected{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lighthouse beacon node is not connected to eth1 node
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: LighthouseBeaconNodeIsOutOfSync
+          expr: sync_eth2_synced{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 3m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lighthouse beacon node is out of sync
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- else if  eq .Values.beacon.client "prysm" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: PrysmBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: Prysm50SlotsBehind
+          expr: beacon_clock_time_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node is out of sync
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: PrysmParticipationRateLessThen66Percent
+          expr: beacon_prev_epoch_target_gwei{job='{{ include "common.names.fullname" . }}'}/beacon_prev_epoch_active_gwei{job='{{ include "common.names.fullname" . }}'}*100 < 66
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: Prysm beacon node participation rate less then 66%
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: PrysmBeaconNodeRestarted
+          expr: (time()-process_start_time_seconds{job='{{ include "common.names.fullname" . }}'})/3600 < 0.1
+          for: 1m
+          labels:
+            severity: warning
+          annotations:
+            summary: Prysm beacon node was restarted
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}          
+  {{- else if  eq .Values.beacon.client "teku" }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: TekuBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Teku beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: Teku50SlotsBehind
+          expr: beacon_slot{job='{{ include "common.names.fullname" . }}'}-beacon_head_slot{job='{{ include "common.names.fullname" . }}'} > 50
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: Teku beacon node is out of sync
+            description: Check {{ printf  "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- end }}
+  {{- end }}
+{{- end }}
