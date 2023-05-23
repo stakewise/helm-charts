@@ -149,7 +149,7 @@ global:
   p2pNodePort:
     ## @param p2pNodePort.enabled Expose P2P port via NodePort
     ##
-    enabled: true
+    enabled: false
     ## @param p2pNodePort.annotations
     ##
     annotations: {}
@@ -175,11 +175,16 @@ global:
 
 execution:
   client: geth
+  livenessProbe:
+    enabled: false
+  readinessProbe:
+    enabled: false
   imagePullPolicy: IfNotPresent
   imageMap:
-    nethermind: nethermind/nethermind:1.18.0
-    geth: ethereum/client-go:v1.10.26
-    bseu: hyperledger/besu:23.4.0
+    nethermind: nethermind/nethermind:1.18.1
+    geth: ethereum/client-go:v1.11.6
+    bseu: hyperledger/besu:23.4.1
+    erigon: thorax/erigon:v2.43.1
 
   ## Whether or not to allocate persistent volume disk for the data directory.
   ## In case of node failure, the node data directory will still persist.
@@ -232,33 +237,33 @@ execution:
       ##
       enabled: true
 
-  ## Configure liveness and readiness probes
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
-  ##
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 900
-    timeoutSeconds: 3
-    periodSeconds: 30
-    failureThreshold: 3
-    successThreshold: 1
-    httpGet:
-      path: /eth1/liveness
-      port: sidecar
-      scheme: HTTP
+    ## Configure liveness and readiness probes
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+    ##
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 900
+      timeoutSeconds: 3
+      periodSeconds: 30
+      failureThreshold: 3
+      successThreshold: 1
+      httpGet:
+        path: /eth1/liveness
+        port: sidecar
+        scheme: HTTP
 
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 30
-    timeoutSeconds: 3
-    periodSeconds: 30
-    failureThreshold: 30
-    successThreshold: 1
-    httpGet:
-      path: /eth1/readiness
-      port: sidecar
-      scheme: HTTP
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 30
+      timeoutSeconds: 3
+      periodSeconds: 30
+      failureThreshold: 30
+      successThreshold: 1
+      httpGet:
+        path: /eth1/readiness
+        port: sidecar
+        scheme: HTTP
   ## -------------------------- Execution node specific settings -----------------------------------------
   # Manually specify TerminalTotalDifficulty, overriding the bundled setting
   terminalTotalDifficulty: ""
@@ -345,7 +350,9 @@ beacon:
     prysm: gcr.io/prysmaticlabs/prysm/beacon-chain:v4.0.4
     teku: consensys/teku:23.5.0
     lighthouse: sigp/lighthouse:v4.2.0
-    nimbus: statusim/nimbus-eth2:multiarch-v22.11.0
+    nimbus: statusim/nimbus-eth2:multiarch-v23.5.1
+    lodestar: chainsafe/lodestar:v1.8.0
+
   ## Whether or not to allocate persistent volume disk for the data directory.
   ## In case of node failure, the node data directory will still persist.
   ##
@@ -480,17 +487,16 @@ beacon:
     # to allow any host
     hostAllowList:
       - "*"
+    corsOrigins:
+      - "*"
     # Port number of Beacon Rest API
     portMap:
       teku: 5051
       prysm: 8080
       lighthouse: 5052
       nimbus: 5052
+      lodestar: 9596
 
-    # Comma separated list of origins to allow, or * to
-    # allow any origin
-    corsOrigins:
-      - "*"
   grpc:
     enabled: true
     host: "0.0.0.0"
@@ -502,6 +508,7 @@ beacon:
     prysm: 160
     lighthouse: 100
     nimbus: 100
+    lodestar: 100
 
   ## Sets the total difficulty to manual overrides the default
   ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you

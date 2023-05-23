@@ -13,9 +13,12 @@
 {{- define "nimbus.p2pPort" -}}
 {{- printf "9000" -}}
 {{- end -}}
+{{- define "lodestar.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}
 
 {{- define "beacon.p2pPort" -}}
-{{- $p2pPort := index (dict "lighthouse" (include "lighthouse.p2pPort" .) "teku" (include "teku.p2pPort" .) "prysm" (include "prysm.p2pPort" .) "nimbus" (include "nimbus.p2pPort" .)) .Values.beacon.client -}}
+{{- $p2pPort := index (dict "lighthouse" (include "lighthouse.p2pPort" .) "teku" (include "teku.p2pPort" .) "prysm" (include "prysm.p2pPort" .) "nimbus" (include "nimbus.p2pPort" .) "lodestar" (include "lodestar.p2pPort" .)) .Values.beacon.client -}}
 {{- if $p2pPort -}}
 {{- $p2pPort -}}
 {{- else -}}
