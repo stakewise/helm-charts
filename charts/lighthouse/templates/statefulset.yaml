@@ -129,8 +129,6 @@ spec:
               --suggested-fee-recipient={{ .Values.merge.feeRecipient }}
             {{- end }}
             {{- if eq .Values.global.network "gnosis" }}
-              --eth1-endpoints=${EE}
-            {{- else }}
               --execution-endpoint=${EE}
               --execution-jwt=/secret/jwtsecret
             {{- end }}
