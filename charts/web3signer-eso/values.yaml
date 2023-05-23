@@ -34,7 +34,35 @@ cliImage:
 # dbUsername: ""
 # dbPassword: ""
 
+externalSecretsV2:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  data:
+    - secretKey: ESO_DECRYPTION_KEY
+      remoteRef:
+        key: validators
+        property: decryptionKey
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
+    - secretKey: ESO_DB_URL
+      remoteRef:
+        key: validators
+        property: dbUrl
+    - secretKey: ESO_DB_USERNAME
+      remoteRef:
+        key: validators
+        property: dbUsername
+    - secretKey: ESO_DB_PASSWORD
+      remoteRef:
+        key: validators
+        property: dbPassword
+
 externalSecrets:
+  enabled: true
   secretStoreRef: secretStoreRef
   data:
     - secretKey: ESO_DECRYPTION_KEY
