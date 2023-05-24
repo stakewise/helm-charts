@@ -10,6 +10,7 @@ beacon:
   checkPointSync:
     enabled: true
     url: https://checkpoint-sync.goerli.ethpandaops.io
+    trustedSourceUrl: https://goerli.beaconcha.in
   livenessProbe:
     enabled: false
   readinessProbe:

@@ -84,7 +84,7 @@ spec:
         {{/*
         Container used for initialising nimbus checkpoint sync
         */}}
-        {{- if eq .Values.beacon.client "nimbus" }}
+        {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ index .Values.beacon.imageMap .Values.beacon.client }}"
           imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
@@ -92,14 +92,12 @@ spec:
             - sh
             - -ac
             - >
-              {{- if .Values.beacon.checkPointSync.enabled }}
               exec /home/user/nimbus-eth2/build/nimbus_beacon_node
               trustedNodeSync
               --backfill=false 
               --network={{ .Values.global.network }}
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
-              {{- end}}
           volumeMounts:
             - name: data-beacon
               mountPath: /data/beacon
