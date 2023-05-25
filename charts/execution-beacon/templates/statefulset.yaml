@@ -300,9 +300,6 @@ spec:
             {{- range .Values.execution.extraFlags }}
               {{ .  }}
             {{- end }}
-            {{- range .Values.execution.metrics.flags }}
-              {{ .  }}
-            {{- end }}
           env:
             - name: POD_IP
               valueFrom:
@@ -535,9 +532,6 @@ spec:
               --metrics
               --metrics-port={{ .Values.beacon.metrics.port }}
               --metrics-address={{ .Values.beacon.metrics.host }}
-            {{- range .Values.beacon.metrics.flags }}
-              {{ . }}
-            {{- end }}
             {{- end }}
             {{- range .Values.beacon.extraFlags }}
               {{ . }}
@@ -590,9 +584,6 @@ spec:
               --metrics
               --metrics-port={{ .Values.beacon.metrics.port }}
               --metrics-address={{ .Values.beacon.metrics.host }}
-            {{- range .Values.beacon.metrics.flags }}
-              {{ . }}
-            {{- end }}
             {{- end }}
             {{- range .Values.beacon.extraFlags }}
               {{ . }}
@@ -649,9 +640,6 @@ spec:
               --metrics=true
               --metrics.port={{ .Values.beacon.metrics.port }}
               --metrics.address={{ .Values.beacon.metrics.host }}
-            {{- range .Values.beacon.metrics.flags }}
-              {{ . }}
-            {{- end }}
             {{- end }}
             {{- range .Values.beacon.extraFlags }}
               {{ . }}

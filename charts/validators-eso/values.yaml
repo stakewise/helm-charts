@@ -92,7 +92,7 @@ enabled: true
 ## Options for Ethereum: prysm, lighthouse, teku
 ## Options for Gnosis: prysm, lighthouse
 ##
-type: lighthouse
+type: lodestar
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
@@ -120,7 +120,7 @@ validatorsKeyIndex: 0
 ## **NB! Each validtor hosts a certain number of keys specified when using CLI sync-db command,
 ## so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
 ##
-validatorsCount: 4
+validatorsCount: 1
 
 validatorsNoOfKeys: 100
 
@@ -216,7 +216,11 @@ flags:
     - "--log-destination=CONSOLE"
     - "--data-base-path=/data"
   nimbus: []
-  lodestar: []
+  lodestar: 
+    - "validator"
+    - "--dataDir=/data/lodestar"
+    - "--logLevel=info"
+
 
 ## Validators extra flags
 ##
@@ -277,7 +281,10 @@ metrics:
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
     nimbus: []
-    lodestar: []
+    lodestar:
+      - "--metrics=true"
+      - "--metrics.address=0.0.0.0"
+      - "--metrics.port=9090"
 
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator

@@ -277,7 +277,6 @@ execution:
 
     port: 8008
     host: "0.0.0.0"
-    flags: []
 
     ## Prometheus Service Monitor
     ## ref: https://github.com/coreos/prometheus-operator
@@ -400,7 +399,7 @@ beacon:
 
     port: 9090
     host: "0.0.0.0"
-    flags: []
+
     ## Monitoring
     ## Teku Metric categories to enable
     categories:

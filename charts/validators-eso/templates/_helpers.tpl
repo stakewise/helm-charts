@@ -93,6 +93,8 @@ Validator beacon node
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- else if eq $.Values.type "lodestar" }}
+- "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}
 {{- end }}
 
@@ -132,16 +134,4 @@ Validator web3signer endpoint
 
 {{- define "flatten" -}}
   {{- get ( fromYaml (include "flatten_list" . ) ) "list" | uniq | join "," }}
-{{- end -}}
-
-{{- /*
-Custom template function to conditionally select a value based on a condition.
-Usage: {{ cond CONDITION TRUE_VALUE FALSE_VALUE }}
-*/}}
-{{- define "cond" -}}
-    {{- if . -}}
-        {{- index . 1 -}}
-    {{- else -}}
-        {{- index . 2 -}}
-    {{- end -}}
 {{- end -}}
