@@ -1,3 +1,0 @@
-{{- if not .Values.global.JWTSecret }}
-{{- fail ".Values.global.JWTSecret is required" }}
-{{- end }}

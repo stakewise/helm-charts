@@ -1,3 +1,0 @@
-{{- define "prysm.p2pPort" -}}
-{{- printf "13000" -}}
-{{- end -}}

@@ -5,6 +5,7 @@
 global:
   imagePullSecrets: []
   network: mainnet
+  label: "client"
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -42,24 +43,11 @@ cliImage:
   pullPolicy: IfNotPresent
 
 externalSecrets:
-  enabled: true
-  secretStoreRef: secretStoreRef
-  data:
-    - secretKey: ESO_DB_KEYSTORE_URL
-      remoteRef:
-        key: validators
-        property: dbKeystoreUrl
-
-externalSecretsV2:
   enabled: false
   secretStoreRef:
     name: secretStoreRef
     kind: SecretStore
-  data:
-    - secretKey: ESO_DB_KEYSTORE_URL
-      remoteRef:
-        key: validators
-        property: dbKeystoreUrl
+  data: []
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html

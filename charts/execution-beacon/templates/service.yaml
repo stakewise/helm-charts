@@ -5,9 +5,12 @@ metadata:
   name: {{ include "common.names.fullname" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
-{{- if and .Values.prysm.metrics.enabled .Values.prysm.metrics.svcAnnotations }}
+{{- if and .Values.execution.metrics.enabled .Values.execution.metrics.svcAnnotations }}
   annotations:
-    {{ toYaml .Values.prysm.metrics.svcAnnotations | nindent 4 | trim }}
+    {{ toYaml .Values.execution.metrics.svcAnnotations | nindent 4 | trim }}
+{{- else }}
+  annotations:
+      {{ toYaml .Values.beacon.metrics.svcAnnotations | nindent 4 | trim }}
 {{- end }}
 spec:
 {{- if .Values.global.sessionAffinity.enabled }}
@@ -21,80 +24,45 @@ spec:
   clusterIP: None
 {{- end }}
   ports:
-  {{- if and .Values.geth.enabled .Values.global.JWTSecret }}
-    - name: authrpc-exec
-      port: {{ .Values.geth.authRpc.port }}
-      targetPort: authrpc-exec
-  {{- end }}
-  {{- if and .Values.geth.enabled .Values.geth.http.enabled }}
-    - name: http-execution
-      port: {{ .Values.geth.http.port }}
-      targetPort: http-execution
-  {{- end }}
-  {{- if and .Values.geth.enabled .Values.geth.ws.enabled }}
-    - name: ws-execution
-      port: {{ .Values.geth.ws.port }}
-      targetPort: ws-execution
-  {{- end }}
-  {{- if and .Values.geth.enabled .Values.global.metrics.enabled }}
-    - name: metrics-exec
-      port: {{ .Values.geth.metrics.port }}
-      targetPort: metrics-exec
-  {{- end }}
-  {{- if and .Values.nethermind.enabled .Values.nethermind.jsonrpc.enabled }}
-    - port: {{ .Values.nethermind.jsonrpc.ports.rest }}
-      targetPort: json-rest-exec
-      protocol: TCP
-      name: json-rest-exec
-    - port: {{ .Values.nethermind.jsonrpc.ports.websocket }}
-      targetPort: json-ws-exec
-      protocol: TCP
-      name: json-ws-exec
-  {{- end }}
-  {{- if and .Values.nethermind.enabled (or .Values.global.JWTSecret .Values.global.externalSecrets.enabled) }}
-    - port: {{ .Values.nethermind.jsonrpc.engine.port }}
+  {{- if .Values.execution.jsonrpc.enabled }}
+    - name: jsonrpc-exec
+      port: {{ .Values.execution.jsonrpc.http.port }}
+      targetPort: jsonrpc-exec
+    - port: {{ .Values.execution.jsonrpc.engine.port }}
       targetPort: engine-exec
-      protocol: TCP
       name: engine-exec
   {{- end }}
-  {{- if and .Values.nethermind.enabled  .Values.global.metrics.enabled }}
-    - port: {{ .Values.nethermind.metrics.port }}
+  {{- if eq .Values.execution.client "erigon" }}
+    - name: grpc-exec
+      protocol: TCP
+      port: {{ .Values.execution.jsonrpc.grpc.port }}
+      targetPort: grpc-exec
+  {{- end }}
+  {{- if .Values.execution.jsonrpc.websocket.enabled }}
+    - name: ws-exec
+      port: {{ .Values.execution.jsonrpc.websocket.port }}
+      targetPort: ws-exec
+      protocol: TCP
+  {{- end }}
+  {{- if .Values.execution.metrics.enabled }}
+    - name: metrics-exec
+      port: {{ .Values.execution.metrics.port }}
       targetPort: metrics-exec
       protocol: TCP
-      name: metrics-exec
   {{- end }}
-  {{- if .Values.prysm.enabled }}
-    - name: {{ .Values.prysm.rpc.portName }}-beacon
-      port: {{ .Values.prysm.rpc.port }}
-      targetPort: {{ .Values.prysm.rpc.portName }}
+  {{- if and (eq .Values.execution.client "prysm") .Values.beacon.grpc.enabled }}
+    - name: {{ .Values.beacon.grpc.portName }}-beacon
+      port: {{ .Values.beacon.grpc.port }}
+      targetPort: {{ .Values.beacon.grpc.portName }}
   {{- end }}
-  {{- if and .Values.prysm.enabled .Values.prysm.http.enabled }}
+  {{- if .Values.beacon.restApi.enabled }}
     - name: http-beacon
-      port: {{ .Values.prysm.http.port }}
+      port: {{ index .Values.beacon.restApi.portMap .Values.beacon.client }}
       targetPort: http-beacon
   {{- end }}
-  {{- if and .Values.lighthouse.enabled .Values.lighthouse.enabled }}
-    - name: {{ .Values.lighthouse.http.portName }}
-      port: {{ .Values.lighthouse.http.port }}
-      targetPort: {{ .Values.lighthouse.http.portName }}
-  {{- end }}
-  {{- if and .Values.teku.enabled .Values.teku.restApi.enabled }}
-    - name: {{ .Values.teku.restApi.portName }}
-      port: {{ .Values.teku.restApi.port }}
-      targetPort: {{ .Values.teku.restApi.portName }}
-      protocol: TCP
-  {{- end }}
-  {{- if .Values.global.metrics.enabled }}
+  {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
     - name: metrics-beacon
-      {{- if .Values.prysm.enabled }}
-      port: {{ .Values.prysm.metrics.port }}
-      {{- end }}
-      {{- if .Values.lighthouse.enabled }}
-      port: {{ .Values.lighthouse.metrics.port }}
-      {{- end }}
-      {{- if .Values.teku.enabled }}
-      port: {{ .Values.teku.metrics.port }}
-      {{- end }}
+      port: {{ .Values.beacon.metrics.port }}
       targetPort: metrics-beacon
   {{- end }}
   selector:

@@ -36,7 +36,7 @@ cliImage:
 # dbUsername: ""
 # dbPassword: ""
 
-externalSecretsV2:
+externalSecrets:
   enabled: false
   secretStoreRef:
     name: secretStoreRef
