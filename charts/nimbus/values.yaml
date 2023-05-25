@@ -106,7 +106,7 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v22.11.0"
+  tag: "multiarch-v23.5.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -142,6 +142,9 @@ targetPeers: 80
 ## Extra flags for nimbus beacon chain node
 ##
 extraFlags: []
+
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

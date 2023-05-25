@@ -303,6 +303,9 @@ syncMode: "X_SNAP"
 ##
 extraFlags: []
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 # Engine RPC Settings
 engineRpc:
   # Enables Engine RPC
