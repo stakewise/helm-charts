@@ -108,12 +108,16 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 ## Nethermind Settings
 ##
 
 ## Extra flags to pass to the node
 ##
 extraFlags: []
+
 
 jsonrpc:
   enabled: true

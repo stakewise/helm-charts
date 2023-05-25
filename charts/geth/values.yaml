@@ -205,6 +205,9 @@ ws:
 extraFlags:
   - "--syncmode=snap"
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 ## Configure pod disruption budgets for Alertmanager
 ## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
 ## This configuration is immutable once created and will require the PDB to be deleted to be changed

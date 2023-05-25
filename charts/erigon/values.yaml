@@ -148,6 +148,9 @@ extraFlags:
   - "--prune.r.before=11184524"
   - "--prune=htc"
 
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
 serviceAccount:
   # Annotations to add to the service account
   annotations: {}
