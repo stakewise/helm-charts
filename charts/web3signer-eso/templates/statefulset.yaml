@@ -56,18 +56,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-        - name: fetch-keys
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          envFrom:
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
-          volumeMounts:
-            - name: data
-              mountPath: /data
         - name: migrations
           image: "{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
           imagePullPolicy: {{ .Values.flywayImage.pullPolicy }}
@@ -86,6 +74,18 @@ spec:
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
+        - name: fetch-keys
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
