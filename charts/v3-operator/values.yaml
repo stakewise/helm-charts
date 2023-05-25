@@ -100,8 +100,8 @@ settings:
   #   [{"pubkey": "8f1bfd7272c47d70483e8bae70a8ebf316b8ae36f62e2b30e2a7c10bc9c8a307be86f6724cbd5f8ccca0efa48753e59a", "withdrawal_credentials":...
   depositData: ""
 
-  # Operator Private Key
-  operatorPrivateKey: ""
+  # Private key of the hot wallet with ETH for submitting transactions
+  hotWalletPrivateKey: ""
 
 # Additonal volumes and mounts used to attach keystores from existing secret
 # Example:
