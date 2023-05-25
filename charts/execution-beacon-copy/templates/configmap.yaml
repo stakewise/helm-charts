@@ -28,15 +28,11 @@ data:
       echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
       cat /env/init-nodeport;
   {{- if eq .Values.beacon.client "prysm" }}
+      touch /data/beacon/config.yaml;
       echo "p2p-host-ip: $EXTERNAL_IP" > /data/beacon/config.yaml;
       echo "p2p-tcp-port: $EXTERNAL_BEACON_PORT" >> /data/beacon/config.yaml;
       echo "p2p-udp-port: $EXTERNAL_BEACON_PORT" >> /data/beacon/config.yaml;
       echo "Updated Prysm config.yaml file at /data/beacon/config.yaml";
-  {{- else if eq .Values.beacon.client "teku" }}
-      echo "p2p-advertised-port: $EXTERNAL_BEACON_PORT" > /data/beacon/config.yaml;
-      echo "p2p-advertised-ip: $EXTERNAL_IP" >> /data/beacon/config.yaml;
-      echo "Saved Teku config.yaml file at /data/beacon/config.yaml";
   {{- end }}
-      echo "Beacon client config:";
-      cat /data/beacon/config.yaml;
+      if [ -f "/data/beacon/config.yaml" ]; then echo "Beacon client config:" && cat "/data/beacon/config.yaml"; fi;
 {{- end }}

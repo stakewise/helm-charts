@@ -136,8 +136,6 @@ spec:
               --HealthChecks.Enabled={{ .Values.execution.healthchecks.enabled }}
               --HealthChecks.Slug={{ .Values.execution.healthchecks.slug }}
               --HealthChecks.PollingInterval={{ .Values.execution.healthchecks.pollingInterval }}
-              --HealthChecks.MaxIntervalWithoutProcessedBlock={{ .Values.execution.healthchecks.maxIntervalWithoutProcessedBlock }}
-              --HealthChecks.MaxIntervalWithoutProducedBlock={{ .Values.execution.healthchecks.maxIntervalWithoutProducedBlock }}
               --HealthChecks.LowStorageSpaceShutdownThreshold={{ .Values.execution.healthchecks.lowStorageSpaceShutdownThreshold }}
               --HealthChecks.LowStorageSpaceWarningThreshold={{ .Values.execution.healthchecks.lowStorageSpaceWarningThreshold }}
             {{- if .Values.execution.jsonrpc.websocket.enabled }}
@@ -363,44 +361,6 @@ spec:
         resources:
           {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        {{- if .Values.execution.jsonrpc.enabled }}
-        - name: sidecar-execution
-          image: "{{ .Values.execution.sidecar.repository }}:{{ .Values.execution.sidecar.tag }}"
-          imagePullPolicy: {{ .Values.execution.sidecar.pullPolicy }}
-          env:
-            - name: SERVER_BINDADDR
-              value: "{{ .Values.execution.sidecar.bindAddr }}:{{ .Values.execution.sidecar.bindPort }}"
-            - name: CLIENT_PORT
-              value: {{ .Values.execution.jsonrpc.http.port | quote }}
-          ports:
-            - containerPort: {{ .Values.execution.sidecar.bindPort }}
-              name: sidecar
-              protocol: TCP
-          {{- if .Values.execution.livenessProbe.enabled }}
-          livenessProbe:
-            initialDelaySeconds: {{ .Values.execution.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.execution.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.execution.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.execution.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.execution.livenessProbe.successThreshold }}
-            httpGet:
-              path: {{ .Values.execution.livenessProbe.httpGet.path }}
-              port: {{ .Values.execution.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.execution.livenessProbe.httpGet.scheme }}
-          {{- end }}
-          {{- if .Values.execution.readinessProbe.enabled }}
-          readinessProbe:
-            initialDelaySeconds: {{ .Values.execution.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.execution.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.execution.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.execution.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.execution.readinessProbe.successThreshold }}
-            httpGet:
-              path: {{ .Values.execution.readinessProbe.httpGet.path }}
-              port: {{ .Values.execution.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.execution.readinessProbe.httpGet.scheme }}
-          {{- end }}
-        {{- end }}
         {{/*
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
         */}}
@@ -469,6 +429,9 @@ spec:
             - sh
             - -ac
             - >
+              {{- if .Values.global.p2pNodePort.enabled }}
+              . /env/init-nodeport;
+              {{- end }}
               exec /opt/teku/bin/teku
               --network={{ .Values.global.network }}
               --data-beacon-path=/data/beacon/teku
@@ -498,13 +461,12 @@ spec:
               --rest-api-port={{ index .Values.beacon.restApi.portMap "teku" }}
               --rest-api-cors-origins={{ .Values.beacon.restApi.corsOrigins | join "," }}
             {{- end }}
+              --p2p-enabled=true
+              --p2p-port={{ include "beacon.p2pPort" . }}
             {{- if .Values.global.p2pNodePort.enabled }}
-              --p2p-enabled=true
-              --p2p-port={{ include "beacon.p2pPort" . }}
-              --config-file=/data/beacon/config.yaml
+              --p2p-advertised-port=$EXTERNAL_BEACON_PORT
+              --p2p-advertised-ip=$EXTERNAL_IP
             {{- else }}
-              --p2p-enabled=true
-              --p2p-port={{ include "beacon.p2pPort" . }}
               --p2p-advertised-ip=$POD_IP
               --p2p-advertised-port={{ include "beacon.p2pPort" . }}
             {{- end }}
@@ -532,7 +494,9 @@ spec:
               exec lighthouse
               bn
               --staking
+            {{- if .Values.beacon.proposerOnly }}
               --proposer-only
+            {{- end }}
               --datadir=/data/beacon
               --network={{ .Values.global.network }}
               --disable-upnp
@@ -743,42 +707,38 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
         {{- end }}
-        {{- if .Values.beacon.restApi.enabled }}
-        - name: sidecar-beacon
-          image: "{{ .Values.beacon.sidecar.repository }}:{{ .Values.beacon.sidecar.tag }}"
-          imagePullPolicy: {{ .Values.beacon.sidecar.pullPolicy }}
+        {{- if and .Values.global.ethsider.enabled .Values.beacon.restApi.enabled .Values.execution.jsonrpc.enabled }}
+        - name: ethsider
+          image: "{{ .Values.global.ethsider.repository }}:{{ .Values.global.ethsider.tag }}"
+          imagePullPolicy: {{ .Values.global.ethsider.pullPolicy }}
           env:
-            - name: SERVER_BINDADDR
-              value: "{{ .Values.beacon.sidecar.bindAddr }}:{{ .Values.beacon.sidecar.bindPort }}"
-            - name: CLIENT_PORT
-              value: {{ index .Values.beacon.restApi.portMap .Values.beacon.client | quote }}
-          ports:
-            - containerPort: {{ .Values.beacon.sidecar.bindPort }}
-              name: sidecar
-              protocol: TCP
-        {{- if or .Values.beacon.livenessProbe.enabled }}
+            - name: EXECUTION_ENDPOINT
+              value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
+            - name: BEACON_ENDPOINT
+              value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
+        {{- if .Values.ethsider.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.beacon.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.beacon.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.beacon.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.beacon.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.beacon.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.ethsider.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.ethsider.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.ethsider.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.ethsider.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.ethsider.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.beacon.livenessProbe.httpGet.path }}
-              port: {{ .Values.beacon.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.beacon.livenessProbe.httpGet.scheme }}
+              path: {{ .Values.ethsider.livenessProbe.httpGet.path }}
+              port: {{ .Values.ethsider.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.ethsider.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.beacon.readinessProbe.enabled }}
+        {{- if .Values.ethsider.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.beacon.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.beacon.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.beacon.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.beacon.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.beacon.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.ethsider.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.ethsider.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.ethsider.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.ethsider.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.ethsider.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.beacon.readinessProbe.httpGet.path }}
-              port: {{ .Values.beacon.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.beacon.readinessProbe.httpGet.scheme }}
+              path: {{ .Values.ethsider.readinessProbe.httpGet.path }}
+              port: {{ .Values.ethsider.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.ethsider.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
       volumes:

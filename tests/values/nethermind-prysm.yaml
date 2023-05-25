@@ -4,6 +4,8 @@ execution:
     enabled: false
   readinessProbe:
     enabled: false
+  persistence:
+    size: 300Gi
 beacon:
   client: prysm
   suggestedFeeRecipient: "0x670B24610DF99b1685aEAC0dfD5307B92e0cF4d7"
@@ -17,12 +19,7 @@ beacon:
 global:
   network: goerli
   JWTSecret: "b7f6f8e82d8ba8070a032016828b9cc6667c8c2fc5b3a275971f937fe860b70a"
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-        - matchExpressions:
-          - key: lke.linode.com/pool-id
-            operator: In
-            values:
-            - "163952"
+  p2pNodePort:
+    enabled: true
+    startAtExecution: 31300
+    startAtBeacon: 32300

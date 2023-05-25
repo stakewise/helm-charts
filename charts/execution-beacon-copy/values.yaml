@@ -61,6 +61,39 @@ global:
           key: ethereumValidators
           property: jwt
 
+  ethsider:
+    enabled: false
+    repository: "nethermindeth/ethsider"
+    tag: "v0.0.7"
+    pullPolicy: IfNotPresent
+    ## Configure liveness and readiness probes
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    ## NB! readinessProbe and livenessProbe must be disabled before genesis
+    ##
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 900
+      timeoutSeconds: 3
+      periodSeconds: 30
+      failureThreshold: 3
+      successThreshold: 1
+      httpGet:
+        path: /eth2/liveness
+        port: sidecar
+        scheme: HTTP
+
+    readinessProbe:
+      enabled: true
+      initialDelaySeconds: 300
+      timeoutSeconds: 3
+      periodSeconds: 30
+      failureThreshold: 30
+      successThreshold: 2
+      httpGet:
+        path: /eth2/readiness
+        port: sidecar
+        scheme: HTTP
+
   service:
     svcHeadless: true
 
@@ -237,33 +270,6 @@ execution:
       ##
       enabled: true
 
-    ## Configure liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    ## NB! readinessProbe and livenessProbe must be disabled before fully synced
-    ##
-    livenessProbe:
-      enabled: true
-      initialDelaySeconds: 900
-      timeoutSeconds: 3
-      periodSeconds: 30
-      failureThreshold: 3
-      successThreshold: 1
-      httpGet:
-        path: /eth1/liveness
-        port: sidecar
-        scheme: HTTP
-
-    readinessProbe:
-      enabled: true
-      initialDelaySeconds: 30
-      timeoutSeconds: 3
-      periodSeconds: 30
-      failureThreshold: 30
-      successThreshold: 1
-      httpGet:
-        path: /eth1/readiness
-        port: sidecar
-        scheme: HTTP
   ## -------------------------- Execution node specific settings -----------------------------------------
   # Manually specify TerminalTotalDifficulty, overriding the bundled setting
   terminalTotalDifficulty: ""
@@ -323,9 +329,7 @@ execution:
     enabled: true
     slug: "/health"
     pollingInterval: 5
-    maxIntervalWithoutProcessedBlock: null
-    maxIntervalWithoutProducedBlock: null
-    lowStorageSpaceShutdownThreshold: 1
+    lowStorageSpaceShutdownThreshold: 0
     lowStorageSpaceWarningThreshold: 5
   
   targetPeers: 100
@@ -415,33 +419,6 @@ beacon:
       ##
       enabled: true
 
-  ## Configure liveness and readiness probes
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-  ## NB! readinessProbe and livenessProbe must be disabled before genesis
-  ##
-  livenessProbe:
-    enabled: true
-    initialDelaySeconds: 900
-    timeoutSeconds: 3
-    periodSeconds: 30
-    failureThreshold: 3
-    successThreshold: 1
-    httpGet:
-      path: /eth2/liveness
-      port: sidecar
-      scheme: HTTP
-
-  readinessProbe:
-    enabled: true
-    initialDelaySeconds: 300
-    timeoutSeconds: 3
-    periodSeconds: 30
-    failureThreshold: 30
-    successThreshold: 2
-    httpGet:
-      path: /eth2/readiness
-      port: sidecar
-      scheme: HTTP
   ## To get Beacon node up and running in only a few minutes
   ## from a recent finalized checkpoint state rather than syncing from genesis.
   ##
@@ -455,6 +432,9 @@ beacon:
   ## Validator client can override this value through the preparebeaconproposer api. 
   ##
   suggestedFeeRecipient: ""
+
+  # Lighthouse specific setting
+  proposerOnly: false
 
   ## Teku specific setting
   javaOpts:
