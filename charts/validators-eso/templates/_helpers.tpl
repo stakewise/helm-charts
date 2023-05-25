@@ -23,6 +23,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -91,12 +92,7 @@ Validator beacon node
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
-{{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpoints }}
-{{- if gt $beaconChainRpcEndpointsLen 1 }}
-- "--beacon-node-api-endpoints={{ $.Values.beaconChainRpcEndpoints | join "," }}"
-{{- else }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
-{{- end }}
 {{- end }}
 {{- end }}
 
@@ -110,6 +106,15 @@ Validator graffiti
 {{- else if eq $.Values.type "teku" }}
 - "--validators-graffiti={{ $.Values.graffiti }}"
 {{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validator web3signer endpoint
+*/}}
+{{- define "web3signer" -}}
+{{- if $.Values.global.label }}
+{{- default "http://web3signer-{{ $.Values.global.label }}-web3signer-eso:6174" }}
 {{- end }}
 {{- end }}
 
@@ -127,4 +132,16 @@ Validator graffiti
 
 {{- define "flatten" -}}
   {{- get ( fromYaml (include "flatten_list" . ) ) "list" | uniq | join "," }}
+{{- end -}}
+
+{{- /*
+Custom template function to conditionally select a value based on a condition.
+Usage: {{ cond CONDITION TRUE_VALUE FALSE_VALUE }}
+*/}}
+{{- define "cond" -}}
+    {{- if . -}}
+        {{- index . 1 -}}
+    {{- else -}}
+        {{- index . 2 -}}
+    {{- end -}}
 {{- end -}}

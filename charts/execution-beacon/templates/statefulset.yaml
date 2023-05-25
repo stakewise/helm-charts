@@ -16,6 +16,8 @@ spec:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
+        execution: {{ .Values.execution.client }}
+        beacon: {{ .Values.beacon.client }}
       annotations:
         checksum/configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
@@ -86,7 +88,7 @@ spec:
         */}}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
-          image: "{{ index .Values.beacon.imageMap .Values.beacon.client }}"
+          image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
           imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
           command:
             - sh
@@ -107,8 +109,8 @@ spec:
         Container used for Execution clients: Nethermind, Geth, Besu, Erigon
         */}}
         - name: execution
-          image: "{{ index .Values.execution.imageMap .Values.execution.client }}"
-          imagePullPolicy: {{ .Values.execution.imagePullPolicy }}
+          image: "{{ (pluck .Values.execution.client .Values.global.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.global.image.execution | first ).tag }}"
+          imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           command:
             - sh
             - -ac
@@ -365,8 +367,8 @@ spec:
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
         */}}
         - name: beacon
-          image: "{{ index .Values.beacon.imageMap .Values.beacon.client }}"
-          imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
+          image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
+          imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
           {{/*
           Configuration for Prysm beacon client
           */}}

@@ -5,7 +5,28 @@
 global:
   imagePullSecrets: []
   network: mainnet
-  label: "client"
+  label: "test"
+  # RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ##
+  rbac:
+    create: true
+    # The name of the cluster role to use.
+    # If not set and create is true, a name is generated using the fullname template
+    name: ""
+    ## Required Role rules
+    ##
+    rules:
+      ## Required to get information about the services nodePort.
+      ##
+      - apiGroups: [""]
+        resources:
+        - "services"
+        - "pods"
+        verbs:
+        - "list"
+        - "get"
+        - "patch"
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -35,6 +56,13 @@ initImageBusybox:
   tag: "1.35"
   pullPolicy: IfNotPresent
 
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImageKubectl:
+  repository: "bitnami/kubectl"
+  tag: "1.24"
+  pullPolicy: IfNotPresent
+
 ## CLI image is used to fetch public keys.
 ##
 cliImage:
@@ -48,17 +76,6 @@ externalSecrets:
     name: secretStoreRef
     kind: SecretStore
   data: []
-
-externalSecretsV2:
-  enabled: false
-  secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
-  data:
-    - secretKey: ESO_DB_KEYSTORE_URL
-      remoteRef:
-        key: validators
-        property: dbKeystoreUrl
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
@@ -75,7 +92,7 @@ enabled: true
 ## Options for Ethereum: prysm, lighthouse, teku
 ## Options for Gnosis: prysm, lighthouse
 ##
-type: prysm
+type: lighthouse
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
@@ -103,16 +120,16 @@ validatorsKeyIndex: 0
 ## **NB! Each validtor hosts a certain number of keys specified when using CLI sync-db command,
 ## so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
 ##
-validatorsCount: 0
+validatorsCount: 4
 
 validatorsNoOfKeys: 100
 
 ## Default fee recipient for all validator keys.
 ##
-suggestedFeeRecipient: ""
+suggestedFeeRecipient: "0x670B24610DF99b1685aEAC0dfD5307B92e0cF4d7"
 
 ## Whether a builder should be used for proposalConfig
-enableBuilder: false
+enableBuilder: true
 
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
@@ -121,16 +138,19 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v3.1.1"
-  prysmGnosis:
-    repository: "ghcr.io/gnosischain/gbc-prysm-validator"
-    tag: "v2.1.2-gbc"
+    tag: "v4.0.5"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v3.1.2"
+    tag: "v4.2.0"
   teku:
     repository: "consensys/teku"
-    tag: "22.10.1"
+    tag: "23.5.0"
+  nimbus: 
+    repository: "statusim/nimbus-eth2"
+    tag: "multiarch-v23.5.1"
+  lodestar: 
+    repository: "chainsafe/lodestar"
+    tag: "v1.8.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -145,6 +165,7 @@ terminationGracePeriodSeconds: 300
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
+  name: "validators"
   # Annotations to add to the service account
   annotations: {}
 
@@ -172,7 +193,7 @@ priorityClassName: ""
 ## Options for Ethereum: mainnet, prater
 ## Options for Gnosis: gnosis
 ##
-network: "mainnet"
+network: "goerli"
 
 ## Validators flags
 ##
@@ -194,6 +215,8 @@ flags:
     - "validator-client"
     - "--log-destination=CONSOLE"
     - "--data-base-path=/data"
+  nimbus: []
+  lodestar: []
 
 ## Validators extra flags
 ##
@@ -201,10 +224,17 @@ extraFlags:
   prysm: []
   lighthouse: []
   teku: []
+  nimbus: []
+  lodestar: []
 
-## Web3Signer Endpoint
-##
-web3signerEndpoint: http://web3signer:6174
+beaconChainRpcEndpointsAutoDiscovery: true
+
+beaconPortMap:
+  teku: 5051
+  prysm: 8080
+  lighthouse: 5052
+  nimbus: 5052
+  lodestar: 9596
 
 ## List of Beacon Chain node addresses
 ##
@@ -222,11 +252,6 @@ beaconChainRpcEndpointsRandomized: []
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
 ##
 graffiti: ""
-
-## Override fees for solo validators
-## used for stakewise solo validators only
-##
-feeOverride: ""
 
 ## Monitoring
 ##
@@ -251,6 +276,8 @@ metrics:
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
+    nimbus: []
+    lodestar: []
 
   ## Prometheus Service Monitor
   ## ref: https://github.com/coreos/prometheus-operator

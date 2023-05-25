@@ -7,6 +7,38 @@ global:
   ##
   network: mainnet
 
+  image:
+    imagePullPolicy: IfNotPresent
+    execution:
+      nethermind: 
+        repository: "nethermind/nethermind"
+        tag: "1.18.1"
+      geth: 
+        repository: "ethereum/client-go"
+        tag: "v1.11.6"
+      bseu: 
+        repository: "hyperledger/besu"
+        tag: "23.4.1"
+      erigon: 
+        repository: "thorax/erigon"
+        tag: "v2.43.1"
+    beacon:
+      prysm: 
+        repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
+        tag: "v4.0.5"
+      teku: 
+        repository: "consensys/teku"
+        tag: "23.5.0"
+      lighthouse: 
+        repository: "sigp/lighthouse"
+        tag: "v4.2.0"
+      nimbus: 
+        repository: "statusim/nimbus-eth2"
+        tag: "multiarch-v23.5.1"
+      lodestar: 
+        repository: "chainsafe/lodestar"
+        tag: "v1.8.0"
+
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
   ## a command line tool, for example:
@@ -212,12 +244,6 @@ execution:
     enabled: false
   readinessProbe:
     enabled: false
-  imagePullPolicy: IfNotPresent
-  imageMap:
-    nethermind: nethermind/nethermind:1.18.1
-    geth: ethereum/client-go:v1.11.6
-    bseu: hyperledger/besu:23.4.1
-    erigon: thorax/erigon:v2.43.1
 
   ## Whether or not to allocate persistent volume disk for the data directory.
   ## In case of node failure, the node data directory will still persist.
@@ -349,13 +375,6 @@ execution:
 
 beacon:
   client: nimbus
-  imagePullPolicy: IfNotPresent
-  imageMap:
-    prysm: gcr.io/prysmaticlabs/prysm/beacon-chain:v4.0.4
-    teku: consensys/teku:23.5.0
-    lighthouse: sigp/lighthouse:v4.2.0
-    nimbus: statusim/nimbus-eth2:multiarch-v23.5.1
-    lodestar: chainsafe/lodestar:v1.8.0
 
   ## Whether or not to allocate persistent volume disk for the data directory.
   ## In case of node failure, the node data directory will still persist.

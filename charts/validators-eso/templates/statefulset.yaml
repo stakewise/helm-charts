@@ -2,21 +2,7 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
 {{- range (untilStep (int .Values.validatorsKeyIndex) (int (add .Values.validatorsKeyIndex .Values.validatorsCount)) 1) }}
-
-{{ $rpcEndpoints := list }}
-{{- if $.Values.beaconChainRpcEndpointsRandomized }}
-{{- $rpcList := list }}
-{{- range (untilStep $counter (len $.Values.beaconChainRpcEndpointsRandomized) 1) }}
-{{ $rpcList = append $rpcList (index $.Values.beaconChainRpcEndpointsRandomized .) }}
-{{- end }}
-{{ $rpcList = append $rpcList $.Values.beaconChainRpcEndpointsRandomized }}
-{{ $rpcEndpoints = include "flatten" $rpcList }}
-{{- if ge $counter (len $.Values.beaconChainRpcEndpointsRandomized) }}
-  {{- $counter = 1 }}
-{{- else }}
-  {{ $counter = int (add1 $counter) }}
-{{- end }}
-{{- end }}
+{{ $counter = int (add1 $counter) }}
 
 ---
 apiVersion: apps/v1
@@ -71,7 +57,7 @@ spec:
             runAsUser: 0
           env:
             - name: WEB3SIGNER_URL
-              value: {{ $root.Values.web3signerEndpoint }}
+              value: {{ include "web3signer" $root }}
             - name: ESO_DB_KEYSTORE_URL
               valueFrom:
                 secretKeyRef:
@@ -100,10 +86,36 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if $root.Values.feeOverride }}
-            - name: fee-override
-              mountPath: /fee
-          {{- end }}
+        - name: init-beacon-endpoints
+          image: "{{ $root.Values.initImageKubectl.repository }}:{{ $root.Values.initImageKubectl.tag }}"
+          imagePullPolicy: {{ $root.Values.initImageKubectl.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          env:
+            {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+            - name: BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED
+              value: "{{ $.Values.beaconChainRpcEndpointsRandomized | join "," }}"
+            {{- end }}
+            - name: COUNTER
+              value: "{{ $counter }}"
+            - name: BEACON_CLIENT
+              value: "{{ $root.Values.type }}"
+            - name: BEACON_PORT
+              value: "{{ index $root.Values.beaconPortMap $root.Values.type }}"
+            - name: POD_NAMESPACE
+              valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.namespace
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command: ['/bin/bash', '/scripts/init-beacon-endpoints.sh']
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: scripts-init
+              mountPath: /scripts
         - name: prepare
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
@@ -116,67 +128,57 @@ spec:
               ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
-              cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
-              echo "" >>
-              cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
-              cat /data/config_gnosis_prysm;
+              cat /data/beacon_endpoints.txt
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: gnosis-prysm
-              mountPath: /mnt/gnosis-prysm
       containers:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          env:
+            - name: BEACON_ENDPOINTS
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.annotations['beacon-endpoints']
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
             {{- end -}}
 
-            {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
+            {{- if eq $root.Values.type "prysm" }}
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--proposer-settings-file=/data/proposerConfig.json"
-            {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
-            - "--config-file /data/config_gnosis_prysm"
-            - "--chain-config-file /data/config_gnosis_prysm"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--validators-proposer-config=/data/proposerConfig.json"
             {{- if $root.Values.enableBuilder }}
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
             {{- end }}
-
             {{- include "validator-graffiti" $ | nindent 12 }}
 
-          {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+            {{- if or $.Values.beaconChainRpcEndpointsAutoDiscovery }}
             {{- if eq $.Values.type "prysm" }}
-            - "--beacon-rpc-provider={{ $rpcEndpoints }}"
+            - "--beacon-rpc-provider=$(BEACON_ENDPOINTS)"
             {{- else if eq $.Values.type "lighthouse" }}
-            - "--beacon-nodes={{ $rpcEndpoints }}"
+            - "--beacon-nodes=$(BEACON_ENDPOINTS)"
             {{- else if eq $.Values.type "teku" }}
-            {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
-            {{- if gt $beaconChainRpcEndpointsLen 1 }}
-            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
+            - "--beacon-node-api-endpoint=$(BEACON_ENDPOINTS)"
+            {{- end }}
             {{- else }}
-            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
-            {{- end }}
-            {{- end }}
-          {{- else }}
             {{- include "beacon-rpc-node" $ | nindent 12 }}
-          {{- end }}
+            {{- end }}
 
             {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
@@ -210,14 +212,9 @@ spec:
             - name: data
               mountPath: /data
       volumes:
-        - name: gnosis-prysm
+        - name: scripts-init
           configMap:
-            name: {{ template "validators.fullname" $root }}-gnosis-prysm
-      {{- if $root.Values.feeOverride }}
-        - name: fee-override
-          configMap:
-            name: {{ template "validators.fullname" $root }}-override-fee-recipient
-      {{- end }}
+            name: {{ template "validators.fullname" $root }}-init
         - name: data
           emptyDir: {}
 {{- end }}

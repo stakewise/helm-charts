@@ -23,5 +23,5 @@
 {{- $p2pPort -}}
 {{- else -}}
 {{- fail "Invalid beacon client specified" -}}
-{{- end }}
+{{- end -}}
 {{- end -}}

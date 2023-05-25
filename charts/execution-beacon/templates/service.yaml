@@ -5,6 +5,10 @@ metadata:
   name: {{ include "common.names.fullname" . }}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
+    pod: "{{ include "common.names.fullname" . }}"
+    type: api
+    execution: {{ .Values.execution.client }}
+    beacon: {{ .Values.beacon.client }}
 {{- if and .Values.execution.metrics.enabled .Values.execution.metrics.svcAnnotations }}
   annotations:
     {{ toYaml .Values.execution.metrics.svcAnnotations | nindent 4 | trim }}
