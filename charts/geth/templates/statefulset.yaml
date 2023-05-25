@@ -139,7 +139,6 @@ spec:
           {{- end }}
               --datadir=/data/ethereum
               --ethash.dagdir=/data/ethereum/.ethash
-              --ipcdisable
               --{{ .Values.global.network }}
           {{- range .Values.extraFlags }}
               {{ . | quote }}
