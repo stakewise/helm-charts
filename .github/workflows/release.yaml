@@ -1,10 +1,11 @@
 name: Helm Charts Release
 
-on: push
-    # branches:
-    #   - "!*"
-    # tags:
-    #   - "v*"
+on: 
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
 
 jobs:
   release:
@@ -40,4 +41,4 @@ jobs:
           charts_url: https://nethermindeth.github.io/helm-charts
           repository: helm-charts
           branch: gh-pages
-          target_dir: charts
+          target_dir: .
