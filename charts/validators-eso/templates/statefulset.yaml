@@ -165,6 +165,11 @@ spec:
             {{- if $root.Values.enableBuilder }}
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
+            {{- else if eq $root.Values.type "nimbus" }}
+            - "--network={{ $root.Values.network }}"
+            {{- if $root.Values.enableBuilder }}
+            - "--payload-builder=true"
+            {{- end }}
             {{- else if eq $root.Values.type "lodestar" }}
             - "--network={{ $root.Values.network }}"
             - "--proposerSettingsFile=/data/proposerConfig.json"
@@ -179,6 +184,8 @@ spec:
             - "--beacon-nodes=$(BEACON_ENDPOINTS)"
             {{- else if eq $.Values.type "teku" }}
             - "--beacon-node-api-endpoint=$(BEACON_ENDPOINTS)"
+            {{- else if eq $.Values.type "nimbus" }}
+            - "--beacon-node=$(BEACON_ENDPOINTS)"
             {{- else if eq $.Values.type "lodestar" }}
             - "--beaconNodes=$(BEACON_ENDPOINTS)"
             {{- end }}

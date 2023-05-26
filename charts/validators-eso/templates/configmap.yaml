@@ -9,6 +9,7 @@ data:
   init-beacon-endpoints.sh: |
     #!/bin/bash
     echo "Looking for beacon endpoints for validator client: $BEACON_CLIENT, counter: $COUNTER"
+    BEACON_CLIENT=lighthouse
     counter=$COUNTER
     if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}" ]]; then
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}"

@@ -93,6 +93,8 @@ Validator beacon node
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- else if eq $.Values.type "nimbus" }}
+- "--beacon-node={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "lodestar" }}
 - "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}

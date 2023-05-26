@@ -92,7 +92,7 @@ enabled: true
 ## Options for Ethereum: prysm, lighthouse, teku
 ## Options for Gnosis: prysm, lighthouse
 ##
-type: lodestar
+type: nimbus
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
@@ -146,7 +146,7 @@ image:
     repository: "consensys/teku"
     tag: "23.5.0"
   nimbus: 
-    repository: "statusim/nimbus-eth2"
+    repository: "statusim/nimbus-validator-client"
     tag: "multiarch-v23.5.1"
   lodestar: 
     repository: "chainsafe/lodestar"
@@ -215,7 +215,10 @@ flags:
     - "validator-client"
     - "--log-destination=CONSOLE"
     - "--data-base-path=/data"
-  nimbus: []
+  nimbus:
+    - "--data-dir=/data/nimbus"
+    - "--non-interactive"
+    - "--log-level=INFO"
   lodestar: 
     - "validator"
     - "--dataDir=/data/lodestar"
@@ -280,9 +283,12 @@ metrics:
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
-    nimbus: []
+    nimbus:
+      - "--metrics"
+      - "--metrics-port=9090"
+      - "--metrics-address=0.0.0.0"
     lodestar:
-      - "--metrics=true"
+      - "--metrics"
       - "--metrics.address=0.0.0.0"
       - "--metrics.port=9090"
 
