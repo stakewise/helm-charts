@@ -34,7 +34,7 @@ jobs:
           helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Publish Helm chart
-        uses: stefanprodan/helm-gh-pages@master
+        uses: stefanprodan/helm-gh-pages@v1.7.0
         with:
           token: ${{ secrets.BOT_TOKEN  }}
           charts_dir: charts
