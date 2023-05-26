@@ -36,8 +36,10 @@ spec:
           args:
             - -{{ .Values.global.network }}
             - -relay-check
-            - -relays
-            - {{ pluck .Values.global.network .Values.relays | first }}
+          {{- range $relay := index .Values.relays .Values.global.network }}
+            - relay 
+            - "{{ $relay }}"
+          {{- end }}
             - -addr
             - 0.0.0.0:{{ .Values.service.port }}
             - -loglevel

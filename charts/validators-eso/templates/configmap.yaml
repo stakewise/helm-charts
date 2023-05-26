@@ -33,12 +33,12 @@ data:
         else
             rearranged_pod_names=("${beacon_pod_names[@]}")
         fi
+        # Variable to store beacon endpoints
+        beacon_endpoints=""
         # Loop through the endpoint range for each pod
         for ((i = 0; i < $num_endpoints; i++)); do
             service=${beacon_service_names[$i]}
             echo "API Service: $service"
-            # Variable to store beacon endpoints
-            beacon_endpoints=""
             # Loop through rearranged_pod_names and echo pods with matching name
             for pod in "${rearranged_pod_names[@]}"; do
                 if [[ $pod == *"$service"* ]]; then

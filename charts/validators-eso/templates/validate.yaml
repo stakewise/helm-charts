@@ -2,14 +2,6 @@
 {{- fail ".Values.beaconChainRpcEndpoints is empty" }}
 {{- end }}
 
-{{- $address := .Values.suggestedFeeRecipient }}
-{{- $regex := "^0x[a-fA-F0-9]{40}$" }}
-{{- if not $address }}
-{{- fail ".Values.suggestedFeeRecipient is required" }}
-{{- else if not (regexMatch $regex $address) }}
-{{- fail ".Values.suggestedFeeRecipient must be a valid Ethereum address (0x string)" }}
-{{- end }}
-
 {{- if not .Values.global.label }}
 {{- fail ".Values.global.label is required" }}
 {{- end }}

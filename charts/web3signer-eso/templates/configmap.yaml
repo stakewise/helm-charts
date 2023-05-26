@@ -15,9 +15,6 @@ data:
     eth2.slashing-protection-pruning-epochs-to-keep: {{ .Values.pruningEpochToKeep }}
     eth2.slashing-protection-pruning-interval: {{ .Values.pruningInterval }}
     eth2.slashing-protection-pruning-slots-per-epoch: {{ .Values.slotsPerEpoch }}
-    #    eth2.slashing-protection-db-username: {{ .Values.dbUsername }}
-    #    eth2.slashing-protection-db-password: {{ .Values.dbPassword }}
-    #    eth2.slashing-protection-db-url: {{ .Values.dbUrl }}
     metrics-enabled: true
     metrics-host: "0.0.0.0"
     metrics-port: {{ .Values.metricsPort }}
