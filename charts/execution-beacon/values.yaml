@@ -156,7 +156,7 @@ global:
   ##
   initImage:
     repository: "bitnami/kubectl"
-    tag: "1.24"
+    tag: "1.25"
     pullPolicy: IfNotPresent
 
   ## Monitoring
@@ -363,15 +363,6 @@ execution:
   extraFlags: []
   resources: {}
 
-  ## Sidecar image is used to perform Liveness/Readiness probes.
-  ##
-  sidecar:
-    repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.6"
-    pullPolicy: IfNotPresent
-    bindAddr: "0.0.0.0"
-    bindPort: 3000
-
 beacon:
   client: nimbus
 
@@ -519,15 +510,6 @@ beacon:
   ##
   extraFlags: []
   resources: {}
-
-  ## Sidecar image is used to perform Liveness/Readiness probes.
-  ##
-  sidecar:
-    repository: "europe-west4-docker.pkg.dev/stakewiselabs/public/ethnode-sidecar"
-    tag: "v1.0.6"
-    pullPolicy: IfNotPresent
-    bindAddr: "0.0.0.0"
-    bindPort: 3001
 
 ## Service account
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

@@ -15,13 +15,13 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.10.0"
+  tag: "23.3.1"
 
 ## Init image is used to chown data volume, etc.
 ##
 initImage:
   repository: busybox
-  tag: "1.34"
+  tag: "1.36.1"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch private keys.
@@ -30,12 +30,6 @@ cliImage:
   repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
   tag: "v0.0.2"
   pullPolicy: IfNotPresent
-
-# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
-# decryptionKey: "generated with stakewise-cli sync-db"
-# dbUrl: "jdbc:postgresql://localhost/web3signer"
-# dbUsername: ""
-# dbPassword: ""
 
 externalSecrets:
   enabled: false
