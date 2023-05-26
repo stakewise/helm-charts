@@ -25,11 +25,12 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v3
 
-      - name: Add Helm repositories
+      - name: Helm Dependencies
         run: |
-          for dir in $(ls -d charts/*/); do
-            helm dependency list $dir 2> /dev/null | tail +2 | head -n -1 | awk '{ print "helm repo add " $1 " " $3 }' | while read cmd; do $cmd; done
+          for dir in $(ls -d charts/*); do
+            helm dependency update $dir;
           done
+          helm repo add bitnami https://charts.bitnami.com/bitnami
 
       - name: Publish Helm chart
         uses: stefanprodan/helm-gh-pages@master
