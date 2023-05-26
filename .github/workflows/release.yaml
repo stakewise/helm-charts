@@ -17,6 +17,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Helm Dependencies
+        run: |
+          for dir in $(ls -d charts/*); do
+            helm dependency update $dir;
+          done
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
       - name: Install Helm
         uses: azure/setup-helm@v3
 
