@@ -17,6 +17,7 @@ beacon:
   readinessProbe:
     enabled: false
 global:
+  replicaCount: 2
   network: goerli
   JWTSecret: "b7f6f8e82d8ba8070a032016828b9cc6667c8c2fc5b3a275971f937fe860b70a"
   p2pNodePort:
