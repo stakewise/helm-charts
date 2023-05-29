@@ -705,7 +705,11 @@ spec:
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
             - name: BEACON_ENDPOINT
+          {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
+              value: "http://localhost:{{ .Values.beacon.grpc.port }}"
+          {{- else }}
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
+          {{- end }}
         {{- if .Values.global.ethsider.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.global.ethsider.livenessProbe.initialDelaySeconds }}
