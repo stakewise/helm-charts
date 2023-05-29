@@ -706,29 +706,29 @@ spec:
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
             - name: BEACON_ENDPOINT
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
-        {{- if .Values.ethsider.livenessProbe.enabled }}
+        {{- if .Values.global.ethsider.livenessProbe.enabled }}
           livenessProbe:
-            initialDelaySeconds: {{ .Values.ethsider.livenessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.ethsider.livenessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.ethsider.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.ethsider.livenessProbe.failureThreshold }}
-            successThreshold: {{ .Values.ethsider.livenessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.global.ethsider.livenessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.global.ethsider.livenessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.global.ethsider.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.global.ethsider.livenessProbe.failureThreshold }}
+            successThreshold: {{ .Values.global.ethsider.livenessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.ethsider.livenessProbe.httpGet.path }}
-              port: {{ .Values.ethsider.livenessProbe.httpGet.port }}
-              scheme: {{ .Values.ethsider.livenessProbe.httpGet.scheme }}
+              path: {{ .Values.global.ethsider.livenessProbe.httpGet.path }}
+              port: {{ .Values.global.ethsider.livenessProbe.httpGet.port }}
+              scheme: {{ .Values.global.ethsider.livenessProbe.httpGet.scheme }}
         {{- end }}
-        {{- if .Values.ethsider.readinessProbe.enabled }}
+        {{- if .Values.global.ethsider.readinessProbe.enabled }}
           readinessProbe:
-            initialDelaySeconds: {{ .Values.ethsider.readinessProbe.initialDelaySeconds }}
-            timeoutSeconds: {{ .Values.ethsider.readinessProbe.timeoutSeconds }}
-            periodSeconds: {{ .Values.ethsider.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.ethsider.readinessProbe.failureThreshold }}
-            successThreshold: {{ .Values.ethsider.readinessProbe.successThreshold }}
+            initialDelaySeconds: {{ .Values.global.ethsider.readinessProbe.initialDelaySeconds }}
+            timeoutSeconds: {{ .Values.global.ethsider.readinessProbe.timeoutSeconds }}
+            periodSeconds: {{ .Values.global.ethsider.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.global.ethsider.readinessProbe.failureThreshold }}
+            successThreshold: {{ .Values.global.ethsider.readinessProbe.successThreshold }}
             httpGet:
-              path: {{ .Values.ethsider.readinessProbe.httpGet.path }}
-              port: {{ .Values.ethsider.readinessProbe.httpGet.port }}
-              scheme: {{ .Values.ethsider.readinessProbe.httpGet.scheme }}
+              path: {{ .Values.global.ethsider.readinessProbe.httpGet.path }}
+              port: {{ .Values.global.ethsider.readinessProbe.httpGet.port }}
+              scheme: {{ .Values.global.ethsider.readinessProbe.httpGet.scheme }}
         {{- end }}
       {{- end }}
       volumes:
