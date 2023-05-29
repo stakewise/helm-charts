@@ -41,4 +41,5 @@ jobs:
           charts_url: https://nethermindeth.github.io/helm-charts
           repository: helm-charts
           branch: gh-pages
-          target_dir: .
+          target_dir: charts
+          index_dir: .
