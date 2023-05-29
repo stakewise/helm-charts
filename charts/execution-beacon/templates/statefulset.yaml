@@ -148,7 +148,7 @@ spec:
             {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
             {{- if .Values.global.externalSecrets.enabled }}
               --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
-            {{- else }}
+            {{- else }} --
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
             {{- end }}
               --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
@@ -356,10 +356,10 @@ spec:
             {{- end }}
             - name: env-nodeport
               mountPath: /env
-        {{- with .Values.execution.resources }}
-        resources:
-          {{ toYaml . | nindent 12 | trim }}
-        {{- end }}
+          {{- with .Values.execution.resources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+          {{- end }}
         {{/*
         Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
         */}}
