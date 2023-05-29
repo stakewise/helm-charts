@@ -655,7 +655,7 @@ spec:
               value: {{ .Values.beacon.javaOpts.maxHeapSize }}
           {{- end }}
           ports:
-          {{- if and (eq .Values.execution.client "prysm") .Values.beacon.grpc.enabled }}
+          {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
             - containerPort: {{ .Values.beacon.grpc.port }}
               name: {{ .Values.beacon.grpc.portName }}-beacon
               protocol: TCP

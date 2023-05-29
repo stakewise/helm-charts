@@ -54,7 +54,7 @@ spec:
       targetPort: metrics-exec
       protocol: TCP
   {{- end }}
-  {{- if and (eq .Values.execution.client "prysm") .Values.beacon.grpc.enabled }}
+  {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
     - name: {{ .Values.beacon.grpc.portName }}-beacon
       port: {{ .Values.beacon.grpc.port }}
       targetPort: {{ .Values.beacon.grpc.portName }}
