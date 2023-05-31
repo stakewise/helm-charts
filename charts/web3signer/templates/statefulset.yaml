@@ -124,8 +124,8 @@ spec:
               mountPath: /config
       volumes:
         - name: config
-          configMap:
-            name: {{ include "common.names.fullname" . }}
+          secret:
+            secretName: {{ include "common.names.fullname" . }}-config
         - name: migrations
           configMap:
             name: {{ include "common.names.fullname" . }}-migrations
