@@ -96,7 +96,7 @@ global:
   ethsider:
     enabled: false
     repository: "nethermindeth/ethsider"
-    tag: "v0.0.7"
+    tag: "v0.0.9"
     pullPolicy: IfNotPresent
     ## Configure liveness and readiness probes
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
