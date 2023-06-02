@@ -50,42 +50,48 @@ spec:
       serviceAccountName: "validators"
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
-        # - name: get-configs
-        #   image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
-        #   imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
-        #   securityContext:
-        #     runAsUser: 0
-        #   env:
-        #     - name: WEB3SIGNER_URL
-        #       value: {{ include "web3signer" $root }}
-        #     - name: ESO_DB_KEYSTORE_URL
-        #       valueFrom:
-        #         secretKeyRef:
-        #           name: eso-{{ template "validators.fullname" $root }}
-        #           key: ESO_DB_KEYSTORE_URL
-        #   args:
-        #     - "sync-validator-keys"
-        #     - "--db-url"
-        #     - "$(ESO_DB_KEYSTORE_URL)"
-        #     - "--output-dir"
-        #     - "/data"
-        #     - "--index"
-        #     - "{{ . }}"
-        #     - "--no-of-keys"
-        #     - "{{ $root.Values.validatorsNoOfKeys }}"
-        #     {{- if eq $root.Values.network "sepolia" }}
-        #     - "--network"
-        #     - "goerli"
-        #     {{- else }}
-        #     - "--network"
-        #     - "{{ $root.Values.network }}"
-        #     {{- end }}
-        #     {{- if not $root.Values.enableBuilder }}
-        #     - "--no-proposal-builder-enabled"
-        #     {{- end }}
-        #   volumeMounts:
-        #     - name: data
-        #       mountPath: /data
+        - name: get-configs
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: WEB3SIGNER_URL
+              value: {{ include "web3signer" $root }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
+          args:
+            - "sync-validator-keys"
+            - "--db-url"
+            - "$(ESO_DB_KEYSTORE_URL)"
+            - "--output-dir"
+            - "/data"
+            - "--index"
+            - "{{ . }}"
+            - "--no-of-keys"
+            - "{{ $root.Values.validatorsNoOfKeys }}"
+            {{- if eq $root.Values.network "sepolia" }}
+            - "--network"
+            - "goerli"
+            {{- else }}
+            - "--network"
+            - "{{ $root.Values.network }}"
+            {{- end }}
+            {{- if eq $.Values.type "lodestar" }}
+            - "--graffiti"
+            - "{{ $root.Values.graffiti }}"
+            - "--strict-fee-recipient-check"
+            - "{{ $root.Values.strictFeeRecipientCheck }}"
+            {{- end }}
+            {{- if not $root.Values.enableBuilder }}
+            - "--proposal-builder-enabled"
+            {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
         - name: init-beacon-endpoints
           image: "{{ $root.Values.initImageKubectl.repository }}:{{ $root.Values.initImageKubectl.tag }}"
           imagePullPolicy: {{ $root.Values.initImageKubectl.pullPolicy }}
@@ -116,26 +122,26 @@ spec:
               mountPath: /data
             - name: scripts-init
               mountPath: /scripts
-        # - name: prepare
-        #   image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
-        #   imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
-        #   securityContext:
-        #     runAsUser: 0
-        #   command:
-        #     - sh
-        #     - -c
-        #     - >
-        #       ls -lha /data;
-        #       mkdir -p /data/lighthouse/validators;
-        #       cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
-        #       cat /data/signer_keys.yml > /data/config;
-        #       cat /data/config;
-        #       cat /data/proposerConfig.json;
-        #       cat /data/beacon_endpoints.txt
-        #       chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
-        #   volumeMounts:
-        #     - name: data
-        #       mountPath: /data
+        - name: prepare
+          image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
+          imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - sh
+            - -c
+            - >
+              ls -lha /data;
+              mkdir -p /data/lighthouse/validators;
+              cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
+              cat /data/signer_keys.yml > /data/config;
+              cat /data/config;
+              cat /data/proposerConfig.json;
+              cat /data/beacon_endpoints.txt
+              chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"

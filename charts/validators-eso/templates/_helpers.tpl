@@ -105,10 +105,10 @@ Validator graffiti
 */}}
 {{- define "validator-graffiti" -}}
 {{- if $.Values.graffiti }}
-{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") }}
-- "--graffiti={{ $.Values.graffiti }}"
-{{- else if eq $.Values.type "teku" }}
+{{- if eq $.Values.type "teku" }}
 - "--validators-graffiti={{ $.Values.graffiti }}"
+{{- else }}
+- "--graffiti={{ $.Values.graffiti }}"
 {{- end }}
 {{- end }}
 {{- end }}

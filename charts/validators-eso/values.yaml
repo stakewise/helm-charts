@@ -254,6 +254,9 @@ beaconChainRpcEndpoints: []
 ##
 beaconChainRpcEndpointsRandomized: []
 
+# Lodestar specific setting
+strictFeeRecipientCheck: true
+
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
