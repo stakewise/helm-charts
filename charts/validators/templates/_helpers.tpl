@@ -118,7 +118,7 @@ Validator web3signer endpoint
 */}}
 {{- define "web3signer" -}}
 {{- if $.Values.global.label }}
-{{- default "http://web3signer-{{ $.Values.global.label }}-web3signer-eso:6174" }}
+{{- default "http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174" }}
 {{- end }}
 {{- end }}
 

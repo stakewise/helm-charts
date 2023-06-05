@@ -5,7 +5,8 @@
 global:
   imagePullSecrets: []
   network: mainnet
-  label: "test"
+  label: ""
+  project: ""
   # RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ##

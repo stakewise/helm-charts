@@ -1,5 +1,5 @@
 apiVersion: v2
-name: web3signer-eso
+name: web3signer
 description: A Helm chart for installing and configuring Web3signer
 
 # A chart can be either an 'application' or a 'library' chart.
