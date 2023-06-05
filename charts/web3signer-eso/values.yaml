@@ -37,7 +37,7 @@ externalSecrets:
     name: secretStoreRef
     kind: SecretStore
   data: []
-
+  
 ## Flyawy image is used to apply database migrations
 ##
 flywayImage:
