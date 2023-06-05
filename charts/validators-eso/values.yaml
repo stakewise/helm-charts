@@ -124,10 +124,6 @@ validatorsCount: 1
 
 validatorsNoOfKeys: 100
 
-## Default fee recipient for all validator keys.
-##
-suggestedFeeRecipient: "0x670B24610DF99b1685aEAC0dfD5307B92e0cF4d7"
-
 ## Whether a builder should be used for proposalConfig
 enableBuilder: true
 
@@ -188,12 +184,6 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
-
-## Network ID
-## Options for Ethereum: mainnet, prater
-## Options for Gnosis: gnosis
-##
-network: "goerli"
 
 ## Validators flags
 ##
