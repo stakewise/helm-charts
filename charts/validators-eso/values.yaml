@@ -255,6 +255,7 @@ beaconChainRpcEndpoints: []
 beaconChainRpcEndpointsRandomized: []
 
 # Lodestar specific setting
+# Enables strict checking of the validator's feeRecipient with the one returned by engine
 strictFeeRecipientCheck: true
 
 ## You can use the graffiti to add a string to your proposed blocks,
