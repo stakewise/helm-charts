@@ -12,7 +12,7 @@ data:
     counter=$COUNTER
     if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}" ]]; then
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}"
-    else if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS}" ]]; then
+    elif [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS}" ]]; then
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS}"
     else
         BEACON_PODS=$(kubectl -n ${POD_NAMESPACE} get pods -l "beacon=$BEACON_CLIENT" -o jsonpath='{.items[*].metadata.name}')
