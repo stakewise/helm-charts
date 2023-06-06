@@ -138,6 +138,7 @@ spec:
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
+              cat /data/proposerConfig.yaml;
               cat /data/beacon_endpoints.txt;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
             {{- if eq $root.Values.type "nimbus" }}
@@ -182,7 +183,7 @@ spec:
             {{- end }}
             {{- else if eq $root.Values.type "lodestar" }}
             - "--network={{ $root.Values.network }}"
-            - "--proposerSettingsFile=/data/proposerConfig.json"
+            - "--proposerSettingsFile=/data/proposerConfig.yaml"
             - "--externalSigner.url={{ include "web3signer" $root }}"
             - "--externalSigner.fetch=true"
             {{- end }}
