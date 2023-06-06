@@ -12,6 +12,8 @@ data:
     counter=$COUNTER
     if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}" ]]; then
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}"
+    else if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS}" ]]; then
+        beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS}"
     else
         BEACON_PODS=$(kubectl -n ${POD_NAMESPACE} get pods -l "beacon=$BEACON_CLIENT" -o jsonpath='{.items[*].metadata.name}')
         echo "$BEACON_PODS"
@@ -64,8 +66,8 @@ data:
                 fi
             done
         done
-        # Store beacon_endpoints in the file
-        echo "BEACON_ENDPOINTS=$beacon_endpoints" > /data/beacon_endpoints.txt
-        kubectl annotate pod "$POD_NAME" beacon-endpoints="$beacon_endpoints" --namespace="$POD_NAMESPACE"
-        cat /data/beacon_endpoints.txt
     fi
+    # Store beacon_endpoints in the file
+    echo "BEACON_ENDPOINTS=$beacon_endpoints" > /data/beacon_endpoints.txt
+    kubectl annotate pod "$POD_NAME" beacon-endpoints="$beacon_endpoints" --namespace="$POD_NAMESPACE"
+    cat /data/beacon_endpoints.txt

@@ -73,13 +73,6 @@ spec:
             - "{{ . }}"
             - "--no-of-keys"
             - "{{ $root.Values.validatorsNoOfKeys }}"
-            {{- if eq $root.Values.network "sepolia" }}
-            - "--network"
-            - "goerli"
-            {{- else }}
-            - "--network"
-            - "{{ $root.Values.network }}"
-            {{- end }}
             {{- if not $root.Values.strictFeeRecipientCheck }}
             - "--no-strict-fee-recipient-check"
             {{- end }}
@@ -102,6 +95,10 @@ spec:
             {{- if $.Values.beaconChainRpcEndpointsRandomized }}
             - name: BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED
               value: "{{ $.Values.beaconChainRpcEndpointsRandomized | join "," }}"
+            {{- end }}
+            {{- if $.Values.beaconChainRpcEndpoints }}
+            - name: BEACON_CHAIN_RPC_ENDPOINTS
+              value: "{{ $.Values.beaconChainRpcEndpoints | join "," }}"
             {{- end }}
             - name: COUNTER
               value: "{{ $counter }}"
