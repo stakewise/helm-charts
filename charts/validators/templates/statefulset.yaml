@@ -173,6 +173,7 @@ spec:
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
             {{- else if eq $root.Values.type "nimbus" }}
+            - "--validators-dir=/data/nimbus"
             {{- if $root.Values.enableBuilder }}
             - "--payload-builder=true"
             {{- end }}
