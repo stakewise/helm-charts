@@ -80,11 +80,11 @@ spec:
             - "--network"
             - "{{ $root.Values.network }}"
             {{- end }}
+            - "--strict-fee-recipient-check"
+            - "{{ $root.Values.strictFeeRecipientCheck }}"
             {{- if eq $.Values.type "lodestar" }}
             - "--graffiti"
             - "{{ $root.Values.graffiti }}"
-            - "--strict-fee-recipient-check"
-            - "{{ $root.Values.strictFeeRecipientCheck }}"
             {{- end }}
             {{- if not $root.Values.enableBuilder }}
             - "--proposal-builder-enabled"
@@ -137,7 +137,7 @@ spec:
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
-              cat /data/beacon_endpoints.txt
+              cat /data/beacon_endpoints.txt;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
