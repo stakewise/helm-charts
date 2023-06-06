@@ -9,12 +9,12 @@ data:
   init-beacon-endpoints.sh: |
     #!/bin/bash
     echo "Looking for beacon endpoints for validator client: $BEACON_CLIENT, counter: $COUNTER"
-    BEACON_CLIENT=lighthouse
     counter=$COUNTER
     if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}" ]]; then
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}"
     else
         BEACON_PODS=$(kubectl -n ${POD_NAMESPACE} get pods -l "beacon=$BEACON_CLIENT" -o jsonpath='{.items[*].metadata.name}')
+        echo "$BEACON_PODS"
         BEACON_API_SERVICES=$(kubectl -n ${POD_NAMESPACE} get services -l "type=api,beacon=$BEACON_CLIENT" -o jsonpath='{.items[*].metadata.name}')
         # Extract metadata.name fields
         IFS=' ' read -r -a beacon_service_names <<< "$BEACON_API_SERVICES"
@@ -26,10 +26,16 @@ data:
         num_pods=${#beacon_pod_names[@]}
         # Calculate the index range for each pod
         if [ "$counter" -ne 0 ]; then
-            # Calculate the start index based on counter
-            start_index=$((($counter - 1) % $num_pods))
-            # Rearrange the pod names based on start_index
-            rearranged_pod_names=("${beacon_pod_names[@]:$start_index}" "${beacon_pod_names[@]:0:$start_index}")
+            # Check if num_pods is not zero before performing the calculation
+            if [ "$num_pods" -ne 0 ]; then
+                # Calculate the start index based on counter
+                start_index=$((($counter - 1) % $num_pods))
+                # Rearrange the pod names based on start_index
+                rearranged_pod_names=("${beacon_pod_names[@]:$start_index}" "${beacon_pod_names[@]:0:$start_index}")
+            else
+                echo "Error: Division by zero (num_pods is zero)."
+                exit 1
+            fi
         else
             rearranged_pod_names=("${beacon_pod_names[@]}")
         fi
