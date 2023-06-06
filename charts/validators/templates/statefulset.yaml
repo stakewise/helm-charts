@@ -80,14 +80,15 @@ spec:
             - "--network"
             - "{{ $root.Values.network }}"
             {{- end }}
-            - "--strict-fee-recipient-check"
-            - "{{ $root.Values.strictFeeRecipientCheck }}"
+            {{- if not $root.Values.strictFeeRecipientCheck }}
+            - "--no-strict-fee-recipient-check"
+            {{- end }}
             {{- if eq $.Values.type "lodestar" }}
             - "--graffiti"
             - "{{ $root.Values.graffiti }}"
             {{- end }}
             {{- if not $root.Values.enableBuilder }}
-            - "--proposal-builder-enabled"
+            - "--no-proposal-builder-enabled"
             {{- end }}
           volumeMounts:
             - name: data
