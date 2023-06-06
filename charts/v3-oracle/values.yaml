@@ -96,7 +96,7 @@ settings:
   ##
   network: "mainnet"
 
-  oraclePrivateKey:  ""
+  walletPrivateKey:  ""
   sentryDsn: ""
 
   # RSA

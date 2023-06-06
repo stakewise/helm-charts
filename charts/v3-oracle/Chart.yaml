@@ -1,6 +1,6 @@
 apiVersion: v2
 name: v3-oracle
-version: 3.1.4
+version: 3.1.5
 appVersion: v0.1.0
 kubeVersion: "^1.14.0-0"
 description: The StakeWise application for submitting off-chain data to smart contracts.
