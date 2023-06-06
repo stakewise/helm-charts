@@ -173,7 +173,6 @@ spec:
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
             {{- else if eq $root.Values.type "nimbus" }}
-            - "--network={{ $root.Values.network }}"
             {{- if $root.Values.enableBuilder }}
             - "--payload-builder=true"
             {{- end }}
