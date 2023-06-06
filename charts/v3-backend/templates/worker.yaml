@@ -38,7 +38,7 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["bash", "./scripts/worker.sh"]
+          command: ["sh", "./scripts/worker.sh"]
           envFrom:
             - secretRef:
                 name: {{ include "common.names.fullname" . }}
