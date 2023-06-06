@@ -49,7 +49,11 @@ data:
             for pod in "${rearranged_pod_names[@]}"; do
                 if [[ $pod == *"$service"* ]]; then
                     echo "  Matching Pod: $pod"
-                    beacon_endpoint="http://$pod.$service.$POD_NAMESPACE:$BEACON_PORT"
+                    if [[ $BEACON_CLIENT == "prysm" ]]; then
+                        beacon_endpoint="$pod.$service.$POD_NAMESPACE:$BEACON_PORT"
+                    else
+                        beacon_endpoint="http://$pod.$service.$POD_NAMESPACE:$BEACON_PORT"
+                    fi
                     # Append the beacon_endpoint to beacon_endpoints
                     if [ -z "$beacon_endpoints" ]; then
                         beacon_endpoints="$beacon_endpoint"

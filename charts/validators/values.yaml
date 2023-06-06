@@ -231,7 +231,7 @@ beaconChainRpcEndpointsAutoDiscovery: true
 
 beaconPortMap:
   teku: 5051
-  prysm: 8080
+  prysm: 4000
   lighthouse: 5052
   nimbus: 5052
   lodestar: 9596
