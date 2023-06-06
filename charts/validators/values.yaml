@@ -211,6 +211,7 @@ flags:
     - "--data-dir=/data/nimbus"
     - "--non-interactive"
     - "--log-level=INFO"
+    - "--doppelganger-detection=off"
   lodestar: 
     - "validator"
     - "--dataDir=/data/lodestar"

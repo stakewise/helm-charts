@@ -140,6 +140,9 @@ spec:
               cat /data/proposerConfig.json;
               cat /data/beacon_endpoints.txt;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+            {{- if eq $root.Values.type "nimbus" }}
+              find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
