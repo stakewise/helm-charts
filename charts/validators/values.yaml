@@ -4,7 +4,6 @@
 
 global:
   imagePullSecrets: []
-  network: mainnet
   label: ""
   project: ""
   # RBAC configuration.
@@ -94,6 +93,8 @@ enabled: true
 ## Options for Gnosis: prysm, lighthouse
 ##
 type: nimbus
+
+network: mainnet
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
