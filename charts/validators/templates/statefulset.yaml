@@ -182,7 +182,6 @@ spec:
             - "--network={{ $root.Values.network }}"
             - "--proposerSettingsFile=/data/proposerConfig.yaml"
             - "--externalSigner.url={{ include "web3signer" $root }}"
-            - "--externalSigner.fetch=true"
             {{- end }}
             
             {{- include "validator-graffiti" $ | nindent 12 }}
