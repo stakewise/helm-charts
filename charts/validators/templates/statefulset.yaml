@@ -185,7 +185,7 @@ spec:
             - "--network={{ $root.Values.network }}"
             - "--proposerSettingsFile=/data/proposerConfig.yaml"
             - "--externalSigner.url={{ include "web3signer" $root }}"
-            - "--externalSigner.pubkeys=$(paste -sd, /data/pubkeys.txt | tr -d '\n')"
+            - "--externalSigner.pubkeys=$(paste -sd, /data/pubkeys.txt)"
             {{- end }}
             
             {{- include "validator-graffiti" $ | nindent 12 }}
