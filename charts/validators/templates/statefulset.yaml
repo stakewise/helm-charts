@@ -161,7 +161,7 @@ spec:
             - sh
             - -c
             - >
-              export PUBKEYS=$(paste -sd, /data/pubkeys.txt)
+              export PUBKEYS=$(paste -sd, /data/pubkeys.txt);
               node ./packages/cli/bin/lodestar
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
               {{ . }}
