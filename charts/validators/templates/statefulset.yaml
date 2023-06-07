@@ -169,7 +169,7 @@ spec:
               --network={{ $root.Values.network }}
               --proposerSettingsFile=/data/proposerConfig.yaml
               --externalSigner.url={{ include "web3signer" $root }}
-              --externalSigner.pubkeys=$(PUBKEYS)
+              --externalSigner.pubkeys=$PUBKEYS
               --beaconNodes=$(BEACON_ENDPOINTS)
             {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
