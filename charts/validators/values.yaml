@@ -227,7 +227,17 @@ extraFlags:
   nimbus: []
   lodestar: []
 
-beaconChainRpcEndpointsAutoDiscovery: true
+## Any of below 3 options needs to be provided
+beaconChainRpcEndpointsAutoDiscovery: false
+## List of Beacon Chain node addresses
+##
+beaconChainRpcEndpoints: []
+## Randomize endpoints if specified
+## Has a higher priority than beaconChainRpcEndpoints,
+## all specified hosts will be randomly assigned to all validators,
+## used to more evenly distribute the load
+##
+beaconChainRpcEndpointsRandomized: []
 
 beaconPortMap:
   teku: 5051
@@ -236,16 +246,9 @@ beaconPortMap:
   nimbus: 5052
   lodestar: 9596
 
-## List of Beacon Chain node addresses
-##
-beaconChainRpcEndpoints: []
 
-## Randomize endpoints if specified
-## Has a higher priority than beaconChainRpcEndpoints,
-## all specified hosts will be randomly assigned to all validators,
-## used to more evenly distribute the load
-##
-beaconChainRpcEndpointsRandomized: []
+
+
 
 # Lodestar specific setting
 # Enables strict checking of the validator's feeRecipient with the one returned by engine

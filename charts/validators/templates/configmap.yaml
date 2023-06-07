@@ -11,8 +11,10 @@ data:
     echo "Looking for beacon endpoints for validator client: $BEACON_CLIENT, counter: $COUNTER"
     counter=$COUNTER
     if [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}" ]]; then
+        echo "Using beacon endpoints set in Values.beaconChainRpcEndpointsRandomized"
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED}"
     elif [[ -n "${BEACON_CHAIN_RPC_ENDPOINTS}" ]]; then
+        echo "Using beacon endpoints set in Values.beaconChainRpcEndpoints"
         beacon_endpoints="${BEACON_CHAIN_RPC_ENDPOINTS}"
     else
         BEACON_PODS=$(kubectl -n ${POD_NAMESPACE} get pods -l "beacon=$BEACON_CLIENT" -o jsonpath='{.items[*].metadata.name}')
