@@ -165,7 +165,7 @@ spec:
               node ./packages/cli/bin/lodestar
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
               {{ . }}
-            {{- end -}}
+            {{- end }}
               --network={{ $root.Values.network }}
               --proposerSettingsFile=/data/proposerConfig.yaml
               --externalSigner.url={{ include "web3signer" $root }}
@@ -179,7 +179,7 @@ spec:
 
             {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
               {{ . }}
-            {{- end -}}
+            {{- end }}
           {{- else }}
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
