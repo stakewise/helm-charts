@@ -137,7 +137,7 @@ spec:
               cat /data/proposerConfig.json;
               cat /data/proposerConfig.yaml;
               cat /data/beacon_endpoints.txt;
-              formatted_content=$(cat /data/signer_keys.yml | grep -oP '(?<=\[")[0-9a-fA-F]+(?="])' | sed -e 's/^/0x/');
+              formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n' | sed -e 's/^/0x/');
               echo "$formatted_content" > /data/pubkeys.txt;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
             {{- if eq $root.Values.type "nimbus" }}
