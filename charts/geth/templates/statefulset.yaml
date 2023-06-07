@@ -138,7 +138,6 @@ spec:
               --override.terminaltotaldifficulty={{ .Values.terminalTotalDifficulty }}
           {{- end }}
               --datadir=/data/ethereum
-              --ethash.dagdir=/data/ethereum/.ethash
               --{{ .Values.global.network }}
           {{- range .Values.extraFlags }}
               {{ . | quote }}
