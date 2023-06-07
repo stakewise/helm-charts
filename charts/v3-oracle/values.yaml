@@ -51,8 +51,8 @@ serviceAccount:
 ##
 image:
   registry: "europe-west4-docker.pkg.dev"
-  repository: "stakewiselabs/private/v3-oracle"
-  tag: "v0.1.0"
+  repository: "stakewiselabs/public/v3-oracle"
+  tag: "master"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
