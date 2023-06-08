@@ -8,3 +8,4 @@ data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
+  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
