@@ -207,11 +207,9 @@ spec:
             - "--payload-builder=true"
             {{- end }}
             {{- end }}
-            {{- end }}
-            
+
             {{- include "validator-graffiti" $ | nindent 12 }}
 
-            {{- if or $.Values.beaconChainRpcEndpointsAutoDiscovery }}
             {{- if eq $.Values.type "prysm" }}
             - "--beacon-rpc-provider=$(BEACON_ENDPOINTS)"
             {{- else if eq $.Values.type "lighthouse" }}
