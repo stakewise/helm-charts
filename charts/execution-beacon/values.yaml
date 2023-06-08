@@ -482,7 +482,7 @@ beacon:
     # Port number of Beacon Rest API
     portMap:
       teku: 5051
-      prysm: 8080
+      prysm: 4000
       lighthouse: 5052
       nimbus: 5052
       lodestar: 9596
@@ -490,7 +490,7 @@ beacon:
   grpc:
     enabled: true
     host: "0.0.0.0"
-    port: 4000
+    port: 8080
     portName: "rpc"
 
   targetPeersMap:
