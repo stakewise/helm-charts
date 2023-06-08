@@ -35,6 +35,8 @@ settings:
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
   gcpStorageExitSignaturesBucket: ""
+  gcpPerspectiveApiKey: ""
+  gcpCloudVisionApiKey: ""
 
   ipfsLocalClientEndpoint: ""
   ipfsPinataPinEndpoints: "https://api.pinata.cloud/pinning/pinJSONToIPFS"
