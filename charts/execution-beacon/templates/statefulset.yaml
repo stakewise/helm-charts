@@ -374,9 +374,9 @@ spec:
             - "--datadir=/data/beacon"
             - "--execution-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}"
             - "--{{ .Values.global.network }}"
-          {{- if .Values.beacon.restApi.enabled }}
-            - "--rpc-host={{ .Values.beacon.restApi.host }}"
-            - "--rpc-port={{ index .Values.beacon.restApi.portMap "prysm" }}"
+          {{- if .Values.beacon.grpc.enabled }}
+            - "--rpc-host={{ .Values.beacon.grpc.host }}"
+            - "--rpc-port={{ .Values.beacon.grpc.port }}"
           {{- end }}
           {{- if .Values.global.p2pNodePort.enabled }}
             - "--config-file=/data/beacon/config.yaml"
@@ -411,9 +411,9 @@ spec:
           {{- else }}
             - "--disable-monitoring"
           {{- end }}
-          {{- if .Values.beacon.grpc.enabled }}
-            - "--grpc-gateway-host={{ .Values.beacon.grpc.host }}"
-            - "--grpc-gateway-port={{ .Values.beacon.grpc.port }}"
+          {{- if .Values.beacon.restApi.enabled }}
+            - "--grpc-gateway-host={{ .Values.beacon.restApi.host }}"
+            - "--grpc-gateway-port={{ index .Values.beacon.restApi.portMap "prysm" }}"
           {{- else }}
             - "--disable-grpc-gateway"
           {{- end }}
@@ -705,11 +705,7 @@ spec:
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"
             - name: BEACON_ENDPOINT
-          {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
-              value: "http://localhost:{{ .Values.beacon.grpc.port }}"
-          {{- else }}
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
-          {{- end }}
         {{- if .Values.global.ethsider.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.global.ethsider.livenessProbe.initialDelaySeconds }}
