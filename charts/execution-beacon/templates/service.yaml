@@ -57,7 +57,7 @@ spec:
   {{- if and (eq .Values.beacon.client "prysm") .Values.beacon.grpc.enabled }}
     - name: {{ .Values.beacon.grpc.portName }}-beacon
       port: {{ .Values.beacon.grpc.port }}
-      targetPort: {{ .Values.beacon.grpc.portName }}
+      targetPort: {{ .Values.beacon.grpc.portName }}-beacon
   {{- end }}
   {{- if .Values.beacon.restApi.enabled }}
     - name: http-beacon
