@@ -6,8 +6,8 @@
 {{- fail ".Values.settings.consensusEndpoint is empty" }}
 {{- end }}
 
-{{- if not .Values.settings.operatorPrivateKey }}
-{{- fail ".Values.settings.operatorPrivateKey is empty" }}
+{{- if not .Values.settings.hotWalletPrivateKey }}
+{{- fail ".Values.settings.hotWalletPrivateKey is empty" }}
 {{- end }}
 
 {{- if not .Values.settings.vaultContractAddress }}
