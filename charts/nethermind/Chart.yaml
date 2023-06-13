@@ -2,8 +2,8 @@ apiVersion: v2
 name: nethermind
 description: .NET Core Ethereum client
 type: application
-version: 2.4.2
-appVersion: "v1.19.1"
+version: 2.4.3
+appVersion: "v1.19.2"
 keywords:
   - ethereum
   - blockchain
