@@ -707,7 +707,11 @@ spec:
             - name: BEACON_ENDPOINT
               value: "http://localhost:{{ index .Values.beacon.restApi.portMap .Values.beacon.client }}"
             - name: BIND_ADDR
-              value: {{ .Values.global.ethsider.bindAddr }}
+              value: "{{ .Values.global.ethsider.bindAddr }}"
+          ports:
+            - containerPort: {{ .Values.global.ethsider.bindAddr }}
+              name: sidecar
+              protocol: TCP
         {{- if .Values.global.ethsider.livenessProbe.enabled }}
           livenessProbe:
             initialDelaySeconds: {{ .Values.global.ethsider.livenessProbe.initialDelaySeconds }}
