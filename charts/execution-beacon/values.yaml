@@ -96,7 +96,7 @@ global:
   ethsider:
     enabled: true
     repository: "nethermindeth/ethsider"
-    tag: "v0.0.13"
+    tag: "v0.0.15"
     pullPolicy: IfNotPresent
     bindAddr: 3000
     ## Configure liveness and readiness probes
