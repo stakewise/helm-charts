@@ -180,7 +180,6 @@ spec:
               exec geth
               --syncmode=snap
               --datadir=/data/execution
-              --ethash.dagdir=/data/execution/.ethash
               --ipcdisable
               --{{ .Values.global.network }}
             {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
