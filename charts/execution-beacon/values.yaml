@@ -94,35 +94,36 @@ global:
           property: jwt
 
   ethsider:
-    enabled: false
+    enabled: true
     repository: "nethermindeth/ethsider"
-    tag: "v0.0.9"
+    tag: "v0.0.13"
     pullPolicy: IfNotPresent
+    bindAddr: 3000
     ## Configure liveness and readiness probes
     ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
     ## NB! readinessProbe and livenessProbe must be disabled before genesis
     ##
     livenessProbe:
-      enabled: true
-      initialDelaySeconds: 900
+      enabled: false
+      initialDelaySeconds: 10
       timeoutSeconds: 3
-      periodSeconds: 30
+      periodSeconds: 1
       failureThreshold: 3
-      successThreshold: 1
+      successThreshold: 3
       httpGet:
-        path: /eth2/liveness
+        path: /liveness
         port: sidecar
         scheme: HTTP
 
     readinessProbe:
       enabled: true
-      initialDelaySeconds: 300
+      initialDelaySeconds: 10
       timeoutSeconds: 3
-      periodSeconds: 30
-      failureThreshold: 30
-      successThreshold: 2
+      periodSeconds: 1
+      failureThreshold: 3
+      successThreshold: 3
       httpGet:
-        path: /eth2/readiness
+        path: /readiness
         port: sidecar
         scheme: HTTP
 
@@ -432,8 +433,8 @@ beacon:
   ## from a recent finalized checkpoint state rather than syncing from genesis.
   ##
   checkPointSync:
-    enabled: false
-    url: ""
+    enabled: true
+    url: "https://mainnet-checkpoint-sync.attestant.io"
     trustedSourceUrl: ""
 
   ## Post bellatrix, this address will receive the transaction fees produced
