@@ -5,8 +5,8 @@ The list of helm charts forked and reworked from [StakeWise helm repository](htt
 ## TL;DR
 
 ```bash
-$ helm repo add nethermind https://charts.nethermind.io
-$ helm install my-release nethermind/<chart-name>
+$ helm repo add nethermindeth https://charts.nethermind.io
+$ helm install my-release nethermindeth/<chart-name>
 ```
 
 ## Before you begin
