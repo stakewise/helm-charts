@@ -53,6 +53,8 @@ settings:
   memcachedUrl: ""
   brokerUrl: ""
 
+  ratedApiBearerToken: ""
+
   graph:
     postgresHost: ""
     postgresPort: ""
@@ -71,7 +73,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v0.3.3"
+  tag: "v0.3.6"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
