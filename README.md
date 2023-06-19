@@ -1,12 +1,12 @@
 # The Charts for Kubernetes
 
-The list of helm charts forked from [StakeWise helm repository](https://github.com/stakewise/helm-charts), maintained and further developed by Nethermind team. Every chart is located in a separate folder and has the configuration parameters located in `values.yaml` file.
+The list of helm charts forked and reworked from [StakeWise helm repository](https://github.com/stakewise/helm-charts), maintained and further developed by Nethermind team. Every chart is located in a separate folder and has the configuration parameters located in `values.yaml` file.
 
 ## TL;DR
 
 ```bash
-$ helm repo add stakewise https://charts.stakewise.io
-$ helm install my-release stakewise/<chart-name>
+$ helm repo add nethermind https://charts.nethermind.io
+$ helm install my-release nethermind/<chart-name>
 ```
 
 ## Before you begin
