@@ -4,6 +4,8 @@ metadata:
   name: {{ include "web3signer.fullname" . }}
   labels:
     {{- include "web3signer.labels" . | nindent 4 }}
+  annotations:
+    prometheus.io/probe: true
 spec:
   type: {{ .Values.service.type }}
   ports:
