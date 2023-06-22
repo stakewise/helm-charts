@@ -51,6 +51,10 @@ spec:
                 name: {{ include "common.names.fullname" . }}
             - secretRef:
                 name: {{ include "common.names.fullname" . }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.ports.http }}
+              protocol: TCP
         {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
