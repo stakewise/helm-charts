@@ -14,9 +14,6 @@ spec:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
-      annotations:
-        checksum/oracle-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        checksum/oracle-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
     {{- if .Values.tolerations }}
       tolerations:
