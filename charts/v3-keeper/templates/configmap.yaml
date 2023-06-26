@@ -9,3 +9,4 @@ data:
   NETWORK: {{ .Values.settings.network | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
