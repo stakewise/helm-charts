@@ -10,4 +10,3 @@ data:
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
-  METRICS_PORT: {{ .Values.serviceMonitor.port | quote }}
