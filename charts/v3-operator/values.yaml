@@ -151,6 +151,7 @@ persistence:
 ##
 serviceMonitor:
   enabled: false
+  host: 0.0.0.0
   ## The namespace in which the ServiceMonitor will be created
   ##
   namespace: ""
