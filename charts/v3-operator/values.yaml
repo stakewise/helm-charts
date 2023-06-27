@@ -38,6 +38,11 @@ affinity: { }
 ##
 tolerations: [ ]
 
+service:
+  type: ClusterIP
+  ports:
+    http: 9100
+
 serviceAccount:
   ## Annotations to add to the service account
   ##
