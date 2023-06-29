@@ -10,10 +10,11 @@ data:
   VAULT_CONTRACT_ADDRESS: {{ .Values.settings.vaultContractAddress | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
-  KEYSTORES_PASSWORD_PATH: {{ .Values.settings.keystoresPasswordPath | quote }}
+  KEYSTORES_PASSWORD_FILE: {{ .Values.settings.keystoresPasswordFile | quote }}
   KEYSTORES_PATH: {{ .Values.settings.keystoresPath | quote }}
   DEPOSIT_DATA_PATH: {{ .Values.settings.depositDataPath | quote }}
   DEPOSIT_DATA: {{ .Values.settings.depositData | quote }}
+  METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
 
 {{- if .Values.settings.depositData }}
 ---

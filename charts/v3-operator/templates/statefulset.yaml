@@ -55,6 +55,11 @@ spec:
         - name: v3-operator
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - python
+          args:
+            - src/main.py
+            - start
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
