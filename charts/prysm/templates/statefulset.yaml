@@ -103,8 +103,10 @@ spec:
               mountPath: /config
             - name: data
               mountPath: /data
+      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - name: scripts
               mountPath: /data/scripts
+      {{- end }}
       {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
