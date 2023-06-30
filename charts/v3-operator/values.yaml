@@ -57,7 +57,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v0.1.7"
+  tag: "master"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -80,7 +80,7 @@ settings:
   network: "goerli"
 
   # Address of the Vault to register validators for
-  vaultContractAddress:  ""
+  vault:  ""
 
   # API endpoint for the execution node
   executionEndpoint: ""

@@ -7,7 +7,7 @@ metadata:
 data:
   DATABASE_DIR: "/data"
   NETWORK: {{ .Values.settings.network | quote }}
-  VAULT_CONTRACT_ADDRESS: {{ .Values.settings.vaultContractAddress | quote }}
+  VAULT: {{ .Values.settings.vault | quote }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
   KEYSTORES_PASSWORD_FILE: {{ .Values.settings.keystoresPasswordFile | quote }}
