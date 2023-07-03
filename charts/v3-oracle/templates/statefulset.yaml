@@ -63,9 +63,6 @@ spec:
               containerPort: {{ .Values.service.ports.http }}
               protocol: TCP
           volumeMounts:
-            - name: rsakey
-              mountPath: /secret
-              readOnly: true
             - name: data
               mountPath: /data
           {{- with .Values.resources }}
@@ -82,19 +79,12 @@ spec:
             - secretRef:
                 name: {{ include "common.names.fullname" . }}
           volumeMounts:
-            - name: rsakey
-              mountPath: /secret
-              readOnly: true
             - name: data
               mountPath: /data
           {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
-      volumes:
-        - name: rsakey
-          secret:
-            secretName: {{ include "common.names.fullname" . }}-rsa-private-key
   volumeClaimTemplates:
     - metadata:
         name: data
