@@ -148,7 +148,7 @@ spec:
             {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
             {{- if .Values.global.externalSecrets.enabled }}
               --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
-            {{- else }} --
+            {{- else }}
               --JsonRpc.JwtSecretFile=/secret/jwtsecret
             {{- end }}
               --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
