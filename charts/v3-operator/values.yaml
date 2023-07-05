@@ -82,7 +82,7 @@ settings:
   # Address of the Vault to register validators for
   vault:  ""
 
-  # API endpoints for the execution node
+  # Comma separated list of endpoints for the execution node
   executionEndpoints: ""
   # API endpoints for the consensus node
   consensusEndpoints: ""
