@@ -10,7 +10,7 @@ data:
     #!/bin/sh
 {{- if or (and .Values.execution.persistence.enabled .Values.execution.initChownData) (and .Values.beacon.persistence.enabled .Values.beacon.initChownData) }}
     mkdir -p /data && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data;
-    mkdir -p /data/beacon;
+    mkdir -p /data/beacon && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data/beacon;
 {{- end }}
     echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
 {{- if .Values.global.p2pNodePort.enabled }}
