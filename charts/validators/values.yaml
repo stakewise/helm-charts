@@ -136,19 +136,19 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v4.0.5"
+    tag: "v4.0.6"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v4.2.0"
+    tag: "v4.3.0"
   teku:
     repository: "consensys/teku"
-    tag: "23.5.0"
+    tag: "23.6.1"
   nimbus: 
     repository: "statusim/nimbus-validator-client"
-    tag: "multiarch-v23.5.1"
+    tag: "multiarch-v23.6.1"
   lodestar: 
     repository: "chainsafe/lodestar"
-    tag: "v1.8.0"
+    tag: "v1.9.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/

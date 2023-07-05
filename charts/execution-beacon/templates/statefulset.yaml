@@ -75,10 +75,15 @@ spec:
                   fieldPath: spec.nodeName
           command: ['/bin/sh', '/scripts/init.sh']
           volumeMounts:
+          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+            - name: data
+              mountPath: /data
+          {{- else }}
             - name: data-execution
               mountPath: /data/execution
             - name: data-beacon
               mountPath: /data/beacon
+          {{- end }}
             - name: env-nodeport
               mountPath: /env
             - name: scripts-init
@@ -101,8 +106,13 @@ spec:
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
           volumeMounts:
+          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+            - name: data
+              mountPath: /data
+          {{- else }}
             - name: data-beacon
               mountPath: /data/beacon
+          {{- end }}
         {{- end }}
       containers:
         {{/*
@@ -341,8 +351,13 @@ spec:
               protocol: UDP
             {{- end }}
           volumeMounts:
+          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+            - name: data
+              mountPath: /data
+          {{- else }}
             - name: data-execution
               mountPath: /data/execution
+          {{- end }}
             {{- if .Values.global.externalSecrets.enabled }}
             - name: external-secrets
               mountPath: /external-secrets
@@ -678,8 +693,13 @@ spec:
               protocol: TCP
           {{- end }}
           volumeMounts:
+          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+            - name: data
+              mountPath: /data
+          {{- else }}
             - name: data-beacon
               mountPath: /data/beacon
+          {{- end }}
           {{- if .Values.global.externalSecrets.enabled }}
             - name: external-secrets
               mountPath: /external-secrets
@@ -753,6 +773,22 @@ spec:
         - name: env-nodeport
           emptyDir: {}
   volumeClaimTemplates:
+    {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+    - metadata:
+        name: data
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.execution.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.execution.persistence.accessModes }}
+        storageClassName: {{ .Values.execution.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.execution.persistence.size | quote }}
+    {{- else }}
     - metadata:
         name: data-execution
         labels:
@@ -781,3 +817,4 @@ spec:
         resources:
           requests:
             storage: {{ .Values.beacon.persistence.size | quote }}
+    {{- end }}

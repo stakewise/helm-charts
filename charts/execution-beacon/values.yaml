@@ -12,32 +12,32 @@ global:
     execution:
       nethermind: 
         repository: "nethermind/nethermind"
-        tag: "1.18.1"
+        tag: "1.19.3"
       geth: 
         repository: "ethereum/client-go"
         tag: "v1.12.0"
       bseu: 
         repository: "hyperledger/besu"
-        tag: "23.4.1"
+        tag: "23.4.4"
       erigon: 
         repository: "thorax/erigon"
-        tag: "v2.43.1"
+        tag: "v2.48.0"
     beacon:
       prysm: 
         repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
         tag: "v4.0.6"
       teku: 
         repository: "consensys/teku"
-        tag: "23.5.0"
+        tag: "23.6.1"
       lighthouse: 
         repository: "sigp/lighthouse"
-        tag: "v4.2.0"
+        tag: "v4.3.0"
       nimbus: 
         repository: "statusim/nimbus-eth2"
-        tag: "multiarch-v23.5.1"
+        tag: "multiarch-v23.6.1"
       lodestar: 
         repository: "chainsafe/lodestar"
-        tag: "v1.8.0"
+        tag: "v1.9.1"
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using

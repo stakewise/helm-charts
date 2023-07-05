@@ -15,7 +15,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.3.1"
+  tag: "23.6.0"
 
 ## Init image is used to chown data volume, etc.
 ##
@@ -42,7 +42,7 @@ externalSecrets:
 ##
 flywayImage:
   repository: flyway/flyway
-  tag: "8.5.8-alpine"
+  tag: "9.3"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
