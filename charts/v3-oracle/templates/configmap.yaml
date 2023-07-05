@@ -12,4 +12,3 @@ data:
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   DATABASE: "/data/oracle.db"
-  RSA_PRIVATE_KEY_PATH: "/secret/rsakey"

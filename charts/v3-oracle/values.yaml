@@ -99,11 +99,6 @@ settings:
   walletPrivateKey:  ""
   sentryDsn: ""
 
-  # RSA
-  rsaPrivateKeyPassphrase: ""
-  rsaPrivateKeyPath: ""
-  rsaPrivateKey: ""
-
   ## Ethereum / Gnosis Nodes
   ##
   executionEndpoint: ""
