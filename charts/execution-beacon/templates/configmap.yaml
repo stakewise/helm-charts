@@ -10,6 +10,7 @@ data:
     #!/bin/sh
 {{- if or (and .Values.execution.persistence.enabled .Values.execution.initChownData) (and .Values.beacon.persistence.enabled .Values.beacon.initChownData) }}
     mkdir -p /data && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data;
+    mkdir -p /data/beacon;
 {{- end }}
     echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
 {{- if .Values.global.p2pNodePort.enabled }}
@@ -24,7 +25,7 @@ data:
       export EXTERNAL_IP=$(kubectl get nodes "${NODE_NAME}" -o jsonpath='{.status.addresses[?(@.type=="ExternalIP")].address}');
   {{- end }}
       echo "EXTERNAL_EXECUTION_PORT=$EXTERNAL_EXECUTION_PORT" >  /env/init-nodeport;
-      echo "EXTERNAL_BEACON_PORT=$EXTERNAL_BEACON_PORT" >> env/init-nodeport;
+      echo "EXTERNAL_BEACON_PORT=$EXTERNAL_BEACON_PORT" >> /env/init-nodeport;
       echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
       cat /env/init-nodeport;
   {{- if eq .Values.beacon.client "prysm" }}
