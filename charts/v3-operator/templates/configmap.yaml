@@ -8,8 +8,8 @@ data:
   DATABASE_DIR: "/data"
   NETWORK: {{ .Values.settings.network | quote }}
   VAULT: {{ .Values.settings.vault | quote }}
-  EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
-  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
+  CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   KEYSTORES_PASSWORD_FILE: {{ .Values.settings.keystoresPasswordFile | quote }}
   KEYSTORES_PATH: {{ .Values.settings.keystoresPath | quote }}
   DEPOSIT_DATA_PATH: {{ .Values.settings.depositDataPath | quote }}

@@ -82,10 +82,10 @@ settings:
   # Address of the Vault to register validators for
   vault:  ""
 
-  # API endpoint for the execution node
-  executionEndpoint: ""
-  # API endpoint for the consensus node
-  consensusEndpoint: ""
+  # API endpoints for the execution node
+  executionEndpoints: ""
+  # API endpoints for the consensus node
+  consensusEndpoints: ""
 
   # Absolute path to the password file for decrypting keystores
   keystoresPasswordFile: "/password/password.txt"
