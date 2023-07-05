@@ -75,7 +75,7 @@ spec:
                   fieldPath: spec.nodeName
           command: ['/bin/sh', '/scripts/init.sh']
           volumeMounts:
-          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+          {{- if .Values.global.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
           {{- else }}
@@ -106,7 +106,7 @@ spec:
               --data-dir=/data/beacon
               --trusted-node-url={{ .Values.beacon.checkPointSync.url }}
           volumeMounts:
-          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+          {{- if .Values.global.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
           {{- else }}
@@ -351,7 +351,7 @@ spec:
               protocol: UDP
             {{- end }}
           volumeMounts:
-          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+          {{- if .Values.global.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
           {{- else }}
@@ -693,7 +693,7 @@ spec:
               protocol: TCP
           {{- end }}
           volumeMounts:
-          {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+          {{- if .Values.global.sharedPersistence.enabled }}
             - name: data
               mountPath: /data
           {{- else }}
@@ -773,21 +773,21 @@ spec:
         - name: env-nodeport
           emptyDir: {}
   volumeClaimTemplates:
-    {{- if and (contains "nvme" .Values.execution.persistence.storageClassName) (contains "nvme" .Values.beacon.persistence.storageClassName) }}
+    {{- if .Values.global.sharedPersistence.enabled }}
     - metadata:
         name: data
         labels:
           {{- include "common.labels.statefulset" . | nindent 10 }}
-      {{- with .Values.execution.persistence.annotations }}
+      {{- with .Values.global.sharedPersistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
       {{- end }}
       spec:
-        accessModes: {{ .Values.execution.persistence.accessModes }}
-        storageClassName: {{ .Values.execution.persistence.storageClassName }}
+        accessModes: {{ .Values.global.sharedPersistence.accessModes }}
+        storageClassName: {{ .Values.global.sharedPersistence.storageClassName }}
         resources:
           requests:
-            storage: {{ .Values.execution.persistence.size | quote }}
+            storage: {{ .Values.global.sharedPersistence.size | quote }}
     {{- else }}
     - metadata:
         name: data-execution
