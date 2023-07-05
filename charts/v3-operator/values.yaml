@@ -84,7 +84,7 @@ settings:
 
   # Comma separated list of endpoints for the execution node
   executionEndpoints: ""
-  # API endpoints for the consensus node
+  # Comma separated list of endpoints for the consensus node
   consensusEndpoints: ""
 
   # Absolute path to the password file for decrypting keystores
