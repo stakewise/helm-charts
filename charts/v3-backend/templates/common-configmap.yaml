@@ -22,8 +22,8 @@ data:
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
 
-  EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
-  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
+  CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
 
