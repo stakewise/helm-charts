@@ -8,7 +8,7 @@ data:
   LOG_LEVEL: {{ .Values.settings.logLevel | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
   IPFS_LOCAL_CLIENT_ENDPOINT: {{ .Values.settings.ipfsLocalClientEndpoint | quote }}
-  EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
-  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
+  CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   DATABASE: "/data/oracle.db"
