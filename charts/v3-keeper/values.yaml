@@ -45,7 +45,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-keeper"
-  tag: "v0.1.2"
+  tag: "master"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -71,8 +71,8 @@ settings:
   ## Possible values: goerli, perm_goerli, gnosis, mainnet
   ##
   network: "mainnet"
-  executionEndpoint: ""
-  consensusEndpoint: ""
+  executionEndpoints: ""
+  consensusEndpoints: ""
   sentryDsn: ""
 
   ## Credentials

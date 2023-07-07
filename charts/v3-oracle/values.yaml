@@ -101,8 +101,8 @@ settings:
 
   ## Ethereum / Gnosis Nodes
   ##
-  executionEndpoint: ""
-  consensusEndpoint: ""
+  executionEndpoints: ""
+  consensusEndpoints: ""
 
   ## IPFS Settings
   ##
