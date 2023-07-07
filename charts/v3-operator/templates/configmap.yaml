@@ -5,16 +5,22 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
+  DATA_DIR: "/data"
   DATABASE_DIR: "/data"
+  VERBOSE: {{ .Values.settings.verbose | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
   VAULT: {{ .Values.settings.vault | quote }}
+  HARVEST_VAULT: {{ .Values.settings.harvestVault | quote }}
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   KEYSTORES_PASSWORD_FILE: {{ .Values.settings.keystoresPasswordFile | quote }}
-  KEYSTORES_PATH: {{ .Values.settings.keystoresPath | quote }}
-  DEPOSIT_DATA_PATH: {{ .Values.settings.depositDataPath | quote }}
+  KEYSTORES_DIR: {{ .Values.settings.keystoresDir | quote }}
+  DEPOSIT_DATA_FILE: {{ .Values.settings.depositDataFile | quote }}
   DEPOSIT_DATA: {{ .Values.settings.depositData | quote }}
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
+  MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
+  HOT_WALLET_FILE: {{ .Values.settings.hotWalletFile | quote }}
+  HOT_WALLET_PASSWORD_FILE: {{ .Values.settings.hotWalletPasswordFile | quote }}
 
 {{- if .Values.settings.depositData }}
 ---

@@ -75,12 +75,21 @@ resources:
 priorityClassName: ""
 
 settings:
-  ## Possible values: goerli, gnosis, mainnet
-  ##
+  ## Enable debug mode. Default is false.
+  verbose: "false"
+
+  ## The network of the Vault. Choices are: mainnet, gnosis, goerli
+  ## Default value will be taken from vault config
   network: "goerli"
 
-  # Address of the Vault to register validators for
+  ## Address of the Vault to register validators for
   vault:  ""
+
+  ## Whether to submit vault harvest transactions. Default is false.
+  harvestVault: "false"
+
+  ## Maximum fee per gas limit for transactions. Default is 70 Gwei.
+  maxFeePerGasGwei: 70
 
   # Comma separated list of endpoints for the execution node
   executionEndpoints: ""
@@ -94,10 +103,10 @@ settings:
   keystoresPassword: ""
 
   # Absolute path to the directory with all the encrypted keystores
-  keystoresPath: "/keystores"
+  keystoresDir: "/keystores"
 
   # Path to the deposit_data.json file
-  depositDataPath: "/deposit/deposit_data.json"
+  depositDataFile: "/deposit/deposit_data.json"
 
   # Optional if used from configmap.
   # Example:
@@ -105,8 +114,21 @@ settings:
   #   [{"pubkey": "8f1bfd7272c47d70483e8bae70a8ebf316b8ae36f62e2b30e2a7c10bc9c8a307be86f6724cbd5f8ccca0efa48753e59a", "withdrawal_credentials":...
   depositData: ""
 
-  # Private key of the hot wallet with ETH for submitting transactions
-  hotWalletPrivateKey: ""
+  # Path to the hot wallet keystore
+  hotWalletFile: "/wallet/wallet.json"
+
+  # Optional if used from configmap.
+  # Example:
+  # hotWallet: |
+  #   {"address": "ce9...
+  hotWallet: ""
+
+  # Path to the hot wallet password file
+  hotWalletPasswordFile: "/wallet/password.txt"
+
+  # Password for the hot wallet
+  # Optional if used from secrets. 
+  hotWalletPassword: ""
 
 # Additonal volumes and mounts used to attach keystores from existing secret
 # Example:
