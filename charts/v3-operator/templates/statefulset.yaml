@@ -63,8 +63,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
-            - secretRef:
-                name: {{ include "common.names.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.ports.http }}
@@ -78,6 +76,11 @@ spec:
           {{- if .Values.settings.keystoresPassword }}
             - name: keystores-password
               mountPath: /password
+              readOnly: true
+          {{- end }}
+          {{- if and .Values.settings.hotWallet .Values.settings.hotWalletPassword }}
+            - name: hot-wallet
+              mountPath: /wallet
               readOnly: true
           {{- end }}
           {{- with .Values.additionalMounts  }}
@@ -106,6 +109,16 @@ spec:
           secret:
             secretName: {{ include "common.names.fullname" . }}-keystores-password
             items:
+            - key: password.txt
+              path: password.txt
+      {{- end }}
+      {{- if and .Values.settings.hotWallet .Values.settings.hotWalletPassword }}
+        - name: hot-wallet
+          secret:
+            secretName: {{ include "common.names.fullname" . }}-hot-wallet
+            items:
+            - key: wallet.json
+              path: wallet.json
             - key: password.txt
               path: password.txt
       {{- end }}

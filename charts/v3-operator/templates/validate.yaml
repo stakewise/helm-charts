@@ -1,15 +1,11 @@
-{{- if not .Values.settings.executionEndpoint }}
-{{- fail ".Values.settings.executionEndpoint is empty" }}
+{{- if not .Values.settings.executionEndpoints }}
+{{- fail ".Values.settings.executionEndpoints is empty" }}
 {{- end }}
 
-{{- if not .Values.settings.consensusEndpoint }}
-{{- fail ".Values.settings.consensusEndpoint is empty" }}
+{{- if not .Values.settings.consensusEndpoints }}
+{{- fail ".Values.settings.consensusEndpoints is empty" }}
 {{- end }}
 
-{{- if not .Values.settings.hotWalletPrivateKey }}
-{{- fail ".Values.settings.hotWalletPrivateKey is empty" }}
-{{- end }}
-
-{{- if not .Values.settings.vaultContractAddress }}
-{{- fail ".Values.settings.vaultContractAddress is empty" }}
+{{- if not .Values.settings.vault }}
+{{- fail ".Values.settings.vault is empty" }}
 {{- end }}
