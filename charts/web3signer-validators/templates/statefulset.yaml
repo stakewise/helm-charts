@@ -35,8 +35,6 @@ spec:
     metadata:
       labels:
         {{- include "validators.selectorLabels" $root | nindent 8 }}
-      annotations:
-        checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
       {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:

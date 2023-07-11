@@ -1,5 +1,5 @@
 apiVersion: v2
-name: validators
+name: web3signer-validators
 description: A Helm chart for installing validators with the web3signer.
 
 # A chart can be either an 'application' or a 'library' chart.
