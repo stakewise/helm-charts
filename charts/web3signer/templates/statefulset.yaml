@@ -61,7 +61,7 @@ spec:
           envFrom:
             - secretRef:
                 name: {{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", "{{ .Values.dbKeystoreUrl }}", "--output-dir", "/data/keystore"]
+          args: ["key_manager/main.py", "sync-web3signer", "--db-url", "{{ .Values.dbKeystoreUrl }}", "--output-dir", "/data/keystore"]
           volumeMounts:
             - name: data
               mountPath: /data
