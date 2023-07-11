@@ -60,6 +60,9 @@ spec:
           args:
             - src/main.py
             - start
+          env:
+            - name: PYTHONPATH
+              value: "."
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
