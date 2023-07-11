@@ -16,7 +16,7 @@ securityContext:
 ## Termination Grace Period
 ## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
 ##
-terminationGracePeriodSeconds: 1800
+terminationGracePeriodSeconds: 10
 
 ## Affinity Settings
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
