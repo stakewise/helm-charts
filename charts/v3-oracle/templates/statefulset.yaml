@@ -52,7 +52,10 @@ spec:
         - name: api
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["./scripts/app.sh"]
+          command: ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--log-config", "uvicorn-log-config.json"]
+          env:
+            - name: PYTHONPATH
+              value: "."
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
@@ -72,7 +75,10 @@ spec:
         - name: worker
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          command: ["./scripts/worker.sh"]
+          command: ["python3", "src/worker.py"]
+          env:
+            - name: PYTHONPATH
+              value: "."
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}

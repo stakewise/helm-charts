@@ -46,6 +46,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command: ["python"]
           args: ["./src/main.py"]
+          env:
+            - name: PYTHONPATH
+              value: "."
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
