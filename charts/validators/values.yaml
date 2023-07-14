@@ -107,7 +107,7 @@ image:
   prysm:
     registry: "gcr.io"
     repository: "prysmaticlabs/prysm/validator"
-    tag: "v4.0.6"
+    tag: "v4.0.7"
   prysmGnosis:
     registry: "ghcr.io"
     repository: "gnosischain/gbc-prysm-validator"
