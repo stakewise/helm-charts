@@ -1,7 +1,6 @@
 # Oracle Helm Chart
 
-Kubernetes Helm chart for deploying [v3-oracle](https://github.com/stakewise/v3-oracle) - the entity which is responsible for reading StakeWise pool validators data from beacon chain and submitting
-it to the Oracles smart contract.
+Kubernetes Helm chart for deploying [v3-oracle](https://github.com/stakewise/v3-oracle).
 
 ## TL;DR;
 
