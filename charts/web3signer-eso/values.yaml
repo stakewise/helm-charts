@@ -12,7 +12,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.10.0"
+  tag: "23.6.0"
 
 ## Init image is used to chown data volume, etc.
 ##
@@ -33,6 +33,12 @@ cliImage:
 # dbUrl: "jdbc:postgresql://localhost/web3signer"
 # dbUsername: ""
 # dbPassword: ""
+
+provisioningExternalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
 
 externalSecretsV2:
   enabled: false
