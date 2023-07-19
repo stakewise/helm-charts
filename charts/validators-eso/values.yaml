@@ -41,6 +41,12 @@ cliImage:
   tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
+provisioningExternalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+
 externalSecrets:
   enabled: true
   secretStoreRef: secretStoreRef
