@@ -101,10 +101,9 @@ spec:
               ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
-               cat /data/signer_keys.yml > /data/config;
+              cat /data/signer_keys.yml > /data/config;
               cat /data/config;
-              echo "" >>
-               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+              chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
               mountPath: /data
