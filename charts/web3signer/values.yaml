@@ -28,7 +28,7 @@ initImage:
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/key-manager"
-  tag: "v0.2.1.alpha"
+  tag: "v0.2.1"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
