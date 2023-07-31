@@ -111,6 +111,9 @@ web3signerJavaOpts: "-Xmx1g -Xms1g"
 ##
 keyManagerApiEnabled: "false"
 
+## Extra flags for web3signer
+##
+extraFlags: []
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
