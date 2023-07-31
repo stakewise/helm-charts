@@ -87,6 +87,9 @@ spec:
           args:
             - --config-file=/config/config.yaml
             - eth2
+          {{- range .Values.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
