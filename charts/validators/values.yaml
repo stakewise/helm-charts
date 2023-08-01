@@ -3,6 +3,9 @@
 # Declare variables to be passed into your templates.
 
 global:
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
   imagePullSecrets: []
   label: ""
   project: ""
@@ -149,11 +152,6 @@ image:
   lodestar: 
     repository: "chainsafe/lodestar"
     tag: "v1.9.1"
-
-## Credentials to fetch images from private registry
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-##
-imagePullSecrets: []
 
 terminationGracePeriodSeconds: 300
 
