@@ -1,41 +1,47 @@
 # StakeWise Helm Charts for Kubernetes
 
-This repository contains a curated list of StakeWise Helm charts, with each chart located in a separate folder and its configuration parameters defined in the `values.yaml` file.
+This repository offers a selection of carefully curated StakeWise Helm charts, which are stored in individual folders. Each chart has its own `values.yaml` file defining the configuration parameters.
 
-## Quick Start
+## Getting Started
 
-To install a chart from this repository, add the StakeWise repository to your local Helm client:
+To use these Helm charts, you first need to add the StakeWise repository to your local Helm client:
 
 ```bash
 helm repo add stakewise https://charts.stakewise.io
 ```
 
-You can then deploy a chart by running:
+Once the repository is added, you can deploy a specific chart with the following command:
 
 ```bash
 helm install my-release stakewise/<chart-name>
 ```
 
-Make sure to replace `<chart-name>` with the name of the chart you want to install.
+**Note:** Make sure to replace `<chart-name>` with the name of the actual chart you intend to install.
 
-## Prerequisites
+## Requirements
 
-Before you can use these Helm charts, you will need:
+Before you can use these Helm charts, ensure you have the following:
 
-* Kubernetes 1.20+
+* Kubernetes 1.20 or higher
 * Helm 3
-* PV provisioner support in the underlying infrastructure (for some charts)
+* PV provisioner support in the underlying infrastructure (required for some charts)
 
-If you are new to Kubernetes or Helm, we recommend following the guides below to get started:
+If you are unfamiliar with Kubernetes or Helm, consider starting with the following guides:
 
 * [Kubernetes Getting Started Guide](https://kubernetes.io/docs/getting-started/)
 * [Helm Installation Guide](https://helm.sh/docs/intro/install/)
 
 ## Using Helm
-O
-nce you have installed the Helm client and added the StakeWise repository, you can use Helm to manage packages on your Kubernetes cluster. For more information on how to use Helm, refer to the [official documentation](https://helm.sh/docs/intro/using_helm/).
 
-Here are some useful Helm commands to get started:
+After installing the Helm client and adding the StakeWise repository, Helm is your tool of choice to manage packages on your Kubernetes cluster. For detailed guidance on using Helm, see the [official documentation](https://helm.sh/docs/intro/using_helm/).
+
+Here's a selection of helpful Helm commands to kickstart your journey:
 
 * Install a chart: `helm install my-release stakewise/<chart-name>`
-* Upgrade your application: `helm upgrade`
+* Upgrade your application: `helm upgrade my-release stakewise/<chart-name>`
+
+## Contribute
+
+We welcome contributions to improve our Helm charts. If you discover any bugs, have issues, or ideas for enhancements, feel free to open an issue or submit a pull request. Every feedback, bug report, or feature request is invaluable to us, and we appreciate the community's involvement in making StakeWise's Helm charts better.
+
+Feel free to explore the repository and experiment with the Helm charts to suit your specific needs. StakeWise's Helm charts aim to make application deployment on Kubernetes an effortless experience.
