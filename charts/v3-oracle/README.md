@@ -15,7 +15,7 @@ Can be used to deploy StakeWise oracles on a [Kubernetes](http://kubernetes.io) 
 
 ## Prerequisites
 
-- Kubernetes 1.18+
+- Kubernetes 1.20+
 - Helm 3
 
 ## Installing the Chart
@@ -46,7 +46,7 @@ The command removes all the Kubernetes components associated with the chart and 
 See `values.yaml` for configuration notes. Specify each parameter using the `--set key=value[,key=value]` argument to `helm install`. For example,
 
 ```bash
-$ helm install my-release stakewise/oracle --set settings.executionEndpoints="XXXXXXXX" --set settings.awsSecretconsensusEndpointsAccessKey="XXXXXXXX"
+$ helm install my-release stakewise/v3-oracle --set settings.executionEndpoints="XXXXXXXX" --set settings.awsSecretconsensusEndpointsAccessKey="XXXXXXXX"
 ```
 
 The above command specifies the web3 endpoint.
