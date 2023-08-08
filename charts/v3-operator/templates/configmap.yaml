@@ -6,6 +6,7 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   DATA_DIR: "/data"
+  DEPOSIT_DATA_FILE: "/data/{{ .Values.settings.vault }}/deposit/deposit_data.json"
   DATABASE_DIR: "/data"
   VERBOSE: {{ .Values.settings.verbose | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
@@ -13,23 +14,5 @@ data:
   HARVEST_VAULT: {{ .Values.settings.harvestVault | quote }}
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
-  KEYSTORES_PASSWORD_FILE: {{ .Values.settings.keystoresPasswordFile | quote }}
-  KEYSTORES_DIR: {{ .Values.settings.keystoresDir | quote }}
-  DEPOSIT_DATA_FILE: {{ .Values.settings.depositDataFile | quote }}
-  DEPOSIT_DATA: {{ .Values.settings.depositData | quote }}
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
   MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
-  HOT_WALLET_FILE: {{ .Values.settings.hotWalletFile | quote }}
-  HOT_WALLET_PASSWORD_FILE: {{ .Values.settings.hotWalletPasswordFile | quote }}
-
-{{- if .Values.settings.depositData }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "common.names.fullname" . }}-deposit-data
-  labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-data:
-  deposit_data.json: {{ .Values.settings.depositData | quote }}
-{{- end }}

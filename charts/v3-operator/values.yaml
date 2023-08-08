@@ -57,7 +57,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "master"
+  tag: "v0.2.5"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -83,6 +83,7 @@ settings:
   network: "goerli"
 
   ## Address of the Vault to register validators for
+  ## NOTE: MUST BE ON LOWERCASE
   vault:  ""
 
   ## Whether to submit vault harvest transactions. Default is false.
@@ -96,61 +97,9 @@ settings:
   # Comma separated list of endpoints for the consensus node
   consensusEndpoints: ""
 
-  # Absolute path to the password file for decrypting keystores
-  keystoresPasswordFile: "/password/password.txt"
-  # Password for keystores
-  # Optional if used from secrets. 
-  keystoresPassword: ""
-
-  # Absolute path to the directory with all the encrypted keystores
-  keystoresDir: "/keystores"
-
-  # Path to the deposit_data.json file
-  depositDataFile: "/deposit/deposit_data.json"
-
-  # Optional if used from configmap.
-  # Example:
-  # depositData: |
-  #   [{"pubkey": "8f1bfd7272c47d70483e8bae70a8ebf316b8ae36f62e2b30e2a7c10bc9c8a307be86f6724cbd5f8ccca0efa48753e59a", "withdrawal_credentials":...
-  depositData: ""
-
-  # Path to the hot wallet keystore
-  hotWalletFile: "/wallet/wallet.json"
-
-  # Optional if used from configmap.
-  # Example:
-  # hotWallet: |
-  #   {"address": "ce9...
-  hotWallet: ""
-
-  # Path to the hot wallet password file
-  hotWalletPasswordFile: "/wallet/password.txt"
-
-  # Password for the hot wallet
-  # Optional if used from secrets. 
-  hotWalletPassword: ""
-
-# Additonal volumes and mounts used to attach keystores from existing secret
-# Example:
-# additionalVolumes:
-#   - name: keystores
-#     secret:
-#       secretName: keystores
-#   - name: deposit-data
-#     configmap:
-#       name: deposit-data
-#       items:
-#         - key: deposit_data.json
-#           path: deposit_data.json
-# additionalMounts:
-#   - name: keystores
-#     mountPath: /keystores
-#   - name: keystores-password
-#     mountPath: /keystores-password
-#   - name: deposit-data
-#     mountPath: /deposit-data
-additionalVolumes: []
-additionalMounts: []
+  depositDataSecretName: ""
+  keystoresSecretName: ""
+  walletSecretName: ""
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
