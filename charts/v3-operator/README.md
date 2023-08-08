@@ -31,8 +31,8 @@ kubectl create secret generic v3-operator-wallet-data --from-file=/home/username
 To install the chart with the release name `v3-operator`, execute the following commands:
 
 ```bash
-whelm repo add stakewise https://charts.stakewise.io
-whelm install v3-operator  stakewise/v3-operator \
+helm repo add stakewise https://charts.stakewise.io
+helm install v3-operator  stakewise/v3-operator \
   --set settings.network="goerli" \
   --set settings.vault="0xeefffd4c23d2e8c845870e273861e7d60df49663" \
   --set settings.executionEndpoints="https://node.example.com/execution" \
