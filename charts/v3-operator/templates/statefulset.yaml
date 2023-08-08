@@ -15,7 +15,6 @@ spec:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
       annotations:
-        checksum/v3-operator-secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         checksum/v3-operator-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
     {{- if .Values.tolerations }}
@@ -46,7 +45,12 @@ spec:
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
-          command: ["chown", "-R", "{{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }}", "/data"]
+          command:
+            - sh
+            - -c
+            - >
+              mkdir /data/{{ .Values.settings.vault }} || true;
+              chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data
           volumeMounts:
             - name: data
               mountPath: /data
@@ -71,24 +75,12 @@ spec:
               containerPort: {{ .Values.service.ports.http }}
               protocol: TCP
           volumeMounts:
-          {{- if .Values.settings.depositData }}
             - name: deposit-data
-              mountPath: /deposit
-              readOnly: true
-          {{- end }}
-          {{- if .Values.settings.keystoresPassword }}
-            - name: keystores-password
-              mountPath: /password
-              readOnly: true
-          {{- end }}
-          {{- if and .Values.settings.hotWallet .Values.settings.hotWalletPassword }}
-            - name: hot-wallet
-              mountPath: /wallet
-              readOnly: true
-          {{- end }}
-          {{- with .Values.additionalMounts  }}
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
+              mountPath: /data/{{ .Values.settings.vault }}/deposit
+            - name: keystores
+              mountPath: /data/{{ .Values.settings.vault }}/keystores
+            - name: wallet
+              mountPath: /data/{{ .Values.settings.vault }}/wallet
             - name: data
               mountPath: /data
           {{- with .Values.resources }}
@@ -96,35 +88,15 @@ spec:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
       volumes:
-      {{- with .Values.additionalVolumes }}
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- if .Values.settings.depositData }}
         - name: deposit-data
-          configMap:
-            name: {{ include "common.names.fullname" . }}-deposit-data
-            items:
-            - key: deposit_data.json
-              path: deposit_data.json
-      {{- end }}
-      {{- if .Values.settings.keystoresPassword }}
-        - name: keystores-password
           secret:
-            secretName: {{ include "common.names.fullname" . }}-keystores-password
-            items:
-            - key: password.txt
-              path: password.txt
-      {{- end }}
-      {{- if and .Values.settings.hotWallet .Values.settings.hotWalletPassword }}
-        - name: hot-wallet
+            secretName: {{ .Values.settings.depositDataSecretName }}
+        - name: keystores
           secret:
-            secretName: {{ include "common.names.fullname" . }}-hot-wallet
-            items:
-            - key: wallet.json
-              path: wallet.json
-            - key: password.txt
-              path: password.txt
-      {{- end }}
+            secretName: {{ .Values.settings.keystoresSecretName }}
+        - name: wallet
+          secret:
+            secretName: {{ .Values.settings.walletSecretName }}
   volumeClaimTemplates:
     - metadata:
         name: data
