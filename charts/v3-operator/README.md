@@ -37,9 +37,9 @@ helm install v3-operator  stakewise/v3-operator \
   --set settings.vault="0xeefffd4c23d2e8c845870e273861e7d60df49663" \
   --set settings.executionEndpoints="https://node.example.com/execution" \
   --set settings.consensusEndpoints="https://node.example.com/consensus" \
-  --set settings.depositDataSecretName: "v3-operator-deposit-data" \
-  --set settings.keystoresSecretName: " v3-operator-keystores-data" \
-  --set settings.walletSecretName: "v3-operator-wallet-data"
+  --set settings.depositDataSecretName="v3-operator-deposit-data" \
+  --set settings.keystoresSecretName=" v3-operator-keystores-data" \
+  --set settings.walletSecretName="v3-operator-wallet-data"
 ```
 
 This command deploys the v3-operator with default configuration. Refer to the configuration section to learn more about customizing your deployment.
