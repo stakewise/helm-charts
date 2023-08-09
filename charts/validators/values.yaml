@@ -132,6 +132,9 @@ validatorsNoOfKeys: 100
 ## Whether a builder should be used for proposalConfig
 enableBuilder: true
 
+# If not provided will be crafted based on global.project and global.label
+web3signerEndpoint: ""
+
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
 ## ref: https://hub.docker.com/r/sigp/lighthouse
