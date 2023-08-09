@@ -38,7 +38,7 @@ helm install v3-operator  stakewise/v3-operator \
   --set settings.executionEndpoints="https://node.example.com/execution" \
   --set settings.consensusEndpoints="https://node.example.com/consensus" \
   --set settings.depositDataSecretName="v3-operator-deposit-data" \
-  --set settings.keystoresSecretName=" v3-operator-keystores-data" \
+  --set settings.keystoresSecretName="v3-operator-keystores-data" \
   --set settings.walletSecretName="v3-operator-wallet-data"
 ```
 
