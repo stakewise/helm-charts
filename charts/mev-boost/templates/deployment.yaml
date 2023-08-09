@@ -37,7 +37,7 @@ spec:
             - -{{ .Values.global.network }}
             - -relay-check
           {{- range $relay := index .Values.relays .Values.global.network }}
-            - relay 
+            - -relay 
             - "{{ $relay }}"
           {{- end }}
             - -addr
