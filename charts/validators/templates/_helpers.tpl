@@ -117,10 +117,7 @@ Validator graffiti
 Validator web3signer endpoint
 */}}
 {{- define "web3signer" -}}
-{{- if $.Values.web3signerEndpoint }}
-http://{{ $.Values.web3signerEndpoint }}:6174
-{{- else }}
-http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174
+{{- if $.Values.web3signerEndpoint }}http://{{ $.Values.web3signerEndpoint }}:6174{{- else }}http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174
 {{- end }}
 {{- end }}
 
