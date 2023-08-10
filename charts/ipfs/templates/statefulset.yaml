@@ -49,6 +49,11 @@ spec:
         - name: {{ include "common.names.fullname" . }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+            - daemon
+            - --migrate=true
+            - --agent-version-suffix=docker
+            - --enable-gc
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
