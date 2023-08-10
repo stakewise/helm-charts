@@ -475,13 +475,14 @@ spec:
               --rest-api-cors-origins={{ .Values.beacon.restApi.corsOrigins | join "," }}
             {{- end }}
               --p2p-enabled=true
-              --p2p-port={{ include "beacon.p2pPort" . }}
             {{- if .Values.global.p2pNodePort.enabled }}
               --p2p-advertised-port=$EXTERNAL_BEACON_PORT
               --p2p-advertised-ip=$EXTERNAL_IP
+              --p2p-port=$EXTERNAL_BEACON_PORT
             {{- else }}
               --p2p-advertised-ip=$POD_IP
               --p2p-advertised-port={{ include "beacon.p2pPort" . }}
+              --p2p-port={{ include "beacon.p2pPort" . }}
             {{- end }}
             {{- if and .Values.global.metrics.enabled .Values.beacon.metrics.enabled }}
               --metrics-enabled={{ .Values.beacon.metrics.enabled }}
@@ -647,6 +648,7 @@ spec:
               --enr.ip=$EXTERNAL_IP
               --enr.tcp=$EXTERNAL_BEACON_PORT
               --enr.udp=$EXTERNAL_BEACON_PORT
+              --port=$EXTERNAL_BEACON_PORT
             {{- else }}
               --port={{ include "beacon.p2pPort" . }}
             {{- end }}
