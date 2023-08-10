@@ -28,13 +28,13 @@ spec:
     - name: p2p-tcp-exec
       port: {{ include "execution.p2pPort" $ }}
       protocol: TCP
-      targetPort: {{ include "execution.p2pPort" $ }}
+      targetPort: {{ $portExecution }}
       nodePort: {{ $portExecution }}
   {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-exec
       port: {{ include "execution.p2pPort" $ }}
       protocol: UDP
-      targetPort: {{ include "execution.p2pPort" $ }}
+      targetPort: {{ $portExecution }}
       nodePort: {{ $portExecution }}
   {{- end }}
   selector:
@@ -62,13 +62,13 @@ spec:
     - name: p2p-tcp-beacon
       port: {{ include "beacon.p2pPort" $ }}
       protocol: TCP
-      targetPort: {{ include "beacon.p2pPort" $ }}
+      targetPort: {{ $portBeacon }}
       nodePort: {{ $portBeacon }}
   {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
     - name: p2p-udp-beacon
       port: {{ include "beacon.p2pPort" $ }}
       protocol: UDP
-      targetPort: {{ include "beacon.p2pPort" $ }}
+      targetPort: {{ $portBeacon }}
       nodePort: {{ $portBeacon }}
   {{- end }}
   selector:
