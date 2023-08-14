@@ -87,13 +87,6 @@ spec:
             - "{{ . }}"
             - "--no-of-keys"
             - "{{ $root.Values.validatorsNoOfKeys }}"
-            {{- if eq $root.Values.network "sepolia" }}
-            - "--network"
-            - "goerli"
-            {{- else }}
-            - "--network"
-            - "{{ $root.Values.network }}"
-            {{- end }}
             {{- if not $root.Values.enableBuilder }}
             - "--no-proposal-builder-enabled"
             {{- end }}
