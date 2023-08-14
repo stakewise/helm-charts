@@ -136,6 +136,18 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+        - name: fetch-keys-reloader
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2", "--refresh-frequency", "60"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
       volumes:
         - name: config
           configMap:
