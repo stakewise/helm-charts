@@ -140,7 +140,7 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            runAsUser: 0
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
