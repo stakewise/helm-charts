@@ -194,7 +194,7 @@ spec:
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
-            - "--network=auto"
+            - "--network={{ $root.Values.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--validators-proposer-config=/data/proposerConfig.json"
