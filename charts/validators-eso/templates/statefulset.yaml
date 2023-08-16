@@ -127,7 +127,7 @@ spec:
         - name: watcher
           image: ubuntu:latest
           command: [ "/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 30; done;" ]
+          args: [ "while true; do sleep 120; exit 0; done;" ]
       {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
