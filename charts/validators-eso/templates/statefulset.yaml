@@ -144,7 +144,7 @@ spec:
              sync-validator-keys
              --db-url $(ESO_DB_KEYSTORE_URL)
              --output-dir /tmp/data
-             --index {{ . }}"
+             --index {{ . }}
              --no-of-keys {{ $root.Values.validatorsNoOfKeys }}
              {{- if not $root.Values.enableBuilder }}
              --no-proposal-builder-enabled
