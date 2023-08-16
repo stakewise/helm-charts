@@ -139,8 +139,17 @@ spec:
           args:
           - >
              while true; 
-             do sleep 3600; 
-             exit 0; 
+             do mkdir /tmp/data;
+             poetry run keystore-cli
+             sync-validator-keys
+             --db-url $(ESO_DB_KEYSTORE_URL)
+             --output-dir /tmp/data
+             --index {{ . }}"
+             --no-of-keys {{ $root.Values.validatorsNoOfKeys }}
+             {{- if not $root.Values.enableBuilder }}
+             --no-proposal-builder-enabled
+             {{- end }};
+             sleep 60;
              done;
           volumeMounts:
             - name: data
