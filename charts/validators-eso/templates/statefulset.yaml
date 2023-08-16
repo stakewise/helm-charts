@@ -138,10 +138,10 @@ spec:
           command: [ "/bin/bash", "-c", "--" ]
           args:
           - >-
-            "while true; 
-            do sleep 3600; 
-            exit 0; 
-            done;"
+              "while true; 
+              do sleep 3600; 
+              exit 0; 
+              done;"
           volumeMounts:
             - name: data
               mountPath: /data
