@@ -136,7 +136,12 @@ spec:
                   name: eso-{{ template "validators.fullname" $root }}
                   key: ESO_DB_KEYSTORE_URL
           command: [ "/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 3600; exit 0; done;" ]
+          args:
+          - >-
+            "while true; 
+            do sleep 3600; 
+            exit 0; 
+            done;"
           volumeMounts:
             - name: data
               mountPath: /data
