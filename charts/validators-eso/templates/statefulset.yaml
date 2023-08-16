@@ -125,9 +125,25 @@ spec:
       containers:
       {{- if $root.Values.enableWatcher }}
         - name: watcher
-          image: ubuntu:latest
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          env:
+            - name: WEB3SIGNER_URL
+              value: {{ $root.Values.web3signerEndpoint }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
           command: [ "/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 120; exit 0; done;" ]
+          args: [ "while true; do sleep 3600; exit 0; done;" ]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- if $root.Values.feeOverride }}
+            - name: fee-override
+              mountPath: /fee
+          {{- end }}
       {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
