@@ -150,6 +150,7 @@ spec:
              --no-proposal-builder-enabled
              {{- end }};
              sleep 60;
+             exit 0;
              done;
           livenessProbe:
             exec:
