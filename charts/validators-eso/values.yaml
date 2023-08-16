@@ -235,6 +235,8 @@ graffiti: ""
 ##
 feeOverride: ""
 
+enableWatcher: false
+
 ## Monitoring
 ##
 metrics:

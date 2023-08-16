@@ -123,6 +123,12 @@ spec:
             - name: gnosis-prysm
               mountPath: /mnt/gnosis-prysm
       containers:
+      {{- if $root.Values.metrics.enableWatcher }}
+        - name: watcher
+          image: ubuntu:latest
+          command: [ "/bin/bash", "-c", "--" ]
+          args: [ "while true; do sleep 30; done;" ]
+      {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
