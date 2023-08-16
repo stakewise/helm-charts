@@ -153,18 +153,9 @@ spec:
              {{- if not $root.Values.enableBuilder }}
              --no-proposal-builder-enabled
              {{- end }};
+             if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
              sleep 60;
-             exit 0;
              done;
-          livenessProbe:
-            exec:
-              command:
-                - diff
-                - /tmp/data/validator_definitions.yml
-                - /data/validator_definitions.yml
-            initialDelaySeconds: 60
-            periodSeconds: 60
-            failureThreshold: 1
           volumeMounts:
             - name: data
               mountPath: /data
