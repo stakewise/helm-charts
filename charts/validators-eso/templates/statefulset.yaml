@@ -149,9 +149,16 @@ spec:
              {{- if not $root.Values.enableBuilder }}
              --no-proposal-builder-enabled
              {{- end }};
-             if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then exit 0; fi;
              sleep 60;
              done;
+          livenessProbe:
+            exec:
+              command:
+                - diff
+                - /tmp/data/validator_definitions.yml
+                - /data/validator_definitions.yml
+            initialDelaySeconds: 60
+            periodSeconds: 60
           volumeMounts:
             - name: data
               mountPath: /data
