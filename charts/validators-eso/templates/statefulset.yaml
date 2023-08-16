@@ -149,6 +149,7 @@ spec:
              {{- if not $root.Values.enableBuilder }}
              --no-proposal-builder-enabled
              {{- end }};
+             if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then exit 0; fi
              sleep 60;
              done;
           volumeMounts:
