@@ -123,7 +123,7 @@ spec:
             - name: gnosis-prysm
               mountPath: /mnt/gnosis-prysm
       containers:
-      {{- if $root.Values.metrics.enableWatcher }}
+      {{- if $root.Values.enableWatcher }}
         - name: watcher
           image: ubuntu:latest
           command: [ "/bin/bash", "-c", "--" ]
