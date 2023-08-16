@@ -159,6 +159,7 @@ spec:
                 - /data/validator_definitions.yml
             initialDelaySeconds: 60
             periodSeconds: 60
+            failureThreshold: 1
           volumeMounts:
             - name: data
               mountPath: /data
