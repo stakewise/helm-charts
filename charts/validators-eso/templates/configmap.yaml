@@ -209,9 +209,9 @@ data:
     sync-validator-keys
     --db-url $(ESO_DB_KEYSTORE_URL)
     --output-dir /tmp/data
-    --index {{ . }}
-    --no-of-keys {{ $root.Values.validatorsNoOfKeys }}
-    {{- if not $root.Values.enableBuilder }}
+    --index $1
+    --no-of-keys {{ .Values.validatorsNoOfKeys }}
+    {{- if not .Values.enableBuilder }}
     --no-proposal-builder-enabled
     {{- end }};
     if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
