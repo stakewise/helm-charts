@@ -117,6 +117,7 @@ spec:
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
               chmod +x /scripts/watcher.sh || true;
+              ls -al /scripts/ || true;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
