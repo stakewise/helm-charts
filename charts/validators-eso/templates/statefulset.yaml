@@ -116,6 +116,7 @@ spec:
               echo "" >>
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
+              chmod +x /scripts/watcher.sh || true;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
@@ -139,8 +140,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          command: [ "/bin/bash" ]
-          args: ["/scripts/watcher.sh", "{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
+          command: [ "/scripts/watcher.sh" ]
+          args: ["{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
           volumeMounts:
             - name: data
               mountPath: /data
