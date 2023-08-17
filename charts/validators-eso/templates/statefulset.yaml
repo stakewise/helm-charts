@@ -142,8 +142,8 @@ spec:
           command: [ "/bin/bash", "-c", "--" ]
           args:
           - >
-             while true; 
              do mkdir /tmp/data;
+             while true;
              poetry run keystore-cli
              sync-validator-keys
              --db-url $(ESO_DB_KEYSTORE_URL)
@@ -154,7 +154,7 @@ spec:
              --no-proposal-builder-enabled
              {{- end }};
              if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
-             sleep 60;
+             sleep 60 &; wait $!;
              done;
           volumeMounts:
             - name: data
