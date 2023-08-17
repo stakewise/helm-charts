@@ -139,24 +139,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          command: [ "/bin/bash", "-c", "--" ]
-          args:
-          - >
-             mkdir /tmp/data;
-             while true;
-             do
-             poetry run keystore-cli
-             sync-validator-keys
-             --db-url $(ESO_DB_KEYSTORE_URL)
-             --output-dir /tmp/data
-             --index {{ . }}
-             --no-of-keys {{ $root.Values.validatorsNoOfKeys }}
-             {{- if not $root.Values.enableBuilder }}
-             --no-proposal-builder-enabled
-             {{- end }};
-             if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
-             sleep 60;
-             done;
+          command: [ "/bin/bash" ]
+          args: ["/scripts/watcher.sh"]
           volumeMounts:
             - name: data
               mountPath: /data
