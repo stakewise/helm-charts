@@ -201,20 +201,5 @@ metadata:
     "helm.sh/hook": pre-install,pre-upgrade
     "helm.sh/hook-weight": "-5"
 data:
-  watcher.sh: |-
-    mkdir /tmp/data;
-    while true;
-    do
-    poetry run keystore-cli
-    sync-validator-keys
-    --db-url $(ESO_DB_KEYSTORE_URL)
-    --output-dir /tmp/data
-    --index $1
-    --no-of-keys {{ .Values.validatorsNoOfKeys }}
-    {{- if not .Values.enableBuilder }}
-    --no-proposal-builder-enabled
-    {{- end }};
-    if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
-    sleep 60 &; wait $!;
-    done;
+{{ (.Files.Glob "watcher.sh").AsConfig | indent 2 }}
 {{- end }}
