@@ -193,7 +193,7 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ template "validators.fullname" . }}-override-fee-recipient
+  name: {{ template "validators.fullname" . }}-watcher
   labels:
     {{- include "validators.labels" . | nindent 4 }}
   annotations:
