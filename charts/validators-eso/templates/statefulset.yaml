@@ -164,6 +164,10 @@ spec:
             - name: fee-override
               mountPath: /fee
           {{- end }}
+          {{- if $root.Values.enableWatcher }}
+            - name: watcher
+              mountPath: /scripts
+          {{- end }}
       {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
@@ -252,6 +256,11 @@ spec:
         - name: fee-override
           configMap:
             name: {{ template "validators.fullname" $root }}-override-fee-recipient
+      {{- end }}
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          configMap:
+            name: {{ template "validators.fullname" $root }}-watcher
       {{- end }}
         - name: data
           emptyDir: {}
