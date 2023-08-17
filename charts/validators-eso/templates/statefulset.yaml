@@ -116,18 +116,12 @@ spec:
               echo "" >>
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
-              cp /scripts/watcher.sh /data/watcher.sh || true;
-              chmod +x /data/watcher.sh || true;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
           volumeMounts:
             - name: data
               mountPath: /data
             - name: gnosis-prysm
               mountPath: /mnt/gnosis-prysm
-          {{- if $root.Values.enableWatcher }}
-            - name: watcher
-              mountPath: /scripts
-          {{- end }}
       containers:
       {{- if $root.Values.enableWatcher }}
         - name: watcher
