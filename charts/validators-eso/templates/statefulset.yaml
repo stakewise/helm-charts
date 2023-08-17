@@ -140,7 +140,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
           command: [ "/bin/bash" ]
-          args: ["/scripts/watcher.sh", "{{ . }}", "{{ .Values.validatorsNoOfKeys }}"]
+          args: ["/scripts/watcher.sh", "{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
           volumeMounts:
             - name: data
               mountPath: /data
