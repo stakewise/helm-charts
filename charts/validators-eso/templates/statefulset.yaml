@@ -123,6 +123,10 @@ spec:
               mountPath: /data
             - name: gnosis-prysm
               mountPath: /mnt/gnosis-prysm
+          {{- if $root.Values.enableWatcher }}
+            - name: watcher
+              mountPath: /scripts
+          {{- end }}
       containers:
       {{- if $root.Values.enableWatcher }}
         - name: watcher
