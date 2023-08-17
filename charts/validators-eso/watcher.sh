@@ -11,8 +11,7 @@ do
     --db-url "$ESO_DB_KEYSTORE_URL" \
     --output-dir /tmp/data \
     --index "$1" \
-    --no-of-keys {{ .Values.validatorsNoOfKeys }};
-    echo "a";
+    --no-of-keys "$2";
     if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod "$POD_NAME"; fi;
     sleep 60 &
     wait $!;
