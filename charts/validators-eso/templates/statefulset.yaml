@@ -155,7 +155,7 @@ spec:
              --no-proposal-builder-enabled
              {{- end }};
              if ! diff /tmp/data/validator_definitions.yml /data/validator_definitions.yml; then kubectl delete pod $(POD_NAME); fi;
-             sleep 60;
+             sleep 60 &; wait $!;
              done;
           volumeMounts:
             - name: data
