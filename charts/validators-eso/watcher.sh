@@ -2,6 +2,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+die_func() {
+        exit 0
+}
+trap die_func TERM
+
 mkdir -p /tmp/data
 
 while true;
