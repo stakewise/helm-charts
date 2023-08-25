@@ -1,46 +1,46 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{- range (untilStep 1 (atoi (quote .Values.replicaCount)) 1) }}
+{{- range (untilStep 1 (int .Values.replicaCount) 1) }}
 
 
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 kind: StatefulSet
 metadata:
-  name: {{ include "common.names.fullname" . }}-{{.}}
+  name: {{ include "common.names.fullname" $root }}-{{.}}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "common.labels.standard" $root | nindent 4 }}
 spec:
   replicas: 1
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+      {{- include "common.labels.matchLabels" $root | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" $root }}
   template:
     metadata:
       {{- with $root.Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml $root | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "common.labels.matchLabels" $root | nindent 8 }}
     spec:
       {{- with $root.Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml $root | nindent 8 }}
       {{- end }}
       {{- with $root.Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml $root | nindent 8 }}
       {{- end }}
       {{- with $root.Values.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml $root | nindent 8 }}
       {{- end }}
       {{- with $root.Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        {{- toYaml $root | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "dirk.serviceAccountName" . }}
+      serviceAccountName: {{ include "dirk.serviceAccountName" $root }}
       securityContext:
         {{- toYaml $root.Values.podSecurityContext | nindent 8 }}
       initContainers:
@@ -57,7 +57,7 @@ spec:
               chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "common.names.fullname" $root }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -68,7 +68,7 @@ spec:
             runAsUser: 0
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "common.names.fullname" $root }}
           args: ["sync-dirk-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--wallet-dir", "/data/dirk", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
           volumeMounts:
             - name: data
@@ -81,7 +81,7 @@ spec:
             runAsUser: 0
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "common.names.fullname" $root }}
           command: [ "/usr/local/bin/bash", "-c", "--" ]
           args: [ "while true; do sleep 30; done;" ]
           volumeMounts:
@@ -90,10 +90,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "common.names.fullname" . }}
-        - name: migrations
-          configMap:
-            name: {{ include "common.names.fullname" . }}-migrations
+            name: {{ include "common.names.fullname" $root }}
         - name: data
           emptyDir:
             medium: Memory
