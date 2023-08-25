@@ -1,4 +1,3 @@
-{{- if .Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
 {{ range until (atoi (quote $root.Values.replicaCount)) }}
@@ -99,5 +98,4 @@ spec:
             medium: Memory
             sizeLimit: 128Mi
 
-{{- end }}
 {{- end }}
