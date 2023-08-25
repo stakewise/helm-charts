@@ -69,7 +69,16 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          args: ["sync-dirk-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--wallet-dir", "/data/dirk", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
+          args:
+          - "sync-dirk-keys"
+          - "--db-url"
+          - $(ESO_DB_KEYSTORE_URL)
+          - "--wallet-dir"
+          - "/data/dirk"
+          - "--decryption-key-env"
+          - "ESO_DECRYPTION_KEY"
+          - "--index"
+          - "{{ . }}"
           volumeMounts:
             - name: data
               mountPath: /data
