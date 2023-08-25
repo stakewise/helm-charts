@@ -15,7 +15,7 @@ data:
     server:
       id: {{.}}
       name: dirk-{{.}}
-      listen-address: 0.0.0.0:8881
+      listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
     certificates:
       ca-cert: file:///root/.dirk/security/ca.crt
       server-cert: file:///root/.dirk/security/dirk-{{.}}.crt
@@ -26,9 +26,9 @@ data:
       type: filesystem
       location: /root/.dirk/wallets
     peers:
-      1: dirk-1:8881
-      2: dirk-2:8881
-      3: dirk-3:8881
+      1: dirk-1:{{ $root.Values.service.httpPort }}
+      2: dirk-2:{{ $root.Values.service.httpPort }}
+      3: dirk-3:{{ $root.Values.service.httpPort }}
     unlocker:
       account-passphrases:
         - secret

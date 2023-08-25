@@ -113,7 +113,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  httpPort: 80
+  httpPort: 8881
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
