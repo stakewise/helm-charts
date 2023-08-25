@@ -1,12 +1,13 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
 {{- range (until (int .Values.replicaCount)) }}
+{{- $index := (add . 1) -}}
 
 
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 kind: StatefulSet
 metadata:
-  name: {{ include "common.names.fullname" $root }}-{{.}}
+  name: {{ include "common.names.fullname" $root }}-{{$index}}
   labels:
     {{- include "common.labels.standard" $root | nindent 4 }}
 spec:
