@@ -1,45 +1,41 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ include "common.names.fullname" . }}
-  labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
-data:
-  config.yaml: |
-    data-path: "/data/dirk"
-    key-store-path: "/data/keystore"
-    eth2.network: {{ .Values.network }}
-    logging: {{ .Values.loggingLevel }}
-    eth2.slashing-protection-enabled: true
-    eth2.slashing-protection-pruning-enabled: true
-    eth2.slashing-protection-pruning-epochs-to-keep: {{ .Values.pruningEpochToKeep }}
-    eth2.slashing-protection-pruning-interval: {{ .Values.pruningInterval }}
-    eth2.slashing-protection-pruning-slots-per-epoch: {{ .Values.slotsPerEpoch }}
-    #    eth2.slashing-protection-db-username: {{ .Values.dbUsername }}
-    #    eth2.slashing-protection-db-password: {{ .Values.dbPassword }}
-    #    eth2.slashing-protection-db-url: {{ .Values.dbUrl }}
-    metrics-enabled: true
-    metrics-host: "0.0.0.0"
-    metrics-port: {{ .Values.metricsPort }}
-    metrics-host-allowlist: ["*"]
-    swagger-ui-enabled: true
-    http-cors-origins: ["*"]
-    http-listen-host: "0.0.0.0"
-    http-listen-port: {{ .Values.httpPort }}
-    http-host-allowlist: ["*"]
+{{- $root := . -}}
+{{- $counter := 0 }}
+{{- range (untilStep 1 (int (add1 .Values.replicaCount)) 1) }}
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" . }}-migrations
+  name: {{ include "common.names.fullname" . }}-{{.}}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
-{{ $root := . }}
-{{- range $path, $_ :=  .Files.Glob  "migrations/**.sql" }}
-{{- with $root }}
-  {{ $path | replace "migrations/" ""}}: |-
-{{ .Files.Get $path | indent 4 }}
-{{- end }}
+  config.yaml: |
+    log-level: Debug
+    server:
+      id: {{.}}
+      name: dirk-{{.}}
+      listen-address: 0.0.0.0:8881
+    certificates:
+      ca-cert: file:///root/.dirk/security/ca.crt
+      server-cert: file:///root/.dirk/security/dirk-{{.}}.crt
+      server-key: file:///root/.dirk/security/dirk-{{.}}.key
+    storage-path: /root/.dirk/storage
+    stores:
+    - name: Local
+      type: filesystem
+      location: /root/.dirk/wallets
+    peers:
+      1: dirk-1:8882
+      2: dirk-2:8883
+      3: dirk-3:8881
+    unlocker:
+      account-passphrases:
+        - secret
+    process:
+      generation-passphrase: secret
+    permissions:
+      client1:
+        Validators: All
+
 {{- end }}
