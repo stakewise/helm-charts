@@ -19,26 +19,26 @@ spec:
     metadata:
       {{- with $root.Values.podAnnotations }}
       annotations:
-        {{- toYaml $root | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "common.labels.matchLabels" $root | nindent 8 }}
     spec:
       {{- with $root.Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml $root | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with $root.Values.affinity }}
       affinity:
-        {{- toYaml $root | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with $root.Values.tolerations }}
       tolerations:
-        {{- toYaml $root | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with $root.Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml $root | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "dirk.serviceAccountName" $root }}
       securityContext:
