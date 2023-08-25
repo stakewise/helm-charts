@@ -26,8 +26,8 @@ data:
       type: filesystem
       location: /root/.dirk/wallets
     peers:
-      1: dirk-1:8882
-      2: dirk-2:8883
+      1: dirk-1:8881
+      2: dirk-2:8881
       3: dirk-3:8881
     unlocker:
       account-passphrases:
