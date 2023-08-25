@@ -12,9 +12,9 @@ metadata:
   annotations:
     prometheus.io/probe: "true"
 spec:
-  type: {{ $root.service.type }}
+  type: {{ $root.Values.service.type }}
   ports:
-    - port: {{ $root.service.httpPort }}
+    - port: {{ $root.Values.service.httpPort }}
       targetPort: http
       protocol: TCP
       name: http
