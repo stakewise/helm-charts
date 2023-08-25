@@ -26,9 +26,9 @@ data:
       type: filesystem
       location: /root/.dirk/wallets
     peers:
-      1: dirk-1:{{ $root.Values.service.httpPort }}
-      2: dirk-2:{{ $root.Values.service.httpPort }}
-      3: dirk-3:{{ $root.Values.service.httpPort }}
+      1: {{ include "dirk.fullname" $root }}-1:{{ $root.Values.service.httpPort }}
+      2: {{ include "dirk.fullname" $root }}-2:{{ $root.Values.service.httpPort }}
+      3: {{ include "dirk.fullname" $root }}-3:{{ $root.Values.service.httpPort }}
     unlocker:
       account-passphrases:
         - secret
@@ -37,5 +37,4 @@ data:
     permissions:
       client1:
         Validators: All
-
 {{- end }}

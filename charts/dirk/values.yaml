@@ -39,6 +39,8 @@ provisioningExternalSecrets:
   secretStoreRef:
     name: secretStoreRef
     kind: SecretStore
+  dataFrom:
+    key: dirk
 
 imagePullSecrets: []
 
