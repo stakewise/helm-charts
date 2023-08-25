@@ -1,6 +1,6 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{- range $i := .Values.replicaCount }}
+{{- range (until (int .Values.replicaCount)) }}
 
 
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
