@@ -1,0 +1,144 @@
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "dirk.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - sh
+            - -ac
+            - >
+              mkdir -p /data/dirk /data/keystore;
+              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/dirk
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        - name: fetch-keys
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-dirk-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--wallet-dir", "/data/dirk"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+#        - name: {{ .Chart.Name }}
+#          securityContext:
+#            {{- toYaml .Values.securityContext | nindent 12 }}
+#          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+#          imagePullPolicy: {{ .Values.image.pullPolicy }}
+#          args:
+#            - --config-file=/config/config.yaml
+#            - eth2
+#            - --slashing-protection-db-url=$(ESO_DB_URL)
+#            - --slashing-protection-db-username=$(ESO_DB_USERNAME)
+#            - --slashing-protection-db-password=$(ESO_DB_PASSWORD)
+#          env:
+#            - name: JAVA_OPTS
+#              value: {{ .Values.dirkJavaOpts | quote }}
+#          envFrom:
+#            - secretRef:
+#                name: eso-{{ include "common.names.fullname" . }}
+#          ports:
+#            - name: http
+#              containerPort: {{ .Values.httpPort }}
+#              protocol: TCP
+#            - name: metrics
+#              containerPort: {{ .Values.metricsPort }}
+#              protocol: TCP
+#          livenessProbe:
+#            httpGet:
+#              path: /upcheck
+#              port: http
+#            initialDelaySeconds: 900
+#            timeoutSeconds: 3
+#            periodSeconds: 30
+#            failureThreshold: 3
+#            successThreshold: 1
+#          readinessProbe:
+#            httpGet:
+#              path: /upcheck
+#              port: http
+#            initialDelaySeconds: 60
+#            timeoutSeconds: 3
+#            periodSeconds: 30
+#            failureThreshold: 3
+#            successThreshold: 1
+#          resources:
+#            {{- toYaml .Values.resources | nindent 12 }}
+#          volumeMounts:
+#            - name: data
+#              mountPath: /data
+#            - name: config
+#              mountPath: /config
+        - name: sleeper
+          image: "bash:latest"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          command: ["bash"]
+          args: ["-c", "sleep", "600000"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "common.names.fullname" . }}
+        - name: migrations
+          configMap:
+            name: {{ include "common.names.fullname" . }}-migrations
+        - name: data
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Mi
