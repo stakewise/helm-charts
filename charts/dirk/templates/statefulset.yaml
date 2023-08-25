@@ -2,6 +2,7 @@
 {{- $counter := 0 }}
 {{- range (untilStep 1 (int (add1 .Values.replicaCount)) 1) }}
 
+---
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" $root }}
 kind: StatefulSet
 metadata:
