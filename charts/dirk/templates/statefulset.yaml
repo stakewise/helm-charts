@@ -1,6 +1,6 @@
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{- range (untilStep 1 (atoi (quote $root.Values.replicaCount)) 1) }}
+{{- range (untilStep 1 (atoi (quote .Values.replicaCount)) 1) }}
 
 
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
