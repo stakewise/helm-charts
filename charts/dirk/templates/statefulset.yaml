@@ -1,3 +1,8 @@
+{{- if $root.Values.enabled }}
+{{- $root := . -}}
+{{- $counter := 0 }}
+{{ range $k, $v := until (atoi (quote $root$root.Values.replicaCount)) }}
+
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
@@ -5,43 +10,43 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
       {{- include "common.labels.matchLabels" . | nindent 6 }}
   serviceName: {{ include "common.names.fullname" . }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
+      {{- with $root.Values.podAnnotations }}
       annotations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.nodeSelector }}
+      {{- with $root.Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with $root.Values.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with $root.Values.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.imagePullSecrets }}
+      {{- with $root.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ include "dirk.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml $root.Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
-          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          image: "{{ $root.Values.initImage.repository }}:{{ $root.Values.initImage.tag }}"
+          imagePullPolicy: {{ $root.Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           command:
@@ -49,7 +54,7 @@ spec:
             - -ac
             - >
               mkdir -p /data/dirk /data/keystore;
-              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/dirk
+              chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -57,8 +62,8 @@ spec:
             - name: data
               mountPath: /data
         - name: fetch-keys
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
@@ -71,7 +76,7 @@ spec:
       containers:
         - name: sleeper
           image: "bash:latest"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
@@ -93,3 +98,6 @@ spec:
           emptyDir:
             medium: Memory
             sizeLimit: 128Mi
+
+{{- end }}
+{{- end }}
