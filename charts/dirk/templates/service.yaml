@@ -6,9 +6,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "dirk.fullname" . }}-{{.}}
+  name: {{ include "dirk.fullname" $root }}-{{.}}
   labels:
-    {{- include "dirk.labels" . | nindent 4 }}
+    {{- include "dirk.labels" $root | nindent 4 }}
   annotations:
     prometheus.io/probe: "true"
 spec:
@@ -19,5 +19,5 @@ spec:
       protocol: TCP
       name: http
   selector:
-    {{- include "dirk.selectorLabels" . | nindent 4 }}
+    {{- include "dirk.selectorLabels" $root | nindent 4 }}
 {{- end }}
