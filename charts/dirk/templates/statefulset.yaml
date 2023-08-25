@@ -1,7 +1,7 @@
 {{- if $root.Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{ range $k, $v := until (atoi (quote $root$root.Values.replicaCount)) }}
+{{ range $k, $v := until (atoi (quote $root.Values.replicaCount)) }}
 
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
