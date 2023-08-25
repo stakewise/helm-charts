@@ -1,12 +1,12 @@
 {{- if $root.Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
-{{ range $k, $v := until (atoi (quote $root.Values.replicaCount)) }}
+{{ range until (atoi (quote $root.Values.replicaCount)) }}
 
 apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "common.names.fullname" . }}-{{.}}
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 spec:
