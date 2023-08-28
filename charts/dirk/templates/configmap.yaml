@@ -17,14 +17,14 @@ data:
       name: dirk-{{.}}
       listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
     certificates:
-      ca-cert: file:///root/.dirk/security/ca.crt
-      server-cert: file:///root/.dirk/security/dirk-{{.}}.crt
-      server-key: file:///root/.dirk/security/dirk-{{.}}.key
-    storage-path: /root/.dirk/storage
+      ca-cert: file:///data/dirk/certs/ca.crt
+      server-cert: file:///data/dirk/certs/dirk-{{.}}.crt
+      server-key: file:///data/dirk/certs/dirk-{{.}}.key
+    storage-path: /data/dirk/storage
     stores:
     - name: Local
       type: filesystem
-      location: /root/.dirk/wallets
+      location: /data/dirk/wallets
     peers:
       1: {{ include "dirk.fullname" $root }}-1:{{ $root.Values.service.httpPort }}
       2: {{ include "dirk.fullname" $root }}-2:{{ $root.Values.service.httpPort }}
