@@ -14,7 +14,7 @@ data:
     log-level: Debug
     server:
       id: {{.}}
-      name: {{ include "dirk.fullname" $root }}-{{.}}
+      name: {{ include "dirk.fullname" $root }}-{{.}}-0.{{ include "dirk.fullname" $root }}
       listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
     certificates:
       ca-cert: file:///data/dirk/dirk-{{.}}/certs/ca.crt
@@ -26,9 +26,9 @@ data:
       type: filesystem
       location: /data/dirk/dirk-{{.}}/wallets
     peers:
-      1: {{ include "dirk.fullname" $root }}-1:{{ $root.Values.service.httpPort }}
-      2: {{ include "dirk.fullname" $root }}-2:{{ $root.Values.service.httpPort }}
-      3: {{ include "dirk.fullname" $root }}-3:{{ $root.Values.service.httpPort }}
+      1: {{ include "dirk.fullname" $root }}-1-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
+      2: {{ include "dirk.fullname" $root }}-2-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
+      3: {{ include "dirk.fullname" $root }}-3-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
     unlocker:
       account-passphrases:
         - secret
