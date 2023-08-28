@@ -13,6 +13,7 @@ metadata:
     prometheus.io/probe: "true"
 spec:
   type: {{ $root.Values.service.type }}
+  clusterIP: None
   ports:
     - port: {{ $root.Values.service.httpPort }}
       targetPort: http
