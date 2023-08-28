@@ -55,7 +55,6 @@ spec:
             - >
               mkdir -p /data/dirk /data/keystore;
               chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
-              sleep 3600
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
