@@ -87,7 +87,7 @@ spec:
               mountPath: /config
         - name: sleeper
           image: "bash:latest"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
