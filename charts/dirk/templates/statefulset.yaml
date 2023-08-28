@@ -54,16 +54,19 @@ spec:
             - -ac
             - >
               mkdir -p /data/dirk/certs /data/keystore;
-              chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
+              cp /config/dirk.yaml /data/dirk/;
               printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
               printenv dirk-{{ . }}.crt | base64 -d  > /data/dirk/certs/dirk-{{ . }}.crt;
               printenv dirk-{{ . }}.key | base64 -d  > /data/dirk/certs/dirk-{{ . }}.key;
+              chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: config
+              mountPath: /config
         - name: fetch-keys
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
