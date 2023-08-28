@@ -1,24 +1,19 @@
-{{- $root := . -}}
-{{- $counter := 0 }}
-{{- range (untilStep 1 (int (add1 .Values.replicaCount)) 1) }}
-
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "dirk.fullname" $root }}-{{.}}
+  name: {{ include "dirk.fullname" . }}
   labels:
-    {{- include "dirk.labels" $root | nindent 4 }}
+    {{- include "dirk.labels" . | nindent 4 }}
   annotations:
     prometheus.io/probe: "true"
 spec:
-  type: {{ $root.Values.service.type }}
+  type: {{ .Values.service.type }}
   clusterIP: None
   ports:
-    - port: {{ $root.Values.service.httpPort }}
+    - port: {{ .Values.service.httpPort }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{- include "dirk.selectorLabels" $root | nindent 4 }}
-{{- end }}
+    {{- include "dirk.selectorLabels" . | nindent 4 }}
