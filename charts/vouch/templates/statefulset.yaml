@@ -51,9 +51,9 @@ spec:
             - >
               mkdir -p /data/vouch/client1/certs/;
               cp /config/vouch.yaml /data/vouch/;
-              printenv vouch-ca.crt | base64 -d  > /data/vouch/certs/ca.crt;
-              printenv client-1.crt | base64 -d  > /data/vouch/certs/client-1.crt;
-              printenv client-1.key | base64 -d  > /data/vouch/certs/client-1.key;
+              printenv vouch-ca.crt | base64 -d  > /data/vouch/client1/certs/ca.crt;
+              printenv client-1.crt | base64 -d  > /data/vouch/client1/certs/client-1.crt;
+              printenv client-1.key | base64 -d  > /data/vouch/client1/certs/client-1.key;
               chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/vouch;
           envFrom:
             - secretRef:
