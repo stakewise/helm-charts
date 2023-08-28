@@ -53,11 +53,11 @@ spec:
             - sh
             - -ac
             - >
-              mkdir -p /data/dirk/certs /data/keystore;
-              cp /config/dirk.yaml /data/dirk/;
-              printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
-              printenv dirk-{{ . }}.crt | base64 -d  > /data/dirk/certs/dirk-{{ . }}.crt;
-              printenv dirk-{{ . }}.key | base64 -d  > /data/dirk/certs/dirk-{{ . }}.key;
+              mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
+              cp /config/dirk.yaml /data/dirk/dirk-{{.}}/;
+              printenv dirk-ca.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.crt;
+              printenv dirk-{{ . }}.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/dirk-{{ . }}.crt;
+              printenv dirk-{{ . }}.key | base64 -d  > /data/dirk/dirk-{{.}}/certs/dirk-{{ . }}.key;
               chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
@@ -97,7 +97,7 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          args: [ "--base-dir", "/data/dirk" ]
+          args: [ "--base-dir", "/data/dirk/dirk-{{.}}" ]
           volumeMounts:
             - name: data
               mountPath: /data
