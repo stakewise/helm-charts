@@ -90,15 +90,14 @@ spec:
               mountPath: /data
       containers:
         - name: dirk
-          image: "nethermindeth/dirk-debug:0.0.1"
+          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          command: ["/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 30; done;" ]
+          args: [ "--base-dir", "/data/dirk/dirk-{{.}}" ]
           volumeMounts:
             - name: data
               mountPath: /data
