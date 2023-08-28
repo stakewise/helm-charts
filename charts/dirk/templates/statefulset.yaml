@@ -97,7 +97,7 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          command: ["/bin/bash"]
+          command: ["/bin/bash", "-c", "--" ]
           args: [ "while true; do sleep 30; done;" ]
           volumeMounts:
             - name: data
