@@ -10,7 +10,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" $root | nindent 4 }}
 data:
-  config.yaml: |
+  dirk.yaml: |
     log-level: Debug
     server:
       id: {{.}}
