@@ -14,7 +14,7 @@ data:
     log-level: Debug
     server:
       id: {{.}}
-      name: dirk-{{.}}
+      name: {{ include "dirk.fullname" $root }}-{{.}}
       listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
     certificates:
       ca-cert: file:///data/dirk/dirk-{{.}}/certs/ca.crt
