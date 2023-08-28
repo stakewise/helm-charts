@@ -53,8 +53,11 @@ spec:
             - sh
             - -ac
             - >
-              mkdir -p /data/dirk /data/keystore;
+              mkdir -p /data/dirk/certs /data/keystore;
               chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
+              printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
+              printenv dirk-testaivaras-{{ . }}.crt | base64 -d  > /data/dirk/certs/dirk-testaivaras-{{ . }}.crt;
+              printenv dirk-testaivaras-{{ . }}.key | base64 -d  > /data/dirk/certs/dirk-testaivaras-{{ . }}.key;
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
