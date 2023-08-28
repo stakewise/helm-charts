@@ -80,7 +80,7 @@ spec:
           - "--db-url-env"
           - "ESO_DB_KEYSTORE_URL"
           - "--wallet-dir"
-          - "/tmp/dirk"
+          - "/data/dirk"
           - "--decryption-key-env"
           - "ESO_DECRYPTION_KEY"
           - "--index"
