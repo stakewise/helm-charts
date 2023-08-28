@@ -72,8 +72,8 @@ spec:
                 name: eso-{{ include "common.names.fullname" $root }}
           args:
           - "sync-dirk-keys"
-          - "--db-url"
-          - $(ESO_DB_KEYSTORE_URL)
+          - "--db-url-env"
+          - "ESO_DB_KEYSTORE_URL"
           - "--wallet-dir"
           - "/data/dirk"
           - "--decryption-key-env"
