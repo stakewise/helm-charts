@@ -8,7 +8,6 @@ metadata:
 data:
   vouch.yaml: |
     beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
-    beacon-node-addresses: {{ .Values.vouch.beaconnodeaddresses }}
     log-level: {{ .Values.vouch.loglevel }}
     graffiti:
       static:
