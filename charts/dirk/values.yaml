@@ -36,6 +36,9 @@ provisioningExternalSecrets:
   dataFrom:
     key: dirk
 
+dirk:
+  loglevel: Debug
+
 imagePullSecrets: []
 
 ## Provide a name in place of operator for `app:` labels

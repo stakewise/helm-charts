@@ -11,7 +11,7 @@ metadata:
     {{- include "common.labels.standard" $root | nindent 4 }}
 data:
   dirk.yaml: |
-    log-level: Debug
+    log-level: {{ $root.Values.dirk.loglevel }}
     server:
       id: {{.}}
       name: {{ include "dirk.fullname" $root }}-{{.}}-0.{{ include "dirk.fullname" $root }}
