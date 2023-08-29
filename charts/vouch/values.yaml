@@ -19,12 +19,6 @@ initImage:
   tag: "1.34"
   pullPolicy: IfNotPresent
 
-# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
-# decryptionKey: "generated with stakewise-cli sync-db"
-# dbUrl: "jdbc:postgresql://localhost/vouch"
-# dbUsername: ""
-# dbPassword: ""
-
 provisioningExternalSecrets:
   enabled: false
   secretStoreRef:
@@ -32,6 +26,39 @@ provisioningExternalSecrets:
     kind: SecretStore
   dataFrom:
     key: vouch
+
+vouch:
+  beaconnodeaddress: gethouse-testnets-execution-beacon-0.gethouse-testnets-execution-beacon.goerli:5052
+  beaconnodeaddresses:
+  - 'gethouse-testnets-execution-beacon-0.gethouse-testnets-execution-beacon.goerli:5052'
+  - 'gethouse-testnets-execution-beacon-1.gethouse-testnets-execution-beacon.goerli:5052'
+  loglevel: 'debug'
+  graffiti:
+    static:
+      value: 'My graffiti'
+  accountmanager:
+    dirk:
+      endpoints:
+        - dirk-testaivaras-1-0.dirk-testaivaras:8881
+        - dirk-testaivaras-2-0.dirk-testaivaras:8881
+        - dirk-testaivaras-3-0.dirk-testaivaras:8881
+      clientcert: file:///data/vouch/client1/certs/client1.crt
+      clientkey: file:///data/vouch/client1/certs/client1.key
+      cacert: file:///data/vouch/client1/certs/ca.crt
+      accounts:
+        - Validators
+      timeout: 1m
+  feerecipient:
+    defaultaddress: '0x0000000000000000000000000000000000000001'
+  # metrics is the module that logs metrics, in this case using prometheus.
+  metrics:
+    prometheus:
+      # log-level is the log level for this module, over-riding the global level.
+      loglevel: 'trace'
+      # listen-address is the address on which prometheus listens for metrics requests.
+      listenaddress: '0.0.0.0:8081'
+  blockrelay:
+    fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
 
 imagePullSecrets: []
 
@@ -52,19 +79,6 @@ network: "mainnet"
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
 loggingLevel: "INFO"
 
-## Number of epochs to keep when pruning the slashing protection database.
-##
-pruningEpochToKeep: 100
-
-## Hours between slashing protection database pruning operations.
-##
-pruningInterval: 24
-
-## Number of slots per epoch. This number multiplied by the number of epochs to keep determines what blocks to keep when pruning the slashing protection database.
-## The default is 32 as defined on MainNet/Prater.
-##
-slotsPerEpoch: 32
-
 ## Port on which vouch HTTP listens.
 ##
 httpPort: 8881
@@ -72,10 +86,6 @@ httpPort: 8881
 ## The port (TCP) on which Prometheus accesses metrics
 ##
 metricsPort: 9000
-
-## Java Opts
-##
-vouchJavaOpts: "-Xmx1g -Xms1g"
 
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/

@@ -7,28 +7,25 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   vouch.yaml: |
-    beacon-node-address: gethouse-testnets-execution-beacon-0.gethouse-testnets-execution-beacon.goerli:5052
-    log-level: 'debug'
+    beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
+    beacon-node-addresses: {{ .Values.vouch.beaconnodeaddresses }}
+    log-level: {{ .Values.vouch.loglevel }}
+    graffiti:
+      static:
+        value: {{ .Values.vouch.graffiti.static.value }}
     accountmanager:
       dirk:
-        endpoints:
-          - dirk-testaivaras-1-0.dirk-testaivaras:8881
-          - dirk-testaivaras-2-0.dirk-testaivaras:8881
-          - dirk-testaivaras-3-0.dirk-testaivaras:8881
-        client-cert: file:///data/vouch/client1/certs/client1.crt
-        client-key: file:///data/vouch/client1/certs/client1.key
-        ca-cert: file:///data/vouch/client1/certs/ca.crt
-        accounts:
-          - Validators
-        timeout: 1m
+        endpoints: {{ .Values.vouch.accountmanager.dirk.endpoints }}
+        client-cert: {{ .Values.vouch.accountmanager.dirk.clientcert }}
+        client-key: {{ .Values.vouch.accountmanager.dirk.clientkey }}
+        ca-cert: {{ .Values.vouch.accountmanager.dirk.cacert }}
+        accounts: {{ .Values.vouch.accountmanager.dirk.accounts }}
+        timeout: {{ .Values.vouch.accountmanager.dirk.timeout }}
     feerecipient:
-      default-address: '0x0000000000000000000000000000000000000001'
-    # metrics is the module that logs metrics, in this case using prometheus.
+      default-address: {{ .Values.vouch.feerecipient.defaultaddress }}
     metrics:
       prometheus:
-        # log-level is the log level for this module, over-riding the global level.
-        log-level: 'trace'
-        # listen-address is the address on which prometheus listens for metrics requests.
-        listen-address: '0.0.0.0:8081'
+        log-level: {{ .Values.vouch.metrics.prometheus.loglevel }}
+        listen-address: {{ .Values.vouch.metrics.prometheus.listenaddress }}
     blockrelay:
-      fallback-fee-recipient: '0x0000000000000000000000000000000000000001'
+      fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient }}

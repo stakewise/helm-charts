@@ -28,12 +28,6 @@ cliImage:
   tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
-# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
-# decryptionKey: "generated with stakewise-cli sync-db"
-# dbUrl: "jdbc:postgresql://localhost/dirk"
-# dbUsername: ""
-# dbPassword: ""
-
 provisioningExternalSecrets:
   enabled: false
   secretStoreRef:
@@ -61,19 +55,6 @@ network: "mainnet"
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
 loggingLevel: "INFO"
 
-## Number of epochs to keep when pruning the slashing protection database.
-##
-pruningEpochToKeep: 100
-
-## Hours between slashing protection database pruning operations.
-##
-pruningInterval: 24
-
-## Number of slots per epoch. This number multiplied by the number of epochs to keep determines what blocks to keep when pruning the slashing protection database.
-## The default is 32 as defined on MainNet/Prater.
-##
-slotsPerEpoch: 32
-
 ## Port on which dirk HTTP listens.
 ##
 httpPort: 8881
@@ -81,10 +62,6 @@ httpPort: 8881
 ## The port (TCP) on which Prometheus accesses metrics
 ##
 metricsPort: 9000
-
-## Java Opts
-##
-dirkJavaOpts: "-Xmx1g -Xms1g"
 
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
