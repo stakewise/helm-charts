@@ -28,10 +28,10 @@ data:
         accounts: {{ .Values.vouch.accountmanager.dirk.accounts }}
         timeout: {{ .Values.vouch.accountmanager.dirk.timeout }}
     feerecipient:
-      default-address: {{ .Values.vouch.feerecipient.defaultaddress }}
+      default-address: {{ .Values.vouch.feerecipient.defaultaddress | quote }}
     metrics:
       prometheus:
         log-level: {{ .Values.vouch.metrics.prometheus.loglevel }}
         listen-address: {{ .Values.vouch.metrics.prometheus.listenaddress }}
     blockrelay:
-      fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient }}
+      fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}

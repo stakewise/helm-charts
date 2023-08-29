@@ -50,12 +50,9 @@ vouch:
       timeout: 1m
   feerecipient:
     defaultaddress: '0x0000000000000000000000000000000000000001'
-  # metrics is the module that logs metrics, in this case using prometheus.
   metrics:
     prometheus:
-      # log-level is the log level for this module, over-riding the global level.
       loglevel: 'trace'
-      # listen-address is the address on which prometheus listens for metrics requests.
       listenaddress: '0.0.0.0:8081'
   blockrelay:
     fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
