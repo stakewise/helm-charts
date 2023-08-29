@@ -8,13 +8,20 @@ metadata:
 data:
   vouch.yaml: |
     beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
+    {{- with .Values.vouch.beaconnodeaddresses }}
+    beacon-node-addresses:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
     log-level: {{ .Values.vouch.loglevel }}
     graffiti:
       static:
         value: {{ .Values.vouch.graffiti.static.value }}
     accountmanager:
       dirk:
-        endpoints: {{ .Values.vouch.accountmanager.dirk.endpoints }}
+        {{- with .Values.vouch.accountmanager.dirk.endpoints }}
+        endpoints:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         client-cert: {{ .Values.vouch.accountmanager.dirk.clientcert }}
         client-key: {{ .Values.vouch.accountmanager.dirk.clientkey }}
         ca-cert: {{ .Values.vouch.accountmanager.dirk.cacert }}
