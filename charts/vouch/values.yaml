@@ -28,10 +28,10 @@ provisioningExternalSecrets:
     key: vouch
 
 vouch:
-  beaconnodeaddress: gethouse-testnets-execution-beacon-0.gethouse-testnets-execution-beacon.goerli:5052
+  beaconnodeaddress: localhost:5052
   beaconnodeaddresses:
-  - 'gethouse-testnets-execution-beacon-0.gethouse-testnets-execution-beacon.goerli:5052'
-  - 'gethouse-testnets-execution-beacon-1.gethouse-testnets-execution-beacon.goerli:5052'
+  - localhost:5051
+  - localhost:5052
   loglevel: 'debug'
   graffiti:
     static:
@@ -39,9 +39,9 @@ vouch:
   accountmanager:
     dirk:
       endpoints:
-        - dirk-testaivaras-1-0.dirk-testaivaras:8881
-        - dirk-testaivaras-2-0.dirk-testaivaras:8881
-        - dirk-testaivaras-3-0.dirk-testaivaras:8881
+        - dirk-1:8881
+        - dirk-2:8881
+        - dirk-3:8881
       clientcert: file:///data/vouch/client1/certs/client1.crt
       clientkey: file:///data/vouch/client1/certs/client1.key
       cacert: file:///data/vouch/client1/certs/ca.crt
