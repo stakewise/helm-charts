@@ -105,6 +105,8 @@ settings:
   walletPrivateKey:  ""
   sentryDsn: ""
 
+  validatorsWithdrawalsConcurrency: "20"
+
   ## Ethereum / Gnosis Nodes
   ##
   executionEndpoints: ""

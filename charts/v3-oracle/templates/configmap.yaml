@@ -12,3 +12,4 @@ data:
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   DATABASE: "/data/oracle.db"
+  VALIDATORS_WITHDRAWALS_CONCURRENCY: {{ .Values.settings.validatorsWithdrawalsConcurrency | quote }}
