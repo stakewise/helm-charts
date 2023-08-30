@@ -1,0 +1,9 @@
+{{- if $.Values.svc.ingress.enabled }}
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ .Values.deployment.projectName }}
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+{{ toYaml .Values.svc.ingress.backendConfig | indent 2 }}
+{{- end -}}

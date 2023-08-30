@@ -1,0 +1,45 @@
+{{- if .Values.service_lb.enable -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "loki.fullname" . }}-internal-lb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "loki.name" . }}
+    chart: {{ template "loki.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+    {{- with .Values.service_lb.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  annotations:
+    {{- toYaml .Values.service_lb.annotations | nindent 4 }}
+spec:
+  type: {{ .Values.service_lb.type }}
+{{- if (and (eq .Values.service_lb.type "ClusterIP") (not (empty .Values.service_lb.clusterIP))) }}
+  clusterIP: {{ .Values.service_lb.clusterIP }}
+{{- end }}
+{{- if (and (eq .Values.service_lb.type "LoadBalancer") (not (empty .Values.service_lb.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.service_lb.loadBalancerIP }}
+{{- end }}
+{{- if .Values.service_lb.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range $cidr := .Values.service_lb.loadBalancerSourceRanges }}
+    - {{ $cidr }}
+  {{- end }}
+{{- end }}
+  ports:
+    - port: {{ .Values.service_lb.port }}
+      protocol: TCP
+      name: http-metrics
+      targetPort: {{ .Values.service_lb.targetPort }}
+{{- if (and (eq .Values.service_lb.type "NodePort") (not (empty .Values.service_lb.nodePort))) }}
+      nodePort: {{ .Values.service_lb.nodePort }}
+{{- end }}
+{{- if .Values.extraPorts }}
+{{ toYaml .Values.extraPorts | indent 4}}
+{{- end }}
+  selector:
+    app: {{ template "loki.name" . }}
+    release: {{ .Release.Name }}
+{{- end -}}

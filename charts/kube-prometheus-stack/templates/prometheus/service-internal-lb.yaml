@@ -1,0 +1,71 @@
+{{- if .Values.prometheus.service_lb.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kube-prometheus-stack.fullname" . }}-prometheus-internal-lb
+  namespace: {{ template "kube-prometheus-stack.namespace" . }}
+  labels:
+    app: {{ template "kube-prometheus-stack.name" . }}-prometheus
+    self-monitor: {{ .Values.prometheus.serviceMonitor.selfMonitor | quote }}
+{{ include "kube-prometheus-stack.labels" . | indent 4 }}
+{{- if .Values.prometheus.service_lb.labels }}
+{{ toYaml .Values.prometheus.service_lb.labels | indent 4 }}
+{{- end }}
+{{- if .Values.prometheus.service_lb.annotations }}
+  annotations:
+{{ toYaml .Values.prometheus.service_lb.annotations | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.prometheus.service_lb.clusterIP }}
+  clusterIP: {{ .Values.prometheus.service_lb.clusterIP }}
+{{- end }}
+{{- if .Values.prometheus.service_lb.externalIPs }}
+  externalIPs:
+{{ toYaml .Values.prometheus.service_lb.externalIPs | indent 4 }}
+{{- end }}
+{{- if .Values.prometheus.service_lb.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.prometheus.service_lb.loadBalancerIP }}
+{{- end }}
+{{- if .Values.prometheus.service_lb.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range $cidr := .Values.prometheus.service_lb.loadBalancerSourceRanges }}
+    - {{ $cidr }}
+  {{- end }}
+{{- end }}
+{{- if ne .Values.prometheus.service_lb.type "ClusterIP" }}
+  externalTrafficPolicy: {{ .Values.prometheus.service_lb.externalTrafficPolicy }}
+{{- end }}
+  ports:
+  - name: {{ .Values.prometheus.prometheusSpec.portName }}
+    {{- if eq .Values.prometheus.service_lb.type "NodePort" }}
+    nodePort: {{ .Values.prometheus.service_lb.nodePort }}
+    {{- end }}
+    port: {{ .Values.prometheus.service_lb.port }}
+    targetPort: {{ .Values.prometheus.service_lb.targetPort }}
+  - name: reloader-web
+    port: 8080
+    targetPort: reloader-web
+  {{- if .Values.prometheus.thanosIngress.enabled }}
+  - name: grpc
+    {{- if eq .Values.prometheus.service_lb.type "NodePort" }}
+    nodePort: {{ .Values.prometheus.thanosIngress.nodePort }}
+    {{- end }}
+    port: {{ .Values.prometheus.thanosIngress.servicePort }}
+    targetPort: {{ .Values.prometheus.thanosIngress.servicePort }}
+  {{- end }}
+{{- if .Values.prometheus.service_lb.additionalPorts }}
+{{ toYaml .Values.prometheus.service_lb.additionalPorts | indent 2 }}
+{{- end }}
+  publishNotReadyAddresses: {{ .Values.prometheus.service_lb.publishNotReadyAddresses }}
+  selector:
+    {{- if .Values.prometheus.agentMode }}
+    app.kubernetes.io/name: prometheus-agent
+    {{- else }}
+    app.kubernetes.io/name: prometheus
+    {{- end }}
+    operator.prometheus.io/name: {{ template "kube-prometheus-stack.prometheus.crname" . }}
+{{- if .Values.prometheus.service_lb.sessionAffinity }}
+  sessionAffinity: {{ .Values.prometheus.service_lb.sessionAffinity }}
+{{- end }}
+  type: "{{ .Values.prometheus.service_lb.type }}"
+{{- end }}

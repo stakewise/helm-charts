@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.projectName }}
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.projectName }}
+    addToHostAliases: "true"
+    fqdn: {{ .Values.svc.fdqn }}
+  annotations:
+    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.targetPort }}":"{{ .Values.deployment.projectName }}"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: {{ .Values.svc.clustertype }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 30
+  ports:
+  {{- range .Values.deployment.port }}
+  - port: {{ $.Values.svc.targetPort }}
+    name: port-{{ . }}
+    targetPort: {{ . }}
+    protocol: TCP
+  {{- end }}
+  selector:
+    app: {{ .Values.deployment.projectName }}

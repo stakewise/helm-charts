@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.projectName }}-metric
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.projectName }}
+    addToHostAliases: "true"
+    fqdn: metric-{{ .Values.svc.fdqn }}
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9090
+    name: port-9090
+    targetPort: 9090
+    protocol: TCP
+  selector:
+    app: {{ .Values.deployment.projectName }}
