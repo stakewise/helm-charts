@@ -13,3 +13,5 @@ data:
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
   DATABASE: "/data/oracle.db"
   VALIDATORS_WITHDRAWALS_CONCURRENCY: {{ .Values.settings.validatorsWithdrawalsConcurrency | quote }}
+  DEFAULT_RETRY_TIME: {{ .Values.settings.defaultRetryTime | quote }}
+  CONSENSUS_BLOCK_CHUNK_SIZE: {{ .Values.settings.consensusBlockChunkSize | quote }}
