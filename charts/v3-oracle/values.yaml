@@ -108,6 +108,7 @@ settings:
   validatorsWithdrawalsConcurrency: "20"
   consensusBlockChunkSize: "100"
   defaultRetryTime: "180"
+  eventsBlockRangeInterval: "43200"
 
   ## Ethereum / Gnosis Nodes
   ##
