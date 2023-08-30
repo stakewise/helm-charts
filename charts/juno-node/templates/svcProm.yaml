@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.deployment.projectName }}-metric
+  name: {{ .Values.deployment.projectName }}-metrics
   namespace: {{ .Values.deployment.namespace }}
   labels:
     app: {{ .Values.deployment.projectName }}
     addToHostAliases: "true"
-    fqdn: metric-{{ .Values.svc.fdqn }}
+    fqdn: metrics-{{ .Values.svc.fdqn }}
 spec:
   type: ClusterIP
   ports:

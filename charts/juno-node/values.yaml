@@ -21,7 +21,6 @@ args:
    --http-port: "6060"
    --db-path: "/var/lib/juno"
    --network: "goerli"
-   --eth-node: "wss://"
    --http: "true"
    --metrics: "true"
 ### Node selector and Tanits
