@@ -170,6 +170,9 @@ persistence:
 ##
 nodeSelector: {}
 
+# hostNetwork
+hostNetwork: false
+
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 ##

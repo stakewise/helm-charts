@@ -33,6 +33,9 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      {{- end }}
       {{- if and .Values.persistence.enabled .Values.initChownData }}
       initContainers:
         - name: init-chown
