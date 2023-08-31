@@ -30,8 +30,8 @@ data:
         *) INIT_ARGS="--profile=$IPFS_PROFILE" ;;
       esac
       ipfs init $INIT_ARGS
-      ipfs config Addresses.API /ip4/0.0.0.0/tcp/{{ .values.service.ports.api}}
-      ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/{{ .values.service.ports.gateway }}
+      ipfs config Addresses.API /ip4/0.0.0.0/tcp/{{ .Values.service.ports.api}}
+      ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/{{ .Values.service.ports.gateway }}
 
       # Set up the swarm key, if provided
 
