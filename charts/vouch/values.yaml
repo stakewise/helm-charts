@@ -19,6 +19,11 @@ initImage:
   tag: "1.34"
   pullPolicy: IfNotPresent
 
+cliImage:
+  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
+  tag: "v0.0.2"
+  pullPolicy: IfNotPresent
+
 provisioningExternalSecrets:
   enabled: false
   secretStoreRef:
@@ -56,6 +61,8 @@ vouch:
       listenaddress: '0.0.0.0:8081'
   blockrelay:
     fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
+
+relays: ""
 
 imagePullSecrets: []
 

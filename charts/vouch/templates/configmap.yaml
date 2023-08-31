@@ -35,3 +35,5 @@ data:
         listen-address: {{ .Values.vouch.metrics.prometheus.listenaddress }}
     blockrelay:
       fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}
+      config:
+        url: 'file:///data/vouch/execution_config.json'
