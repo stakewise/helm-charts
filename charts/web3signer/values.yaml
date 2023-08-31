@@ -113,7 +113,8 @@ keyManagerApiEnabled: "false"
 
 ## Extra flags for web3signer
 ##
-extraFlags: []
+extraFlags:
+  - --slashing-protection-pruning-at-boot-enabled=true
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
