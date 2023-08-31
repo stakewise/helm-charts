@@ -64,13 +64,13 @@ spec:
             - name: config
               mountPath: /config
         - name: sync-config
-          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
-          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" $root }}
+                name: eso-{{ include "common.names.fullname" . }}
           args:
           - "sync-vouch-config"
           - "--db-url-env"
