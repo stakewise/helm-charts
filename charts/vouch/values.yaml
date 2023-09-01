@@ -89,7 +89,7 @@ httpPort: 8881
 
 ## The port (TCP) on which Prometheus accesses metrics
 ##
-metricsPort: 9000
+metricsPort: 8081
 
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
