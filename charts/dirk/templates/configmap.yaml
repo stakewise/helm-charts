@@ -37,4 +37,6 @@ data:
     permissions:
       client1:
         Validators: All
+    metrics:
+      listen-address: 0.0.0.0:{{ $root.Values.metricsPort }}
 {{- end }}
