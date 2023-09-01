@@ -62,7 +62,6 @@ svc:
          port: 6060
          type: HTTP
          requestPath: /
-         response: 200
       customResponseHeaders:
          headers:
           - "X-Frame-Options: SAMEORIGIN"
