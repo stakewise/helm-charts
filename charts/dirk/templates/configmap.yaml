@@ -32,8 +32,6 @@ data:
     unlocker:
       account-passphrases:
         - secret
-    process:
-      generation-passphrase: secret
     permissions:
       client1:
         Validators: All
