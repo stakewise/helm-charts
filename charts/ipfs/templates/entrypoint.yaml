@@ -62,6 +62,9 @@ data:
     fi
 
     set -x
+    if [ "{{ .Values.ipfs.bootstrap }}" != "" ];then
+      ipfs config --json Bootstrap {{ .Values.ipfs.bootstrap }}
+    fi
     ipfs config --json Peering.Peers {{ .Values.ipfs.peers }}
     ipfs config Datastore.StorageMax {{ .Values.ipfs.datastoreStorageMax}}
     ipfs config --json Addresses.NoAnnounce {{ .Values.ipfs.addressesNoAnnounce }}
