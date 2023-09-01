@@ -114,6 +114,7 @@ settings:
   ##
   executionEndpoints: ""
   consensusEndpoints: ""
+  # executionGraphqlEndpoint: ""
 
   ## IPFS Settings
   ##
