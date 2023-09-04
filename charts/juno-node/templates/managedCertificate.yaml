@@ -1,0 +1,12 @@
+{{- if $.Values.svc.ingress.managedCertificate.enabled }} 
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: {{ $.Values.deployment.projectName }}-cert
+  namespace: {{ $.Values.deployment.namespace }}
+spec:
+  domains:
+  {{- range .Values.svc.ingress.managedCertificate.domain }}
+    - {{ . }}
+  {{- end }}
+{{- end }}

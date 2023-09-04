@@ -49,7 +49,7 @@ svc:
     enabled: true
     ## GCP Certificate
     managedCertificate:
-      enabled: true
+      enabled: false
       domain:
         - "rpc-goerli-1-juno.nethermind.dev"
     host: "rpc-goerli-1-juno.nethermind.dev"   
