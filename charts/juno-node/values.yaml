@@ -23,6 +23,7 @@ args:
    --network: "goerli"
    --http: "true"
    --metrics: "true"
+   --pending-poll-interval: "2s"
 ### Node selector and Tanits
 nodeSelector:
    enabled: false
