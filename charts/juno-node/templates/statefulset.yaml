@@ -15,6 +15,10 @@ spec:
   replicas: {{ .Values.deployment.replicas }}
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: 'true'
+        prometheus.io/path: '/metrics'
+        prometheus.io/port: '9090'
       labels:
          app: {{ .Values.deployment.projectName }}
     spec:
