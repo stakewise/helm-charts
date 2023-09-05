@@ -4,7 +4,7 @@ metadata:
     name: {{ .Values.deployment.projectName }}
     namespace: {{ .Values.deployment.namespace }}
     annotations:
-      prometheus.io/scrape: 'true'
+      prometheus.io/scrapenode: 'true'
       prometheus.io/path: '/metrics'
       prometheus.io/port: '9090'
 spec:
@@ -16,7 +16,7 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/scrape: 'true'
+        prometheus.io/scrapenode: 'true'
         prometheus.io/path: '/metrics'
         prometheus.io/port: '9090'
       labels:
