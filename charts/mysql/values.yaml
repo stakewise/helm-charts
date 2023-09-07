@@ -1,0 +1,6 @@
+# values.yaml
+mysqlRootPassword: "<rootpassword>"
+mysqlDatabase: mydb
+mysqlUser: myuser
+mysqlPassword: "<password>"
+storageSize: 100Gi

@@ -1,0 +1,6 @@
+# Chart.yaml
+apiVersion: v2
+name: my-mysql-chart
+description: A Helm chart for deploying MySQL with StatefulSet, Service, Secret, and PVC.
+version: 1.0.0
+appVersion: 5.7

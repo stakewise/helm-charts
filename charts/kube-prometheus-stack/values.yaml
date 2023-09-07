@@ -38,7 +38,7 @@ crds:
 defaultRules:
   create: true
   rules:
-    alertmanager: true
+    alertmanager: false
     etcd: true
     configReloaders: true
     general: true
@@ -63,8 +63,8 @@ defaultRules:
     node: true
     nodeExporterAlerting: true
     nodeExporterRecording: true
-    prometheus: true
-    prometheusOperator: true
+    prometheus: false
+    prometheusOperator: false
     windows: true
 
   ## Reduce app namespace alert scope
@@ -213,7 +213,7 @@ alertmanager:
 
   ## Deploy alertmanager
   ##
-  enabled: true
+  enabled: false
 
   ## Annotations for Alertmanager
   ##
@@ -1064,7 +1064,7 @@ kubernetesServiceMonitors:
 ## Component scraping the kube api server
 ##
 kubeApiServer:
-  enabled: true
+  enabled: false
   tlsConfig:
     serverName: kubernetes
     insecureSkipVerify: false
@@ -1415,7 +1415,7 @@ kubeControllerManager:
 ## Component scraping coreDns. Use either this or kubeDns
 ##
 coreDns:
-  enabled: true
+  enabled: false
   service:
     port: 9153
     targetPort: 9153
@@ -3353,38 +3353,6 @@ prometheus:
           - targets:
             - localhost:9090
 
-      - job_name: dev-goerli-1
-        scrape_interval: 5s
-        metrics_path: /
-        scheme: http
-        static_configs:
-          - targets:
-            - juno-goerli-1-prom.dev-goerli-1.svc.cluster.local:9090
-
-      - job_name: dev-goerli-2
-        metrics_path: /
-        scrape_interval: 5s
-        scheme: http
-        static_configs:
-          - targets:
-            - juno-goerli-2-prom.dev-goerli-2.svc.cluster.local:9090
-
-      - job_name: dev-integration
-        metrics_path: /
-        scrape_interval: 5s
-        scheme: http
-        static_configs:
-          - targets:
-            - juno-integration-prom.dev-integration.svc.cluster.local:9090
-
-      - job_name: dev-mainnet
-        metrics_path: /
-        scrape_interval: 5s
-        scheme: http
-        static_configs:
-          - targets:
-            - juno-mainnet-1-prom.dev-mainnet-1.svc.cluster.local:9090
-
     # - job_name: kube-etcd
     #   kubernetes_sd_configs:
     #     - role: node
@@ -4100,6 +4068,7 @@ thanosRuler:
                   operator: In
                   values:
                   - monitoring
+                
     # nodeAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     nodeSelectorTerms:
