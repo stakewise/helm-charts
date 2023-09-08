@@ -1,0 +1,34 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  DB_URL: "sqlite+aiosqlite:////data/monitor.db"
+  NETWORK: {{ .Values.settings.network | quote }}
+  FRONTEND_URL: {{ .Values.settings.frontendUrl | quote }}
+  {{- if .Values.settings.vaultAddress }}
+  VAULT_ADDRESS: {{ .Values.settings.vaultAddress | quote }}
+  {{- end }}
+  EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
+  CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
+  NOTIFIERS_ENABLED_PROVIDER: {{ .Values.settings.notifiersEnabledProvider | quote }}
+  NOTIFIERS_INTERVAL_IN_MINUTES: {{ .Values.settings.notifiersIntervalInMinutes | quote }}
+  {{- if or (.Values.settings.notifiersTelegramToken) (.Values.settings.notifiersTelegramChatID) }}
+  NOTIFIERS_TELEGRAM_TOKEN: {{ .Values.settings.notifiersTelegramToken | quote }}
+  NOTIFIERS_TELEGRAM_CHAT_ID: {{ .Values.settings.notifiersTelegramChatID | quote }}
+  {{- end }}
+  {{- if .Values.settings.notifiersSlackWebhookURL }}
+  NOTIFIERS_SLACK_WEBHOOK_URL: {{ .Values.settings.notifiersSlackWebhookURL | quote }}
+  {{- end }}
+  {{- if .Values.settings.notifiersDiscordWebhookURL }}
+  NOTIFIERS_DISCORD_WEBHOOK_URL: {{ .Values.settings.notifiersDiscordWebhookURL | quote }}
+  {{- end }}
+  {{- if .Values.settings.notifiersPagerdutyRoutingKey }}
+  NOTIFIERS_PAGERDUTY_ROUTING_KEY: {{ .Values.settings.notifiersPagerdutyRoutingKey | quote }}
+  {{- end }}
+  {{- if or (.Values.settings.notifiersPushoverToken) (.Values.settings.notifiersPushoverUser) }}
+  NOTIFIERS_PUSHOVER_TOKEN: {{ .Values.settings.notifiersPushoverToken | quote }}
+  NOTIFIERS_PUSHOVER_USER: {{ .Values.settings.notifiersPushoverUser | quote }}
+  {{- end }}
