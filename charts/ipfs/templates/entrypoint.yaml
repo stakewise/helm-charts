@@ -30,9 +30,6 @@ data:
         *) INIT_ARGS="--profile=$IPFS_PROFILE" ;;
       esac
       ipfs init $INIT_ARGS
-      ipfs config Addresses.API /ip4/0.0.0.0/tcp/{{ .Values.service.ports.api}}
-      ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/{{ .Values.service.ports.gateway }}
-
       # Set up the swarm key, if provided
 
       SWARM_KEY_FILE="$repo/swarm.key"
@@ -65,6 +62,9 @@ data:
     if [ "{{ .Values.ipfs.bootstrap }}" != "" ];then
       ipfs config --json Bootstrap {{ .Values.ipfs.bootstrap }}
     fi
+
+    ipfs config Addresses.API /ip4/0.0.0.0/tcp/{{ .Values.service.ports.api}}
+    ipfs config Addresses.Gateway /ip4/0.0.0.0/tcp/{{ .Values.service.ports.gateway }}
     ipfs config --json Peering.Peers {{ .Values.ipfs.peers }}
     ipfs config Datastore.StorageMax {{ .Values.ipfs.datastoreStorageMax}}
     ipfs config --json Addresses.NoAnnounce {{ .Values.ipfs.addressesNoAnnounce }}
