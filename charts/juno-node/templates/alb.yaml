@@ -17,4 +17,9 @@ spec:
   - hosts:
     - {{ .Values.svc.ingress.host }}
     secretName: {{ .Values.deployment.projectName }}-alb-tls-cert
+{{- if $.Values.svc.ingress.host2 }}
+  - hosts:
+    - "{{ .Values.svc.ingress.host2 }}"
+    secretName: {{ .Values.deployment.projectName }}-wildcard-alb-tls-cert
+{{- end -}}
 {{- end -}}
