@@ -94,6 +94,8 @@ serviceAccount:
 ##
 service:
   type: ClusterIP
+  containerPorts:
+    gateway: 8082
   ports:
     p2p: 4001
     api: 5001
