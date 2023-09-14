@@ -148,4 +148,4 @@ spec:
         - name: data
           emptyDir:
             medium: Memory
-            sizeLimit: 128Mi
+            sizeLimit: {{ .Values.tmpfsSize }}
