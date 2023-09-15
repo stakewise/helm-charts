@@ -28,6 +28,9 @@ cliImage:
   tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
+
+enableReloader: false
+
 # dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
 # decryptionKey: "generated with stakewise-cli sync-db"
 # dbUrl: "jdbc:postgresql://localhost/web3signer"

@@ -136,6 +136,7 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+        {{- if .Values.enableReloader }}
         - name: fetch-keys-reloader
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
@@ -148,6 +149,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+        {{- end }}
       volumes:
         - name: config
           configMap:
