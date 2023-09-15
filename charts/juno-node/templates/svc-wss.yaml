@@ -1,23 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Values.deployment.projectName }}
+  name: {{ .Values.deployment.projectName }}-wss
   namespace: {{ .Values.deployment.namespace }}
   labels:
     app: {{ .Values.deployment.projectName }}
   annotations:
-    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.rpc.port }}":"{{ .Values.deployment.projectName }}"}}'
+    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.wss.port }}":"{{ .Values.deployment.projectName }}-wss"}}'
     cloud.google.com/neg: '{"ingress": true}'
 spec:
-  type: {{ .Values.svc.rpc.clustertype }}
+  type: {{ .Values.svc.wss.clustertype }}
   sessionAffinity: ClientIP
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 30
   ports:
-  - port: {{ .Values.svc.rpc.port }}
-    name: port-{{ .Values.svc.rpc.port }}
-    targetPort: {{ .Values.svc.rpc.port }}
+  - port: {{ .Values.svc.wss.port }}
+    name: port-{{ .Values.svc.wss.port }}
+    targetPort: {{ .Values.svc.wss.port }}
     protocol: TCP
   selector:
     app: {{ .Values.deployment.projectName }}

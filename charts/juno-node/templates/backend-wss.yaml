@@ -2,8 +2,8 @@
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
-  name: {{ .Values.deployment.projectName }}
+  name: {{ .Values.deployment.projectName }}-wss
   namespace: {{ .Values.deployment.namespace }}
 spec:
-{{ toYaml .Values.svc.rpc.backendConfig | indent 2 }}
+{{ toYaml .Values.svc.wss.backendConfig | indent 2 }}
 {{- end -}}

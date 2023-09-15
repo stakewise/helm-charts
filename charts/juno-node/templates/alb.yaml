@@ -1,4 +1,4 @@
-{{- if $.Values.svc.ingress.enabled }}
+{{- if $.Values.svc.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -10,6 +10,9 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-gce
     ingress.kubernetes.io/force-ssl-redirect: "true"
     kubernetes.io/tls-acme: "true"
+    {{- if .Values.svc.globalStaticIpName }}
+    kubernetes.io/ingress.global-static-ip-name: "{{ $.Values.svc.globalStaticIpName }}"
+    {{- end }}
 spec:
   rules:
 {{ toYaml .Values.svc.ingress.rules | indent 2 }}

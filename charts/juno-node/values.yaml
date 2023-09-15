@@ -1,108 +1,142 @@
 ### Basic
 deployment:
-   projectName: goerli
-   namespace: dev-goerli-1
-   replicas: 1
-   imagename: nethermind/juno
-   imagetag: v0.6.0
-   snapshotUrl: "https://juno-snapshot.s3.us-east-2.amazonaws.com/goerli2/juno_goerli2_v0.4.0_125026.tar" # if Value is Null sync start from 0 block
-   resources:
+  projectName: goerli-test
+  namespace: test
+  replicas: 1
+  imagename: nethermind/juno
+  imagetag: v0.6.0
+  snapshotUrl: "" # if Value is Null sync start from 0 block
+  resources:
     limits:
       cpu: "4"
       memory: 14Gi
     requests:
       cpu: "2"
       memory: 8Gi
-   port:
-    - 6060
+  port:
+  - 6060
+  - 6061
 
 ### Container Arguments
 args:
-   --http-port: "6060"
-   --db-path: "/var/lib/juno"
-   --network: "goerli"
-   --http: "true"
-   --metrics: "true"
-   --pending-poll-interval: "2s"
+  --http-port: "6060"
+  --db-path: "/var/lib/juno"
+  --network: "goerli"
+  --metrics-port: "9090"
+  --http: "true"
+  --metrics: "true"
+  --pending-poll-interval: "2s"
+  --ws: "true"
+  --ws-port: "6061"
+
 ### Node selector and Tanits
 nodeSelector:
-   enabled: false
-   label:
-     network: juno
+  enabled: false
+  label:
+    network: juno
 
 taintsToleration:
-   enabled: false
-   tolerations:
+  enabled: false
+  tolerations:
       network: juno
 
 ### Service account
 serviceAccount: 
-   enabled: false
-   name: "juno"
+  enabled: false
+  name: "juno"
+
 
 ### Networking Service
 svc:
-   clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
-   fdqn: juno.cluster.local
-   targetPort: "6060"
-# Ingress
-   ingress:
-    enabled: true
-    host: "rpc-goerli-1-juno.nethermind.dev"   
-    ## ALB Backend Config
+  globalStaticIpName: ""
+  rpc:
+    clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
+    port: "6060"
     backendConfig:
+      timeoutSec: 400
       sessionAffinity:
-         affinityType: "CLIENT_IP"
+        affinityType: "CLIENT_IP"
       connectionDraining:
-         drainingTimeoutSec: 30
+        drainingTimeoutSec: 300
       healthCheck:
-         checkIntervalSec: 15
-         timeoutSec: 15
-         healthyThreshold: 1
-         unhealthyThreshold: 2 
-         port: 6060
-         type: HTTP
-         requestPath: /
+        checkIntervalSec: 15
+        timeoutSec: 15
+        healthyThreshold: 1
+        unhealthyThreshold: 2 
+        port: 6060
+        type: HTTP
+        requestPath: /
       customResponseHeaders:
-         headers:
-          - "X-Frame-Options: SAMEORIGIN"
-          - "X-Content-Type-Options: nosniff"
-          - "X-XSS-Protection: 1; mode=block"
-          - "Referrer-Policy: no-referrer-when-downgrade"
-          - "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload"
-    ## Ingress Rules
+        headers:
+        - "X-Frame-Options: SAMEORIGIN"
+        - "X-Content-Type-Options: nosniff"
+        - "X-XSS-Protection: 1; mode=block"
+        - "Referrer-Policy: no-referrer-when-downgrade"
+        - "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload"
+        
+  wss:
+    clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
+    port: "6061"
+    backendConfig:
+      timeoutSec: 400
+      sessionAffinity:
+        affinityType: "CLIENT_IP"
+      connectionDraining:
+        drainingTimeoutSec: 300
+      healthCheck:
+        checkIntervalSec: 15
+        timeoutSec: 15
+        healthyThreshold: 1
+        unhealthyThreshold: 2 
+        port: 6060
+        type: HTTP
+    ## ALB Ingress Rules
+    # Ingress
+  ingress:
+    enabled: true
+    extraHost:
+      enabled: false
+      host1: ""
+      host2: ""
+      host3: ""
     rules:
-    - host: "rpc-goerli-juno.nethermind.dev"
-      http:
+      - host: "test.juno.rpc.nethermind.dev"
+        http:
         paths:
-         - path: /
-           pathType: ImplementationSpecific
-           backend:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
             service:
-             name: goerli
-             port:
-               number: 6060
+              name: goerli-test
+              port:
+                number: 6060
+          - path: /ws
+            pathType: ImplementationSpecific
+            backend:
+            service:
+              name: goerli-test-wss
+              port:
+                number: 6061
 
 ### Horizontal pod scaling
 hpa:
-   enabled: false
-   minReplicas: 1
-   maxReplicas: 2
-   cpuUtilization: 80
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  cpuUtilization: 80
 
 ### Persistant Volume
 pvc:
-   enabled: true
-   storageClassName: standard
+  enabled: true
+  storageClassName: standard
+  mount:
+  - pvName: pv
+    mountPath: /var/lib/juno
+    storageSize: 250Gi
 
-   mount:
-   - pvName: pv
-     mountPath: /var/lib/juno
-     storageSize: 250Gi
-
-### Environment Variables 
+### ENVIRONMENT VARIABLES 
 env:
-   enabled: false
-   data:
-   - name: NETWORK
-     value: "juno"
+  enabled: false
+  data:
+  - name: NETWORK
+    value: "juno"
