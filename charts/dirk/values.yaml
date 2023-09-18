@@ -38,6 +38,8 @@ provisioningExternalSecrets:
 
 dirk:
   loglevel: Debug
+  tracing:
+    address: 'jaeger:4317'
 
 imagePullSecrets: []
 

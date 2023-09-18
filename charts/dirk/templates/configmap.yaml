@@ -37,4 +37,6 @@ data:
         Validators: All
     metrics:
       listen-address: 0.0.0.0:{{ $root.Values.metricsPort }}
+    tracing:
+      address: {{ $root.Values.dirk.tracing.address | quote }}
 {{- end }}
