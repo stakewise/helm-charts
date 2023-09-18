@@ -4,7 +4,7 @@ deployment:
   namespace: test
   replicas: 1
   imagename: nethermind/juno
-  imagetag: v0.6.0
+  imagetag: v0.6.2
   snapshotUrl: "" # if Value is Null sync start from 0 block
   resources:
     limits:
@@ -20,14 +20,17 @@ deployment:
 ### Container Arguments
 args:
   --http-port: "6060"
+  --http-host: "0.0.0.0"
   --db-path: "/var/lib/juno"
   --network: "goerli"
+  --metrics-host: "0.0.0.0"
   --metrics-port: "9090"
   --http: "true"
   --metrics: "true"
   --pending-poll-interval: "2s"
   --ws: "true"
   --ws-port: "6061"
+  --ws-host: "0.0.0.0" 
 
 ### Node selector and Tanits
 nodeSelector:
