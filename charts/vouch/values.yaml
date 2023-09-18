@@ -61,6 +61,8 @@ vouch:
       listenaddress: '0.0.0.0:8081'
   blockrelay:
     fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
+  tracing:
+    address: 'jaeger:4317'
 
 relays: ""
 

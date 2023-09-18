@@ -37,3 +37,5 @@ data:
       fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}
       config:
         url: 'file:///data/vouch/execution_config.json'
+    tracing:
+      address: {{ .Values.vouch.tracing.address | quote }}
