@@ -36,10 +36,10 @@ The command deploys oracle on the Kubernetes cluster in the default configuratio
 
 ## Uninstalling the Chart
 
-To uninstall/delete the `v3-operator` deployment:
+To uninstall/delete the `v3-oracle` deployment:
 
 ```bash
-helm delete v3-operator
+helm delete v3-oracle
 ```
 
 The command removes all the Kubernetes components associated with the chart and deletes the release.
@@ -57,7 +57,7 @@ The above command specifies the web3 endpoint.
 Alternatively, a YAML file that specifies the values for the parameters can be provided while installing the chart. For example,
 
 ```bash
-helm upgrade --install v3-operator stakewise/v3-oracle -f values.yaml
+helm upgrade --install v3-oracle stakewise/v3-oracle -f values.yaml
 ```
 
 > **Tip**: You can override the default [values.yaml](values.yaml)
