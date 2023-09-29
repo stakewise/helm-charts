@@ -86,7 +86,7 @@ spec:
           - "--index"
           - "{{ . }}"
           {{- range $root.Values.dirk.fetchKeysExtraFlags }}
-            {{ . | quote }}
+          - {{ . | quote }}
           {{- end }}
           volumeMounts:
             - name: data

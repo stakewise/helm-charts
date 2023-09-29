@@ -41,7 +41,8 @@ dirk:
   tracing:
     address: 'jaeger:4317'
 
-  fetchKeysExtraFlags: []
+  fetchKeysExtraFlags:
+  - "test"
 
 imagePullSecrets: []
 
