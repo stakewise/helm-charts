@@ -85,7 +85,7 @@ spec:
           - "ESO_DECRYPTION_KEY"
           - "--index"
           - "{{ . }}"
-          {{- range .Values.dirk.fetchKeysExtraFlags }}
+          {{- range $root.Values.dirk.fetchKeysExtraFlags }}
             {{ . | quote }}
           {{- end }}
           volumeMounts:
