@@ -85,6 +85,9 @@ spec:
           - "ESO_DECRYPTION_KEY"
           - "--index"
           - "{{ . }}"
+          {{- range .Values.dirk.fetchKeysExtraFlags }}
+            {{ . | quote }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data

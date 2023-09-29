@@ -41,6 +41,8 @@ dirk:
   tracing:
     address: 'jaeger:4317'
 
+  fetchKeysExtraFlags: []
+
 imagePullSecrets: []
 
 ## Provide a name in place of operator for `app:` labels
