@@ -104,12 +104,8 @@ spec:
             {{- if .Values.p2pNodePort.enabled }}
               . /env/init-nodeport;
             {{- end }}
-              exec /nethermind/Nethermind.Runner
-          {{- if eq .Values.global.network "gnosis" }}
-              --config=xdai
-          {{- else }}
+              exec /nethermind/nethermind
               --config={{ .Values.global.network }}
-          {{- end }}
               --datadir=/data/nethermind
           {{- if .Values.jsonrpc.enabled }}
               --JsonRpc.Enabled={{ .Values.jsonrpc.enabled }}
