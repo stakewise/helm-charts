@@ -42,6 +42,8 @@ spec:
               value: {{ .Values.telegramReceivers | quote }}
             - name: DISCORD_WEBHOOK_URL
               value: {{ .Values.discordWebhookUrl | quote }}
+            - name: PAGERDUTY_ROUTING_KEY
+              value: {{ .Values.pagerdutyRoutingKey | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}

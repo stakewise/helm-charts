@@ -14,7 +14,7 @@ image:
   repository: "stakewiselabs/private/contract-watcher"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v0.1.2"
+  tag: "master"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -24,6 +24,7 @@ wsUrl: ""
 telegramApiToken: ""
 telegramReceivers: ""
 discordWebhookUrl: ""
+pagerdutyRoutingKey: ""
 
 serviceAccount:
   # Annotations to add to the service account
