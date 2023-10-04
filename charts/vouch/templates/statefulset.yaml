@@ -49,7 +49,7 @@ spec:
             - sh
             - -ac
             - >
-              apk add bash;
+              apk add openssl;
               mkdir -p /data/vouch/client1/certs/;
               cp /config/vouch.yaml /data/vouch/;
               printenv vouch-ca.crt | base64 -d  > /data/vouch/client1/certs/ca.crt;
