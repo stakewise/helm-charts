@@ -55,8 +55,6 @@ spec:
               printenv vouch-ca.crt | base64 -d  > /data/vouch/client1/certs/ca.crt;
               printenv vouch-ca.key | base64 -d  > /data/vouch/client1/certs/ca.key;
               bash /scripts/generate_cert.sh /data/vouch/client1/certs/ ca client1;
-              # printenv client1.crt | base64 -d  > /data/vouch/client1/certs/client1.crt;
-              # printenv client1.key | base64 -d  > /data/vouch/client1/certs/client1.key;
               chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/vouch;
           envFrom:
             - secretRef:
