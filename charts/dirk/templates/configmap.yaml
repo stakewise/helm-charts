@@ -40,3 +40,18 @@ data:
     tracing:
       address: {{ $root.Values.dirk.tracing.address | quote }}
 {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-scripts
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+{{ $root := . }}
+{{- range $path, $_ :=  .Files.Glob  "scripts/**.sh" }}
+{{- with $root }}
+  {{ $path | replace "scripts/" ""}}: |-
+{{ .Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}

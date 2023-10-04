@@ -70,6 +70,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
         - name: fetch-keys
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
@@ -116,6 +118,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
         - name: sleeper
           image: "bash:latest"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
@@ -131,10 +135,15 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
       volumes:
         - name: config
           configMap:
             name: {{ include "common.names.fullname" $root }}-{{.}}
+        - name: scripts
+          configMap:
+            name: {{ include "common.names.fullname" $root }}-scripts
         - name: data
           emptyDir:
             medium: Memory
