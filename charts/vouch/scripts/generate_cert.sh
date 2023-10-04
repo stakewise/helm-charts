@@ -15,9 +15,14 @@ pushd "${LOCATION}"
 
 if [ ! -f "${CA_CERT_NAME}.key" ]
 then
-  echo "Generating authority"
+  echo "Generating authority key"
   openssl genrsa -des3 -out "${CA_CERT_NAME}_pass.key" 4096
   openssl rsa -in "${CA_CERT_NAME}_pass.key" -out "${CA_CERT_NAME}.key"
+fi
+
+if [ ! -f "${CA_CERT_NAME}.crt" ]
+then
+  echo "Generating authority crt"
   openssl req -x509 -new -nodes -key "${CA_CERT_NAME}.key" -sha256 -days 1825 -out "${CA_CERT_NAME}.crt"
 fi
 
