@@ -39,3 +39,18 @@ data:
         url: 'file:///data/vouch/execution_config.json'
     tracing:
       address: {{ .Values.vouch.tracing.address | quote }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-scripts
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+{{ $root := . }}
+{{- range $path, $_ :=  .Files.Glob  "scripts/**.sh" }}
+{{- with $root }}
+  {{ $path | replace "scripts/" ""}}: |-
+{{ .Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}

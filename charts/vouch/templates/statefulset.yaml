@@ -63,6 +63,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
         - name: sync-config
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
@@ -84,6 +86,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
       containers:
         - name: vouch
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -106,6 +110,8 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
         - name: sleeper
           image: "bash:latest"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
@@ -121,10 +127,15 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+            - name: scripts
+              mountPath: /scripts
       volumes:
         - name: config
           configMap:
             name: {{ include "common.names.fullname" . }}
+        - name: scripts
+          configMap:
+            name: {{ include "common.names.fullname" . }}-scripts
         - name: data
           emptyDir:
             medium: Memory
