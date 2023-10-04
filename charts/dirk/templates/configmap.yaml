@@ -18,8 +18,8 @@ data:
       listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
     certificates:
       ca-cert: file:///data/dirk/dirk-{{.}}/certs/ca.crt
-      server-cert: file:///data/dirk/dirk-{{.}}/certs/dirk-{{.}}.crt
-      server-key: file:///data/dirk/dirk-{{.}}/certs/dirk-{{.}}.key
+      server-cert: file:///data/dirk/dirk-{{.}}/certs/{{ include "dirk.fullname" $root }}-{{.}}-0.{{ include "dirk.fullname" $root }}.crt
+      server-key: file:///data/dirk/dirk-{{.}}/certs/{{ include "dirk.fullname" $root }}-{{.}}-0.{{ include "dirk.fullname" $root }}.key
     storage-path: /data/dirk/dirk-{{.}}/storage
     stores:
     - name: Local
