@@ -52,7 +52,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-oracle"
-  tag: "v0.5.1"
+  tag: "v0.5.3"
   pullPolicy: IfNotPresent
   pullSecrets: [ ]
 
@@ -61,8 +61,8 @@ image:
 ##
 resources:
   requests:
-    cpu: 10m
-    memory: 200Mi
+    cpu: 500m
+    memory: 1Gi
 
 ## Used to assign priority to pod
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
