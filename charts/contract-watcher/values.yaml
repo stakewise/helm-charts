@@ -14,7 +14,7 @@ image:
   repository: "stakewiselabs/private/contract-watcher"
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "master"
+  tag: "main"
 
 imagePullSecrets: []
 nameOverride: ""
