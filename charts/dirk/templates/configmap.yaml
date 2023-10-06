@@ -33,7 +33,7 @@ data:
       account-passphrases:
         - secret
     permissions:
-      client1:
+      {{ $root.Values.dirk.clientName }}:
         Validators: All
     metrics:
       listen-address: 0.0.0.0:{{ $root.Values.metricsPort }}

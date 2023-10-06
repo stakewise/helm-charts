@@ -32,6 +32,7 @@ provisioningExternalSecrets:
   dataFrom:
     key: vouch
 
+vouchDataDir: /data/vouch
 vouch:
   beaconnodeaddress: localhost:5052
   beaconnodeaddresses:

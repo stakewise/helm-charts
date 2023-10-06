@@ -36,7 +36,7 @@ data:
     blockrelay:
       fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}
       config:
-        url: 'file:///data/vouch/execution_config.json'
+        url: 'file://{{ .Values.vouchDataDir }}/execution_config.json'
     tracing:
       address: {{ .Values.vouch.tracing.address | quote }}
 ---

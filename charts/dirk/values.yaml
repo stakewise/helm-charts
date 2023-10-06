@@ -38,6 +38,7 @@ provisioningExternalSecrets:
 
 dirk:
   loglevel: Debug
+  clientName: client1
   tracing:
     address: 'jaeger:4317'
 
