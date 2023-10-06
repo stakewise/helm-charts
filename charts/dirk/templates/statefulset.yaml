@@ -56,8 +56,7 @@ spec:
               apk add openssl envsubst;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
               export INDEX="{{.}}";
-              # export DIRK_INDEXINDEX=$((${HOSTNAME##*-}+1));
-              echo $INDEX > /data/dirk/dirk-{{.}}/index;
+              echo "$INDEX" > /data/dirk/dirk-{{.}}/index;
               printenv;
               envsubst < /config/dirk.yaml.tml > /data/dirk/dirk-{{.}}/dirk.yaml;
               printenv dirk-ca.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.crt;
