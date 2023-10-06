@@ -55,8 +55,9 @@ spec:
             - >
               apk add openssl;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
-              export INDEX={{ . }};
+              export INDEX="{{.}}";
               envsubst < /config/dirk.yaml.tml > /data/dirk/dirk-{{.}}/dirk.yaml;
+              cat /data/dirk/dirk-{{.}}/dirk.yaml;
               printenv dirk-ca.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.crt;
               printenv dirk-ca.key | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.key;
               bash /scripts/generate_cert.sh /data/dirk/dirk-{{.}}/certs/ ca {{ include "dirk.fullname" $root }}-{{ . }}-0.{{ include "dirk.fullname" $root }};
