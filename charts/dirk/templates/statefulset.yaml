@@ -53,7 +53,7 @@ spec:
             - bash
             - -c
             - >
-              apk add openssl;
+              apk add openssl envsubst;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
               export INDEX="{{.}}";
               envsubst < /config/dirk.yaml.tml > /data/dirk/dirk-{{.}}/dirk.yaml;
