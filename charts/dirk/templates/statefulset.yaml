@@ -56,7 +56,8 @@ spec:
               apk add openssl envsubst;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
               export INDEX="{{.}}";
-              export DIRK_INDEX=$((${HOSTNAME##*-}+1));
+              # export DIRK_INDEXINDEX=$((${HOSTNAME##*-}+1));
+              echo $INDEX > /data/dirk/dirk-{{.}}/index
               printenv;
               envsubst < /config/dirk.yaml.tml > /data/dirk/dirk-{{.}}/dirk.yaml;
               printenv dirk-ca.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.crt;
@@ -89,8 +90,6 @@ spec:
           - "/data/dirk"
           - "--decryption-key-env"
           - "ESO_DECRYPTION_KEY"
-          - "--index"
-          - "{{ . }}"
           {{- range $root.Values.dirk.fetchKeysExtraFlags }}
           - {{ . | quote }}
           {{- end }}
@@ -137,8 +136,6 @@ spec:
           - "/data/dirk"
           - "--decryption-key-env"
           - "ESO_DECRYPTION_KEY"
-          - "--index"
-          - "{{ . }}"
           - "--refresh-frequency"
           - "1800"
           {{- range $root.Values.dirk.fetchKeysExtraFlags }}
