@@ -54,14 +54,14 @@ spec:
             - -xc
             - >
               apk add openssl envsubst;
-              mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
+              mkdir -p /data/dirk/certs /data/keystore;
               export INDEX="{{.}}";
-              echo "$INDEX" > /data/dirk/dirk-{{.}}/index;
+              echo "$INDEX" > /data/dirk/index;
               printenv;
-              envsubst < /config/dirk.yaml.tml > /data/dirk/dirk-{{.}}/dirk.yaml;
-              printenv dirk-ca.crt | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.crt;
-              printenv dirk-ca.key | base64 -d  > /data/dirk/dirk-{{.}}/certs/ca.key;
-              bash /scripts/generate_cert.sh /data/dirk/dirk-{{.}}/certs/ ca {{ include "dirk.fullname" $root }}-{{ . }}-0.{{ include "dirk.fullname" $root }};
+              envsubst < /config/dirk.yaml.tml > /data/dirk/dirk.yaml;
+              printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
+              printenv dirk-ca.key | base64 -d  > /data/dirk/certs/ca.key;
+              bash /scripts/generate_cert.sh /data/dirk/certs/ ca {{ include "dirk.fullname" $root }}-{{ . }}-0.{{ include "dirk.fullname" $root }};
               chown -R {{ $root.Values.podSecurityContext.runAsUser }}:{{ $root.Values.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
@@ -104,7 +104,7 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          args: [ "--base-dir", "/data/dirk/dirk-{{.}}" ]
+          args: [ "--base-dir", "/data/dirk" ]
           ports:
             - name: http
               containerPort: {{ $root.Values.service.httpPort }}
