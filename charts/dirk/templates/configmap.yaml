@@ -10,21 +10,21 @@ data:
     log-level: {{ .Values.dirk.loglevel }}
     server:
       id: $INDEX
-      name: {{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}
+      name: $HOSTNAME.{{ include "dirk.fullname" . }}
       listen-address: 0.0.0.0:{{ .Values.service.httpPort }}
     certificates:
       ca-cert: file:///data/dirk/certs/ca.crt
-      server-cert: file:///data/dirk/certs/{{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}.crt
-      server-key: file:///data/dirk/certs/{{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}.key
+      server-cert: file:///data/dirk/certs/$HOSTNAME.{{ include "dirk.fullname" . }}.crt
+      server-key: file:///data/dirk/certs/$HOSTNAME.{{ include "dirk.fullname" . }}.key
     storage-path: /data/dirk/storage
     stores:
     - name: Local
       type: filesystem
       location: /data/dirk/wallets
     peers:
-      1: {{ include "dirk.fullname" . }}-1-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
-      2: {{ include "dirk.fullname" . }}-2-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
-      3: {{ include "dirk.fullname" . }}-3-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      1: {{ include "dirk.fullname" . }}-0-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      2: {{ include "dirk.fullname" . }}-0-1.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      3: {{ include "dirk.fullname" . }}-0-2.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
     unlocker:
       account-passphrases:
         - secret
