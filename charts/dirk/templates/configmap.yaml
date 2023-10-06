@@ -6,6 +6,7 @@ metadata:
   labels:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
+  PEERS: 1:{{ include "dirk.fullname" . }}-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }},2:{{ include "dirk.fullname" . }}-1.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }},3:{{ include "dirk.fullname" . }}-2.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
   dirk.yaml.tml: |
     log-level: {{ .Values.dirk.loglevel }}
     server:
