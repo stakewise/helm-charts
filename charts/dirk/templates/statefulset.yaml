@@ -50,8 +50,8 @@ spec:
           securityContext:
             runAsUser: 0
           command:
-            - sh
-            - -ac
+            - bash
+            - -c
             - >
               apk add openssl;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
