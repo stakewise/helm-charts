@@ -14,5 +14,10 @@ data:
   HARVEST_VAULT: {{ .Values.settings.harvestVault | quote }}
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
+  ENABLE_METRICS: {{ .Values.metrics.enabled | quote }}
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
+  METRICS_PORT: {{ .Values.metrics.port | quote }}
   MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
+  {{- if .Values.settings.remoteSigner.enabled }}
+  REMOTE_SIGNER_URL: {{ .Values.settings.remoteSigner.url | quote }}
+  {{- end }}
