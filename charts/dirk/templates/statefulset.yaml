@@ -118,16 +118,29 @@ spec:
               mountPath: /config
             - name: scripts
               mountPath: /scripts
-        - name: sleeper
-          image: "bash:latest"
+        - name: fetch-keys-syncer
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" $root }}
-          command: [ "/usr/local/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 30; done;" ]
+          args:
+          - "sync-dirk-keys"
+          - "--db-url-env"
+          - "ESO_DB_KEYSTORE_URL"
+          - "--wallet-dir"
+          - "/data/dirk"
+          - "--decryption-key-env"
+          - "ESO_DECRYPTION_KEY"
+          - "--index"
+          - "{{ . }}"
+          - "--refresh-frequency"
+          - "1800"
+          {{- range $root.Values.dirk.fetchKeysExtraFlags }}
+          - {{ . | quote }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
