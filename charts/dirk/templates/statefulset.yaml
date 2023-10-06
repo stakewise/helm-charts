@@ -152,7 +152,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: {{ include "common.names.fullname" $root }}-{{.}}
+            name: {{ include "common.names.fullname" $root }}
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" $root }}-scripts
