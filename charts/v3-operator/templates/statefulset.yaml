@@ -74,6 +74,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.ports.http }}
               protocol: TCP
+            {{- if .Values.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.metrics.port }}
+              protocol: TCP
+            {{- end }}
           volumeMounts:
             - name: deposit-data
               mountPath: /data/{{ .Values.settings.vault }}/deposit
