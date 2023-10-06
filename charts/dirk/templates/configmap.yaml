@@ -2,39 +2,39 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "common.names.fullname" $root }}
+  name: {{ include "common.names.fullname" . }}
   labels:
-    {{- include "common.labels.standard" $root | nindent 4 }}
+    {{- include "common.labels.standard" . | nindent 4 }}
 data:
   dirk.yaml.tml: |
-    log-level: {{ $root.Values.dirk.loglevel }}
+    log-level: {{ .Values.dirk.loglevel }}
     server:
       id: $INDEX
-      name: {{ include "dirk.fullname" $root }}-$INDEX-0.{{ include "dirk.fullname" $root }}
-      listen-address: 0.0.0.0:{{ $root.Values.service.httpPort }}
+      name: {{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}
+      listen-address: 0.0.0.0:{{ .Values.service.httpPort }}
     certificates:
       ca-cert: file:///data/dirk/dirk-$INDEX/certs/ca.crt
-      server-cert: file:///data/dirk/dirk-$INDEX/certs/{{ include "dirk.fullname" $root }}-$INDEX-0.{{ include "dirk.fullname" $root }}.crt
-      server-key: file:///data/dirk/dirk-$INDEX/certs/{{ include "dirk.fullname" $root }}-$INDEX-0.{{ include "dirk.fullname" $root }}.key
+      server-cert: file:///data/dirk/dirk-$INDEX/certs/{{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}.crt
+      server-key: file:///data/dirk/dirk-$INDEX/certs/{{ include "dirk.fullname" . }}-$INDEX-0.{{ include "dirk.fullname" . }}.key
     storage-path: /data/dirk/dirk-$INDEX/storage
     stores:
     - name: Local
       type: filesystem
       location: /data/dirk/dirk-$INDEX/wallets
     peers:
-      1: {{ include "dirk.fullname" $root }}-1-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
-      2: {{ include "dirk.fullname" $root }}-2-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
-      3: {{ include "dirk.fullname" $root }}-3-0.{{ include "dirk.fullname" $root }}:{{ $root.Values.service.httpPort }}
+      1: {{ include "dirk.fullname" . }}-1-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      2: {{ include "dirk.fullname" . }}-2-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      3: {{ include "dirk.fullname" . }}-3-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
     unlocker:
       account-passphrases:
         - secret
     permissions:
-      {{ $root.Values.dirk.clientName }}:
+      {{ .Values.dirk.clientName }}:
         Validators: All
     metrics:
-      listen-address: 0.0.0.0:{{ $root.Values.metricsPort }}
+      listen-address: 0.0.0.0:{{ .Values.metricsPort }}
     tracing:
-      address: {{ $root.Values.dirk.tracing.address | quote }}
+      address: {{ .Values.dirk.tracing.address | quote }}
 ---
 apiVersion: v1
 kind: ConfigMap
