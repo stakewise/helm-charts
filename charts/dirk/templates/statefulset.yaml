@@ -51,7 +51,7 @@ spec:
             runAsUser: 0
           command:
             - bash
-            - -c
+            - -xc
             - >
               apk add openssl envsubst;
               mkdir -p /data/dirk/dirk-{{.}}/certs /data/keystore;
