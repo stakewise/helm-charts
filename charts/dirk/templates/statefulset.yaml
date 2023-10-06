@@ -77,7 +77,7 @@ spec:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
             - configMapRef:
-                name: {{ include "common.names.fullname" . }}
+                name: {{ include "common.names.fullname" . }}-env
           args:
           - "sync-dirk-keys"
           - "--db-url-env"
@@ -124,6 +124,8 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}-env
           args:
           - "sync-dirk-keys"
           - "--db-url-env"
