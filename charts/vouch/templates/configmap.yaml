@@ -22,9 +22,9 @@ data:
         endpoints:
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        client-cert: {{ .Values.vouch.accountmanager.dirk.clientcert }}
-        client-key: {{ .Values.vouch.accountmanager.dirk.clientkey }}
-        ca-cert: {{ .Values.vouch.accountmanager.dirk.cacert }}
+        client-cert: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/{{ include "common.names.fullname" . }}.crt
+        client-key: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/{{ include "common.names.fullname" . }}.key
+        ca-cert: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.crt
         accounts: {{ .Values.vouch.accountmanager.dirk.accounts }}
         timeout: {{ .Values.vouch.accountmanager.dirk.timeout }}
     feerecipient:
