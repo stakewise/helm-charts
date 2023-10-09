@@ -15,8 +15,8 @@ metadata:
     {{- end }}
 spec:
   endpoints:
-    - port: http
-      path: /metrics
+    - port: metrics
+      path: /
       {{- if .Values.serviceMonitor.interval }}
       interval: {{ .Values.serviceMonitor.interval }}
       {{- end }}
