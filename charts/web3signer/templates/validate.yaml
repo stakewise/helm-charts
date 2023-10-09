@@ -1,3 +1,0 @@
-{{- if not .Values.global.label }}
-{{- fail ".Values.global.label is required" }}
-{{- end }}
