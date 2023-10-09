@@ -41,19 +41,6 @@ enableReloader: false
 # dbUsername: ""
 # dbPassword: ""
 
-provisioningExternalSecrets:
-  enabled: false
-  secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
-
-externalSecretsV2:
-  enabled: false
-  secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
-  data: []
-
 externalSecrets:
   enabled: true
   secretStoreRef: secretStoreRef
