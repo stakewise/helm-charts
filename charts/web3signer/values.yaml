@@ -8,6 +8,10 @@ global:
 
 replicaCount: 3
 
+idleTimeout: 30	
+
+tmpfsSize: 128Mi
+
 image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
@@ -18,7 +22,7 @@ image:
 ##
 initImage:
   repository: busybox
-  tag: "1.34"
+  tag: "1.36.1"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch private keys.
@@ -48,66 +52,18 @@ externalSecretsV2:
   secretStoreRef:
     name: secretStoreRef
     kind: SecretStore
-  data:
-    - secretKey: ESO_DECRYPTION_KEY
-      remoteRef:
-        key: validators
-        property: decryptionKey
-    - secretKey: ESO_DECRYPTION_KEY_V2
-      remoteRef:
-        key: validators
-        property: decryptionKeyV2
-    - secretKey: ESO_DB_KEYSTORE_URL
-      remoteRef:
-        key: validators
-        property: dbKeystoreUrl
-    - secretKey: ESO_DB_URL
-      remoteRef:
-        key: validators
-        property: dbUrl
-    - secretKey: ESO_DB_USERNAME
-      remoteRef:
-        key: validators
-        property: dbUsername
-    - secretKey: ESO_DB_PASSWORD
-      remoteRef:
-        key: validators
-        property: dbPassword
+  data: []
 
 externalSecrets:
   enabled: true
   secretStoreRef: secretStoreRef
-  data:
-    - secretKey: ESO_DECRYPTION_KEY
-      remoteRef:
-        key: validators
-        property: decryptionKey
-    - secretKey: ESO_DECRYPTION_KEY_V2
-      remoteRef:
-        key: validators
-        property: decryptionKeyV2
-    - secretKey: ESO_DB_KEYSTORE_URL
-      remoteRef:
-        key: validators
-        property: dbKeystoreUrl
-    - secretKey: ESO_DB_URL
-      remoteRef:
-        key: validators
-        property: dbUrl
-    - secretKey: ESO_DB_USERNAME
-      remoteRef:
-        key: validators
-        property: dbUsername
-    - secretKey: ESO_DB_PASSWORD
-      remoteRef:
-        key: validators
-        property: dbPassword
+  data: []
 
 ## Flyawy image is used to apply database migrations
 ##
 flywayImage:
   repository: flyway/flyway
-  tag: "8.5.8-alpine"
+  tag: "9.3"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

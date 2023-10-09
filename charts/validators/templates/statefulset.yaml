@@ -71,7 +71,7 @@ spec:
             runAsUser: 0
           env:
             - name: WEB3SIGNER_URL
-              value: {{ $root.Values.web3signerEndpoint }}
+              value: {{ include "web3signer" . }}
             - name: ESO_DB_KEYSTORE_URL
               valueFrom:
                 secretKeyRef:
@@ -87,6 +87,13 @@ spec:
             - "{{ . }}"
             - "--no-of-keys"
             - "{{ $root.Values.validatorsNoOfKeys }}"
+            {{- if not $root.Values.strictFeeRecipientCheck }}	
+            - "--no-strict-fee-recipient-check"	
+            {{- end }}	
+            {{- if eq $.Values.type "lodestar" }}	
+            - "--graffiti"	
+            - "{{ $root.Values.graffiti }}"	
+            {{- end }}
             {{- if not $root.Values.enableBuilder }}
             - "--no-proposal-builder-enabled"
             {{- end }}
@@ -113,10 +120,17 @@ spec:
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
+              cat /data/proposerConfig.yaml;
+              formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n');
+              echo "$formatted_content" > /data/pubkeys.txt;	
+              cat /data/pubkeys.txt;
               echo "" >>
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+           {{- if eq $root.Values.type "nimbus" }}	
+              find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;	
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -156,6 +170,35 @@ spec:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          {{- if eq $root.Values.type "lodestar" }}
+          command:
+            - sh
+            - -c
+            - >
+              export PUBKEYS=$(paste -sd, /data/pubkeys.txt);
+              node ./packages/cli/bin/lodestar
+            {{- range (pluck $root.Values.type $root.Values.flags | first) }}
+              {{ . }}
+            {{- end }}
+              --network={{ $root.Values.network }}
+              --proposerSettingsFile=/data/proposerConfig.yaml
+              --externalSigner.url={{ include "web3signer" $root }}
+              --externalSigner.pubkeys=$PUBKEYS
+            {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+              --beaconNodes=={{ $rpcEndpoints }}"
+            {{- else }}
+              {{- include "beacon-rpc-node" $ | nindent 12 }}
+            {{- end }}
+            {{- if $root.Values.metrics.enabled }}
+            {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
+              {{ . }}
+            {{- end }}
+            {{- end }}
+
+            {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
+              {{ . }}
+            {{- end }}
+          {{- else }}
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
