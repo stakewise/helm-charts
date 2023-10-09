@@ -188,3 +188,18 @@ data:
   feeOverride.json: |-
     {{- .Values.feeOverride | nindent 4 }}
 {{- end }}
+{{- if .Values.enableWatcher }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "validators.fullname" . }}-watcher
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/resource-policy": keep
+    "helm.sh/hook": pre-install,pre-upgrade
+    "helm.sh/hook-weight": "-5"
+data:
+{{ (.Files.Glob "watcher.sh").AsConfig | indent 2 }}
+{{- end }}

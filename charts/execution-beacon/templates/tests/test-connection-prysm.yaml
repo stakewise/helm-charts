@@ -1,4 +1,4 @@
-{{- if .Values.prysm.enabled }}
+{{- if eq .Values.beacon.client "prysm" }}
 apiVersion: v1
 kind: Pod
 metadata:
@@ -12,6 +12,6 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args: ['{{ include "common.names.fullname" . }}:{{ .Values.prysm.rpc.port }}']
+      args: ['{{ include "common.names.fullname" . }}:{{ .Values.beacon.grpc.port }}']
   restartPolicy: Never
 {{- end }}

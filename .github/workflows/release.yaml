@@ -1,0 +1,45 @@
+name: Helm Charts Release
+
+on: 
+  push:
+    branches:
+      - "!*"
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+
+      - name: Helm Dependencies
+        run: |
+          for dir in $(ls -d charts/*); do
+            helm dependency update $dir;
+          done
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+
+      - name: Publish Helm chart
+        uses: stefanprodan/helm-gh-pages@v1.7.0
+        with:
+          token: ${{ secrets.BOT_TOKEN  }}
+          charts_dir: charts
+          charts_url: https://nethermindeth.github.io/helm-charts
+          repository: helm-charts
+          branch: gh-pages
+          target_dir: charts
+          index_dir: .

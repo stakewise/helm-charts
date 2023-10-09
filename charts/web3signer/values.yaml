@@ -12,7 +12,7 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.10.0"
+  tag: "23.6.0"
 
 ## Init image is used to chown data volume, etc.
 ##
@@ -24,19 +24,84 @@ initImage:
 ## CLI image is used to fetch private keys.
 ##
 cliImage:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.1.10"
+  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
+  tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
-## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
-##
-dbKeystoreUrl: ""
 
-## The key for decrypting private keys is generated with stakewise-cli sync-db command
-##
-decryptionKey: ""
+enableReloader: false
 
-idleTimeout: 30
+# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
+# decryptionKey: "generated with stakewise-cli sync-db"
+# dbUrl: "jdbc:postgresql://localhost/web3signer"
+# dbUsername: ""
+# dbPassword: ""
+
+provisioningExternalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+
+externalSecretsV2:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  data:
+    - secretKey: ESO_DECRYPTION_KEY
+      remoteRef:
+        key: validators
+        property: decryptionKey
+    - secretKey: ESO_DECRYPTION_KEY_V2
+      remoteRef:
+        key: validators
+        property: decryptionKeyV2
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
+    - secretKey: ESO_DB_URL
+      remoteRef:
+        key: validators
+        property: dbUrl
+    - secretKey: ESO_DB_USERNAME
+      remoteRef:
+        key: validators
+        property: dbUsername
+    - secretKey: ESO_DB_PASSWORD
+      remoteRef:
+        key: validators
+        property: dbPassword
+
+externalSecrets:
+  enabled: true
+  secretStoreRef: secretStoreRef
+  data:
+    - secretKey: ESO_DECRYPTION_KEY
+      remoteRef:
+        key: validators
+        property: decryptionKey
+    - secretKey: ESO_DECRYPTION_KEY_V2
+      remoteRef:
+        key: validators
+        property: decryptionKeyV2
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
+    - secretKey: ESO_DB_URL
+      remoteRef:
+        key: validators
+        property: dbUrl
+    - secretKey: ESO_DB_USERNAME
+      remoteRef:
+        key: validators
+        property: dbUsername
+    - secretKey: ESO_DB_PASSWORD
+      remoteRef:
+        key: validators
+        property: dbPassword
 
 ## Flyawy image is used to apply database migrations
 ##
@@ -80,18 +145,6 @@ pruningInterval: 24
 ## The default is 32 as defined on MainNet/Prater.
 ##
 slotsPerEpoch: 32
-
-## The Java Database Connectivity (JDBC) URL of the slashing protection database.
-##
-dbUrl: "jdbc:postgresql://localhost/web3signer"
-
-## The username to use when connecting to the slashing protection database.
-##
-dbUsername: ""
-
-## The password to connect to the slashing protection database.
-##
-dbPassword: ""
 
 ## Port on which Web3Signer HTTP listens.
 ##

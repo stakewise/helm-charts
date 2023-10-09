@@ -1,0 +1,86 @@
+{{- if and (or .Values.execution.metrics.enabled .Values.beacon.metrics.enabled)
+    (or .Values.execution.metrics.serviceMonitor.enabled .Values.beacon.metrics.serviceMonitor.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-execution
+  {{- if .Values.execution.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.execution.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.execution.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.execution.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-exec
+      {{- if eq .Values.execution.client "geth" }}
+      path: /debug/metrics/prometheus
+      {{- else }}
+      path: /metrics
+      {{- end }}
+      {{- if .Values.execution.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.execution.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.execution.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.execution.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.execution.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.execution.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.execution.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.execution.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.execution.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.execution.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ template "common.names.fullname" . }}-beacon
+  {{- if .Values.beacon.metrics.serviceMonitor.namespace }}
+  namespace: {{ .Values.beacon.metrics.serviceMonitor.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.beacon.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.beacon.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  endpoints:
+    - port: metrics-beacon
+      path: /metrics
+      {{- if .Values.beacon.metrics.serviceMonitor.interval }}
+      interval: {{ .Values.beacon.metrics.serviceMonitor.interval }}
+      {{- end }}
+      {{- if .Values.beacon.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ .Values.beacon.metrics.serviceMonitor.scrapeTimeout }}
+      {{- end }}
+      {{- if .Values.beacon.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ .Values.beacon.metrics.serviceMonitor.honorLabels }}
+      {{- end }}
+      {{- if .Values.beacon.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml .Values.beacon.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- end }}
+      {{- if .Values.beacon.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml .Values.beacon.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- end }}
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+{{- end }}

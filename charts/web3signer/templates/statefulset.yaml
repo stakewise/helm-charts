@@ -50,18 +50,9 @@ spec:
             - >
               mkdir -p /data/web3signer /data/keystore;
               chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/web3signer
-          volumeMounts:
-            - name: data
-              mountPath: /data
-        - name: fetch-keys
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
           envFrom:
             - secretRef:
-                name: {{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", "{{ .Values.dbKeystoreUrl }}", "--output-dir", "/data/keystore"]
+                name: eso-{{ include "common.names.fullname" . }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -71,13 +62,30 @@ spec:
           securityContext:
             runAsUser: 0
           args:
-            - -user={{ .Values.dbUsername }}
-            - -password={{ .Values.dbPassword }}
-            - -url={{ .Values.dbUrl }}
+            - -user=$(ESO_DB_USERNAME)
+            - -password=$(ESO_DB_PASSWORD)
+            - -url=$(ESO_DB_URL)
             - migrate
+          # for first time clean may be needed, be careful not remove production db
+          # flyway -user=$ESO_DB_USERNAME -password=$ESO_DB_PASSWORD -url=$ESO_DB_URL clean -cleanDisabled=false
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
+        - name: fetch-keys
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -86,12 +94,16 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml
-            - --logging={{ .Values.loggingLevel }}
-            - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
+            - --slashing-protection-db-url=$(ESO_DB_URL)
+            - --slashing-protection-db-username=$(ESO_DB_USERNAME)
+            - --slashing-protection-db-password=$(ESO_DB_PASSWORD)
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.httpPort }}
@@ -124,6 +136,20 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+        {{- if .Values.enableReloader }}
+        - name: fetch-keys-reloader
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2", "--refresh-frequency", "60"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- end }}
       volumes:
         - name: config
           configMap:

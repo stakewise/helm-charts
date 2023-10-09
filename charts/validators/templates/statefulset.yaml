@@ -72,29 +72,24 @@ spec:
           env:
             - name: WEB3SIGNER_URL
               value: {{ $root.Values.web3signerEndpoint }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
           args:
             - "sync-validator-keys"
             - "--db-url"
-            - "{{ $root.Values.dbKeystoreUrl }}"
+            - "$(ESO_DB_KEYSTORE_URL)"
             - "--output-dir"
             - "/data"
             - "--index"
             - "{{ . }}"
-            {{- if eq $root.Values.network "sepolia" }}
-            - "--network"
-            - "goerli"
-            {{- else }}
-            - "--network"
-            - "{{ $root.Values.network }}"
+            - "--no-of-keys"
+            - "{{ $root.Values.validatorsNoOfKeys }}"
+            {{- if not $root.Values.enableBuilder }}
+            - "--no-proposal-builder-enabled"
             {{- end }}
-          {{- if $root.Values.feeOverride }}
-            - "--solo-fees-file"
-            - "/fee/feeOverride.json"
-          {{- end }}
-          {{- if not $root.Values.enableBuilder }}
-            - "--proposal-builder-enabled"
-            - "false"
-          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -122,18 +117,42 @@ spec:
               cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
               cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
-              echo "Replace goerli fee recipient";
-              grep -rl -i "0x6A9d30e05C6832E868390F155388c7d97A6faEAC" -r /data/ | xargs --no-run-if-empty sed -i "s/0x6A9d30e05C6832E868390F155388c7d97A6faEAC/{{ $.Values.suggestedFeeRecipient }}/g";
-              echo "Replace mainnet fee recipient";
-              grep -rl -i "0x6b333B20fBae3c5c0969dd02176e30802e2fbBdB" -r /data/ | xargs --no-run-if-empty sed -i "s/0x6b333B20fBae3c5c0969dd02176e30802e2fbBdB/{{ $.Values.suggestedFeeRecipient }}/g";
-              echo "Replace gnosis fee recipient";
-              grep -rl -i "0x0000000000000000000000000000000000000000" -r /data/ | xargs --no-run-if-empty sed -i "s/0x0000000000000000000000000000000000000000/{{ $.Values.suggestedFeeRecipient }}/g";
           volumeMounts:
             - name: data
               mountPath: /data
             - name: gnosis-prysm
               mountPath: /mnt/gnosis-prysm
       containers:
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          env:
+            - name: WEB3SIGNER_URL
+              value: {{ $root.Values.web3signerEndpoint }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command: [ "/bin/bash" ]
+          args: ["/scripts/watcher.sh", "{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- if $root.Values.feeOverride }}
+            - name: fee-override
+              mountPath: /fee
+          {{- end }}
+          {{- if $root.Values.enableWatcher }}
+            - name: watcher
+              mountPath: /scripts
+          {{- end }}
+      {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
@@ -221,6 +240,11 @@ spec:
         - name: fee-override
           configMap:
             name: {{ template "validators.fullname" $root }}-override-fee-recipient
+      {{- end }}
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          configMap:
+            name: {{ template "validators.fullname" $root }}-watcher
       {{- end }}
         - name: data
           emptyDir: {}

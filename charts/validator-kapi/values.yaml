@@ -1,0 +1,220 @@
+# Default values for web3signer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  serviceAccount:
+    create: true
+
+  replicaCount: 1
+
+  externalSecrets:
+    enabled: false
+    secretStoreRef: secretStoreRef
+    data:
+      - secretKey: DB_NAME
+        remoteRef:
+          key: validatorKapiSecrets
+          property: dbName
+      - secretKey: DB_PORT
+        remoteRef:
+          key: validatorKapiSecrets
+          property: dbPort
+      - secretKey: DB_HOST
+        remoteRef:
+          key: validatorKapiSecrets
+          property: dbHost
+      - secretKey: DB_USER
+        remoteRef:
+          key: validatorKapiSecrets
+          property: dbUser
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          key: validatorKapiSecrets
+          property: dbPassword
+
+  image:
+    repository: lidofinance/lido-keys-api
+    pullPolicy: IfNotPresent
+    tag: "stable"
+
+kapi:
+  env: "production"
+  # Application port
+  port: 3000
+  # The number of seconds that each request will last in storage
+  corsWhitelistRegexp: ""
+  jobIntervalRegistry: "*/5 * * * * *"
+  jobIntervalValidatorsRegistry: "*/10 * * * * *"
+  globlaThrottleTTL: 5
+  # FallbackProviderModule request policy parameters
+  # values below are default
+  providerJsonRpcMaxBatchSize: 100
+  providerConcurrentRequests: 5
+  providerBatchAggregationWaitMs: 10
+  # The maximum number of requests within the TTL limit
+  globalThrottleLimit: 100
+  # Cache expiration time in seconds
+  globalCacheTTL: 1
+  # Log level: debug, info, notice, warning or error
+  logLevel: debug
+  # Log format: simple or json
+  logFormat: json
+  # EL Node provider
+  # You could provide few providers for fallback
+  execution: http://your_el_node1,http://your_el_node2
+  # chain id
+  chainId: 1
+  # It is possible to enable/disable collecting of validators
+  # value below is default
+  validatorRegistryEnable: true
+  # CL api urls
+  # if VALIDATOR_REGISTRY_ENABLE=false , there are no need to provide CL_API_URLS
+  consensus: http://your_cl_node1,http://your_cl_node2
+
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+podSecurityContext: {}
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+## PostgreSQL Server
+## ref: https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+##
+postgresql:
+  enabled: true
+  volumePermissions:
+    enabled: true
+    image:
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 11-debian-11-r99
+      pullPolicy: Always
+    securityContext:
+      runAsUser: 0
+  securityContext:
+    enabled: true
+    fsGroup: 1001
+  containerSecurityContext:
+    enabled: true
+    runAsUser: 1001
+  rbac:
+    create: false
+  hostname: postgresql
+  audit:
+    logHostname: true
+  auth:
+    username: "postgres"
+    password: "kapi"
+    database: "kapi"
+    postgresPassword: "kapi-admin"
+    existingSecret: ""
+    secretKeys:
+      adminPasswordKey: ""
+      userPasswordKey: ""
+      replicationPasswordKey: ""
+  service:
+    ports:
+      postgresql: 5432
+  primary:
+    persistence:
+      enabled: true
+      mountPath: /bitnami/postgresql
+      subPath: ''
+      accessModes:
+        - ReadWriteOnce
+      size: 20Gi
+      annotations: { }
+      selector: { }
+    resources:
+      requests:
+        memory: 384Mi
+        cpu: 250m
+  networkPolicy:
+    enabled: false
+  tls:
+    enabled: false
+  metrics:
+    enabled: true
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## Prometheus Service Monitor
+## ref: https://github.com/coreos/prometheus-operator
+##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+##
+serviceMonitor:
+  ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+  ##
+  enabled: false
+  ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+  ##
+  namespace: ""
+  ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+  ##
+  interval: 30s
+  ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+  ##
+  scrapeTimeout: ""
+  ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+  ##
+  relabellings: []
+  ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+  ##
+  metricRelabelings: []
+  ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+  ##
+  honorLabels: false
+  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+  ##
+  additionalLabels: {}

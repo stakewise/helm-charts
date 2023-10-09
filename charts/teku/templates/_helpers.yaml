@@ -1,3 +1,0 @@
-{{- define "teku.p2pPort" -}}
-{{- printf "9000" -}}
-{{- end -}}

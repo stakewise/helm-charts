@@ -37,13 +37,35 @@ initImageBusybox:
 ## CLI image is used to fetch public keys.
 ##
 cliImage:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.2.7"
+  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
+  tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
-## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
-##
-dbKeystoreUrl: ""
+provisioningExternalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+
+externalSecrets:
+  enabled: true
+  secretStoreRef: secretStoreRef
+  data:
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
+
+externalSecretsV2:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  data:
+    - secretKey: ESO_DB_KEYSTORE_URL
+      remoteRef:
+        key: validators
+        property: dbKeystoreUrl
 
 ## Configuration for validators
 ## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
@@ -89,6 +111,8 @@ validatorsKeyIndex: 0
 ## so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
 ##
 validatorsCount: 0
+
+validatorsNoOfKeys: 100
 
 ## Default fee recipient for all validator keys.
 ##
@@ -210,6 +234,8 @@ graffiti: ""
 ## used for stakewise solo validators only
 ##
 feeOverride: ""
+
+enableWatcher: false
 
 ## Monitoring
 ##

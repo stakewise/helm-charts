@@ -23,6 +23,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 
+
 {{/*
 Create chart name and version as used by the chart label.
 */}}
@@ -91,12 +92,11 @@ Validator beacon node
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
-{{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpoints }}
-{{- if gt $beaconChainRpcEndpointsLen 1 }}
-- "--beacon-node-api-endpoints={{ $.Values.beaconChainRpcEndpoints | join "," }}"
-{{- else }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
-{{- end }}
+{{- else if eq $.Values.type "nimbus" }}
+- "--beacon-node={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- else if eq $.Values.type "lodestar" }}
+- "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}
 {{- end }}
 
@@ -105,11 +105,19 @@ Validator graffiti
 */}}
 {{- define "validator-graffiti" -}}
 {{- if $.Values.graffiti }}
-{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") }}
-- "--graffiti={{ $.Values.graffiti }}"
-{{- else if eq $.Values.type "teku" }}
+{{- if eq $.Values.type "teku" }}
 - "--validators-graffiti={{ $.Values.graffiti }}"
+{{- else }}
+- "--graffiti={{ $.Values.graffiti }}"
 {{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Validator web3signer endpoint
+*/}}
+{{- define "web3signer" -}}
+{{- if $.Values.web3signerEndpoint }}http://{{ $.Values.web3signerEndpoint }}:6174{{- else }}http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174
 {{- end }}
 {{- end }}
 
