@@ -98,11 +98,7 @@ global:
     secretStoreRef: 
       name: secretStoreRef
       kind: SecretStore
-    data:
-      - secretKey: JWT_SECRET
-        remoteRef:
-          key: ethereumValidators
-          property: jwt
+    data: []
 
   ethsider:
     enabled: true
