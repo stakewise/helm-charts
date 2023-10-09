@@ -158,8 +158,10 @@ spec:
         name: data
         labels:
           {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
         annotations:
           {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
       spec:
         accessModes: {{ .Values.persistence.accessModes }}
         storageClassName: {{ .Values.persistence.storageClassName }}
