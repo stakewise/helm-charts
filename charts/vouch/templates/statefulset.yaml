@@ -113,23 +113,6 @@ spec:
               mountPath: /config
             - name: scripts
               mountPath: /scripts
-        - name: sleeper
-          image: "bash:latest"
-          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          envFrom:
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-          command: [ "/usr/local/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 30; done;" ]
-          volumeMounts:
-            - name: data
-              mountPath: /data
-            - name: config
-              mountPath: /config
-            - name: scripts
-              mountPath: /scripts
       volumes:
         - name: config
           configMap:
