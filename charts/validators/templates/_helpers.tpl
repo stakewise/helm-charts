@@ -24,7 +24,7 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Extract the first part of a string before the hyphen ("-"). Defining the validators owner.
+Extract the last part of a string after the hyphen ("-"). Defining the validators owner.
 */}}
 {{- define "validators.ownership" -}}
 {{- $fullname := .Values.fullnameOverride }}
@@ -33,7 +33,7 @@ Extract the first part of a string before the hyphen ("-"). Defining the validat
 {{- $fullname = printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- $parts := split "-" $fullname }}
-{{- index $parts 0 }}
+{{- index $parts (sub (len $parts) 1) }}
 {{- end }}
 
 {{/*
@@ -125,16 +125,9 @@ Validator graffiti
 {{- end }}
 {{- end }}
 
-{{/*
-Validator web3signer endpoint
-*/}}
 {{- define "web3signer" -}}
-{{- $owner := include "validators.onwership" . }}
-{{- $web3signerEndpoint := printf "http://%s-web3signer-web3signer:6174" $owner }}
-{{- if $.Values.web3signerEndpoint }}
-  {{- $web3signerEndpoint = printf "http://%s:6174" $.Values.web3signerEndpoint }}
+{{- if $.Values.web3signerEndpoint }}http://{{ $.Values.web3signerEndpoint }}:6174{{- else }}http://{{ $.Values.global.project }}-web3signer-{{ $.Values.global.owner }}-web3signer:6174
 {{- end }}
-{{- $web3signerEndpoint }}
 {{- end }}
 
 {{- define "flatten_list" -}}

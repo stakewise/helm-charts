@@ -71,7 +71,7 @@ spec:
             runAsUser: 0
           env:
             - name: WEB3SIGNER_URL
-              value: {{ include "web3signer" . }}
+              value: {{ include "web3signer" $root }}
             - name: ESO_DB_KEYSTORE_URL
               valueFrom:
                 secretKeyRef:
@@ -143,7 +143,7 @@ spec:
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           env:
             - name: WEB3SIGNER_URL
-              value: {{ $root.Values.web3signerEndpoint }}
+              value: {{ include "web3signer" $root }}
             - name: ESO_DB_KEYSTORE_URL
               valueFrom:
                 secretKeyRef:
@@ -207,18 +207,18 @@ spec:
             {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
             - "--config-file /data/config_gnosis_prysm"
             - "--chain-config-file /data/config_gnosis_prysm"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--validators-proposer-config=/data/proposerConfig.json"
             {{- if $root.Values.enableBuilder }}
             - "--validators-proposer-blinded-blocks-enabled=true"
