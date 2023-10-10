@@ -38,6 +38,7 @@ data:
   POSTGRES_DB: {{ .Values.settings.postgres.db | quote }}
   POSTGRES_USER: {{ .Values.settings.postgres.user | quote }}
 
+  GRAPH_API_URL: {{ .Values.settings.graph.APIUrl | quote }}
   GRAPH_POSTGRES_HOST: {{ .Values.settings.graph.postgresHost | quote }}
   GRAPH_POSTGRES_PORT: {{ .Values.settings.graph.postgresPort | quote }}
   GRAPH_POSTGRES_DB: {{ .Values.settings.graph.postgresDB | quote }}
