@@ -1,7 +1,0 @@
-{{- if and .Values.beaconChainRpcAutoDiscovery (not .Values.beaconChainRpcEndpoints) (not .Values.beaconChainRpcEndpointsRandomized) }}
-{{- fail ".Values.beaconChainRpcEndpoints is empty" }}
-{{- end }}
-
-{{- if not .Values.global.label }}
-{{- fail ".Values.global.label is required" }}
-{{- end }}
