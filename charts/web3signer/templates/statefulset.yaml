@@ -94,7 +94,7 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml
-            - --logging={{ .Values.loggingLevel }}
+            - --logging={{ .Values.loggingLevel }}	
             - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
             - --slashing-protection-db-url=$(ESO_DB_URL)
@@ -138,6 +138,20 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+        {{- if .Values.enableReloader }}
+        - name: fetch-keys-reloader
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2", "--refresh-frequency", "60"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- end }}
       volumes:
         - name: config
           configMap:

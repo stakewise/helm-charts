@@ -1,29 +1,24 @@
-# Default values for web3signer.
+# Default values for dirk.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
 global:
-  owner: ""
   serviceAccount:
     create: true
 
 replicaCount: 3
 
-idleTimeout: 30	
-
-tmpfsSize: 128Mi
-
 image:
-  repository: consensys/web3signer
+  repository: attestant/dirk
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.6.0"
+  tag: "1.1.0"
 
 ## Init image is used to chown data volume, etc.
 ##
 initImage:
-  repository: busybox
-  tag: "1.36.1"
+  repository: bash
+  tag: "5.2"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch private keys.
@@ -33,26 +28,21 @@ cliImage:
   tag: "v0.0.2"
   pullPolicy: IfNotPresent
 
-
-enableReloader: false
-
-# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
-# decryptionKey: "generated with stakewise-cli sync-db"
-# dbUrl: "jdbc:postgresql://localhost/web3signer"
-# dbUsername: ""
-# dbPassword: ""
-
 externalSecrets:
-  enabled: true
-  secretStoreRef: secretStoreRef
-  data: []
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  dataFrom:
+    key: dirk
 
-## Flyawy image is used to apply database migrations
-##
-flywayImage:
-  repository: flyway/flyway
-  tag: "9.3"
-  pullPolicy: IfNotPresent
+dirk:
+  loglevel: Debug
+  clientName: client1
+  tracing:
+    address: 'jaeger:4317'
+
+  fetchKeysExtraFlags: []
 
 imagePullSecrets: []
 
@@ -65,10 +55,6 @@ nameOverride: ""
 fullnameOverride: ""
 
 
-## Web3Signer Settings
-## ref: https://docs.web3signer.consensys.net/en/latest/Reference/CLI/CLI-Syntax/
-##
-
 ## Network
 ## Options: mainnet, prater, gnosis
 network: "mainnet"
@@ -77,30 +63,21 @@ network: "mainnet"
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
 loggingLevel: "INFO"
 
-## Number of epochs to keep when pruning the slashing protection database.
+## Port on which dirk HTTP listens.
 ##
-pruningEpochToKeep: 100
-
-## Hours between slashing protection database pruning operations.
-##
-pruningInterval: 24
-
-## Number of slots per epoch. This number multiplied by the number of epochs to keep determines what blocks to keep when pruning the slashing protection database.
-## The default is 32 as defined on MainNet/Prater.
-##
-slotsPerEpoch: 32
-
-## Port on which Web3Signer HTTP listens.
-##
-httpPort: 6174
+httpPort: 8881
 
 ## The port (TCP) on which Prometheus accesses metrics
 ##
 metricsPort: 9000
 
-## Java Opts
-##
-web3signerJavaOpts: "-Xmx1g -Xms1g"
+
+persistence:
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+  annotations: {}
 
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -131,7 +108,7 @@ securityContext: {}
 
 service:
   type: ClusterIP
-  port: 80
+  httpPort: 8881
 
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/

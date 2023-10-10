@@ -38,7 +38,7 @@ spec:
       annotations:
         checksum/configmap: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
     spec:
-      {{- with $root.Values.global.imagePullSecrets }}
+      {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -87,12 +87,12 @@ spec:
             - "{{ . }}"
             - "--no-of-keys"
             - "{{ $root.Values.validatorsNoOfKeys }}"
-            {{- if not $root.Values.strictFeeRecipientCheck }}
-            - "--no-strict-fee-recipient-check"
-            {{- end }}
-            {{- if eq $.Values.type "lodestar" }}
-            - "--graffiti"
-            - "{{ $root.Values.graffiti }}"
+            {{- if not $root.Values.strictFeeRecipientCheck }}	
+            - "--no-strict-fee-recipient-check"	
+            {{- end }}	
+            {{- if eq $.Values.type "lodestar" }}	
+            - "--graffiti"	
+            - "{{ $root.Values.graffiti }}"	
             {{- end }}
             {{- if not $root.Values.enableBuilder }}
             - "--no-proposal-builder-enabled"
@@ -100,40 +100,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-        - name: init-beacon-endpoints
-          image: "{{ $root.Values.initImageKubectl.repository }}:{{ $root.Values.initImageKubectl.tag }}"
-          imagePullPolicy: {{ $root.Values.initImageKubectl.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          env:
-            {{- if $.Values.beaconChainRpcEndpointsRandomized }}
-            - name: BEACON_CHAIN_RPC_ENDPOINTS_RANDOMIZED
-              value: "{{ $rpcEndpoints }}"
-            {{- end }}
-            {{- if $.Values.beaconChainRpcEndpoints }}
-            - name: BEACON_CHAIN_RPC_ENDPOINTS
-              value: "{{ $.Values.beaconChainRpcEndpoints | join "," }}"
-            {{- end }}
-            - name: COUNTER
-              value: "{{ $counter }}"
-            - name: BEACON_CLIENT
-              value: "{{ $root.Values.type }}"
-            - name: BEACON_PORT
-              value: "{{ index $root.Values.beaconPortMap $root.Values.type }}"
-            - name: POD_NAMESPACE
-              valueFrom:
-                  fieldRef:
-                    fieldPath: metadata.namespace
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          command: ['/bin/bash', '/scripts/init-beacon-endpoints.sh']
-          volumeMounts:
-            - name: data
-              mountPath: /data
-            - name: scripts-init
-              mountPath: /scripts
+          {{- if $root.Values.feeOverride }}
+            - name: fee-override
+              mountPath: /fee
+          {{- end }}
         - name: prepare
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
@@ -146,30 +116,60 @@ spec:
               ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
+              cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
               cat /data/proposerConfig.yaml;
-              cat /data/beacon_endpoints.txt;
               formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n');
-              echo "$formatted_content" > /data/pubkeys.txt;
+              echo "$formatted_content" > /data/pubkeys.txt;	
               cat /data/pubkeys.txt;
+              echo "" >>
+              cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
+              cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
-            {{- if eq $root.Values.type "nimbus" }}
-              find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;
+           {{- if eq $root.Values.type "nimbus" }}	
+              find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;	
             {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
+            - name: gnosis-prysm
+              mountPath: /mnt/gnosis-prysm
       containers:
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          env:
+            - name: WEB3SIGNER_URL
+              value: {{ include "web3signer" $root }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command: [ "/bin/bash" ]
+          args: ["/scripts/watcher.sh", "{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- if $root.Values.feeOverride }}
+            - name: fee-override
+              mountPath: /fee
+          {{- end }}
+          {{- if $root.Values.enableWatcher }}
+            - name: watcher
+              mountPath: /scripts
+          {{- end }}
+      {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
-          env:
-            - name: BEACON_ENDPOINTS
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.annotations['beacon-endpoints']
           {{- if eq $root.Values.type "lodestar" }}
           command:
             - sh
@@ -184,7 +184,11 @@ spec:
               --proposerSettingsFile=/data/proposerConfig.yaml
               --externalSigner.url={{ include "web3signer" $root }}
               --externalSigner.pubkeys=$PUBKEYS
-              --beaconNodes=$(BEACON_ENDPOINTS)
+            {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+              --beaconNodes=={{ $rpcEndpoints }}"
+            {{- else }}
+              {{- include "beacon-rpc-node" $ | nindent 12 }}
+            {{- end }}
             {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
               {{ . }}
@@ -200,41 +204,45 @@ spec:
             - {{ . | quote }}
             {{- end -}}
 
-            {{- if eq $root.Values.type "prysm" }}
+            {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--proposer-settings-file=/data/proposerConfig.json"
+            {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
+            - "--config-file /data/config_gnosis_prysm"
+            - "--chain-config-file /data/config_gnosis_prysm"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
-            - "--network={{ $root.Values.network }}"
+            - "--network=auto"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--validators-proposer-config=/data/proposerConfig.json"
             {{- if $root.Values.enableBuilder }}
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
-            {{- else if eq $root.Values.type "nimbus" }}
-            - "--validators-dir=/data/nimbus"
-            {{- if $root.Values.enableBuilder }}
-            - "--payload-builder=true"
-            {{- end }}
             {{- end }}
 
             {{- include "validator-graffiti" $ | nindent 12 }}
 
+          {{- if $.Values.beaconChainRpcEndpointsRandomized }}
             {{- if eq $.Values.type "prysm" }}
-            - "--beacon-rpc-provider=$(BEACON_ENDPOINTS)"
+            - "--beacon-rpc-provider={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "lighthouse" }}
-            - "--beacon-nodes=$(BEACON_ENDPOINTS)"
+            - "--beacon-nodes={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "teku" }}
-            - "--beacon-node-api-endpoint=$(BEACON_ENDPOINTS)"
-            {{- else if eq $.Values.type "nimbus" }}
-            - "--beacon-node=$(BEACON_ENDPOINTS)"
+            {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
+            {{- if gt $beaconChainRpcEndpointsLen 1 }}
+            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
             {{- else }}
-            {{- include "beacon-rpc-node" $ | nindent 12 }}
+            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
             {{- end }}
+            {{- end }}
+          {{- else }}
+            {{- include "beacon-rpc-node" $ | nindent 12 }}
+          {{- end }}
 
             {{- if $root.Values.metrics.enabled }}
             {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
@@ -245,7 +253,7 @@ spec:
             {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
             - {{ . | quote }}
             {{- end -}}
-          {{- end }}
+
           {{- if $root.Values.metrics.enabled }}
           ports:
             - containerPort: {{ $root.Values.metrics.port }}
@@ -268,10 +276,21 @@ spec:
             - name: data
               mountPath: /data
       volumes:
-        - name: scripts-init
+        - name: gnosis-prysm
           configMap:
-            name: {{ template "validators.fullname" $root }}-init
+            name: {{ template "validators.fullname" $root }}-gnosis-prysm
+      {{- if $root.Values.feeOverride }}
+        - name: fee-override
+          configMap:
+            name: {{ template "validators.fullname" $root }}-override-fee-recipient
+      {{- end }}
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          configMap:
+            name: {{ template "validators.fullname" $root }}-watcher
+      {{- end }}
         - name: data
           emptyDir: {}
+{{- end }}
 {{- end }}
 {{- end }}

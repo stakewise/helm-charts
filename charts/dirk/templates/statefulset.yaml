@@ -1,0 +1,170 @@
+---
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "dirk.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - bash
+            - -xc
+            - >
+              apk add openssl envsubst;
+              mkdir -p /data/dirk/certs /data/keystore;
+              export INDEX=$((${HOSTNAME##*-}+1));
+              echo "$INDEX" > /data/dirk/index;
+              envsubst < /config/dirk.yaml.tml > /data/dirk/dirk.yaml;
+              printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
+              printenv dirk-ca.key | base64 -d  > /data/dirk/certs/ca.key;
+              bash /scripts/generate_cert.sh /data/dirk/certs/ ca ${HOSTNAME}.{{ include "dirk.fullname" . }};
+              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/dirk;
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: scripts
+              mountPath: /scripts
+        - name: fetch-keys
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}-env
+          args:
+          - "sync-dirk-keys"
+          - "--db-url-env"
+          - "ESO_DB_KEYSTORE_URL"
+          - "--wallet-dir"
+          - "/data/dirk"
+          - "--decryption-key-env"
+          - "ESO_DECRYPTION_KEY"
+          {{- range .Values.dirk.fetchKeysExtraFlags }}
+          - {{ . | quote }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: dirk
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: [ "--base-dir", "/data/dirk" ]
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.httpPort }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.metricsPort }}
+              protocol: TCP
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: scripts
+              mountPath: /scripts
+        - name: fetch-keys-syncer
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}-env
+          args:
+          - "sync-dirk-keys"
+          - "--db-url-env"
+          - "ESO_DB_KEYSTORE_URL"
+          - "--wallet-dir"
+          - "/data/dirk"
+          - "--decryption-key-env"
+          - "ESO_DECRYPTION_KEY"
+          - "--refresh-frequency"
+          - "1800"
+          {{- range .Values.dirk.fetchKeysExtraFlags }}
+          - {{ . | quote }}
+          {{- end }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: scripts
+              mountPath: /scripts
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "common.names.fullname" . }}
+        - name: scripts
+          configMap:
+            name: {{ include "common.names.fullname" . }}-scripts
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}

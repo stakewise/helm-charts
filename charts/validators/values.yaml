@@ -3,33 +3,10 @@
 # Declare variables to be passed into your templates.
 
 global:
-  ## Credentials to fetch images from private registry
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-  ##
-  imagePullSecrets: []
-  label: ""
+  owner: ""
   project: ""
-  # RBAC configuration.
-  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-  ##
-  rbac:
-    create: true
-    # The name of the cluster role to use.
-    # If not set and create is true, a name is generated using the fullname template
-    name: ""
-    ## Required Role rules
-    ##
-    rules:
-      ## Required to get information about the services nodePort.
-      ##
-      - apiGroups: [""]
-        resources:
-        - "services"
-        - "pods"
-        verbs:
-        - "list"
-        - "get"
-        - "patch"
+  imagePullSecrets: []
+  network: mainnet
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -51,19 +28,22 @@ securityContext:
 ##
 rbac:
   create: true
+  name: ""	
+  rules:	
+    - apiGroups: [""]	
+      resources:	
+      - "services"	
+      - "pods"	
+      verbs:	
+      - "list"	
+      - "get"	
+      - "patch"
 
 ## Init image is used to chown data volume, initialise genesis, etc.
 ##
 initImageBusybox:
   repository: "busybox"
   tag: "1.36.1"
-  pullPolicy: IfNotPresent
-
-## Init image is used to chown data volume, initialise genesis, etc.
-##
-initImageKubectl:
-  repository: "bitnami/kubectl"
-  tag: "1.25"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch public keys.
@@ -74,10 +54,10 @@ cliImage:
   pullPolicy: IfNotPresent
 
 externalSecrets:
-  enabled: false
+  enabled: true
   secretStoreRef:
-    name: secretStoreRef
-    kind: SecretStore
+    name: secretStoreName
+    kind: secretStoreKind
   data: []
 
 ## Configuration for validators
@@ -95,9 +75,7 @@ enabled: true
 ## Options for Ethereum: prysm, lighthouse, teku
 ## Options for Gnosis: prysm, lighthouse
 ##
-type: nimbus
-
-network: mainnet
+type: prysm
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
@@ -125,15 +103,12 @@ validatorsKeyIndex: 0
 ## **NB! Each validtor hosts a certain number of keys specified when using CLI sync-db command,
 ## so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
 ##
-validatorsCount: 1
+validatorsCount: 0
 
 validatorsNoOfKeys: 100
 
 ## Whether a builder should be used for proposalConfig
-enableBuilder: true
-
-# If not provided will be crafted based on global.project and global.label
-web3signerEndpoint: ""
+enableBuilder: false
 
 ## Validators image version
 ## ref: https://gcr.io/prysmaticlabs/prysm/validator
@@ -142,19 +117,27 @@ image:
   pullPolicy: IfNotPresent
   prysm:
     repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v4.0.6"
+    tag: "v4.0.8"
+  prysmGnosis:
+    repository: "ghcr.io/gnosischain/gbc-prysm-validator"
+    tag: "v2.1.2-gbc"
   lighthouse:
     repository: "sigp/lighthouse"
-    tag: "v4.3.0"
+    tag: "v4.4.1"
   teku:
     repository: "consensys/teku"
-    tag: "23.6.1"
-  nimbus: 
+    tag: "23.9.0"
+  nimbus: 	
     repository: "statusim/nimbus-validator-client"
-    tag: "multiarch-v23.6.1"
-  lodestar: 
+    tag: "multiarch-v23.9.0"
+  lodestar:
     repository: "chainsafe/lodestar"
-    tag: "v1.9.1"
+    tag: "v1.11.0"
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
 
 terminationGracePeriodSeconds: 300
 
@@ -164,7 +147,6 @@ terminationGracePeriodSeconds: 300
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
-  name: "validators"
   # Annotations to add to the service account
   annotations: {}
 
@@ -188,6 +170,12 @@ affinity: {}
 ##
 priorityClassName: ""
 
+## Network ID
+## Options for Ethereum: mainnet, prater
+## Options for Gnosis: gnosis
+##
+network: "mainnet"
+
 ## Validators flags
 ##
 flags:
@@ -208,16 +196,6 @@ flags:
     - "validator-client"
     - "--log-destination=CONSOLE"
     - "--data-base-path=/data"
-  nimbus:
-    - "--data-dir=/data/nimbus"
-    - "--non-interactive"
-    - "--log-level=INFO"
-    - "--doppelganger-detection=off"
-  lodestar: 
-    - "validator"
-    - "--dataDir=/data/lodestar"
-    - "--logLevel=info"
-
 
 ## Validators extra flags
 ##
@@ -225,14 +203,17 @@ extraFlags:
   prysm: []
   lighthouse: []
   teku: []
-  nimbus: []
+  nimbus: []	
   lodestar: []
 
-## Any of below 3 options needs to be provided
-beaconChainRpcEndpointsAutoDiscovery: false
+## Web3Signer Endpoint
+##
+web3signerEndpoint: ""
+
 ## List of Beacon Chain node addresses
 ##
 beaconChainRpcEndpoints: []
+
 ## Randomize endpoints if specified
 ## Has a higher priority than beaconChainRpcEndpoints,
 ## all specified hosts will be randomly assigned to all validators,
@@ -240,26 +221,22 @@ beaconChainRpcEndpoints: []
 ##
 beaconChainRpcEndpointsRandomized: []
 
-beaconPortMap:
-  teku: 5051
-  prysm: 4000
-  lighthouse: 5052
-  nimbus: 5052
-  lodestar: 9596
-
-
-
-
-
-# Lodestar specific setting
-# Enables strict checking of the validator's feeRecipient with the one returned by engine
-strictFeeRecipientCheck: false
-
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
 ##
 graffiti: ""
+
+## Override fees for solo validators
+## used for stakewise solo validators only
+##
+feeOverride: ""
+
+enableWatcher: false
+
+## Lodestar specific setting	
+## Enables strict checking of the validator's feeRecipient with the one returned by engine	
+strictFeeRecipientCheck: false
 
 ## Monitoring
 ##
@@ -284,13 +261,13 @@ metrics:
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
-    nimbus:
-      - "--metrics"
-      - "--metrics-port=9090"
-      - "--metrics-address=0.0.0.0"
-    lodestar:
-      - "--metrics"
-      - "--metrics.address=0.0.0.0"
+    nimbus:	
+      - "--metrics"	
+      - "--metrics-port=9090"	
+      - "--metrics-address=0.0.0.0"	
+    lodestar:	
+      - "--metrics"	
+      - "--metrics.address=0.0.0.0"	
       - "--metrics.port=9090"
 
   ## Prometheus Service Monitor
