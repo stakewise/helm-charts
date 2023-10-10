@@ -44,7 +44,9 @@ enableReloader: false
 
 externalSecrets:
   enabled: true
-  secretStoreRef: secretStoreRef
+  secretStoreRef:
+    name: secretStoreName
+    kind: secretStoreKind
   data: []
 
 ## Flyawy image is used to apply database migrations
