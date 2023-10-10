@@ -61,7 +61,7 @@ spec:
       securityContext:
         {{ toYaml . | nindent 8 | trim }}
       {{- end }}
-      serviceAccountName: "validators"
+      serviceAccountName: {{ template "validators.serviceAccountName" . }}
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
         - name: get-configs
