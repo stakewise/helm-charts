@@ -32,10 +32,13 @@ Extract the first part of a string before the hyphen ("-"). Defining the validat
 {{- $name := default .Chart.Name .Values.nameOverride }}
 {{- $fullname = printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
-{{- $parts := split "-" $fullname }}
-{{- if len $parts }}
-{{- index $parts 0 }}
+{{- $hyphenIndex := index $fullname "-" | add 0 }}
+{{- if $hyphenIndex }}
+{{- $owner := printf "%s" $fullname | slice 0 $hyphenIndex }}
+{{- else }}
+{{- $owner := $fullname }}
 {{- end }}
+{{- $owner }}
 {{- end }}
 
 {{/*
