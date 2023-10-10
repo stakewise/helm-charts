@@ -24,16 +24,6 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
-Define a custom template function to extract the owner's name from a string.
-*/}}
-{{- define "web3signer.extractOwner" -}}
-{{- $fullname := . }}
-{{- with index (split "-" $fullname) 0 }}
-{{.}}
-{{- end }}
-{{- end }}
-
-{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "web3signer.chart" -}}
