@@ -33,7 +33,7 @@ Extract the first part of a string before the hyphen ("-"). Defining the validat
 {{- $fullname = printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 {{- $parts := split "-" $fullname }}
-{{- index $parts 0 }}
+{{- toString (index $parts 0) }}
 {{- end }}
 
 
