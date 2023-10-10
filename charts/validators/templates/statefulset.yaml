@@ -291,6 +291,6 @@ spec:
       {{- end }}
         - name: data
           emptyDir: {}
-
+{{- end }}
 {{- end }}
 {{- end }}

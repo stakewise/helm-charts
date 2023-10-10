@@ -55,7 +55,9 @@ cliImage:
 
 externalSecrets:
   enabled: true
-  secretStoreRef: secretStoreRef
+  secretStoreRef:
+    name: secretStoreName
+    kind: secretStoreKind
   data: []
 
 ## Configuration for validators

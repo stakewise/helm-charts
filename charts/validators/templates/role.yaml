@@ -1,4 +1,4 @@
-{{- if and .Values.global.rbac.create -}}
+{{- if .Values.rbac.create -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
@@ -6,5 +6,5 @@ metadata:
   labels:
     {{- include "validators.labels" . | nindent 4 }}
 rules:
-{{- toYaml .Values.global.rbac.rules | nindent 0 }}
+{{- toYaml .Values.rbac.rules | nindent 0 }}
 {{- end }}
