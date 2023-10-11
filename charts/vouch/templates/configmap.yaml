@@ -37,8 +37,10 @@ data:
       fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}
       config:
         url: 'file://{{ .Values.vouchDataDir }}/execution_config.json'
+    {{- if .Values.dirk.tracing }}
     tracing:
-      address: {{ .Values.vouch.tracing.address | quote }}
+      {{- toYaml .Values.dirk.tracing | nindent 4 }}
+    {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
