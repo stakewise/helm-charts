@@ -39,7 +39,7 @@ data:
         url: 'file://{{ .Values.vouchDataDir }}/execution_config.json'
     {{- if .Values.vouch.tracing }}
     tracing:
-      {{- toYaml .Values.vouch.tracing | nindent 4 }}
+      {{- toYaml .Values.vouch.tracing | nindent 6 }}
     {{- end }}
 ---
 apiVersion: v1
