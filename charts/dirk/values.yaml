@@ -39,7 +39,7 @@ externalSecrets:
 dirk:
   loglevel: Debug
   clientName: client1
-  tracing: {}
+  tracing:
 
   fetchKeysExtraFlags: []
 
