@@ -41,7 +41,7 @@ data:
       listen-address: 0.0.0.0:{{ .Values.metricsPort }}
     {{- if .Values.dirk.tracing }}
     tracing:
-      {{- toYaml .Values.dirk.tracing | nindent 4 }}
+      {{- toYaml .Values.dirk.tracing | nindent 6 }}
     {{- end }}
 
 ---
