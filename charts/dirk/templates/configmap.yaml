@@ -34,9 +34,6 @@ data:
       1: {{ include "dirk.fullname" . }}-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
       2: {{ include "dirk.fullname" . }}-1.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
       3: {{ include "dirk.fullname" . }}-2.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
-    unlocker:
-      account-passphrases:
-        - secret
     permissions:
       {{ .Values.dirk.clientName }}:
         Validators: All
