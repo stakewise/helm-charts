@@ -16,10 +16,16 @@ deployment:
   port:
   - 6060
   - 6061
-  readinessProbe:
-    initialDelaySeconds: 120
-    failureThreshold: 60
-    periodSeconds: 300
+  healthCheck:
+   enabled: false
+   livenessProbe: 
+     initialDelaySeconds: 9600
+     failureThreshold: 6
+     periodSeconds: 600
+   readinessProbe:
+     initialDelaySeconds: 9600
+     failureThreshold: 6
+     periodSeconds: 600
 
 ### Container Arguments
 args:
