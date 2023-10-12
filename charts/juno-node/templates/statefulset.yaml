@@ -85,6 +85,17 @@ spec:
            containerPort: {{ . }}
            protocol: TCP
         {{- end }}
+        readinessProbe:
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              res=`curl -s localhost:9090 | awk '/sync_best_known_block_number/ { bn = $2 } /sync_blockchain_height/ { bh = $2 } END { print bn - bh }'`
+              if [ $res -eq 0 ]; then echo "Node synced" ; exit 0; else echo "Node is syncing" ; exit 0; fi
+          initialDelaySeconds: {{ .Values.deployment.readinessProbe.initialDelaySeconds }}
+          failureThreshold: {{ .Values.deployment.readinessProbe.failureThreshold }}
+          periodSeconds: {{ .Values.deployment.readinessProbe.periodSeconds }}
         args:
         {{- range $key, $value := .Values.args }}
          - {{ $key }}={{ $value }}
@@ -99,6 +110,7 @@ spec:
         {{- end }}
         {{- end }}
         {{- if .Values.pvc.enabled }}
+
         volumeMounts:
         {{- range $.Values.pvc.mount }}
           - mountPath: {{ .mountPath }}

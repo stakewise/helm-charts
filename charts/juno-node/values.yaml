@@ -16,6 +16,10 @@ deployment:
   port:
   - 6060
   - 6061
+  readinessProbe:
+    initialDelaySeconds: 120
+    failureThreshold: 60
+    periodSeconds: 300
 
 ### Container Arguments
 args:
