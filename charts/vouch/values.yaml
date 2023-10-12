@@ -21,7 +21,7 @@ initImage:
 
 cliImage:
   repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
-  tag: "v0.0.2"
+  tag: "dirk-0.0.16"
   pullPolicy: IfNotPresent
 
 externalSecrets:
@@ -72,11 +72,6 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
-
-
-## Network
-## Options: mainnet, prater, gnosis
-network: "mainnet"
 
 ## Sets logging verbosity.
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
