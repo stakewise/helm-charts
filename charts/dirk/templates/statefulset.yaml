@@ -127,7 +127,7 @@ spec:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}-env
           command: [ "/bin/bash" ]
-          args: [ "sleep 6000000" ]
+          args: [ "-c 'sleep 6000000'" ]
 #          args:
 #          - "sync-dirk-keys"
 #          - "--db-url-env"
