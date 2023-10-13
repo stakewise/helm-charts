@@ -116,16 +116,18 @@ spec:
               mountPath: /config
             - name: scripts
               mountPath: /scripts
-#        - name: fetch-keys-syncer
-#          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-#          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
-#          securityContext:
-#            runAsUser: 0
-#          envFrom:
-#            - secretRef:
-#                name: eso-{{ include "common.names.fullname" . }}
-#            - configMapRef:
-#                name: {{ include "common.names.fullname" . }}-env
+        - name: fetch-keys-syncer
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}-env
+          command: [ "/bin/bash" ]
+          args: [ "sleep 6000000" ]
 #          args:
 #          - "sync-dirk-keys"
 #          - "--db-url-env"
@@ -139,13 +141,13 @@ spec:
 #          {{- range .Values.dirk.fetchKeysExtraFlags }}
 #          - {{ . | quote }}
 #          {{- end }}
-#          volumeMounts:
-#            - name: data
-#              mountPath: /data
-#            - name: config
-#              mountPath: /config
-#            - name: scripts
-#              mountPath: /scripts
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+            - name: scripts
+              mountPath: /scripts
       volumes:
         - name: config
           configMap:
