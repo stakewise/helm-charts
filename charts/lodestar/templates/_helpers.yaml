@@ -1,0 +1,3 @@
+{{- define "lodestar.p2pPort" -}}
+{{- printf "9000" -}}
+{{- end -}}

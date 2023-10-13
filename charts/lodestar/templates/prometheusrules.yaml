@@ -1,0 +1,51 @@
+{{- if and (or .Values.global.metrics.enabled .Values.metrics.enabled)
+           (or .Values.global.metrics.prometheusRule.enabled .Values.metrics.prometheusRule.enabled) }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  {{- if .Values.metrics.prometheusRule.namespace }}
+  namespace: {{ .Values.metrics.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.metrics.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.metrics.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.metrics.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.metrics.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: LodestarBeaconNodeDown
+          expr: up{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lodestar beacon node is down
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: LodestarBeaconNodeIsNotConnectedToEth1Node
+          expr: sync_eth1_connected{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lodestar beacon node is not connected to eth1 node
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+        - alert: LodestarBeaconNodeIsOutOfSync
+          expr: sync_eth2_synced{job='{{ include "common.names.fullname" . }}'} == 0
+          for: 3m
+          labels:
+            severity: critical
+          annotations:
+            summary: Lodestar beacon node is out of sync
+            description: Check {{ printf "{{ $labels.pod }}" }} beacon node in namespace {{ printf "{{ $labels.namespace }}" }}
+  {{- end }}
+{{- end }}
