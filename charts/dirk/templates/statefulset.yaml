@@ -126,8 +126,8 @@ spec:
                 name: eso-{{ include "common.names.fullname" . }}
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}-env
-          command: [ "/bin/bash" ]
-          args: [ "-c 'sleep 6000000'" ]
+          command: [ "/bin/bash", "-c", "--" ]
+          args: [ "while true; do sleep 30; done;" ]
 #          args:
 #          - "sync-dirk-keys"
 #          - "--db-url-env"
