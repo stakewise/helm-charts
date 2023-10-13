@@ -116,36 +116,36 @@ spec:
               mountPath: /config
             - name: scripts
               mountPath: /scripts
-        - name: fetch-keys-syncer
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
-          envFrom:
-            - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
-            - configMapRef:
-                name: {{ include "common.names.fullname" . }}-env
-          args:
-          - "sync-dirk-keys"
-          - "--db-url-env"
-          - "ESO_DB_KEYSTORE_URL"
-          - "--wallet-dir"
-          - "/data/dirk"
-          - "--decryption-key-env"
-          - "ESO_DECRYPTION_KEY"
-          - "--refresh-frequency"
-          - "1800"
-          {{- range .Values.dirk.fetchKeysExtraFlags }}
-          - {{ . | quote }}
-          {{- end }}
-          volumeMounts:
-            - name: data
-              mountPath: /data
-            - name: config
-              mountPath: /config
-            - name: scripts
-              mountPath: /scripts
+#        - name: fetch-keys-syncer
+#          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+#          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+#          securityContext:
+#            runAsUser: 0
+#          envFrom:
+#            - secretRef:
+#                name: eso-{{ include "common.names.fullname" . }}
+#            - configMapRef:
+#                name: {{ include "common.names.fullname" . }}-env
+#          args:
+#          - "sync-dirk-keys"
+#          - "--db-url-env"
+#          - "ESO_DB_KEYSTORE_URL"
+#          - "--wallet-dir"
+#          - "/data/dirk"
+#          - "--decryption-key-env"
+#          - "ESO_DECRYPTION_KEY"
+#          - "--refresh-frequency"
+#          - "1800"
+#          {{- range .Values.dirk.fetchKeysExtraFlags }}
+#          - {{ . | quote }}
+#          {{- end }}
+#          volumeMounts:
+#            - name: data
+#              mountPath: /data
+#            - name: config
+#              mountPath: /config
+#            - name: scripts
+#              mountPath: /scripts
       volumes:
         - name: config
           configMap:
