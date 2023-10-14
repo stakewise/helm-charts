@@ -12,7 +12,7 @@ image:
   repository: attestant/dirk
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.1.0"
+  tag: "1.2.0"
 
 ## Init image is used to chown data volume, etc.
 ##

@@ -10,7 +10,7 @@ image:
   repository: attestant/vouch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.7.5"
+  tag: "1.7.6"
 
 ## Init image is used to chown data volume, etc.
 ##
