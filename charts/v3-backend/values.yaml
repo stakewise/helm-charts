@@ -62,7 +62,7 @@ settings:
     postgresDB: ""
     postgresUser: ""
     postgresPassword: ""
-    scoringTable: ""
+    vaultsTable: ""
 
   postgres:
     host: localhost
