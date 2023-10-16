@@ -42,4 +42,4 @@ data:
   GRAPH_POSTGRES_HOST: {{ .Values.settings.graph.postgresHost | quote }}
   GRAPH_POSTGRES_PORT: {{ .Values.settings.graph.postgresPort | quote }}
   GRAPH_POSTGRES_DB: {{ .Values.settings.graph.postgresDB | quote }}
-  GRAPH_SCORING_TABLE: {{ .Values.settings.graph.scoringTable | quote }}
+  GRAPH_VAULTS_TABLE: {{ .Values.settings.graph.vaultsTable | quote }}
