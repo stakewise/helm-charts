@@ -106,9 +106,7 @@ serviceAccount:
 
 podAnnotations: {}
 
-securityContext:
-  fsGroup: 1001
-  runAsUser: 1001
+securityContext: {}
 
 service:
   type: ClusterIP
@@ -155,7 +153,7 @@ affinity: {}
 ## If false, data ownership will not be reset at startup
 ## This allows the node to be run with an arbitrary user
 ##
-initChownData: true
+initChownData: false
 
 ## Whether or not to allocate persistent volume disk for the data directory.
 ## In case of pod failure, the pod data directory will still persist.

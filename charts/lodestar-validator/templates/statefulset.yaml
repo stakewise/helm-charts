@@ -54,7 +54,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-            {{- range $i := until (int .Values.replicaCount) }}
+          {{- range $i := until (int .Values.replicaCount) }}
             - name: keystore-{{ . }}
               mountPath: /keystore-{{ . }}
               readOnly: true
@@ -71,6 +71,8 @@ spec:
               validator
               --network={{ .Values.global.network }}
               --dataDir=/data
+              --importKeystores=/keystore-${INDEX}
+              --importKeystoresPassword=/keystore-${INDEX}/keystore-${INDEX}.txt
               --beaconNodes={{ .Values.global.beaconNodes }}
               --metrics
               --metrics.address={{ .Values.metrics.address }}
