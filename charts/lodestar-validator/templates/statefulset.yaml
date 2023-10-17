@@ -47,7 +47,7 @@ spec:
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           command:
             - sh
-            - -ac
+            - -c
             - >
               INDEX=$((${HOSTNAME##*-}));
               node /usr/app/packages/cli/bin/lodestar validator import --dataDir=/data --importKeystores=/keystore-${INDEX} --importKeystoresPassword=/keystore-${INDEX}/keystore-${INDEX}.txt
@@ -65,14 +65,12 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           command:
             - sh
-            - -ac
+            - -c
             - >
               node /usr/app/packages/cli/bin/lodestar
               validator
               --network={{ .Values.global.network }}
               --dataDir=/data
-              --importKeystores=/keystore-${INDEX}
-              --importKeystoresPassword=/keystore-${INDEX}/keystore-${INDEX}.txt
               --beaconNodes={{ .Values.global.beaconNodes }}
               --metrics
               --metrics.address={{ .Values.metrics.address }}

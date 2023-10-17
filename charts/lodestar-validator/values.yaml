@@ -95,7 +95,7 @@ image:
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "lstar-validator"
 
 serviceAccount:
   # Annotations to add to the service account
