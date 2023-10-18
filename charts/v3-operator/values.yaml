@@ -94,16 +94,26 @@ settings:
 
   # Comma separated list of endpoints for the execution node
   executionEndpoints: ""
+
   # Comma separated list of endpoints for the consensus node
   consensusEndpoints: ""
-  # endpoint of the remote signer
-  remoteSigner:
-    enabled: false
-    url: ""
 
+  # Whether to receive configuration files from database
+  # and to receive keyshares from web3signer
+  remoteDbConfig:
+    enabled: false
+    dbUrl: "postgresql://postgres:postgres@localhost/operator"
+    remoteSignerUrl: "http://web3signer:6174"
+
+  # If specified, deposit data will be obtained from the secret
   depositDataSecretName: ""
+  # If specified, keystores will be obtained from the secret
   keystoresSecretName: ""
+  # If specified, wallet will be obtained from the secret
   walletSecretName: ""
+
+  # Additional arguments to path to operator
+  extraFlags: []
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user

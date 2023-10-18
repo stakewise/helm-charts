@@ -67,13 +67,23 @@ spec:
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
             runAsUser: 0
+          env:
+            - name: PYTHONPATH
+              value: "."
+          command:
+            - python
           args:
-            - "key_manager/main.py"
-            - "sync-validator"
-            - "--web3signer-endpoint"
-            - "{{ $root.Values.web3signerEndpoint }}"
+            - src/main.py
+            - remote-db
+            - --network
+            - {{ $root.Values.global.network }}
+            - --vault
+            - {{ $root.Values.global.vault }}
             - "--db-url"
             - "{{ $root.Values.dbKeystoreUrl }}"
+            - setup-validator
+            - "--web3signer-endpoint"
+            - "{{ $root.Values.web3signerEndpoint }}"
             - "--output-dir"
             - "/data"
             - "--total-validators"
@@ -117,11 +127,11 @@ spec:
             {{- end -}}
 
             {{- if eq $root.Values.type "prysm" }}
-            - "--{{ $root.Values.network }}"
+            - "--{{ $root.Values.global.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
             {{- else if eq $root.Values.type "lighthouse" }}
-            - "--network={{ $root.Values.network }}"
+            - "--network={{ $root.Values.global.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
