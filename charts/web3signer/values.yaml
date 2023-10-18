@@ -28,7 +28,7 @@ initImage:
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "remote-database"
+  tag: "v0.3.4.alpha"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
