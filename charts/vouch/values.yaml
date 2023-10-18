@@ -61,7 +61,7 @@ vouch:
     fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
   tracing:
 
-relays: ""
+relays: []
 
 imagePullSecrets: []
 

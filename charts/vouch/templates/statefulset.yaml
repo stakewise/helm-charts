@@ -81,7 +81,7 @@ spec:
           - "--vouch-dir"
           - "{{ .Values.vouchDataDir }}"
           - "--relays"
-          - "{{ .Values.relays }}"
+          - '{{ join "," .Values.relays }}'
           volumeMounts:
             - name: data
               mountPath: /data
