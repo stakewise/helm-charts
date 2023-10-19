@@ -78,7 +78,7 @@ livenessProbe:
   exec:
     command:
       - /bin/bash
-      - /scripts/liveness_probe.sh
+      - /scripts/liveness_probe.sh 30
   periodSeconds: 600
   timeoutSeconds: 550
   failureThreshold: 1

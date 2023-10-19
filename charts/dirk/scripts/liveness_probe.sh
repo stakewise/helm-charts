@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-multiplier=120
+multiplier=$1
 INDEX=$(cat /data/dirk/index)
 CHECK_FILE=/data/dirk/dirty
 
