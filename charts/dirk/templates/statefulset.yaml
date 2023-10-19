@@ -63,7 +63,7 @@ spec:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
           {{- if .Values.livenessProbe }}
-          {{- with (pluck .Values.type .Values.livenessProbe | first) }}
+          {{- with .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml . | nindent 12 }}
           {{- end }}
