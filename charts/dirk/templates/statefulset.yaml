@@ -160,9 +160,6 @@ spec:
           configMap:
             name: {{ include "common.names.fullname" . }}-scripts
   minReadySeconds: {{ .Values.minReadySeconds }}
-  updateStrategy:
-    rollingUpdate:
-      maxUnavailable: 1
   volumeClaimTemplates:
     - metadata:
         name: data
