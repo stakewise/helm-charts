@@ -159,7 +159,7 @@ spec:
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}-scripts
-  minReadySeconds: 10
+  minReadySeconds: {{ .Values.minReadySeconds }}
   updateStrategy:
     rollingUpdate:
       maxUnavailable: 1

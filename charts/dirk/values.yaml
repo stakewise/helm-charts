@@ -65,6 +65,7 @@ httpPort: 8881
 ##
 metricsPort: 9000
 
+minReadySeconds: 10
 
 persistence:
   storageClassName: ""
