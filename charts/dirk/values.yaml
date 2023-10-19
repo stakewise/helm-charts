@@ -80,6 +80,7 @@ livenessProbe:
       - /bin/bash
       - /scripts/liveness_probe.sh
   periodSeconds: 600
+  timeoutSeconds: 550
   failureThreshold: 1
 
 
