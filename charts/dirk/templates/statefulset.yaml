@@ -50,6 +50,7 @@ spec:
             - -xc
             - >
               apk add openssl envsubst;
+              rm -f /data/dirk/dirk;
               mkdir -p /data/dirk/certs;
               export INDEX=$((${HOSTNAME##*-}+1));
               echo "$INDEX" > /data/dirk/index;
@@ -61,6 +62,12 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
+          {{- if .Values.livenessProbe }}
+          {{- with (pluck .Values.type .Values.livenessProbe | first) }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data

@@ -74,6 +74,13 @@ persistence:
   size: 1Gi
   annotations: {}
 
+livenessProbe:
+  exec:
+    command:
+      - /bin/bash
+      - /scripts/liveness_probe.sh
+  periodSeconds: 600
+
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
