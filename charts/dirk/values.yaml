@@ -80,6 +80,7 @@ livenessProbe:
       - /bin/bash
       - /scripts/liveness_probe.sh
   periodSeconds: 600
+  failureThreshold: 1
 
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
