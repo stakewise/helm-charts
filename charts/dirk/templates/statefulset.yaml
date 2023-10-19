@@ -162,7 +162,6 @@ spec:
   minReadySeconds: {{ .Values.minReadySeconds }}
   updateStrategy:
     rollingUpdate:
-      maxSurge: 0
       maxUnavailable: 1
   volumeClaimTemplates:
     - metadata:
