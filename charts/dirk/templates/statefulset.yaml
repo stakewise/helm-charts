@@ -62,12 +62,6 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
-          {{- if .Values.livenessProbe }}
-          {{- with .Values.livenessProbe }}
-          livenessProbe:
-            {{- toYaml . | nindent 12 }}
-          {{- end }}
-          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -119,6 +113,12 @@ spec:
           {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.livenessProbe }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           {{- end }}
           volumeMounts:
             - name: data
