@@ -159,9 +159,9 @@ spec:
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}-scripts
+  minReadySeconds: 10
   updateStrategy:
     rollingUpdate:
-      minReadySeconds: 10
       maxUnavailable: 1
   volumeClaimTemplates:
     - metadata:
