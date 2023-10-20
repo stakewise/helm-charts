@@ -79,7 +79,7 @@ livenessProbe:
     command:
       - /bin/bash
       - /scripts/liveness_probe.sh
-  periodSeconds: 60
+  periodSeconds: 90
   failureThreshold: 1
 
 

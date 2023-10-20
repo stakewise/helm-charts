@@ -20,6 +20,7 @@ if test -f "$CHECK_FILE"; then
 
   if (( current_timestamp > cutoff_timestamp )); then
     echo "Wait time completed. Should exit."
+    rm ${CHECK_FILE}
     exit 1
   else
     echo "Wait for ${remaining_seconds} seconds to exit"
