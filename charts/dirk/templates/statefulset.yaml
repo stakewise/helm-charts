@@ -137,21 +137,21 @@ spec:
                 name: eso-{{ include "common.names.fullname" . }}
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}-env
-          command: [ "/bin/bash", "-c", "--" ]
-          args: [ "while true; do sleep 30; done;" ]
-#          args:
-#          - "sync-dirk-keys"
-#          - "--db-url-env"
-#          - "ESO_DB_KEYSTORE_URL"
-#          - "--wallet-dir"
-#          - "/data/dirk"
-#          - "--decryption-key-env"
-#          - "ESO_DECRYPTION_KEY"
-#          - "--refresh-frequency"
-#          - "1800"
-#          {{- range .Values.dirk.fetchKeysExtraFlags }}
-#          - {{ . | quote }}
-#          {{- end }}
+#          command: [ "/bin/bash", "-c", "--" ]
+#          args: [ "while true; do sleep 30; done;" ]
+          args:
+          - "sync-dirk-keys"
+          - "--db-url-env"
+          - "ESO_DB_KEYSTORE_URL"
+          - "--wallet-dir"
+          - "/data/dirk"
+          - "--decryption-key-env"
+          - "ESO_DECRYPTION_KEY"
+          - "--refresh-frequency"
+          - "1800"
+          {{- range .Values.dirk.fetchKeysExtraFlags }}
+          - {{ . | quote }}
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data

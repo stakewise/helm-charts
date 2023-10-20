@@ -4,7 +4,6 @@ IFS=$'\n\t'
 
 multiplier=$1
 location="/data/dirk"
-location="/Users/aivaras/projects/nethermind-charts/dirk"
 CHECK_FILE=${location}/dirty
 
 
