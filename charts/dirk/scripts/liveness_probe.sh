@@ -2,7 +2,7 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-multiplier=$1
+multiplier="${1:-120}"
 location="/data/dirk"
 CHECK_FILE=${location}/dirty
 
