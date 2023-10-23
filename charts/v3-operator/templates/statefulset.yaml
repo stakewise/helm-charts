@@ -49,8 +49,36 @@ spec:
             - sh
             - -c
             - >
-              mkdir /data/{{ .Values.settings.vault }} || true;
+              mkdir -p /data/{{ .Values.settings.vault }}/keystores || true;
               chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data
+          volumeMounts:
+            - name: data
+              mountPath: /data
+    {{- end }}
+    {{- if .Values.settings.remoteDbConfig.enabled }}
+        - name: fetch-configs
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            runAsUser: 0
+          command:
+            - python
+          args:
+            - src/main.py
+            - remote-db
+            - --network
+            - {{ .Values.settings.network }}
+            - --db-url
+            - {{ .Values.settings.remoteDbConfig.dbUrl }}
+            - --vault
+            - {{ .Values.settings.vault }}
+            - setup-operator
+          env:
+            - name: PYTHONPATH
+              value: "."
+          envFrom:
+            - configMapRef:
+                name: {{ include "common.names.fullname" . }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -64,6 +92,13 @@ spec:
           args:
             - src/main.py
             - start
+          {{- if .Values.settings.remoteDbConfig.enabled }}
+            - --remote-signer-url
+            - {{ .Values.settings.remoteDbConfig.remoteSignerUrl }}
+          {{- end }}
+          {{- range .Values.settings.extraFlags }}
+            - {{ . }}
+          {{- end }}
           env:
             - name: PYTHONPATH
               value: "."
@@ -80,28 +115,44 @@ spec:
               protocol: TCP
             {{- end }}
           volumeMounts:
+        {{- if or .Values.settings.depositDataSecretName .Values.settings.keystoresSecretName .Values.settings.walletSecretName }}
+          {{- if .Values.settings.depositDataSecretName }}
             - name: deposit-data
               mountPath: /data/{{ .Values.settings.vault }}/deposit
+          {{- end }}
+          {{- if .Values.settings.keystoresSecretName }}
             - name: keystores
               mountPath: /data/{{ .Values.settings.vault }}/keystores
+          {{- end }}
+          {{- if .Values.settings.walletSecretName }}
             - name: wallet
               mountPath: /data/{{ .Values.settings.vault }}/wallet
+          {{- end }}
+        {{- end }}
             - name: data
               mountPath: /data
           {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
+    {{- if or .Values.settings.depositDataSecretName .Values.settings.keystoresSecretName .Values.settings.walletSecretName }}
       volumes:
+      {{- if .Values.settings.depositDataSecretName }}
         - name: deposit-data
           secret:
             secretName: {{ .Values.settings.depositDataSecretName }}
+      {{- end }}
+      {{- if .Values.settings.keystoresSecretName }}
         - name: keystores
           secret:
             secretName: {{ .Values.settings.keystoresSecretName }}
+      {{- end }}
+      {{- if .Values.settings.walletSecretName }}
         - name: wallet
           secret:
             secretName: {{ .Values.settings.walletSecretName }}
+      {{- end }}
+    {{- end}}
   volumeClaimTemplates:
     - metadata:
         name: data

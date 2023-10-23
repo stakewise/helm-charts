@@ -27,8 +27,8 @@ initImage:
 ##
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
-  repository: "stakewiselabs/public/key-manager"
-  tag: "v0.2.1"
+  repository: "stakewiselabs/public/v3-operator"
+  tag: "v0.3.4"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -61,6 +61,9 @@ fullnameOverride: ""
 ## Web3Signer Settings
 ## ref: https://docs.web3signer.consensys.net/en/latest/Reference/CLI/CLI-Syntax/
 ##
+
+# StakeWise V3 Vault contract address
+vault: ""
 
 ## Network
 ## Options: mainnet, prater, gnosis

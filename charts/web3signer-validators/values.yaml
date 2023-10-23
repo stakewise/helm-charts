@@ -4,7 +4,13 @@
 
 global:
   imagePullSecrets: []
+  ## Network ID
+  ## Options for Ethereum: mainnet, goerli
+  ## Options for Gnosis: gnosis
+  ##
   network: mainnet
+  # StakeWise V3 Vault contract address
+  vault: ""
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -39,8 +45,8 @@ initImageBusybox:
 ##
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
-  repository: "stakewiselabs/public/key-manager"
-  tag: "v0.2.1"
+  repository: "stakewiselabs/public/v3-operator"
+  tag: "v0.3.4"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -152,12 +158,6 @@ affinity: {}
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
 ##
 priorityClassName: ""
-
-## Network ID
-## Options for Ethereum: mainnet, goerli
-## Options for Gnosis: gnosis
-##
-network: "mainnet"
 
 ## Validators flags
 ##
