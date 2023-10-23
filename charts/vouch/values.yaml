@@ -60,6 +60,8 @@ vouch:
   blockrelay:
     fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
   tracing:
+  strategies:
+  submitter:
 
 relays: []
 

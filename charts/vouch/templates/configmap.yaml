@@ -41,6 +41,14 @@ data:
     tracing:
       {{- toYaml .Values.vouch.tracing | nindent 6 }}
     {{- end }}
+    {{- if .Values.vouch.strategies }}
+    strategies:
+      {{- toYaml .Values.vouch.strategies | nindent 6 }}
+    {{- end }}
+    {{- if .Values.vouch.submitter }}
+    submitter:
+      {{- toYaml .Values.vouch.submitter | nindent 6 }}
+    {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap
