@@ -87,6 +87,18 @@ httpPort: 8881
 ##
 metricsPort: 8081
 
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 1
+  failureThreshold: 3
+  successThreshold: 3
+  httpGet:
+    path: /metrics
+    port: metrics
+    scheme: HTTP
+
 
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
 ##
