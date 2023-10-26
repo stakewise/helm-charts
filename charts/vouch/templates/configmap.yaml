@@ -7,6 +7,9 @@ metadata:
     {{- include "common.labels.standard" . | nindent 4 }}
 data:
   vouch.yaml: |
+  {{- if .Values.vouchFullConfig }}
+    {{- toYaml .Values.vouchFullConfig | nindent 2 }}
+  {{- else }}
     beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
     {{- with .Values.vouch.beaconnodeaddresses }}
     beacon-node-addresses:
@@ -49,6 +52,7 @@ data:
     submitter:
       {{- toYaml .Values.vouch.submitter | nindent 6 }}
     {{- end }}
+  {{- end }}
 ---
 apiVersion: v1
 kind: ConfigMap

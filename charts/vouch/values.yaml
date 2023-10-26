@@ -33,6 +33,10 @@ externalSecrets:
     key: vouch
 
 vouchDataDir: /data/vouch
+
+# use vouchFullConfig: to provide all vouch.yaml values
+# use vouch: to populate good defaults and to do minimal changes
+vouchFullConfig:
 vouch:
   beaconnodeaddress: localhost:5052
   beaconnodeaddresses:
