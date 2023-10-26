@@ -8,7 +8,7 @@ metadata:
 data:
   vouch.yaml: |
   {{- if .Values.vouchFullConfig }}
-    {{- toYaml .Values.vouchFullConfig | nindent 2 }}
+    {{- toYaml .Values.vouchFullConfig | nindent 4 }}
   {{- else }}
     beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
     {{- with .Values.vouch.beaconnodeaddresses }}
