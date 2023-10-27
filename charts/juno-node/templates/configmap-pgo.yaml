@@ -1,0 +1,11 @@
+{{- if $.Values.pgo.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.deployment.projectName }}
+  namespace: {{ .Values.deployment.namespace }}
+data:
+  {{- range $key, $value := .Values.pgo.config }}
+    {{ $key }}: {{ $value | quote }}
+  {{- end }}
+{{- end -}}

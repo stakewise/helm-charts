@@ -21,7 +21,7 @@ spec:
         prometheus.io/port: '9090'
       labels:
          app: {{ .Values.deployment.projectName }}
-    spec:
+    spec:   
       {{- if .Values.nodeSelector.enabled }}
       nodeSelector:
       {{- range $key, $value := $.Values.nodeSelector.label }}
@@ -76,6 +76,28 @@ spec:
         {{- end }}
 
       containers:
+      {{- if .Values.pgo.enabled }}
+      - name: {{ .Values.deployment.projectName }}-pgo
+        image: {{ .Values.pgo.image }}
+        imagePullPolicy: Always
+        ports:
+        - containerPort: {{ .Values.pgo.port }}
+        envFrom:
+          - configMapRef:
+                name: {{ .Values.deployment.projectName }}
+        env:
+          - name: SERVICE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+        resources:
+          requests:
+            memory: {{ .Values.pgo.resources.requests.memory }}
+            cpu: {{ .Values.pgo.resources.requests.cpu }}
+          limits:
+            memory: {{ .Values.pgo.resources.limits.memory }}
+            cpu: {{ .Values.pgo.resources.limits.cpu }}
+      {{- end }}      
       - name: {{ .Values.deployment.projectName }}
         image: {{ .Values.deployment.imagename }}:{{ .Values.deployment.imagetag }}
         imagePullPolicy: Always

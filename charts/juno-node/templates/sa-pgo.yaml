@@ -1,0 +1,9 @@
+{{- if $.Values.serviceAccount.enabled -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    iam.gke.io/gcp-service-account: {{ .Values.serviceAccount.gcpServiceAccount }}
+  name: {{ .Values.serviceAccount.name }}
+  namespace: {{ .Values.deployment.namespace }}
+{{- end -}}

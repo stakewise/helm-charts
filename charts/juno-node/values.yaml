@@ -41,6 +41,7 @@ args:
   --ws: "true"
   --ws-port: "6061"
   --ws-host: "0.0.0.0" 
+  --pprof: "true"
 
 ### Node selector and Tanits
 nodeSelector:
@@ -53,10 +54,34 @@ taintsToleration:
   tolerations:
       network: juno
 
-### Service account
+  ### Configmap
+
+
+  ### PGO Container 
+pgo:
+  enabled: false
+  image: "gcr.io/juno-dev-nth/node-pgo-monitor:4.0"
+  port: 3000
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "1"
+      memory: 2Gi
+  config:
+    BUCKET: "gs://juno-prod-pgo-bucket"
+    DURATION: "30"
+    ITERATION: "10"
+    ENV: "juno-integration"
+    URL: "http://localhost:6062/debug/pprof/profile"
+
+  ### Service account
 serviceAccount: 
   enabled: false
-  name: "juno"
+  name: "juno-pgo"
+  gcpServiceAccount: "monitoring-sa-euw1@juno-prod-nth.iam.gserviceaccount.com"
+
 
 
 ### Networking Service
