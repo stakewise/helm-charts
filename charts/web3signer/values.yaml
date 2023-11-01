@@ -3,6 +3,13 @@
 # Declare variables to be passed into your templates.
 
 global:
+  ## Network
+  ## Options: mainnet, prater, gnosis
+  network: "mainnet"
+
+  # StakeWise V3 Vault contract address
+  vault: ""
+
   serviceAccount:
     create: true
 
@@ -61,13 +68,6 @@ fullnameOverride: ""
 ## Web3Signer Settings
 ## ref: https://docs.web3signer.consensys.net/en/latest/Reference/CLI/CLI-Syntax/
 ##
-
-# StakeWise V3 Vault contract address
-vault: ""
-
-## Network
-## Options: mainnet, prater, gnosis
-network: "mainnet"
 
 ## Sets logging verbosity.
 ## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
