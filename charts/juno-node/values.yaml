@@ -167,6 +167,7 @@ hpa:
 pvc:
   enabled: true
   storageClassName: standard
+  datasource: ""
   mount:
   - pvName: pv
     mountPath: /var/lib/juno

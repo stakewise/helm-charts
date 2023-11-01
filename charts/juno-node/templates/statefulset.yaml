@@ -159,6 +159,11 @@ spec:
   - metadata:
          name: {{ $.Values.deployment.projectName }}-{{ .pvName }}
     spec:
+        {{- if $.Values.pvc.datasource }}
+        dataSource:
+           name: {{ $.Values.pvc.datasource }}
+           kind: PersistentVolumeClaim
+        {{- end }}
         accessModes:
             - ReadWriteOnce
         resources:
