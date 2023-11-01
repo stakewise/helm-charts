@@ -1,0 +1,3 @@
+{{- if not .Values.global.vault }}
+{{- fail ".Values.global.vault is empty" }}
+{{- end }}
