@@ -20,7 +20,7 @@ global:
   ##
   ## !!!!! WARNING !!!!!
   ## NEVER CHANGE THE ORDER OF ENDPOINTS AS THIS MAY BREAK
-  ## THE CONSENSUS AND EXECTION CLIENTS CONNECTIVITY
+  ## THE CONSENSUS AND EXECUTION CLIENTS CONNECTIVITY
   executionEndpoints: []
 
   ## Credentials to fetch images from private registry
