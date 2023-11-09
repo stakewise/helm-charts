@@ -31,7 +31,7 @@ kubectl create secret generic keystore-0 --from-file=/path/to/my-wallet/keystore
 kubectl create secret generic keystore-1 --from-file=/path/to/my-wallet/keystores-1 --from-file=/path/to/my-wallet/keystore-1.txt
 ```
 
-> `/path/to/my-wallet/keystores-0` expect keystores with name `keystore*.json` and `/path/to/my-wallet/keystore-0.txt` plain txt with password for these keystores/
+> `/path/to/my-wallet/keystores-0` expect keystores with name `keystore*.json` and `/path/to/my-wallet/keystore-0.txt` plain txt with password for these keystores.
 
 This will create a new Kubernetes secrets named `keystore-0` and `keystore-1` that contains your keystore files and passwords.
 
