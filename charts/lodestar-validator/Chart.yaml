@@ -1,6 +1,6 @@
 apiVersion: v2
 name: lodestar-validator
-description: A lodestar Validator Chart
+description: A Lodestar Validator Chart
 
 # A chart can be either an 'application' or a 'library' chart.
 #

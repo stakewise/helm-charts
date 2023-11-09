@@ -1,4 +1,4 @@
-# Default values for lodestar.
+# Default values for Lodestar.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
@@ -99,7 +99,7 @@ sidecar:
   bindAddr: "0.0.0.0"
   bindPort: 3000
 
-## Configuration for lodestar
+## Configuration for Lodestar
 ## ref: https://chainsafe.github.io/lodestar/
 ##
 
@@ -116,7 +116,7 @@ image:
 ##
 imagePullSecrets: []
 
-## Provide a name in place of lodestar for `app:` labels
+## Provide a name in place of Lodestar for `app:` labels
 ##
 nameOverride: ""
 
@@ -138,7 +138,7 @@ rest:
   # Access-Control-Allow-Origin response HTTP header
   cors: "*"
 
-## If set, lodestar will perform a checkpoint sync. For more information see here: https://lodestar-book.sigmaprime.io/checkpoint-sync.html
+## If set, Lodestar will perform a checkpoint sync. For more information see here: https://lodestar-book.sigmaprime.io/checkpoint-sync.html
 ## Respective public checkpoint sync endpoints can be found here: https://eth-clients.github.io/checkpoint-sync-endpoints/
 ## It is not recommended to blindly trust any public beacon node.
 ## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root 

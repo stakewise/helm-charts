@@ -71,7 +71,7 @@ global:
 
 replicaCount: 1
 
-## Extra flags for lodestar validator
+## Extra flags for Lodestar validator
 ##
 ## Example:
 ## extraFlags:

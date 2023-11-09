@@ -11,7 +11,7 @@ keywords:
   - p2p
 home: https://www.ethereum.org/
 sources:
-  - https://github.com/sigp/lodestar
+  - https://github.com/ChainSafe/lodestar
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
