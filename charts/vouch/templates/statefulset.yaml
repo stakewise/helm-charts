@@ -117,7 +117,12 @@ spec:
               mountPath: /config
             - name: scripts
               mountPath: /scripts
-        {{- if .Values.readinessProbe.enabled }}
+          {{- if .Values.livenessProbe }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
           readinessProbe:
             initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
             timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -128,7 +133,7 @@ spec:
               path: {{ .Values.readinessProbe.httpGet.path }}
               port: {{ .Values.readinessProbe.httpGet.port }}
               scheme: {{ .Values.readinessProbe.httpGet.scheme }}
-        {{- end }}
+          {{- end }}
       volumes:
         - name: config
           configMap:
