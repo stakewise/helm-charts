@@ -2,14 +2,6 @@
 
 This guide will walk you through creating a new Lodestar Validator, loading an existing keystore to it, and creating a Kubernetes secret to store your keystore securely.
 
-Lodestar is an open-source Ethereum 2.0 validator client developed by Sigma Prime. It is written in Rust and designed to be highly secure, efficient, and flexible. Lodestar is one of several Ethereum 2.0 clients that validators can use to participate in the network and earn rewards for validating blocks.
-
-Lodestar offers a number of features that make it an attractive choice for validators, including a highly optimized beacon node that can handle a large number of validators, support for multiple operating systems and hardware architectures, and robust support for handling slashing events and other security threats.
-
-In addition, Lodestar is designed to be modular and flexible, making it easy to customize and extend as needed. It also includes a user-friendly command-line interface and extensive documentation to help validators get started quickly and easily.
-
-Overall, Lodestar is a powerful and reliable validator client that is well-suited for both individual and institutional validators looking to participate in Ethereum 2.0 and earn rewards for securing the network.
-
 ## Prerequisites
 
 * Lodestar Validator installed on your local machine or a remote server.
