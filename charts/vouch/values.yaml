@@ -106,9 +106,9 @@ readinessProbe:
   enabled: true
   initialDelaySeconds: 10
   timeoutSeconds: 3
-  periodSeconds: 1
+  periodSeconds: 5
   failureThreshold: 3
-  successThreshold: 3
+  successThreshold: 2
   httpGet:
     path: /metrics
     port: metrics
