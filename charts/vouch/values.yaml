@@ -96,7 +96,7 @@ livenessProbe:
   timeoutSeconds: 3
   periodSeconds: 10
   failureThreshold: 3
-  successThreshold: 3
+  successThreshold: 1
   httpGet:
     path: /metrics
     port: metrics
