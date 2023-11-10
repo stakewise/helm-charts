@@ -12,6 +12,10 @@ data:
   IPFS_LOCAL_USERNAME: {{ .Values.settings.ipfsLocalUsername | quote}}
   IPFS_LOCAL_PASSWORD: {{ .Values.settings.ipfsLocalPassword | quote}}
   {{- end }}
+  {{- if .Values.settings.walletSecretName }}
+  ORACLE_WALLET_PATH: /wallet/wallet.json
+  ORACLE_WALLET_PASSWORD_PATH: /wallet/password.txt
+  {{- end }}
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
   CONSENSUS_CLIENT_TIMEOUT:  {{ .Values.settings.consensusClientTimeout | quote }}
