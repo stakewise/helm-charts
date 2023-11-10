@@ -1,0 +1,24 @@
+apiVersion: v2
+name: lodestar
+version: 1.0.2
+kubeVersion: "^1.20.0-0"
+description: Rust Ethereum 2.0 Client.
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - lodestar
+  - p2p
+home: https://www.ethereum.org/
+sources:
+  - https://github.com/ChainSafe/lodestar
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+appVersion: v1.12.0
+
+dependencies:
+- name: common
+  repository: https://charts.stakewise.io/
+  version: 1.x.x
