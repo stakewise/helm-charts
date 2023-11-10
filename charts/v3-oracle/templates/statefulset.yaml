@@ -68,6 +68,10 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if .Values.settings.walletSecretName }}
+            - name: wallet
+              mountPath: /wallet
+          {{- end }}
           {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -87,10 +91,20 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
+          {{- if .Values.settings.walletSecretName }}
+            - name: wallet
+              mountPath: /wallet
+          {{- end }}
           {{- with .Values.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
+    {{- if .Values.settings.walletSecretName }}
+      volumes:
+        - name: wallet
+          secret:
+            secretName: {{ .Values.settings.walletSecretName }}
+    {{- end}}
   volumeClaimTemplates:
     - metadata:
         name: data
