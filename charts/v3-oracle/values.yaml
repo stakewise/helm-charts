@@ -60,9 +60,20 @@ image:
 ## http://kubernetes.io/docs/user-guide/compute-resources/
 ##
 resources:
-  requests:
-    cpu: 500m
-    memory: 1Gi
+  api:
+    requests:
+      cpu: "1"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  worker:
+    requests:
+      cpu: "2"
+      memory: "2Gi"
+    limits:
+      cpu: "2"
+      memory: "2Gi"
 
 ## Used to assign priority to pod
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
