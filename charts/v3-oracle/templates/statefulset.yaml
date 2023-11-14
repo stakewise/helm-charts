@@ -72,7 +72,7 @@ spec:
             - name: wallet
               mountPath: /wallet
           {{- end }}
-          {{- with .Values.resources }}
+          {{- with .Values.resources.api }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
@@ -95,7 +95,7 @@ spec:
             - name: wallet
               mountPath: /wallet
           {{- end }}
-          {{- with .Values.resources }}
+          {{- with .Values.resources.worker }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
