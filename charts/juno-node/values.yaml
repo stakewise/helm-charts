@@ -82,8 +82,6 @@ serviceAccount:
   name: "juno-pgo"
   gcpServiceAccount: "monitoring-sa-euw1@juno-prod-nth.iam.gserviceaccount.com"
 
-
-
 ### Networking Service
 svc:
   globalStaticIpName: ""
@@ -163,6 +161,9 @@ hpa:
   maxReplicas: 2
   cpuUtilization: 80
 
+batchjob:
+   enabled: false
+   schedule: "* */1 * * *"
 ### Persistant Volume
 pvc:
   enabled: true
