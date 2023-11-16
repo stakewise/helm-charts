@@ -95,7 +95,7 @@ image:
   repository: hyperledger/besu
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.10.1"
+  tag: "23.10.2"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -139,11 +139,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## Required Role rules
   ##
   rules:
@@ -151,11 +151,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 service:
   type: ClusterIP
@@ -197,7 +197,8 @@ p2pNodePort:
   #  "0": 32345
   #  "3": 32348
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -290,7 +291,6 @@ persistence:
     - ReadWriteOnce
   size: 300Gi
   annotations: {}
-
 
 ## Besu Settings
 
