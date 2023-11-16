@@ -41,7 +41,6 @@ args:
   --ws: "true"
   --ws-port: "6061"
   --ws-host: "0.0.0.0" 
-  --pprof: "true"
 
 ### Node selector and Tanits
 nodeSelector:
@@ -154,6 +153,14 @@ svc:
               port:
                 number: 6061
 
+svc_lb:
+  enabled: false
+  clustertype: LoadBalancer
+  hostname: integration.juno.prod
+  wss_hostname: integration-wss.juno.prod
+
+batchjob:
+  enabled: false
 ### Horizontal pod scaling
 hpa:
   enabled: false

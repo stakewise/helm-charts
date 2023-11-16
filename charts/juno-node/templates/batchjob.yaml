@@ -50,8 +50,13 @@ spec:
             - "-c"
             - |
                 namespace="{{ .Values.deployment.namespace }}"
+                skip="{{ $.Values.pvc.datasource }}"
                 pvcs=$(kubectl get pvc -n "$namespace" -o custom-columns=":metadata.name" --no-headers)
                  for pvc in $pvcs; do
+                  if [ "$pvc" = "$skip" ]; then
+                     echo "Skipping $pvc"
+                     continue  # Skip this PVC and move to the next one
+                  fi
                   describe_output=$(kubectl describe pvc -n "$namespace" "$pvc")
                    if echo "$describe_output" | grep -q "Used By:[[:space:]]*<none>"; then
                      echo "$pvc"

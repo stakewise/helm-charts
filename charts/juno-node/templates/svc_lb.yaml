@@ -1,0 +1,28 @@
+{{- if $.Values.svc_lb.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal-lb
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.projectName }}
+  annotations:
+    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.rpc.port }}":"{{ .Values.deployment.projectName }}"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/load-balancer-type: internal
+    networking.gke.io/internal-load-balancer-allow-global-access: "true"
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.svc_lb.hostname }} 
+spec:
+  type: {{ .Values.svc_lb.clustertype }}
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 30
+  ports:
+  - port: {{ .Values.svc.rpc.port }}
+    name: port-{{ .Values.svc.rpc.port }}
+    targetPort: {{ .Values.svc.rpc.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.deployment.projectName }}
+{{- end -}}
