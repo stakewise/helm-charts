@@ -24,6 +24,8 @@ data:
 
     if [ -e "$repo/config" ]; then
       echo "Found IPFS fs-repo at $repo"
+      echo "Try to migrate existing repo..."
+      ipfs repo migrate
     else
       case "$IPFS_PROFILE" in
         "") INIT_ARGS="" ;;
