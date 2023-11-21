@@ -35,7 +35,7 @@ initImage:
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v0.3.4"
+  tag: "v1.0.1"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -63,7 +63,6 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
-
 
 ## Web3Signer Settings
 ## ref: https://docs.web3signer.consensys.net/en/latest/Reference/CLI/CLI-Syntax/
@@ -137,7 +136,8 @@ podSecurityContext:
   fsGroup: 1000
   runAsUser: 1000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -152,7 +152,8 @@ service:
 ## Configure resource requests and limits.
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 ##
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
