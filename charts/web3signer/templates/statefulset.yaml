@@ -62,15 +62,15 @@ spec:
             - src/main.py
             - remote-db
             - --network
-          {{ if eq .Values.network "prater"}}
+          {{ if eq .Values.global.network "prater"}}
             - goerli
           {{- else }}
-            - {{ .Values.network }}
+            - {{ .Values.global.network }}
           {{- end }}
             - --db-url
             - {{ .Values.dbKeystoreUrl }}
             - --vault
-            - {{ .Values.vault }}
+            - {{ .Values.global.vault }}
             - setup-web3signer
             - --encrypt-key
             - {{ .Values.decryptionKey }}

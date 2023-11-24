@@ -93,8 +93,7 @@ spec:
             - "--fee-recipient"
             - "{{ $root.Values.suggestedFeeRecipient }}"
           {{- if $root.Values.enableBuilder }}
-            - "--disable-builder-enabled"
-            - "true"
+            - "--disable-proposal-builder"
           {{- end }}
           volumeMounts:
             - name: data
