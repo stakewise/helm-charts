@@ -1,6 +1,6 @@
 apiVersion: v2
 name: v3-operator
-version: 3.2.4
+version: 3.2.5
 appVersion: master
 kubeVersion: "^1.20.0-0"
 description: Operator hosted service for Stakewise V3 protocol.

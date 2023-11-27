@@ -15,7 +15,7 @@ data:
   DATABASE_DIR: "/data"
   VERBOSE: {{ .Values.settings.verbose | quote }}
   NETWORK: {{ .Values.settings.network | quote }}
-  VAULT: {{ .Values.settings.vault | quote }}
+  VAULT: {{ lower .Values.settings.vault | quote }}
   HARVEST_VAULT: {{ .Values.settings.harvestVault | quote }}
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
