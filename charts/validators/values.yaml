@@ -147,6 +147,7 @@ terminationGracePeriodSeconds: 300
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
+  name: "validators"
   # Annotations to add to the service account
   annotations: {}
 
