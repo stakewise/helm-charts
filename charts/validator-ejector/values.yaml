@@ -27,13 +27,13 @@ global:
 
   initImage:
     repository: "bitnami/kubectl"
-    tag: "1.26"
+    tag: "1.28"
     pullPolicy: IfNotPresent
 
   image:
     repository: lidofinance/validator-ejector
     pullPolicy: IfNotPresent
-    tag: "dev"
+    tag: "1.2.0"
 
   loader:
     repository: nethermindeth/eth-exit-messages

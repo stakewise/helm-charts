@@ -43,7 +43,7 @@ rbac:
 ##
 initImageBusybox:
   repository: "busybox"
-  tag: "1.36.1"
+  tag: "1.36"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch public keys.

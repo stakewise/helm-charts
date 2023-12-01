@@ -36,7 +36,7 @@ global:
   image:
     repository: lidofinance/lido-keys-api
     pullPolicy: IfNotPresent
-    tag: "stable"
+    tag: "0.10.1"
 
 kapi:
   env: "production"
