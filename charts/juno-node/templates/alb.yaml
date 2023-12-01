@@ -5,6 +5,8 @@ metadata:
   name: {{ .Values.deployment.projectName }}-alb
   namespace: {{ .Values.deployment.namespace }}
   annotations:
+    cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-edit-in-place: "true"
     kubernetes.io/ingress.class: "gce"
     cert-manager.io/acme-challenge-type: http01
     cert-manager.io/cluster-issuer: letsencrypt-gce
