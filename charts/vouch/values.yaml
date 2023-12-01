@@ -20,8 +20,8 @@ initImage:
   pullPolicy: IfNotPresent
 
 cliImage:
-  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
-  tag: "dirk-0.0.16"
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
 externalSecrets:

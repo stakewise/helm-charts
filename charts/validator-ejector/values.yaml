@@ -38,7 +38,7 @@ global:
   loader:
     repository: nethermindeth/eth-exit-messages
     pullPolicy: IfNotPresent
-    tag: "v0.0.15"
+    tag: "v0.0.26"
 
 loader:
   EIP2335_PASSWORD: "test"

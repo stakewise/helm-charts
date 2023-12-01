@@ -1,6 +1,7 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
+
 {{- range (untilStep (int .Values.validatorsKeyIndex) (int (add .Values.validatorsKeyIndex .Values.validatorsCount)) 1) }}
 
 {{ $rpcEndpoints := list }}
@@ -100,10 +101,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if $root.Values.feeOverride }}
-            - name: fee-override
-              mountPath: /fee
-          {{- end }}
         - name: prepare
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
@@ -116,17 +113,14 @@ spec:
               ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
-              cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
               cat /data/proposerConfig.json;
               cat /data/proposerConfig.yaml;
               formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n');
-              echo "$formatted_content" > /data/pubkeys.txt;	
+              echo "$formatted_content" > /data/pubkeys.txt;
+              echo '{"externalSigner.pubkeys": ['"$(awk '{printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' pubkeys.txt)"']}' > /data/rcconfig.json;
               cat /data/pubkeys.txt;
-              echo "" >>
-              cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
-              cat /data/config_gnosis_prysm;
               chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
            {{- if eq $root.Values.type "nimbus" }}	
               find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;	
@@ -134,8 +128,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: gnosis-prysm
-              mountPath: /mnt/gnosis-prysm
       containers:
       {{- if $root.Values.enableWatcher }}
         - name: watcher
@@ -158,10 +150,6 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if $root.Values.feeOverride }}
-            - name: fee-override
-              mountPath: /fee
-          {{- end }}
           {{- if $root.Values.enableWatcher }}
             - name: watcher
               mountPath: /scripts
@@ -175,7 +163,6 @@ spec:
             - sh
             - -c
             - >
-              export PUBKEYS=$(paste -sd, /data/pubkeys.txt);
               node ./packages/cli/bin/lodestar
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
               {{ . }}
@@ -183,9 +170,9 @@ spec:
               --network={{ $root.Values.network }}
               --proposerSettingsFile=/data/proposerConfig.yaml
               --externalSigner.url={{ include "web3signer" $root }}
-              --externalSigner.pubkeys=$PUBKEYS
+              --rcConfig=/data/rcconfig.json
             {{- if $.Values.beaconChainRpcEndpointsRandomized }}
-              --beaconNodes={{ $rpcEndpoints }}"
+              --beaconNodes={{ $rpcEndpoints }}
             {{- else }}
               {{- include "beacon-rpc-node" $ | nindent 12 }}
             {{- end }}
@@ -204,15 +191,11 @@ spec:
             - {{ . | quote }}
             {{- end -}}
 
-            {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
+            {{- if eq $root.Values.type "prysm" }}
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
             - "--validators-external-signer-url={{ include "web3signer" $root }}"
             - "--proposer-settings-file=/data/proposerConfig.json"
-            {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
-            - "--config-file /data/config_gnosis_prysm"
-            - "--chain-config-file /data/config_gnosis_prysm"
-            - "--validators-external-signer-url={{ include "web3signer" $root }}"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
@@ -223,21 +206,26 @@ spec:
             {{- if $root.Values.enableBuilder }}
             - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
+            {{- else if eq $root.Values.type "nimbus" }}
+            - "--validators-dir=/data/nimbus"
+            {{- if $root.Values.enableBuilder }}
+            - "--payload-builder=true"
+            {{- end }}
             {{- end }}
 
             {{- include "validator-graffiti" $ | nindent 12 }}
 
-          {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if $root.Values.beaconChainRpcEndpointsRandomized }}
             {{- if eq $.Values.type "prysm" }}
             - "--beacon-rpc-provider={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "lighthouse" }}
             - "--beacon-nodes={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "teku" }}
-            {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
-            {{- if gt $beaconChainRpcEndpointsLen 1 }}
-            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
-            {{- else }}
-            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+            - "--beacon-node-api-endpoints={{ $rpcEndpoints }}"
+            {{- else if eq $.Values.type "nimbus" }}
+            {{- $valuesList := split "," $rpcEndpoints }}
+            {{- range $endpoint := $valuesList }}
+            - "--beacon-node={{ $endpoint }}"
             {{- end }}
             {{- end }}
           {{- else }}
@@ -276,14 +264,6 @@ spec:
             - name: data
               mountPath: /data
       volumes:
-        - name: gnosis-prysm
-          configMap:
-            name: {{ template "validators.fullname" $root }}-gnosis-prysm
-      {{- if $root.Values.feeOverride }}
-        - name: fee-override
-          configMap:
-            name: {{ template "validators.fullname" $root }}-override-fee-recipient
-      {{- end }}
       {{- if $root.Values.enableWatcher }}
         - name: watcher
           configMap:

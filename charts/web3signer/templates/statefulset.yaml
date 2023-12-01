@@ -66,8 +66,6 @@ spec:
             - -password=$(ESO_DB_PASSWORD)
             - -url=$(ESO_DB_URL)
             - migrate
-          # for first time clean may be needed, be careful not remove production db
-          # flyway -user=$ESO_DB_USERNAME -password=$ESO_DB_PASSWORD -url=$ESO_DB_URL clean -cleanDisabled=false
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -147,7 +145,7 @@ spec:
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY_V2", "--refresh-frequency", "60"]
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY", "--refresh-frequency", "60"]
           volumeMounts:
             - name: data
               mountPath: /data

@@ -49,8 +49,8 @@ initImageBusybox:
 ## CLI image is used to fetch public keys.
 ##
 cliImage:
-  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
-  tag: "v0.0.2"
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
 externalSecrets:
@@ -72,10 +72,10 @@ externalSecrets:
 enabled: true
 
 ## What type of validator to use.
-## Options for Ethereum: prysm, lighthouse, teku
-## Options for Gnosis: prysm, lighthouse
+## Options for Ethereum: prysm, lighthouse, teku, nimbus, lodestar
+## Options for Gnosis: teku, lighthouse, nimbus
 ##
-type: prysm
+type: teku
 
 ## If you want to run multiple validator types (e.g lighouse, teku,...)
 ## you need to adjust the key index to prevent double signing.
@@ -115,31 +115,28 @@ enableBuilder: false
 ## ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   pullPolicy: IfNotPresent
-  prysm:
-    repository: "gcr.io/prysmaticlabs/prysm/validator"
-    tag: "v4.0.8"
-  prysmGnosis:
-    repository: "ghcr.io/gnosischain/gbc-prysm-validator"
-    tag: "v2.1.2-gbc"
-  lighthouse:
-    repository: "sigp/lighthouse"
-    tag: "v4.4.1"
-  teku:
+  prysm: 
+    repository: "gcr.io/prylabs-dev/prysm/validator"
+    tag: "v4.1.1"
+  teku: 
     repository: "consensys/teku"
-    tag: "23.9.0"
-  nimbus: 	
+    tag: "23.11.0"
+  lighthouse: 
+    repository: "sigp/lighthouse"
+    tag: "v4.5.0"
+  nimbus: 
     repository: "statusim/nimbus-validator-client"
-    tag: "multiarch-v23.9.0"
-  lodestar:
+    tag: "multiarch-v23.11.0"
+  lodestar: 
     repository: "chainsafe/lodestar"
-    tag: "v1.11.0"
+    tag: "v1.12.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
 ##
 imagePullSecrets: []
 
-terminationGracePeriodSeconds: 300
+terminationGracePeriodSeconds: 120
 
 ## Spearate service account per validator.
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -197,6 +194,15 @@ flags:
     - "validator-client"
     - "--log-destination=CONSOLE"
     - "--data-base-path=/data"
+  nimbus:
+    - "--data-dir=/data/nimbus"
+    - "--non-interactive"
+    - "--log-level=INFO"
+    - "--doppelganger-detection=off"
+  lodestar: 
+    - "validator"
+    - "--dataDir=/data/lodestar"
+    - "--logLevel=info"
 
 ## Validators extra flags
 ##
@@ -228,11 +234,6 @@ beaconChainRpcEndpointsRandomized: []
 ##
 graffiti: ""
 
-## Override fees for solo validators
-## used for stakewise solo validators only
-##
-feeOverride: ""
-
 enableWatcher: false
 
 ## Lodestar specific setting	
@@ -262,13 +263,13 @@ metrics:
       - "--metrics-host-allowlist=*"
       - "--metrics-interface=0.0.0.0"
       - "--metrics-port=9090"
-    nimbus:	
-      - "--metrics"	
-      - "--metrics-port=9090"	
-      - "--metrics-address=0.0.0.0"	
-    lodestar:	
-      - "--metrics"	
-      - "--metrics.address=0.0.0.0"	
+    nimbus:
+      - "--metrics"
+      - "--metrics-port=9090"
+      - "--metrics-address=0.0.0.0"
+    lodestar:
+      - "--metrics"
+      - "--metrics.address=0.0.0.0"
       - "--metrics.port=9090"
 
   ## Prometheus Service Monitor
@@ -377,6 +378,26 @@ readinessProbe:
       path: /metrics
       port: metrics
       scheme: HTTP
+  nimbus:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /metrics
+      port: metrics
+      scheme: HTTP
+  lodestar:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /metrics
+      port: metrics
+      scheme: HTTP
 livenessProbe:
   prysm:
     initialDelaySeconds: 60
@@ -399,6 +420,26 @@ livenessProbe:
       port: metrics
       scheme: HTTP
   teku:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /metrics
+      port: metrics
+      scheme: HTTP
+  nimbus:
+    initialDelaySeconds: 60
+    timeoutSeconds: 1
+    periodSeconds: 60
+    failureThreshold: 3
+    successThreshold: 1
+    httpGet:
+      path: /metrics
+      port: metrics
+      scheme: HTTP
+  lodestar:
     initialDelaySeconds: 60
     timeoutSeconds: 1
     periodSeconds: 60

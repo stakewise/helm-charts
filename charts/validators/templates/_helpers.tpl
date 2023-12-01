@@ -106,7 +106,9 @@ Validator beacon node
 {{- else if eq $.Values.type "teku" }}
 - "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "nimbus" }}
-- "--beacon-node={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- range $.Values.beaconChainRpcEndpoints }}
+- "--beacon-node={{ . }}"
+{{- end }}
 {{- else if eq $.Values.type "lodestar" }}
 - "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}

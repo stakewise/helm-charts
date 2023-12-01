@@ -17,20 +17,20 @@ image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.6.0"
+  tag: "23.11.0"
 
 ## Init image is used to chown data volume, etc.
 ##
 initImage:
   repository: busybox
-  tag: "1.36.1"
+  tag: "1.36"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch private keys.
 ##
 cliImage:
-  repository: 238155366538.dkr.ecr.eu-west-1.amazonaws.com/keystores-cli
-  tag: "v0.0.2"
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
 

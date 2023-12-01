@@ -133,11 +133,7 @@ spec:
             */}}
             {{- if eq .Values.execution.client "nethermind" }}
               exec /nethermind/Nethermind.Runner
-            {{- if eq .Values.global.network "gnosis" }}
-              --config=xdai
-            {{- else }}
               --config={{ .Values.global.network }}
-            {{- end }}
               --datadir=/data/execution
             {{- if .Values.execution.jsonrpc.enabled }}
               --JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
