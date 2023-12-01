@@ -12,32 +12,32 @@ global:
     execution:
       nethermind: 
         repository: "nethermind/nethermind"
-        tag: "1.19.3"
+        tag: "1.22.0"
       geth: 
         repository: "ethereum/client-go"
-        tag: "v1.12.0"
+        tag: "v1.13.5"
       bseu: 
         repository: "hyperledger/besu"
-        tag: "23.4.4"
+        tag: "23.10.2"
       erigon: 
         repository: "thorax/erigon"
-        tag: "v2.48.0"
+        tag: "v2.54.0"
     beacon:
       prysm: 
-        repository: "gcr.io/prysmaticlabs/prysm/beacon-chain"
-        tag: "v4.0.6"
+        repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
+        tag: "v4.1.1"
       teku: 
         repository: "consensys/teku"
-        tag: "23.6.1"
+        tag: "23.11.0"
       lighthouse: 
         repository: "sigp/lighthouse"
-        tag: "v4.3.0"
+        tag: "v4.5.0"
       nimbus: 
         repository: "statusim/nimbus-eth2"
-        tag: "multiarch-v23.6.1"
+        tag: "multiarch-v23.11.0"
       lodestar: 
         repository: "chainsafe/lodestar"
-        tag: "v1.9.1"
+        tag: "v1.12.0"
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
@@ -103,7 +103,7 @@ global:
   ethsider:
     enabled: true
     repository: "nethermindeth/ethsider"
-    tag: "v0.0.15"
+    tag: "v1.0.0"
     pullPolicy: IfNotPresent
     bindAddr: 3000
     ## Configure liveness and readiness probes
@@ -158,13 +158,13 @@ global:
   ## Termination Grace Period
   ## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
   ##
-  terminationGracePeriodSeconds: 300
+  terminationGracePeriodSeconds: 120
 
   ## Init image is used to chown data volume, initialise genesis, etc.
   ##
   initImage:
     repository: "bitnami/kubectl"
-    tag: "1.25"
+    tag: "1.28"
     pullPolicy: IfNotPresent
 
   ## Monitoring
@@ -247,11 +247,7 @@ global:
     runAsUser: 1001
 
 execution:
-  client: geth
-  livenessProbe:
-    enabled: false
-  readinessProbe:
-    enabled: false
+  client: nethermind
 
   ## Whether or not to allocate persistent volume disk for the data directory.
   ## In case of node failure, the node data directory will still persist.
@@ -365,7 +361,7 @@ execution:
     lowStorageSpaceShutdownThreshold: 0
     lowStorageSpaceWarningThreshold: 5
   
-  targetPeers: 100
+  targetPeers: 50
   ## Extra flags to pass to the node
   ##
   extraFlags: []
@@ -502,11 +498,11 @@ beacon:
     portName: "rpc"
 
   targetPeersMap:
-    teku: 100
-    prysm: 160
-    lighthouse: 100
-    nimbus: 100
-    lodestar: 100
+    teku: 50
+    prysm: 50
+    lighthouse: 50
+    nimbus: 50
+    lodestar: 50
 
   ## Sets the total difficulty to manual overrides the default
   ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you

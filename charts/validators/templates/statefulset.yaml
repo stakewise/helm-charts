@@ -185,7 +185,7 @@ spec:
               --externalSigner.url={{ include "web3signer" $root }}
               --externalSigner.pubkeys=$PUBKEYS
             {{- if $.Values.beaconChainRpcEndpointsRandomized }}
-              --beaconNodes=={{ $rpcEndpoints }}"
+              --beaconNodes={{ $rpcEndpoints }}"
             {{- else }}
               {{- include "beacon-rpc-node" $ | nindent 12 }}
             {{- end }}
