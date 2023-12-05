@@ -8,7 +8,7 @@ metadata:
 data:
   init.sh: |
     #!/bin/sh
-{{- if or (and .Values.execution.persistence.enabled .Values.execution.initChownData) (and .Values.beacon.persistence.enabled .Values.beacon.initChownData) }}
+{{- if or (and .Values.execution.persistence.enabled .Values.execution.initChownData) (and .Values.beacon.persistence.enabled .Values.beacon.initChownData) (.Values.sharedPersistence.enabled) }}
     mkdir -p /data && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data;
     mkdir -p /data/beacon && chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data/beacon;
 {{- end }}

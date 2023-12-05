@@ -11,6 +11,12 @@
 {{ $rpcList = append $rpcList (index $.Values.beaconChainRpcEndpointsRandomized .) }}
 {{- end }}
 {{ $rpcList = append $rpcList $.Values.beaconChainRpcEndpointsRandomized }}
+
+# Appending the failover endpoints to the rpcList before flattening
+{{- if $.Values.fallbackRpcEndpoints }}
+  {{- $rpcList = append $rpcList $.Values.fallbackRpcEndpoints }}
+{{- end }}
+
 {{ $rpcEndpoints = include "flatten" $rpcList }}
 {{- if ge $counter (len $.Values.beaconChainRpcEndpointsRandomized) }}
   {{- $counter = 1 }}

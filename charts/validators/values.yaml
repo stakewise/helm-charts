@@ -228,6 +228,12 @@ beaconChainRpcEndpoints: []
 ##
 beaconChainRpcEndpointsRandomized: []
 
+## if using beaconChainRpcEndpointsRandomized
+## fallbackRpcEndpoints will be appended to the list 
+## always serving as the last, failover endpoint
+##
+fallbackRpcEndpoints: []
+
 ## You can use the graffiti to add a string to your proposed blocks,
 ## which will be seen on the block explorer.
 ## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
