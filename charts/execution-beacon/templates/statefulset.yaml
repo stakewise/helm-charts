@@ -318,6 +318,11 @@ spec:
             - name: BESU_OPTS
               value: {{ .Values.execution.javaOpts.maxHeapSize }}
           {{- end }}
+          {{- if .Values.global.externalSecrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
           ports:
             {{- if eq .Values.execution.client "erigon" }}
             - name: grpc-exec
