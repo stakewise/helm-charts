@@ -99,7 +99,7 @@ image:
   repository: nethermind/nethermind
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.22.0"
+  tag: "1.23.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -118,7 +118,6 @@ podAnnotations: {}
 ##
 extraFlags: []
 
-
 jsonrpc:
   enabled: true
   # Defines which RPC modules should be enabled.
@@ -128,17 +127,17 @@ jsonrpc:
   #                       Net, Nft, Parity, Personal, Proof, Subscribe,
   #                       Trace, TxPool, Vault, Web3.
   modules:
-      - Eth
-      - Subscribe
-      - Trace
-      - TxPool
-      - Web3
-      - Personal
-      - Proof
-      - Net
-      - Parity
-      - Health
-      - Engine
+    - Eth
+    - Subscribe
+    - Trace
+    - TxPool
+    - Web3
+    - Personal
+    - Proof
+    - Net
+    - Parity
+    - Health
+    - Engine
   host: "0.0.0.0"
   ports:
     rest: "8545"
@@ -206,11 +205,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## Required Role rules
   ##
   rules:
@@ -218,11 +217,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 service:
   type: ClusterIP
@@ -265,16 +264,16 @@ p2pNodePort:
   #  "3": 32348
 
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
+# We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+# limits:
+#   cpu: 100m
+#   memory: 128Mi
+# requests:
+#   cpu: 100m
+#   memory: 128Mi
 
 ## Used to assign priority to pods
 ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
