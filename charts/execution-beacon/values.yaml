@@ -243,6 +243,7 @@ global:
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
   securityContext:
+    runAsNonRoot: true
     fsGroup: 1001
     runAsUser: 1001
 
@@ -497,12 +498,7 @@ beacon:
     port: 4000
     portName: "rpc"
 
-  targetPeersMap:
-    teku: 50
-    prysm: 50
-    lighthouse: 50
-    nimbus: 50
-    lodestar: 50
+  targetPeers: 50
 
   ## Sets the total difficulty to manual overrides the default
   ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you
