@@ -54,9 +54,8 @@ spec:
           image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
           imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
           securityContext:
-            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
-            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
-            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
+            runAsNonRoot: false
+            runAsUser: 0
           env:
             - name: POD_IP
               valueFrom:
