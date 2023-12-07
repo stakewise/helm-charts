@@ -32,5 +32,10 @@ spec:
   - hosts:
     - "{{ .Values.svc.ingress.extraHost.host3 }}"
     secretName: {{ .Values.deployment.projectName }}-host3-alb-tls-cert
+{{- range .Values.svc.ingress.extraHost.hosts }}
+  - hosts:
+    - "{{ . }}"
+    secretName: {{ . }}-cert
+{{- end -}}
 {{- end -}}
 {{- end -}}

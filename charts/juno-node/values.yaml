@@ -129,11 +129,14 @@ svc:
     # Ingress
   ingress:
     enabled: true
+    host: "test.juno.rpc.nethermind.dev"
     extraHost:
       enabled: false
       host1: ""
       host2: ""
       host3: ""
+      hosts:
+       - ""
     rules:
       - host: "test.juno.rpc.nethermind.dev"
         http:
@@ -159,8 +162,6 @@ svc_lb:
   hostname: integration.juno.prod
   wss_hostname: integration-wss.juno.prod
 
-batchjob:
-  enabled: false
 ### Horizontal pod scaling
 hpa:
   enabled: false
