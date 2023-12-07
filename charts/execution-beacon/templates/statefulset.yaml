@@ -168,6 +168,10 @@ spec:
           {{- if .Values.execution.terminalTotalDifficulty }}
             - --Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
           {{- end }}
+          {{- range .Values.execution.extraFlags }}
+            - {{ . | quote }}
+          {{- end }}
+          {{- else }}
           command:
             - sh
             - -ac
@@ -301,6 +305,7 @@ spec:
             {{- range .Values.execution.extraFlags }}
               {{ .  }}
             {{- end }}
+          {{- end}}
           env:
             - name: POD_IP
               valueFrom:
