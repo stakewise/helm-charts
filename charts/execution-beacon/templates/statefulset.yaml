@@ -323,9 +323,9 @@ spec:
             {{- end }}
             - name: NETHERMIND_NETWORKCONFIG_DISCOVERYPORT
               value: "{{ $portExecution }}"
-            {{- end }}
             - name: NETHERMIND_NETWORKCONFIG_P2PPORT
               value: "{{ $portExecution }}"
+            {{- end }}
           {{- end }}
           {{- if .Values.execution.javaOpts.enabled }}
             - name: BESU_OPTS
