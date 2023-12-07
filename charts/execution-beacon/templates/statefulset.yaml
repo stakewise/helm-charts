@@ -315,6 +315,18 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+          {{- if and (eq .Values.execution.client "nethermind") (.Values.global.p2pNodePort.enabled) }} }}
+            {{- range $i, $e := until (int .Values.global.replicaCount) }}
+            {{- $portExecution := add $.Values.global.p2pNodePort.startAtExecution $i }}
+            {{- if hasKey $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
+              {{- $portExecution = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
+            {{- end }}
+            - name: NETHERMIND_NETWORKCONFIG_DISCOVERYPORT
+              value: "{{ $portExecution }}"
+            {{- end }}
+            - name: NETHERMIND_NETWORKCONFIG_P2PPORT
+              value: "{{ $portExecution }}"
+          {{- end }}
           {{- if .Values.execution.javaOpts.enabled }}
             - name: BESU_OPTS
               value: {{ .Values.execution.javaOpts.maxHeapSize }}
@@ -371,12 +383,7 @@ spec:
               readOnly: true
             {{- end }}
             - name: env-nodeport
-          {{- if eq .Values.execution.client "nethermind" }}
-              mountPath: /.env
-              subPath: init-nodeport
-          {{- else }}
               mountPath: /env
-          {{- end }}
           {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}

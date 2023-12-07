@@ -28,12 +28,6 @@ data:
       echo "EXTERNAL_BEACON_PORT=$EXTERNAL_BEACON_PORT" >> /env/init-nodeport;
       echo "EXTERNAL_IP=$EXTERNAL_IP"     >> /env/init-nodeport;
       cat /env/init-nodeport;
-  {{- if eq .Values.execution.client "nethermind" }}
-      echo "NETHERMIND_NETWORKCONFIG_DISCOVERYPORT=$EXTERNAL_EXECUTION_PORT" >  /env/init-nodeport;
-      echo "NETHERMIND_NETWORKCONFIG_P2PPORT=$EXTERNAL_EXECUTION_PORT" >> /env/init-nodeport;
-      echo "NETHERMIND_NETWORKCONFIG_EXTERNALIP=$EXTERNAL_IP"     >> /env/init-nodeport;
-      cat ./env/init-nodeport;
-  {{- end }}
   {{- if eq .Values.beacon.client "prysm" }}
       touch /data/beacon/config.yaml;
       echo "p2p-host-ip: $EXTERNAL_IP" > /data/beacon/config.yaml;
