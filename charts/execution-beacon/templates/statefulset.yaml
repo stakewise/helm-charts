@@ -371,7 +371,12 @@ spec:
               readOnly: true
             {{- end }}
             - name: env-nodeport
+          {{- if eq .Values.execution.client "nethermind" }}
+              mountPath: /.env
+              subPath: init-nodeport
+          {{- else }}
               mountPath: /env
+          {{- end }}
           {{- with .Values.execution.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
@@ -715,12 +720,7 @@ spec:
               readOnly: true
           {{- end }}
             - name: env-nodeport
-          {{- if eq .Values.execution.client "nethermind" }}
-              mountPath: /.env
-              subPath: init-nodeport
-          {{- else }}
               mountPath: /env
-          {{- end }}
         {{- with .Values.beacon.resources }}
           resources:
             {{ toYaml . | nindent 12 | trim }}
