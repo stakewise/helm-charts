@@ -182,7 +182,7 @@ spec:
             {{/*
             Configuration for Geth execution client
             */}}
-            {{- else if eq .Values.execution.client "geth" }}
+            {{- if eq .Values.execution.client "geth" }}
               exec geth
               --syncmode=snap
               --datadir=/data/execution
@@ -302,10 +302,10 @@ spec:
                 --metrics.port={{ .Values.execution.metrics.port }}
             {{- end }}
             {{- end }}
+            {{- end}}
             {{- range .Values.execution.extraFlags }}
               {{ .  }}
             {{- end }}
-          {{- end}}
           env:
             - name: POD_IP
               valueFrom:
