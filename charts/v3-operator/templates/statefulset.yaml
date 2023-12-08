@@ -14,8 +14,6 @@ spec:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
-      annotations:
-        checksum/v3-operator-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
     {{- if .Values.tolerations }}
       tolerations:
