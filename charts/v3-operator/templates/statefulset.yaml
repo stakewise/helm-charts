@@ -14,8 +14,6 @@ spec:
     metadata:
       labels:
         {{- include "common.labels.matchLabels" . | nindent 8 }}
-      annotations:
-        checksum/v3-operator-configmap: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     spec:
     {{- if .Values.tolerations }}
       tolerations:
@@ -105,15 +103,12 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
+          {{- if .Values.metrics.enabled }}
           ports:
-            - name: http
-              containerPort: {{ .Values.service.ports.http }}
-              protocol: TCP
-            {{- if .Values.metrics.enabled }}
             - name: metrics
               containerPort: {{ .Values.metrics.port }}
               protocol: TCP
-            {{- end }}
+          {{- end }}
           volumeMounts:
         {{- if or .Values.settings.depositDataSecretName .Values.settings.keystoresSecretName .Values.settings.walletSecretName }}
           {{- if .Values.settings.depositDataSecretName }}

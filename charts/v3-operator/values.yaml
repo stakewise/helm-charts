@@ -57,7 +57,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v1.0.3"
+  tag: "v1.0.4"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -136,7 +136,7 @@ metrics:
   # Whether to enable metrics collection or not
   enabled: false
   # Prometheus exporter port
-  port: 9090
+  port: 9100
   ## Custom PrometheusRule to be defined
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
