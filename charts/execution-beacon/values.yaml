@@ -463,15 +463,6 @@ beacon:
   ## MEV Boost endpoint
   ##
   builderEndpoint: ""
-  # Sets the frequency, in slots, at which to store
-  # finalized states to disk. This option is ignored
-  # if --data-storage-mode is set to PRUNE
-  dataStorageArchiveFrequency: "2048"
-  # Sets the strategy for handling historical chain data
-  # (Valid values: ARCHIVE, PRUNE)
-  dataStorageMode: PRUNE
-  # Store non-canonical blocks
-  dataStorageNonCanonicalBlocksEnabled: false
 
   # Rest API Settings
   restApi:

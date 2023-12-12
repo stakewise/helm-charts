@@ -450,9 +450,6 @@ spec:
               --network={{ .Values.global.network }}
               --data-beacon-path=/data/beacon/teku
               --data-path=/data/beacon
-              --data-storage-archive-frequency={{ .Values.beacon.dataStorageArchiveFrequency }}
-              --data-storage-mode={{ .Values.beacon.dataStorageMode }}
-              --data-storage-non-canonical-blocks-enabled={{ .Values.beacon.dataStorageNonCanonicalBlocksEnabled }}
               --ee-endpoint=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
               {{- if .Values.global.externalSecrets.enabled }}
               --ee-jwt-secret-file=/external-secrets/JWT_SECRET
