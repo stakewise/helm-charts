@@ -132,9 +132,6 @@ svc:
     host: "test.juno.rpc.nethermind.dev"
     extraHost:
       enabled: false
-      host1: ""
-      host2: ""
-      host3: ""
       hosts:
        - ""
     rules:

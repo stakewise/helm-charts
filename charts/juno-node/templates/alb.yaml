@@ -23,15 +23,6 @@ spec:
     - {{ .Values.svc.ingress.host }}
     secretName: {{ .Values.deployment.projectName }}-alb-tls-cert
 {{- if $.Values.svc.ingress.extraHost.enabled }}
-  - hosts:
-    - "{{ .Values.svc.ingress.extraHost.host1 }}"
-    secretName: {{ .Values.deployment.projectName }}-host1-alb-tls-cert
-  - hosts:
-    - "{{ .Values.svc.ingress.extraHost.host2 }}"
-    secretName: {{ .Values.deployment.projectName }}-host2-alb-tls-cert
-  - hosts:
-    - "{{ .Values.svc.ingress.extraHost.host3 }}"
-    secretName: {{ .Values.deployment.projectName }}-host3-alb-tls-cert
 {{- range .Values.svc.ingress.extraHost.hosts }}
   - hosts:
     - "{{ . }}"
