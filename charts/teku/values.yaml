@@ -35,7 +35,7 @@ global:
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
-  
+
   ## RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ## Additional settings could be made in non-global section.
@@ -44,7 +44,7 @@ global:
     ## Specifies whether RBAC resources are to be created
     ##
     create: true
-  
+
   ## Monitoring
   ## Additional settings could be made in non-global section.
   ##
@@ -69,7 +69,7 @@ global:
       ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: false
-  
+
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ## NB! readinessProbe and livenessProbe must be disabled before fully synced
@@ -106,7 +106,7 @@ image:
   repository: consensys/teku
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "23.11.0"
+  tag: "23.12.0"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -145,11 +145,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## Required Role rules
   ##
   rules:
@@ -157,11 +157,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 service:
   type: ClusterIP
@@ -203,7 +203,8 @@ p2pNodePort:
   #  "0": 32345
   #  "3": 32348
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -305,7 +306,6 @@ persistence:
   size: 300Gi
   annotations: {}
 
-
 ## Teku is an open-source Ethereum 2.0 client written in Java.
 ## Teku contains a full Beacon node implementation and a validator
 ## client for participating in consensus.
@@ -388,7 +388,7 @@ metrics:
   # List of hostnames to allow, or * to allow any host
   hostAllowList:
     - "*"
-  
+
   # Metrics network interface to expose metrics for Prometheus
   interface: "0.0.0.0"
 
