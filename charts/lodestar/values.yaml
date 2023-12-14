@@ -35,7 +35,7 @@ global:
   serviceAccount:
     # Specifies whether a service account should be created
     create: true
-  
+
   ## RBAC configuration.
   ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
   ## Additional settings could be made in non-global section.
@@ -44,7 +44,7 @@ global:
     ## Specifies whether RBAC resources are to be created
     ##
     create: true
-  
+
   ## Monitoring
   ## Additional settings could be made in non-global section.
   ##
@@ -69,7 +69,7 @@ global:
       ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       ##
       enabled: false
-  
+
   ## Configure liveness and readiness probes
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
   ## NB! readinessProbe and livenessProbe must be disabled before fully synced
@@ -108,7 +108,7 @@ sidecar:
 image:
   registry: "docker.io"
   repository: "chainsafe/lodestar"
-  tag: "v1.12.0"
+  tag: "v1.12.1"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -141,7 +141,7 @@ rest:
 ## If set, Lodestar will perform a checkpoint sync. For more information see here: https://lodestar-book.sigmaprime.io/checkpoint-sync.html
 ## Respective public checkpoint sync endpoints can be found here: https://eth-clients.github.io/checkpoint-sync-endpoints/
 ## It is not recommended to blindly trust any public beacon node.
-## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root 
+## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root
 ##
 checkpointSyncUrl: ""
 
@@ -192,11 +192,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## Required Role rules
   ##
   rules:
@@ -204,11 +204,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 ## Node labels for pod assignment
 ## ref: https://kubernetes.io/docs/user-guide/node-selection/
