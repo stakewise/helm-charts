@@ -1,0 +1,34 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ include "lodestar.fullname" . }}"
+  labels:
+    {{- include "lodestar.labels" . | nindent 4 }}
+data:
+  run.sh: |
+    #!/bin/sh
+
+    for f in /home/charon/validator_keys/keystore-*.json; do
+      echo "Importing key ${f}"
+
+      # Import keystore with password.
+      node /usr/app/packages/cli/bin/lodestar validator import \
+          --dataDir="/opt/data" \
+          --network="$NETWORK" \
+          --importKeystores="$f" \
+          --importKeystoresPassword="${f//json/txt}"
+    done
+
+    echo "Imported all keys"
+
+    exec node /usr/app/packages/cli/bin/lodestar validator \
+        --dataDir="/opt/data" \
+        --network="$NETWORK" \
+        --metrics=true \
+        --metrics.address="0.0.0.0" \
+        --metrics.port={{ .Values.service.ports.metrics }} \
+        --beaconNodes="$BEACON_NODE_ADDRESS" \
+        --builder="$BUILDER_API_ENABLED" \
+        --builder.selection="$BUILDER_SELECTION" \
+        --distributed

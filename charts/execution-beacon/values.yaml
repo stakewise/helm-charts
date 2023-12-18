@@ -12,7 +12,7 @@ global:
     execution:
       nethermind: 
         repository: "nethermind/nethermind"
-        tag: "1.22.0"
+        tag: "1.24.0"
       geth: 
         repository: "ethereum/client-go"
         tag: "v1.13.5"
@@ -28,7 +28,7 @@ global:
         tag: "v4.1.1"
       teku: 
         repository: "consensys/teku"
-        tag: "23.11.0"
+        tag: "23.12.1"
       lighthouse: 
         repository: "sigp/lighthouse"
         tag: "v4.5.0"
@@ -37,7 +37,7 @@ global:
         tag: "multiarch-v23.11.0"
       lodestar: 
         repository: "chainsafe/lodestar"
-        tag: "v1.12.0"
+        tag: "v1.12.1"
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
@@ -490,6 +490,7 @@ beacon:
     portName: "rpc"
 
   targetPeers: 50
+  targetPeersMin: 40
 
   ## Sets the total difficulty to manual overrides the default
   ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you

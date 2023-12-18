@@ -121,6 +121,11 @@ spec:
         - name: execution
           image: "{{ (pluck .Values.execution.client .Values.global.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.global.image.execution | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
+          {{- if .Values.global.externalSecrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
           command:
             - sh
             - -ac
@@ -128,9 +133,7 @@ spec:
               {{- if .Values.global.p2pNodePort.enabled }}
               . /env/init-nodeport;
               {{- end }}
-            {{/*
-            Configuration for Nethermind execution client
-            */}}
+            {{- /* Configuration for Nethermind execution client */}}
             {{- if eq .Values.execution.client "nethermind" }}
               exec /nethermind/Nethermind.Runner
               --config={{ .Values.global.network }}
@@ -179,9 +182,7 @@ spec:
             {{- if .Values.execution.terminalTotalDifficulty }}
               --Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
             {{- end }}
-            {{/*
-            Configuration for Geth execution client
-            */}}
+            {{- /* Configuration for Geth execution client */}}
             {{- else if eq .Values.execution.client "geth" }}
               exec geth
               --syncmode=snap
@@ -227,9 +228,7 @@ spec:
               --metrics.port={{ .Values.execution.metrics.port }}
               --metrics.addr={{ .Values.execution.metrics.host }}  
             {{- end }}
-            {{/*
-            Configuration for Besu execution client
-            */}}
+            {{- /* Configuration for Besu execution client */}}
             {{- else if eq .Values.execution.client "besu" }}
               exec /opt/besu/bin/besu
               --network={{ .Values.global.network }}
@@ -256,9 +255,7 @@ spec:
               --metrics.port={{ .Values.execution.metrics.port }}
               --metrics.addr={{ .Values.execution.metrics.host }}  
             {{- end }}
-            {{/*
-            Configuration for Erigon execution client
-            */}}
+            {{- /* Configuration for Erigon execution client */}}
             {{- else if eq .Values.execution.client "erigon" }}
               exec erigon
               --datadir=/data/execution
@@ -473,6 +470,8 @@ spec:
               --rest-api-cors-origins={{ .Values.beacon.restApi.corsOrigins | join "," }}
             {{- end }}
               --p2p-enabled=true
+              --p2p-peer-upper-bound={{ .Values.beacon.targetPeers }}
+              --p2p-peer-lower-bound={{ .Values.beacon.targetPeersMin }}
             {{- if .Values.global.p2pNodePort.enabled }}
               --p2p-advertised-port=$EXTERNAL_BEACON_PORT
               --p2p-advertised-ip=$EXTERNAL_IP
