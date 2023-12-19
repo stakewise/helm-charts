@@ -98,7 +98,7 @@ sidecar:
 image:
   registry: "docker.io"
   repository: "ethereum/client-go"
-  tag: "v1.13.5"
+  tag: "v1.13.6"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -155,11 +155,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "nodes"
+        - "nodes"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
   ## Required Role rules
   ##
   rules:
@@ -167,11 +167,11 @@ rbac:
     ##
     - apiGroups: [""]
       resources:
-      - "services"
+        - "services"
       verbs:
-      - "get"
-      - "list"
-      - "watch"
+        - "get"
+        - "list"
+        - "watch"
 
 # Manually specify TerminalTotalDifficulty, overriding the bundled setting
 terminalTotalDifficulty: ""
