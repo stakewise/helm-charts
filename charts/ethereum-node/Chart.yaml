@@ -1,0 +1,6 @@
+apiVersion: v2
+description: 'This chart acts as an umbrella chart and allows to run a ethereum execution
+  and consensus layer client. It''s also able to deploy optional monitoring applications. '
+name: ethereum-node
+type: application
+version: 0.0.19

@@ -1,0 +1,160 @@
+global:
+  main:
+    network: mainnet
+    env: staging
+    engineEndpoint: http://{{ .Release.Name }}-execution:8551
+    rpcEndpoint: http://{{ .Release.Name }}-execution:8545
+    beaconEndpoint: http://{{ .Release.Name }}-beacon:5052
+  checkpointSync:
+    enabled: true
+    addresses:
+      mainnet: https://mainnet-checkpoint-sync.attestant.io
+      goerli: https://checkpoint-sync.goerli.ethpandaops.io
+      sepolia: https://checkpoint-sync.sepolia.ethpandaops.io
+  clientArgs:
+    networks:
+      mainnet:
+        execution:
+          nethermind:
+          - --Pruning.Mode=Hybrid 
+          - --Pruning.FullPruningTrigger=VolumeFreeSpace
+          - --Pruning.FullPruningThresholdMb=256000 
+          - --Pruning.AvailableSpaceCheckEnabled=false
+          - --Sync.NonValidatorNode=true
+          - --Sync.DownloadBodiesInFastSync=false
+          - --Sync.DownloadReceiptsInFastSync=false
+        consensus:
+          prysm: []
+      goerli:
+        execution:
+          nethermind:
+            - --config=goerli
+        consensus:
+          prysm:
+            - --goerli
+      sepolia:
+        execution:
+          nethermind:
+            - --config=sepolia
+        consensus:
+          prysm:
+            - --sepolia
+
+  ########################
+  ###
+  ###  Secret Store 
+  ###
+  ########################
+  secretStore:
+    gcp:
+      projectID: dummy-project-id
+      clusterLocation: dummy-cluster-location
+      clusterName: dummy-cluster-name
+      serviceAccountRef:
+        name: dummy-service-account
+        namespace: dummy-namespace
+
+    refreshInterval: "10m"
+    remoteRef:
+      version: "1"
+      key: dummy-key
+      property: dummy-property
+########################
+###
+###  Execution clients
+###
+########################
+
+nethermind:
+  enabled: true
+  nameOverride: execution
+  httpPort: 8545
+  p2pPort: 30303
+  extraArgs:
+    - >-
+      {{- with( index .Values.global.clientArgs.networks .Values.global.main.network ) }}
+        {{- range $i, $v := .execution.nethermind }}
+        {{- if (eq $i 0) }}
+        {{- $v }}
+        {{- else }}
+        {{ $v }}
+        {{- end }}
+        {{- end -}}
+      {{- end }}
+
+
+########################
+###
+###  Consensus clients
+###
+########################
+
+
+prysm:
+  enabled: true
+  nameOverride: beacon
+  httpPort: 5052
+  p2pPort: 9000
+  checkpointSync:
+    enabled: "{{ default .Values.global.checkpointSync.enabled false }}"
+    url: "{{ index .Values.global.checkpointSync.addresses .Values.global.main.network }}"
+  extraArgs:
+    - >-
+      --execution-endpoint={{ tpl .Values.global.main.engineEndpoint . }}
+      {{- with( index .Values.global.clientArgs.networks .Values.global.main.network ) }}
+        {{- range .consensus.prysm }}
+        {{ . }}
+        {{- end -}}
+      {{- end -}}
+
+  resources:
+    limits:
+      cpu: 4
+      memory: 4Gi
+    requests:
+      cpu: 2
+      memory: 2Gi
+
+  persistence:
+    # -- Uses an EmptyDir when not enabled
+    enabled: true
+    # -- Use an existing PVC when persistence.enabled
+    accessModes:
+    - ReadWriteOnce
+    # -- Requested size for volume claim template
+    size: 100Gi
+    # -- Use a specific storage class
+    # E.g 'local-path' for local storage to achieve best performance
+    # Read more (https://github.com/rancher/local-path-provisioner)
+    storageClassName: standard-rwo
+    # -- Annotations for volume claim template
+    annotations: {}
+    # -- Selector for volume claim template
+    selector: {}
+    #   matchLabels:
+    #     app.kubernetes.io/name: something
+
+
+########################
+###
+###  Monitoring
+###
+########################
+
+ethereum-metrics-exporter:
+  enabled: false
+  nameOverride: metrics-exporter
+  config:
+    consensus:
+      enabled: true
+      url: "{{ tpl  .Values.global.main.beaconEndpoint . }}"
+      name: consensus-client
+    execution:
+      enabled: true
+      url: "{{ tpl  .Values.global.main.rpcEndpoint . }}"
+      name: execution-client
+      modules:
+        - eth
+        - net
+        - web3
+

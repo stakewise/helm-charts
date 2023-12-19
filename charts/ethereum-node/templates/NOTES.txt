@@ -1,0 +1,37 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+====
+{{- $elName := "" -}}
+{{- $elCount := 0 | int -}}
+{{- if .Values.nethermind.enabled -}}
+{{ $elCount = add1 $elCount -}}
+{{ $elName = "nethermind" -}}
+{{- end -}}
+
+{{- $clName := "" -}}
+{{- $clCount := 0 | int -}}
+{{- if .Values.prysm.enabled -}}
+{{ $clCount = add1 $clCount -}}
+{{ $clName = "prysm" -}}
+{{- end -}}
+
+{{- if gt $elCount 1 -}}
+{{ fail "ERROR: You should only enable one execution layer client software" -}}
+{{- end -}}
+{{- if gt $clCount 1 -}}
+{{ fail "ERROR: You should only enable one consensus layer client software" -}}
+{{- end }}
+
+Infos about your ethereum node installation:
+- Network: {{ .Values.global.main.network }}
+- Execution layer client: {{ printf "%s" $elName }}
+- Consensus layer client: {{ printf "%s" $clName }}
+
+=====
