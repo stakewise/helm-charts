@@ -88,13 +88,12 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations:
-    {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-    # nginx.ingress.kubernetes.io/limit-rpm: "100"
-    # nginx.ingress.kubernetes.io/limit-rps: "5"
-    # nginx.ingress.kubernetes.io/limit-req-status: "429"
+  annotations: {}
+  # kubernetes.io/ingress.class: nginx
+  # kubernetes.io/tls-acme: "true"
+  # nginx.ingress.kubernetes.io/limit-rpm: "100"
+  # nginx.ingress.kubernetes.io/limit-rps: "5"
+  # nginx.ingress.kubernetes.io/limit-req-status: "429"
   hosts:
     - host: chart-example.local
       paths:
