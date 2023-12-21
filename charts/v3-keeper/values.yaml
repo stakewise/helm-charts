@@ -21,12 +21,12 @@ terminationGracePeriodSeconds: 10
 ## Affinity Settings
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
 ##
-affinity: { }
+affinity: {}
 
 ## Toleration Settings
 ## ref: https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/
 ##
-tolerations: [ ]
+tolerations: []
 
 service:
   type: ClusterIP
@@ -45,7 +45,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-keeper"
-  tag: "master"
+  tag: "v0.4.0"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry

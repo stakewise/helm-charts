@@ -1,7 +1,7 @@
 apiVersion: v2
 name: v3-keeper
-version: 3.0.7
-appVersion: v0.1.0
+version: 3.0.8
+appVersion: v0.4.0
 kubeVersion: "^1.19.0-0"
 description: StakeWise Keeper is used to aggregate transactions from the oracles and submit them on-chain.
 type: application
@@ -17,6 +17,6 @@ maintainers:
     email: dmitri@stakewise.io
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

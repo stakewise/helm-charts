@@ -1,7 +1,7 @@
 apiVersion: v2
 name: v3-oracle
-version: 3.3.5
-appVersion: v1.0.1
+version: 3.3.6
+appVersion: v1.0.9
 kubeVersion: "^1.14.0-0"
 description: The StakeWise application for submitting off-chain data to smart contracts.
 type: application
@@ -17,10 +17,10 @@ maintainers:
     email: dmitri@stakewise.io
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
-- name: ipfs
-  repository: https://charts.stakewise.io/
-  version: 2.x.x
-  condition: ipfs.enabled
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x
+  - name: ipfs
+    repository: https://charts.stakewise.io/
+    version: 2.x.x
+    condition: ipfs.enabled
