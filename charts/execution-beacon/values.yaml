@@ -248,6 +248,46 @@ global:
     fsGroup: 1001
     runAsUser: 1001
 
+  ingress:
+    enabled: false
+    ingressClassName: nginx
+
+    ## Route Prefix. Can skip it if any item of path has the path defined.
+    ##
+    routePrefix: /
+
+    annotations: {}
+    labels: {}
+
+    ## Hostnames.
+    ## Must be provided if Ingress is enabled.
+    ##
+    # hosts:
+    #   - prometheus.domain.com
+    hosts: []
+
+    ## Paths to use for ingress rules
+    ## If not defined the following default object will be used:
+    ## - path: "/"
+    ##   port: 8545
+    ##   pathType: "ImplementationSpecific"
+    paths: []
+      ## paths:
+      ##  - path: "/execution"
+      ##    port: 8545
+      ##    pathType: "Prefix"
+      ##  - path: "/beacon"
+      ##    port: 8080
+      ##    pathType: "Exact"
+
+    ## TLS configuration for Ingress
+    ## Secret must be manually created in the namespace
+    ##
+    tls: []
+      # - secretName: execution-beacon-general-tls
+      #   hosts:
+      #     - nethermind.example.com
+
 execution:
   client: nethermind
 
