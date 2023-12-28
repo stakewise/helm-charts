@@ -136,6 +136,7 @@ global:
 
   service:
     svcHeadless: true
+    type: ClusterIP
 
   sessionAffinity:
     # Whether to enable session affinity or not
