@@ -1,0 +1,8 @@
+rpcSaas: 
+  clustersecretstore:
+    projectID: dummy
+    clusterLocation: dummy
+    clusterName: dummy
+    serviceAccountname: dummy
+    serviceAccountnamespace: dummy
+    name: dummy
