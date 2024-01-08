@@ -64,10 +64,8 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
       {{- end }}
-      {{- with $root.Values.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-      {{- end }}
+        {{- toYaml $root.Values.global.podSecurityContext | nindent 8 }}
       serviceAccountName: {{ template "validators.serviceAccountName" $root }}
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
@@ -75,7 +73,7 @@ spec:
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           env:
             - name: WEB3SIGNER_URL
               value: {{ include "web3signer" $root }}
@@ -111,12 +109,11 @@ spec:
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -c
             - >
-              ls -lha /data;
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
               cat /data/signer_keys.yml > /data/config;
@@ -125,9 +122,9 @@ spec:
               cat /data/proposerConfig.yaml;
               formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n');
               echo "$formatted_content" > /data/pubkeys.txt;
-              echo '{"externalSigner.pubkeys": ['"$(awk '{printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' pubkeys.txt)"']}' > /data/rcconfig.json;
-              cat /data/pubkeys.txt;
-              chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+              echo '{"externalSigner.pubkeys": ['"$(awk '{printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' /data/pubkeys.txt)"']}' > /data/rcconfig.json;
+              cat /data/rcconfig.json;
+              ls -lha /data;
            {{- if eq $root.Values.type "nimbus" }}	
               find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;	
             {{- end }}
@@ -139,6 +136,8 @@ spec:
         - name: watcher
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          securityContext:
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           env:
             - name: WEB3SIGNER_URL
               value: {{ include "web3signer" $root }}
@@ -164,6 +163,13 @@ spec:
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           {{- if eq $root.Values.type "lodestar" }}
           command:
             - sh

@@ -70,7 +70,13 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
+            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
+            fsGroup: {{ .Values.global.securityContext.fsGroup | default 10000 }}
+            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -94,7 +100,13 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
+            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
+            fsGroup: {{ .Values.global.securityContext.fsGroup | default 10000 }}
+            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
+            capabilities:
+              drop:
+                - ALL
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}

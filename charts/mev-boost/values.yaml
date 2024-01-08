@@ -13,7 +13,22 @@ global:
 
   serviceAccount:
     create: true
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
 
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
+      
 # Relay URLs
 relays:
   mainnet: 
@@ -53,17 +68,6 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP

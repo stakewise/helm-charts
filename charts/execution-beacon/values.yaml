@@ -15,13 +15,13 @@ global:
         tag: "1.24.0"
       geth: 
         repository: "ethereum/client-go"
-        tag: "v1.13.5"
+        tag: "v1.13.8"
       bseu: 
         repository: "hyperledger/besu"
         tag: "23.10.2"
       erigon: 
         repository: "thorax/erigon"
-        tag: "v2.54.0"
+        tag: "v2.55.1"
     beacon:
       prysm: 
         repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
@@ -34,10 +34,10 @@ global:
         tag: "v4.5.0"
       nimbus: 
         repository: "statusim/nimbus-eth2"
-        tag: "multiarch-v23.11.0"
+        tag: "multiarch-v24.1.0"
       lodestar: 
         repository: "chainsafe/lodestar"
-        tag: "v1.12.1"
+        tag: "v1.13.0"
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
@@ -242,10 +242,18 @@ global:
   ## Pod Security Context
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
   ##
-  securityContext:
+  podSecurityContext:
     runAsNonRoot: true
-    fsGroup: 1001
-    runAsUser: 1001
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
 
 execution:
   client: nethermind

@@ -128,7 +128,7 @@ Validator graffiti
 {{- end }}
 
 {{- define "web3signer" -}}
-{{- if $.Values.web3signerEndpoint }}{{ $.Values.web3signerEndpoint }}{{- else }}http://{{ $.Values.global.project }}-web3signer-{{ $.Values.global.owner }}-web3signer:6174
+{{- if $.Values.web3signerEndpoint }}{{ $.Values.web3signerEndpoint }}{{- else }}http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174
 {{- end }}
 {{- end }}
 

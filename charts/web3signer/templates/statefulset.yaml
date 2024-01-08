@@ -37,19 +37,19 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "web3signer.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -ac
             - >
               mkdir -p /data/web3signer /data/keystore;
-              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/web3signer
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -60,7 +60,7 @@ spec:
           image: "{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
           imagePullPolicy: {{ .Values.flywayImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           args:
             - -user=$(ESO_DB_USERNAME)
             - -password=$(ESO_DB_PASSWORD)
@@ -76,7 +76,7 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -87,7 +87,12 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
@@ -141,7 +146,7 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}

@@ -37,25 +37,20 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
     {{- end }}
-    {{- with .Values.global.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-    {{- end }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
     {{- if .Values.global.terminationGracePeriodSeconds }}
       terminationGracePeriodSeconds: {{ .Values.global.terminationGracePeriodSeconds }}
     {{- end }}
       serviceAccountName: {{ include "common.names.fullname" . }}
       priorityClassName: {{ .Values.global.priorityClassName | quote }}
       initContainers:
-        {{/*
-        Container used for initialising data directory and setting right values for ports and external_ip
-        */}}
+        {{/* Container used for initialising data directory and setting right values for ports and external_ip */}}
         - name: init
           image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
           imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
           securityContext:
-            runAsNonRoot: false
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           env:
             - name: POD_IP
               valueFrom:
@@ -88,13 +83,13 @@ spec:
               mountPath: /env
             - name: scripts-init
               mountPath: /scripts
-        {{/*
-        Container used for initialising nimbus checkpoint sync
-        */}}
+        {{/* Container used for initialising nimbus checkpoint sync */}}
         {{- if and (eq .Values.beacon.client "nimbus") .Values.beacon.checkPointSync.enabled }}
         - name: init-nimbus
           image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
           imagePullPolicy: {{ .Values.beacon.imagePullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -ac
@@ -115,12 +110,17 @@ spec:
           {{- end }}
         {{- end }}
       containers:
-        {{/*
-        Container used for Execution clients: Nethermind, Geth, Besu, Erigon
-        */}}
+        {{/* Container used for Execution clients: Nethermind, Geth, Besu, Erigon */}}
         - name: execution
           image: "{{ (pluck .Values.execution.client .Values.global.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.global.image.execution | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           {{- if .Values.global.externalSecrets.enabled }}
           envFrom:
             - secretRef:
@@ -372,15 +372,18 @@ spec:
           resources:
             {{ toYaml . | nindent 12 | trim }}
           {{- end }}
-        {{/*
-        Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar
-        */}}
+        {{/* Container used for Beacon clients: Prysm, Teku, Lighthouse, Nimbus, Lodestar */}}
         - name: beacon
           image: "{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).repository }}:{{ (pluck .Values.beacon.client .Values.global.image.beacon | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
-          {{/*
-          Configuration for Prysm beacon client
-          */}}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
+          {{/* Configuration for Prysm beacon client */}}
           {{- if eq .Values.beacon.client "prysm" }}
           args: 
             - "--datadir=/data/beacon"
@@ -432,9 +435,7 @@ spec:
           {{- range .Values.beacon.extraFlags }}
             - {{ . | quote }}
           {{- end }}
-          {{/*
-          Configuration for Teku beacon client
-          */}}
+          {{/* Configuration for Teku beacon client */}}
           {{- else if eq .Values.beacon.client "teku" }}
           command:
             - sh
@@ -491,9 +492,7 @@ spec:
             {{- range .Values.beacon.extraFlags }}
               {{ . | quote }}
             {{- end }}
-           {{/*
-          Configuration for Lighthouse beacon client
-          */}}
+           {{/* Configuration for Lighthouse beacon client */}}
           {{- else if eq .Values.beacon.client "lighthouse" }}
           command:
             - sh
@@ -548,9 +547,7 @@ spec:
             {{- range .Values.beacon.extraFlags }}
               {{ . }}
             {{- end }}
-          {{/*
-          Configuration for Nimbus beacon client
-          */}}
+          {{/* Configuration for Nimbus beacon client */}}
           {{- else if eq .Values.beacon.client "nimbus" }}
           command:
             - sh
@@ -581,7 +578,7 @@ spec:
             {{- if .Values.beacon.suggestedFeeRecipient }}
               --suggested-fee-recipient={{ .Values.beacon.suggestedFeeRecipient }}
             {{- end }}
-              --web3-url=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
+              --el=http://localhost:{{ .Values.execution.jsonrpc.engine.port }}
               --max-peers={{ .Values.beacon.targetPeers }}
               --enr-auto-update=true
             {{- if .Values.global.p2pNodePort.enabled }}
@@ -600,9 +597,7 @@ spec:
             {{- range .Values.beacon.extraFlags }}
               {{ . }}
             {{- end }}
-          {{/*
-          Configuration for Lodestar beacon client
-          */}}
+          {{/* Configuration for Lodestar beacon client */}}
           {{- else if eq .Values.beacon.client "lodestar" }}
           command:
             - sh
@@ -719,6 +714,8 @@ spec:
         - name: ethsider
           image: "{{ .Values.global.ethsider.repository }}:{{ .Values.global.ethsider.tag }}"
           imagePullPolicy: {{ .Values.global.ethsider.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           env:
             - name: EXECUTION_ENDPOINT
               value: "http://localhost:{{ .Values.execution.jsonrpc.http.port }}"

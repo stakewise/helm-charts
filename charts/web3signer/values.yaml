@@ -3,9 +3,24 @@
 # Declare variables to be passed into your templates.
 
 global:
-  owner: ""
+  label: ""
   serviceAccount:
     create: true
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
 
 replicaCount: 3
 
@@ -115,21 +130,6 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-podSecurityContext:
-  fsGroup: 1000
-  runAsUser: 1000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP

@@ -7,6 +7,21 @@ global:
   project: ""
   imagePullSecrets: []
   network: mainnet
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
 
 ## Provide a name in place of operator for `app:` labels
 ##
@@ -15,13 +30,6 @@ nameOverride: ""
 ## Provide a name to substitute for the full names of resources
 ##
 fullnameOverride: ""
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-securityContext:
-  fsGroup: 1001
-  runAsUser: 1001
 
 ## RBAC configuration.
 ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
@@ -144,7 +152,7 @@ terminationGracePeriodSeconds: 120
 serviceAccount:
   # Specifies whether a service account should be created
   create: true
-  name: "validators"
+  name: ""
   # Annotations to add to the service account
   annotations: {}
 
