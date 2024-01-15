@@ -112,6 +112,9 @@ settings:
   # If specified, wallet will be obtained from the secret
   walletSecretName: ""
 
+  # Sentry connection string
+  # sentryDSN: ""
+
   # Additional arguments to path to operator
   extraFlags: []
 
