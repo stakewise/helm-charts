@@ -23,3 +23,6 @@ data:
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
   METRICS_PORT: {{ .Values.metrics.port | quote }}
   MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
+  {{- if .Values.settings.sentryDSN }}
+  SENTRY_DSN: {{ .Values.settings.sentryDSN | quote }}
+  {{- else }}
