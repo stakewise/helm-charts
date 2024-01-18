@@ -1,0 +1,56 @@
+{{- if .Values.global.ingress.enabled -}}
+  {{- $serviceName := include "common.names.fullname" . -}}
+  {{- $routePrefix := .Values.global.ingress.routePrefix | default "/" -}}
+  {{- $defaultPath := list (dict "path" $routePrefix "port" 8545 "pathType" "ImplementationSpecific") -}}
+  {{- $paths := .Values.global.ingress.paths | default $defaultPath -}} 
+apiVersion: networking.k8s.io/v1 
+kind: Ingress
+metadata:
+{{- if .Values.global.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.global.ingress.annotations | indent 4 }}
+{{- end }}
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+{{- if .Values.global.ingress.labels }}
+{{ toYaml .Values.global.ingress.labels | indent 4 }}
+{{- end }}
+spec:
+  {{- if .Values.global.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.global.ingress.ingressClassName }}
+  {{- end }}
+  rules:
+  {{- if .Values.global.ingress.hosts }}
+  {{- range $host := .Values.global.ingress.hosts }}
+    - host: {{ tpl $host $ }}
+      http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p.path }}
+            pathType: {{ $p.pathType }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $p.port }}
+  {{- end }}
+  {{- end }}
+  {{- else }}
+    - http:
+        paths:
+  {{- range $p := $paths }}
+          - path: {{ $p.path }}
+            pathType: {{ $p.pathType }}
+            backend:
+              service:
+                name: {{ $serviceName }}
+                port:
+                  number: {{ $p.port }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.global.ingress.tls }}
+  tls:
+{{ tpl (toYaml .Values.global.ingress.tls | indent 4) . }}
+  {{- end }}
+{{- end }}

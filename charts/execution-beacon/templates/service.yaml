@@ -23,8 +23,11 @@ spec:
     clientIP:
       timeoutSeconds: {{ .Values.global.sessionAffinity.timeoutSeconds }}
 {{- end }}
-  type: ClusterIP
-{{- if .Values.global.service.svcHeadless }}
+  type: {{ .Values.global.service.type }} # ClusterIP, NodePort, LoadBalancer, or ExternalName
+{{- if .Values.global.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.global.service.externalTrafficPolicy }}
+{{- end }}
+{{- if .Values.global.service.svcHeadless}}
   clusterIP: None
 {{- end }}
   ports:
@@ -71,4 +74,3 @@ spec:
   {{- end }}
   selector:
     {{- include "common.labels.matchLabels" . | nindent 4 }}
-
