@@ -114,55 +114,18 @@ spec:
         - name: execution
           image: "{{ (pluck .Values.execution.client .Values.global.image.execution | first ).repository }}:{{ (pluck .Values.execution.client .Values.global.image.execution | first ).tag }}"
           imagePullPolicy: {{ .Values.global.image.imagePullPolicy }}
-          {{/* Configuration for Nethermind execution client */}}
-          {{- if eq .Values.execution.client "nethermind" }}
-          args:
-            - --config={{ .Values.global.network }}
-            - --datadir=/data/execution
-          {{- if .Values.execution.jsonrpc.enabled }}
-            - --JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
-            - --JsonRpc.EnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
-            - --JsonRpc.Host={{ .Values.execution.jsonrpc.host }}
-            - --JsonRpc.Port={{ .Values.execution.jsonrpc.http.port }}
-          {{- if .Values.execution.healthchecks.enabled }}
-            - --HealthChecks.Enabled={{ .Values.execution.healthchecks.enabled }}
-            - --HealthChecks.Slug={{ .Values.execution.healthchecks.slug }}
-            - --HealthChecks.PollingInterval={{ .Values.execution.healthchecks.pollingInterval }}
-            - --HealthChecks.LowStorageSpaceShutdownThreshold={{ .Values.execution.healthchecks.lowStorageSpaceShutdownThreshold }}
-            - --HealthChecks.LowStorageSpaceWarningThreshold={{ .Values.execution.healthchecks.lowStorageSpaceWarningThreshold }}
-          {{- if .Values.execution.jsonrpc.websocket.enabled }}
-            - --JsonRpc.WebSocketsPort={{ .Values.execution.jsonrpc.websocket.port }}
-          {{- end }}
-          {{- end }} 
-          {{- end }}
-          {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           {{- if .Values.global.externalSecrets.enabled }}
-            - --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
-          {{- else }}
-            - --JsonRpc.JwtSecretFile=/secret/jwtsecret
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
           {{- end }}
-            - --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
-            - --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
-            - --JsonRpc.EngineEnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
-          {{- end }}
-          {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
-            - --Metrics.Enabled={{ .Values.execution.metrics.enabled }}
-            - --Metrics.ExposePort={{ .Values.execution.metrics.port }}
-            - --Metrics.NodeName=$POD_NAME
-          {{- end }}
-            - --Network.MaxActivePeers={{ .Values.execution.targetPeers }}
-          {{- if not .Values.global.p2pNodePort.enabled }}
-            - --Network.ExternalIp=$POD_IP
-            - --Network.P2PPort={{ include "execution.p2pPort" . }}
-            - --Network.DiscoveryPort={{ include "execution.p2pPort" . }}
-          {{- end }}
-          {{- if .Values.execution.terminalTotalDifficulty }}
-            - --Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
-          {{- end }}
-          {{- range .Values.execution.extraFlags }}
-            - {{ . }}
-          {{- end }}
-          {{- else }}
           command:
             - sh
             - -ac
@@ -170,8 +133,57 @@ spec:
               {{- if .Values.global.p2pNodePort.enabled }}
               . /env/init-nodeport;
               {{- end }}
-            {{/* Configuration for Geth execution client */}}
-            {{- if eq .Values.execution.client "geth" }}
+            {{- /* Configuration for Nethermind execution client */}}
+            {{- if eq .Values.execution.client "nethermind" }}
+              exec /nethermind/Nethermind.Runner
+              --config={{ .Values.global.network }}
+              --datadir=/data/execution
+            {{- if .Values.execution.jsonrpc.enabled }}
+              --JsonRpc.Enabled={{ .Values.execution.jsonrpc.enabled }}
+              --JsonRpc.EnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+              --JsonRpc.Host={{ .Values.execution.jsonrpc.host }}
+              --JsonRpc.Port={{ .Values.execution.jsonrpc.http.port }}
+            {{- if .Values.execution.healthchecks.enabled }}
+              --HealthChecks.Enabled={{ .Values.execution.healthchecks.enabled }}
+              --HealthChecks.Slug={{ .Values.execution.healthchecks.slug }}
+              --HealthChecks.PollingInterval={{ .Values.execution.healthchecks.pollingInterval }}
+              --HealthChecks.LowStorageSpaceShutdownThreshold={{ .Values.execution.healthchecks.lowStorageSpaceShutdownThreshold }}
+              --HealthChecks.LowStorageSpaceWarningThreshold={{ .Values.execution.healthchecks.lowStorageSpaceWarningThreshold }}
+            {{- if .Values.execution.jsonrpc.websocket.enabled }}
+              --JsonRpc.WebSocketsPort={{ .Values.execution.jsonrpc.websocket.port }}
+            {{- end }}
+            {{- end }} 
+            {{- end }}
+            {{- if or .Values.global.JWTSecret .Values.global.externalSecrets.enabled }}
+            {{- if .Values.global.externalSecrets.enabled }}
+              --JsonRpc.JwtSecretFile=/external-secrets/JWT_SECRET
+            {{- else }}
+              --JsonRpc.JwtSecretFile=/secret/jwtsecret
+            {{- end }}
+              --JsonRpc.EnginePort={{ .Values.execution.jsonrpc.engine.port }}
+              --JsonRpc.EngineHost={{ .Values.execution.jsonrpc.host }}
+              --JsonRpc.EngineEnabledModules={{ .Values.execution.jsonrpc.namespaces.nethermind | join "," }}
+            {{- end }}
+            {{- if and .Values.global.metrics.enabled .Values.execution.metrics.enabled }}
+              --Metrics.Enabled={{ .Values.execution.metrics.enabled }}
+              --Metrics.ExposePort={{ .Values.execution.metrics.port }}
+              --Metrics.NodeName=$POD_NAME
+            {{- end }}
+              --Network.MaxActivePeers={{ .Values.execution.targetPeers }}
+            {{- if .Values.global.p2pNodePort.enabled }}
+              --Network.ExternalIp=$EXTERNAL_IP
+              --Network.P2PPort=$EXTERNAL_EXECUTION_PORT
+              --Network.DiscoveryPort=$EXTERNAL_EXECUTION_PORT
+            {{- else }}
+              --Network.ExternalIp=$POD_IP
+              --Network.P2PPort={{ include "execution.p2pPort" . }}
+              --Network.DiscoveryPort={{ include "execution.p2pPort" . }}
+            {{- end }}
+            {{- if .Values.execution.terminalTotalDifficulty }}
+              --Merge.TerminalTotalDifficulty={{ .Values.execution.terminalTotalDifficulty }}
+            {{- end }}
+            {{- /* Configuration for Geth execution client */}}
+            {{- else if eq .Values.execution.client "geth" }}
               exec geth
               --syncmode=snap
               --datadir=/data/execution
@@ -278,16 +290,18 @@ spec:
               --ws
             {{- end }}
             {{- end }}
+            {{- range .Values.extraFlags }}
+                {{ . }}
+            {{- end }}
             {{- if .Values.global.metrics.enabled }}
-              --metrics
-              --metrics.addr={{ .Values.execution.metrics.host }}
-              --metrics.port={{ .Values.execution.metrics.port }}
+                --metrics
+                --metrics.addr={{ .Values.execution.metrics.host }}
+                --metrics.port={{ .Values.execution.metrics.port }}
             {{- end }}
             {{- end }}
             {{- range .Values.execution.extraFlags }}
-              {{ . }}
+              {{ .  }}
             {{- end }}
-            {{- end}}
           env:
             - name: POD_IP
               valueFrom:
@@ -297,18 +311,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-          {{- if and (eq .Values.execution.client "nethermind") (.Values.global.p2pNodePort.enabled) }}
-            {{- range $i, $e := until (int .Values.global.replicaCount) }}
-            {{- $portExecution := add $.Values.global.p2pNodePort.startAtExecution $i }}
-            {{- if hasKey $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
-              {{- $portExecution = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
-            {{- end }}
-            - name: NETHERMIND_NETWORKCONFIG_DISCOVERYPORT
-              value: "{{ $portExecution }}"
-            - name: NETHERMIND_NETWORKCONFIG_P2PPORT
-              value: "{{ $portExecution }}"
-            {{- end }}
-          {{- end }}
           {{- if .Values.execution.javaOpts.enabled }}
             - name: BESU_OPTS
               value: {{ .Values.execution.javaOpts.maxHeapSize }}
