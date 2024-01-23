@@ -1,19 +1,19 @@
-# The StakeWise Charts for Kubernetes
+# The Charts for Kubernetes
 
-The curated list of StakeWise helm charts. Every chart is located in a separate folder and has the configuration parameters located in `values.yaml` file.
+The list of helm charts forked and reworked from [StakeWise helm repository](https://github.com/stakewise/helm-charts), maintained and further developed by Nethermind team. Every chart is located in a separate folder and has the configuration parameters located in `values.yaml` file.
 
 ## TL;DR
 
 ```bash
-$ helm repo add stakewise https://charts.stakewise.io
-$ helm install my-release stakewise/<chart-name>
+$ helm repo add nethermindeth https://charts.nethermind.io
+$ helm install my-release nethermindeth/<chart-name>
 ```
 
 ## Before you begin
 
 ### Prerequisites
 
-- Kubernetes 1.18+
+- Kubernetes 1.23+
 - Helm 3
 - PV provisioner support in the underlying infrastructure for some charts
 

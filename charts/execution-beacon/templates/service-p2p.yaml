@@ -1,0 +1,79 @@
+{{- if .Values.global.p2pNodePort.enabled -}}
+{{- range $i, $e := until (int .Values.global.replicaCount) }}
+{{- $portExecution := add $.Values.global.p2pNodePort.startAtExecution $i -}}
+{{- $portBeacon := add $.Values.global.p2pNodePort.startAtBeacon $i -}}
+{{- if hasKey $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) -}}
+  {{ $portExecution = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
+  {{ $portBeacon = index $.Values.global.p2pNodePort.replicaToNodePort ($i | toString) }}
+{{- end }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-execution-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+    pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+    type: p2p
+    client: execution
+  {{- with $.Values.global.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.global.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp-exec
+      port: {{ include "execution.p2pPort" $ }}
+      protocol: TCP
+      targetPort: {{ $portExecution }}
+      nodePort: {{ $portExecution }}
+  {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp-exec
+      port: {{ include "execution.p2pPort" $ }}
+      protocol: UDP
+      targetPort: {{ $portExecution }}
+      nodePort: {{ $portExecution }}
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "common.names.fullname" $ }}-beacon-{{ $i }}
+  labels:
+    {{- include "common.labels.standard" $ | nindent 4 }}
+    pod: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+    type: p2p
+    client: beacon
+  {{- with $.Values.global.p2pNodePort.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ $.Values.global.p2pNodePort.type }}
+  externalTrafficPolicy: Local
+  ports:
+    - name: p2p-tcp-beacon
+      port: {{ include "beacon.p2pPort" $ }}
+      protocol: TCP
+      targetPort: {{ $portBeacon }}
+      nodePort: {{ $portBeacon }}
+  {{- if eq $.Values.global.p2pNodePort.type "NodePort" }}
+    - name: p2p-udp-beacon
+      port: {{ include "beacon.p2pPort" $ }}
+      protocol: UDP
+      targetPort: {{ $portBeacon }}
+      nodePort: {{ $portBeacon }}
+  {{- end }}
+  selector:
+    {{- include "common.labels.matchLabels" $ | nindent 4 }}
+    statefulset.kubernetes.io/pod-name: "{{ include "common.names.fullname" $ }}-{{ $i }}"
+
+{{- end }}
+{{- end }}

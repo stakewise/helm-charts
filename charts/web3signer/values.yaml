@@ -3,44 +3,72 @@
 # Declare variables to be passed into your templates.
 
 global:
+  label: ""
   serviceAccount:
     create: true
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
 
 replicaCount: 3
+
+idleTimeout: 30	
+
+tmpfsSize: 128Mi
 
 image:
   repository: consensys/web3signer
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "22.8.1"
+  tag: "23.11.0"
 
 ## Init image is used to chown data volume, etc.
 ##
 initImage:
   repository: busybox
-  tag: "1.34"
+  tag: "1.36"
   pullPolicy: IfNotPresent
 
 ## CLI image is used to fetch private keys.
 ##
 cliImage:
-  repository: europe-west4-docker.pkg.dev/stakewiselabs/public/cli
-  tag: "v1.1.10"
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.0"
   pullPolicy: IfNotPresent
 
-## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
-##
-dbKeystoreUrl: ""
 
-## The key for decrypting private keys is generated with stakewise-cli sync-db command
-##
-decryptionKey: ""
+enableReloader: false
+
+# dbKeystoreUrl: "postgresql://username:pass@hostname/dbname"
+# decryptionKey: "generated with stakewise-cli sync-db"
+# dbUrl: "jdbc:postgresql://localhost/web3signer"
+# dbUsername: ""
+# dbPassword: ""
+
+externalSecrets:
+  enabled: true
+  secretStoreRef:
+    name: secretStoreName
+    kind: secretStoreKind
+  data: []
 
 ## Flyawy image is used to apply database migrations
 ##
 flywayImage:
   repository: flyway/flyway
-  tag: "8.5.8-alpine"
+  tag: "9.3"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -60,7 +88,11 @@ fullnameOverride: ""
 
 ## Network
 ## Options: mainnet, prater, gnosis
-network: "prater"
+network: "mainnet"
+
+## Sets logging verbosity.
+## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
+loggingLevel: "INFO"
 
 ## Number of epochs to keep when pruning the slashing protection database.
 ##
@@ -74,18 +106,6 @@ pruningInterval: 24
 ## The default is 32 as defined on MainNet/Prater.
 ##
 slotsPerEpoch: 32
-
-## The Java Database Connectivity (JDBC) URL of the slashing protection database.
-##
-dbUrl: "jdbc:postgresql://localhost/web3signer"
-
-## The username to use when connecting to the slashing protection database.
-##
-dbUsername: ""
-
-## The password to connect to the slashing protection database.
-##
-dbPassword: ""
 
 ## Port on which Web3Signer HTTP listens.
 ##
@@ -110,21 +130,6 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-podSecurityContext:
-  fsGroup: 1000
-  runAsUser: 1000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP

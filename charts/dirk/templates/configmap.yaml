@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-env
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  PEERS: 1:{{ include "dirk.fullname" . }}-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }},2:{{ include "dirk.fullname" . }}-1.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }},3:{{ include "dirk.fullname" . }}-2.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  dirk.yaml.tml: |
+    log-level: {{ .Values.dirk.loglevel }}
+    server:
+      id: $INDEX
+      name: $HOSTNAME.{{ include "dirk.fullname" . }}
+      listen-address: 0.0.0.0:{{ .Values.service.httpPort }}
+    certificates:
+      ca-cert: file:///data/dirk/certs/ca.crt
+      server-cert: file:///data/dirk/certs/$HOSTNAME.{{ include "dirk.fullname" . }}.crt
+      server-key: file:///data/dirk/certs/$HOSTNAME.{{ include "dirk.fullname" . }}.key
+    storage-path: /data/dirk/storage
+    stores:
+    - name: Local
+      type: filesystem
+      location: /data/dirk/wallets
+    peers:
+      1: {{ include "dirk.fullname" . }}-0.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      2: {{ include "dirk.fullname" . }}-1.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+      3: {{ include "dirk.fullname" . }}-2.{{ include "dirk.fullname" . }}:{{ .Values.service.httpPort }}
+    permissions:
+      {{ .Values.dirk.clientName }}:
+        Validators: All
+    metrics:
+      listen-address: 0.0.0.0:{{ .Values.metricsPort }}
+    {{- if .Values.dirk.tracing }}
+    tracing:
+      {{- toYaml .Values.dirk.tracing | nindent 6 }}
+    {{- end }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-scripts
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+{{ $root := . }}
+{{- range $path, $_ :=  .Files.Glob  "scripts/**.sh" }}
+{{- with $root }}
+  {{ $path | replace "scripts/" ""}}: |-
+{{ .Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}

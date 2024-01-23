@@ -1,6 +1,7 @@
 {{- if .Values.enabled }}
 {{- $root := . -}}
 {{- $counter := 0 }}
+
 {{- range (untilStep (int .Values.validatorsKeyIndex) (int (add .Values.validatorsKeyIndex .Values.validatorsCount)) 1) }}
 
 {{ $rpcEndpoints := list }}
@@ -10,6 +11,12 @@
 {{ $rpcList = append $rpcList (index $.Values.beaconChainRpcEndpointsRandomized .) }}
 {{- end }}
 {{ $rpcList = append $rpcList $.Values.beaconChainRpcEndpointsRandomized }}
+
+# Appending the failover endpoints to the rpcList before flattening
+{{- if $.Values.fallbackRpcEndpoints }}
+  {{- $rpcList = append $rpcList $.Values.fallbackRpcEndpoints }}
+{{- end }}
+
 {{ $rpcEndpoints = include "flatten" $rpcList }}
 {{- if ge $counter (len $.Values.beaconChainRpcEndpointsRandomized) }}
   {{- $counter = 1 }}
@@ -57,22 +64,44 @@ spec:
       nodeSelector:
         {{ toYaml . | nindent 8 | trim }}
       {{- end }}
-      {{- with $root.Values.securityContext }}
       securityContext:
-        {{ toYaml . | nindent 8 | trim }}
-      {{- end }}
-      serviceAccountName: "validators"
+        {{- toYaml $root.Values.global.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ template "validators.serviceAccountName" $root }}
       priorityClassName: {{ $root.Values.priorityClassName | quote }}
       initContainers:
         - name: get-configs
           image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
           imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           env:
             - name: WEB3SIGNER_URL
-              value: {{ $root.Values.web3signerEndpoint }}
-          args: ["sync-validator-keys", "--db-url", "{{ $root.Values.dbKeystoreUrl }}", "--output-dir", "/data", "--index", "{{ . }}"]
+              value: {{ include "web3signer" $root }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
+          args:
+            - "sync-validator-keys"
+            - "--db-url"
+            - "$(ESO_DB_KEYSTORE_URL)"
+            - "--output-dir"
+            - "/data"
+            - "--index"
+            - "{{ . }}"
+            - "--no-of-keys"
+            - "{{ $root.Values.validatorsNoOfKeys }}"
+            {{- if not $root.Values.strictFeeRecipientCheck }}	
+            - "--no-strict-fee-recipient-check"	
+            {{- end }}	
+            {{- if eq $.Values.type "lodestar" }}	
+            - "--graffiti"	
+            - "{{ $root.Values.graffiti }}"	
+            {{- end }}
+            {{- if not $root.Values.enableBuilder }}
+            - "--no-proposal-builder-enabled"
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -80,69 +109,135 @@ spec:
           image: "{{ $root.Values.initImageBusybox.repository }}:{{ $root.Values.initImageBusybox.tag }}"
           imagePullPolicy: {{ $root.Values.initImageBusybox.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -c
             - >
               mkdir -p /data/lighthouse/validators;
               cp /data/validator_definitions.yml /data/lighthouse/validators/validator_definitions.yml;
-              cp /mnt/gnosis-prysm/config.yaml /data/config_gnosis_prysm;
               cat /data/signer_keys.yml > /data/config;
               cat /data/config;
-              echo "" >>
-              cat /data/signer_keys.yml >> /data/config_gnosis_prysm;
-              cat /data/config_gnosis_prysm;
-              chown -R {{ $root.Values.securityContext.runAsUser }}:{{ $root.Values.securityContext.runAsUser }} /data;
+              cat /data/proposerConfig.json;
+              cat /data/proposerConfig.yaml;
+              formatted_content=$(cat /data/signer_keys.yml | grep -o '".*"' | sed -e 's/"//g' | tr ',' '\n');
+              echo "$formatted_content" > /data/pubkeys.txt;
+              echo '{"externalSigner.pubkeys": ['"$(awk '{printf "%s\"%s\"", (NR==1 ? "" : ", "), $0}' /data/pubkeys.txt)"']}' > /data/rcconfig.json;
+              cat /data/rcconfig.json;
+              ls -lha /data;
+           {{- if eq $root.Values.type "nimbus" }}	
+              find /data/nimbus -type d -name '0x*' -exec chmod 0600 {}/remote_keystore.json \;	
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
-            - name: gnosis-prysm
-              mountPath: /mnt/gnosis-prysm
       containers:
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
+          image: "{{ $root.Values.cliImage.repository }}:{{ $root.Values.cliImage.tag }}"
+          imagePullPolicy: {{ $root.Values.cliImage.pullPolicy }}
+          securityContext:
+            {{- toYaml $root.Values.global.securityContext | nindent 12 }}
+          env:
+            - name: WEB3SIGNER_URL
+              value: {{ include "web3signer" $root }}
+            - name: ESO_DB_KEYSTORE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ template "validators.fullname" $root }}
+                  key: ESO_DB_KEYSTORE_URL
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          command: [ "/bin/bash" ]
+          args: ["/scripts/watcher.sh", "{{ . }}", "{{ $root.Values.validatorsNoOfKeys }}"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          {{- if $root.Values.enableWatcher }}
+            - name: watcher
+              mountPath: /scripts
+          {{- end }}
+      {{- end }}
         - name: validator
           image: "{{ (pluck $root.Values.type $root.Values.image | first ).repository }}:{{ (pluck $root.Values.type $root.Values.image | first ).tag }}"
           imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
+          {{- if eq $root.Values.type "lodestar" }}
+          command:
+            - sh
+            - -c
+            - >
+              node ./packages/cli/bin/lodestar
+            {{- range (pluck $root.Values.type $root.Values.flags | first) }}
+              {{ . }}
+            {{- end }}
+              --network={{ $root.Values.network }}
+              --proposerSettingsFile=/data/proposerConfig.yaml
+              --externalSigner.url={{ include "web3signer" $root }}
+              --rcConfig=/data/rcconfig.json
+            {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+              --beaconNodes={{ $rpcEndpoints }}
+            {{- else }}
+              {{- include "beacon-rpc-node" $ | nindent 12 }}
+            {{- end }}
+            {{- if $root.Values.metrics.enabled }}
+            {{- range (pluck $root.Values.type $root.Values.metrics.flags | first) }}
+              {{ . }}
+            {{- end }}
+            {{- end }}
+
+            {{- range (pluck $root.Values.type $root.Values.extraFlags | first) }}
+              {{ . }}
+            {{- end }}
+          {{- else }}
           args:
             {{- range (pluck $root.Values.type $root.Values.flags | first) }}
             - {{ . | quote }}
             {{- end -}}
 
-            {{- if and (eq $root.Values.type "prysm") (ne $root.Values.network "gnosis") }}
+            {{- if eq $root.Values.type "prysm" }}
             - "--{{ $root.Values.network }}"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
-            {{- else if and (eq $root.Values.type "prysm") (eq $root.Values.network "gnosis") }}
-            - "--config-file /data/config_gnosis_prysm"
-            - "--chain-config-file /data/config_gnosis_prysm"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
+            - "--proposer-settings-file=/data/proposerConfig.json"
             {{- else if eq $root.Values.type "lighthouse" }}
             - "--network={{ $root.Values.network }}"
             {{- else if eq $root.Values.type "teku" }}
             - "--network=auto"
             - "--config-file=/data/config"
-            - "--validators-external-signer-url={{ $.Values.web3signerEndpoint }}"
+            - "--validators-external-signer-url={{ include "web3signer" $root }}"
+            - "--validators-proposer-config=/data/proposerConfig.json"
+            {{- if $root.Values.enableBuilder }}
+            - "--validators-proposer-blinded-blocks-enabled=true"
             {{- end }}
-
-            {{- if eq $root.Values.type "teku" }}
-            - "--validators-proposer-default-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
-            {{- else }}
-            - "--suggested-fee-recipient={{ $.Values.suggestedFeeRecipient }}"
+            {{- else if eq $root.Values.type "nimbus" }}
+            - "--validators-dir=/data/nimbus"
+            {{- if $root.Values.enableBuilder }}
+            - "--payload-builder=true"
+            {{- end }}
             {{- end }}
 
             {{- include "validator-graffiti" $ | nindent 12 }}
 
-          {{- if $.Values.beaconChainRpcEndpointsRandomized }}
+          {{- if $root.Values.beaconChainRpcEndpointsRandomized }}
             {{- if eq $.Values.type "prysm" }}
             - "--beacon-rpc-provider={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "lighthouse" }}
             - "--beacon-nodes={{ $rpcEndpoints }}"
             {{- else if eq $.Values.type "teku" }}
-            {{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpointsRandomized }}
-            {{- if gt $beaconChainRpcEndpointsLen 1 }}
-            - "--beacon-node-api-endpoints={{ $rpcEndpoints | join "," }}"
-            {{- else }}
-            - "--beacon-node-api-endpoint={{ $rpcEndpoints }}"
+            - "--beacon-node-api-endpoints={{ $rpcEndpoints }}"
+            {{- else if eq $.Values.type "nimbus" }}
+            {{- $valuesList := split "," $rpcEndpoints }}
+            {{- range $endpoint := $valuesList }}
+            - "--beacon-node={{ $endpoint }}"
             {{- end }}
             {{- end }}
           {{- else }}
@@ -181,11 +276,13 @@ spec:
             - name: data
               mountPath: /data
       volumes:
-        - name: gnosis-prysm
+      {{- if $root.Values.enableWatcher }}
+        - name: watcher
           configMap:
-            name: {{ template "validators.fullname" $root }}-gnosis-prysm
+            name: {{ template "validators.fullname" $root }}-watcher
+      {{- end }}
         - name: data
           emptyDir: {}
-
+{{- end }}
 {{- end }}
 {{- end }}

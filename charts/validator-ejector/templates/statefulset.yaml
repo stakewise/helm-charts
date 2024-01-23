@@ -1,0 +1,201 @@
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "ejector.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: loader
+          image: "{{ .Values.global.loader.repository }}:{{ .Values.global.loader.tag }}"
+          imagePullPolicy: {{ .Values.global.loader.pullPolicy }}
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
+          env:
+            - name: EIP2335_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: eso-{{ include "common.names.fullname" . }}
+                  key: MESSAGES_PASSWORD
+            - name: ENCRYPTION
+              value: {{ .Values.loader.ENCRYPTION | quote }}
+            - name: ENCRYPT_WITH_METADATA
+              value: {{ .Values.loader.ENCRYPT_WITH_METADATA | quote }}
+            - name: BEACON_ENDPOINT
+              value: {{ .Values.loader.BEACON_ENDPOINT | quote }}
+            - name: CUSTODIAN_WEB3SIGNER_MAPPER
+              value: {{ .Values.loader.CUSTODIAN_WEB3SIGNER_MAPPER | quote }}
+            - name: STORAGE_LOCATION
+              value: {{ .Values.loader.STORAGE_LOCATION | quote }}
+            - name: FETCH_INTERVAL
+              value: {{ .Values.loader.FETCH_INTERVAL | quote }}
+            - name: LOADER_MAPPER
+              value: {{ .Values.loader.LOADER_MAPPER | quote }}
+            - name: SIGNER_MAPPER
+              value: {{ .Values.loader.SIGNER_MAPPER | quote }}
+            - name: KEY_LOADER_TYPE
+              value: {{ .Values.loader.KEY_LOADER_TYPE | quote }}
+            - name: ENCRYPTION_TYPE
+              value: {{ .Values.loader.ENCRYPTION_TYPE | quote }}
+            - name: LidoKAPI_OPERATOR_ID
+              value: {{ .Values.loader.LidoKAPI_OPERATOR_ID | quote }}
+            - name: LidoKAPI_KEYS_PERCENT
+              value: {{ .Values.loader.LidoKAPI_KEYS_PERCENT | quote }}
+          volumeMounts:
+            - name: data-ejector
+              mountPath: /data
+#        - name: init-ejector
+#          image: "{{ .Values.global.initImage.repository }}:{{ .Values.global.initImage.tag }}"
+#          imagePullPolicy: {{ .Values.global.initImage.pullPolicy }}
+#          securityContext:
+#            runAsNonRoot: false
+#            runAsUser: 0
+#          env:
+#            - name: POD_NAME
+#              valueFrom:
+#                fieldRef:
+#                  fieldPath: metadata.name
+#            - name: POD_NAMESPACE
+#              valueFrom:
+#                fieldRef:
+#                  fieldPath: metadata.namespace
+#          command:
+#            - sh
+#            - -c
+#            - >
+#              echo "Namespace: ${POD_NAMESPACE} Pod: ${POD_NAME}";
+#          {{- if and .Values.persistence.enabled .Values.initChownData }}
+#              chown -R {{ .Values.global.securityContext.runAsUser }}:{{ .Values.global.securityContext.runAsUser }} /data | true;
+#          {{- end }}
+#              echo "Loading encrypted messages from eth-exit-messages"
+#          volumeMounts:
+#            - name: data-ejector
+#              mountPath: /data
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: EXECUTION_NODE
+              value: "{{ .Values.ejector.execution }}"
+            - name: CONSENSUS_NODE
+              value: "{{ .Values.ejector.consensus }}"
+            - name: LOCATOR_ADDRESS
+              value: "{{ .Values.ejector.locatorAddress }}"
+            - name: STAKING_MODULE_ID
+              value: "{{ .Values.ejector.stakingModuleId }}"
+            - name: OPERATOR_ID
+              value: "{{ .Values.ejector.operatorId }}"
+            - name: MESSAGES_LOCATION
+              value: "{{ .Values.ejector.messagesLocation }}"
+            - name: VALIDATOR_EXIT_WEBHOOK
+              value: "{{ .Values.ejector.validatorExitWebhook }}"
+            - name: BLOCKS_PRELOAD
+              value: "{{ .Values.ejector.blocksPreload }}"
+            - name: BLOCKS_LOOP
+              value: "{{ .Values.ejector.blocksLoop }}"
+            - name: JOB_INTERVAL
+              value: "{{ .Values.ejector.jobInterval }}"
+            - name: HTTP_PORT
+              value: "{{ .Values.ejector.httpPort }}"
+            - name: RUN_METRICS
+              value: "{{ .Values.ejector.runMetrics }}"
+            - name: RUN_HEALTH_CHECK
+              value: "{{ .Values.ejector.runHealthCheck }}"
+            - name: LOGGER_LEVEL
+              value: "{{ .Values.ejector.loggerLevel }}"
+            - name: LOGGER_FORMAT
+              value: "{{ .Values.ejector.loggerFormat }}"
+            - name: DRY_RUN
+              value: "{{ .Values.ejector.dryRun }}"
+          {{- if .Values.global.externalSecrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
+          {{- if .Values.ejector.runMetrics }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.ejector.httpPort }}
+              protocol: TCP
+          {{- if .Values.ejector.runHealthCheckDISABLED }}
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 30
+            timeoutSeconds: 3
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: metrics
+            initialDelaySeconds: 15
+            timeoutSeconds: 3
+            periodSeconds: 30
+            failureThreshold: 3
+            successThreshold: 1
+          {{- end }}
+          {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data-ejector
+              mountPath: /data
+      volumes:
+        {{- if (not .Values.persistence.enabled) }}
+        - name: data-ejector
+          emptyDir: {}
+        {{- end }}
+  volumeClaimTemplates:
+    - metadata:
+        name: data-ejector
+        labels:
+          {{- include "common.labels.statefulset" . | nindent 10 }}
+      {{- with .Values.persistence.annotations }}
+        annotations:
+          {{ toYaml . | nindent 10 | trim }}
+      {{- end }}
+      spec:
+        accessModes: {{ .Values.persistence.accessModes }}
+        storageClassName: {{ .Values.persistence.storageClassName }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}

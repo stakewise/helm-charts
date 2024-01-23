@@ -1,0 +1,19 @@
+apiVersion: v2
+name: execution-beacon
+version: 1.0.0
+appVersion: 0.0.1
+kubeVersion: "^1.23.0-0"
+description: Execution and Beacon
+type: application
+keywords:
+  - ethereum
+  - blockchain
+  - nethermind
+  - prysm
+  - p2p
+home: https://www.ethereum.org/
+
+dependencies:
+  - name: common
+    repository: file://../common
+    version: 1.0.0

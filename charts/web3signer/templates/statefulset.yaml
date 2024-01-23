@@ -37,31 +37,22 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "web3signer.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -ac
             - >
               mkdir -p /data/web3signer /data/keystore;
-              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/web3signer
-          volumeMounts:
-            - name: data
-              mountPath: /data
-        - name: fetch-keys
-          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
-          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
-          securityContext:
-            runAsUser: 0
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/web3signer
           envFrom:
             - secretRef:
-                name: {{ include "common.names.fullname" . }}
-          args: ["sync-web3signer-keys", "--db-url", "{{ .Values.dbKeystoreUrl }}", "--output-dir", "/data/keystore"]
+                name: eso-{{ include "common.names.fullname" . }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -69,27 +60,55 @@ spec:
           image: "{{ .Values.flywayImage.repository }}:{{ .Values.flywayImage.tag }}"
           imagePullPolicy: {{ .Values.flywayImage.pullPolicy }}
           securityContext:
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           args:
-            - -user={{ .Values.dbUsername }}
-            - -password={{ .Values.dbPassword }}
-            - -url={{ .Values.dbUrl }}
+            - -user=$(ESO_DB_USERNAME)
+            - -password=$(ESO_DB_PASSWORD)
+            - -url=$(ESO_DB_URL)
             - migrate
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
           volumeMounts:
             - name: migrations
               mountPath: /flyway/sql
+        - name: fetch-keys
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --config-file=/config/config.yaml
+            - --logging={{ .Values.loggingLevel }}	
+            - --idle-connection-timeout-seconds={{ .Values.idleTimeout }}
             - eth2
+            - --slashing-protection-db-url=$(ESO_DB_URL)
+            - --slashing-protection-db-username=$(ESO_DB_USERNAME)
+            - --slashing-protection-db-password=$(ESO_DB_PASSWORD)
           env:
             - name: JAVA_OPTS
               value: {{ .Values.web3signerJavaOpts | quote }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.httpPort }}
@@ -122,6 +141,20 @@ spec:
               mountPath: /data
             - name: config
               mountPath: /config
+        {{- if .Values.enableReloader }}
+        - name: fetch-keys-reloader
+          image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
+          imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          args: ["sync-web3signer-keys", "--db-url", $(ESO_DB_KEYSTORE_URL), "--output-dir", "/data/keystore", "--decryption-key-env", "ESO_DECRYPTION_KEY", "--refresh-frequency", "60"]
+          volumeMounts:
+            - name: data
+              mountPath: /data
+        {{- end }}
       volumes:
         - name: config
           configMap:
@@ -132,4 +165,4 @@ spec:
         - name: data
           emptyDir:
             medium: Memory
-            sizeLimit: 128Mi
+            sizeLimit: {{ .Values.tmpfsSize }}

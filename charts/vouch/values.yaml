@@ -1,0 +1,206 @@
+# Default values for vouch.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  serviceAccount:
+    create: true
+
+image:
+  repository: attestant/vouch
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "1.7.6"
+
+## Init image is used to chown data volume, etc.
+##
+initImage:
+  repository: bash
+  tag: "5.2"
+  pullPolicy: IfNotPresent
+
+cliImage:
+  repository: nethermindeth/keystores-cli
+  tag: "v1.0.0"
+  pullPolicy: IfNotPresent
+
+externalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: secretStoreRef
+    kind: SecretStore
+  dataFrom:
+    key: vouch
+
+vouchDataDir: /data/vouch
+
+# use vouchFullConfig: to provide all vouch.yaml values
+# use vouch: to populate good defaults and to do minimal changes
+vouchFullConfig:
+vouch:
+  beaconnodeaddress: localhost:5052
+  beaconnodeaddresses:
+  - localhost:5051
+  - localhost:5052
+  loglevel: 'debug'
+  graffiti:
+    static:
+      value: 'My graffiti'
+  accountmanager:
+    dirk:
+      endpoints:
+        - dirk-1:8881
+        - dirk-2:8881
+        - dirk-3:8881
+      accounts:
+        - Validators
+      timeout: 1m
+  feerecipient:
+    defaultaddress: '0x0000000000000000000000000000000000000001'
+  metrics:
+    prometheus:
+      loglevel: 'trace'
+      listenaddress: '0.0.0.0:8081'
+  blockrelay:
+    fallbackfeerecipient: '0x0000000000000000000000000000000000000001'
+  tracing:
+  strategies:
+  submitter:
+
+relays: []
+
+imagePullSecrets: []
+
+## Provide a name in place of operator for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+## Sets logging verbosity.
+## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
+loggingLevel: "INFO"
+
+## Port on which vouch HTTP listens.
+##
+httpPort: 8881
+
+## The port (TCP) on which Prometheus accesses metrics
+##
+metricsPort: 8081
+
+livenessProbe:
+  initialDelaySeconds: 60
+  timeoutSeconds: 3
+  periodSeconds: 10
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /metrics
+    port: metrics
+    scheme: HTTP
+
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  timeoutSeconds: 3
+  periodSeconds: 5
+  failureThreshold: 3
+  successThreshold: 2
+  httpGet:
+    path: /metrics
+    port: metrics
+    scheme: HTTP
+
+
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+podSecurityContext:
+  fsGroup: 1000
+  runAsUser: 1000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  httpPort: 8881
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## Prometheus Service Monitor
+## ref: https://github.com/coreos/prometheus-operator
+##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+##
+serviceMonitor:
+  ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+  ##
+  enabled: false
+  ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+  ##
+  namespace: ""
+  ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+  ##
+  interval: 30s
+  ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+  ##
+  scrapeTimeout: ""
+  ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+  ##
+  relabellings: []
+  ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+  ##
+  metricRelabelings: []
+  ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+  ##
+  honorLabels: false
+  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+  ##
+  additionalLabels: {}

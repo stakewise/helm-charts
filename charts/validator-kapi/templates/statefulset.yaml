@@ -1,0 +1,102 @@
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "kapi.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: NODE_ENV
+              value: "{{ .Values.kapi.env }}"
+            - name: PORT
+              value: "{{ .Values.kapi.port }}"
+            {{- with .Values.postgresql }}
+            - name: DB_NAME
+              value: "{{ .auth.database }}"
+            - name: DB_HOST
+              value: "{{ .hostname }}"
+            - name: DB_USER
+              value: "{{ .auth.username }}"
+            - name: DB_PASSWORD
+              value: "{{ .auth.postgresPassword }}"
+            - name: DB_PORT
+              value: "{{ .service.ports.postgresql }}"
+            {{- end }}
+            - name: CORS_WHITELIST_REGEXP
+              value: "{{ .Values.kapi.corsWhitelistRegexp }}"
+            - name: JOB_INTERVAL_REGISTRY
+              value: "{{ .Values.kapi.jobIntervalRegistry }}"
+            - name: JOB_INTERVAL_VALIDATORS_REGISTRY
+              value: "{{ .Values.kapi.jobIntervalValidatorsRegistry }}"
+            - name: PROVIDER_JSON_RPC_MAX_BATCH_SIZE
+              value: "{{ .Values.kapi.providerJsonRpcMaxBatchSize }}"
+            - name: PROVIDER_CONCURRENT_REQUESTS
+              value: "{{ .Values.kapi.providerConcurrentRequests }}"
+            - name: PROVIDER_BATCH_AGGREGATION_WAIT_MS
+              value: "{{ .Values.kapi.providerBatchAggregationWaitMs }}"
+            - name: LOG_LEVEL
+              value: "{{ .Values.kapi.logLevel }}"
+            - name: LOG_FORMAT
+              value: "{{ .Values.kapi.logFormat }}"
+            - name: CHAIN_ID
+              value: "{{ .Values.kapi.chainId }}"
+            - name: PROVIDERS_URLS
+              value: "{{ .Values.kapi.execution }}"
+            - name: CL_API_URLS
+              value: "{{ .Values.kapi.consensus }}"
+            - name: GLOBAL_THROTTLE_TTL
+              value: "{{ .Values.kapi.globalThrottleTTL }}"
+            - name: GLOBAL_THROTTLE_LIMIT
+              value: "{{ .Values.kapi.globalThrottleLimit }}"
+            - name: GLOBAL_CACHE_TTL
+              value: "{{ .Values.kapi.globalCacheTTL }}"
+          {{- if .Values.global.externalSecrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
+          ports:
+            - name: api
+              containerPort: {{ .Values.kapi.port }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

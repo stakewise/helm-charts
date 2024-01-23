@@ -15,7 +15,7 @@ metadata:
   {{- end }}
 spec:
   groups:
-  {{- with (pluck .Values.type .Values.metrics.prometheusRule.rules | first) }}
+  {{- with .Values.metrics.prometheusRule.rules }}
     - name: {{ template "validators.fullname" $ }}
       rules: {{- tpl (toYaml .) $ | nindent 8 }}
   {{- end }}

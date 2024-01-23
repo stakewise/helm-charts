@@ -1,0 +1,15 @@
+{{- if .Values.rbac.create }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "validators.fullname" . }}-binding
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ template "validators.fullname" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "validators.serviceAccountName" . }}
+{{- end }}

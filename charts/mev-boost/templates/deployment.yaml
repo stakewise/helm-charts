@@ -26,17 +26,20 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - -{{ .Values.global.network }}
-            - -relays
-            - {{ pluck .Values.global.network .Values.relays | first }}
+            - -relay-check
+          {{- range $relay := index .Values.relays .Values.global.network }}
+            - -relay 
+            - "{{ $relay }}"
+          {{- end }}
             - -addr
             - 0.0.0.0:{{ .Values.service.port }}
             - -loglevel

@@ -1,0 +1,10 @@
+{{- if .Values.rbac.create -}}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "validators.fullname" . }}
+  labels:
+    {{- include "validators.labels" . | nindent 4 }}
+rules:
+{{- toYaml .Values.rbac.rules | nindent 0 }}
+{{- end }}

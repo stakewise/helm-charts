@@ -1,0 +1,70 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  vouch.yaml: |
+  {{- if .Values.vouchFullConfig }}
+    {{- toYaml .Values.vouchFullConfig | nindent 4 }}
+  {{- else }}
+    beacon-node-address: {{ .Values.vouch.beaconnodeaddress }}
+    {{- with .Values.vouch.beaconnodeaddresses }}
+    beacon-node-addresses:
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    log-level: {{ .Values.vouch.loglevel }}
+    graffiti:
+      static:
+        value: {{ .Values.vouch.graffiti.static.value }}
+    accountmanager:
+      dirk:
+        {{- with .Values.vouch.accountmanager.dirk.endpoints }}
+        endpoints:
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        client-cert: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/{{ include "common.names.fullname" . }}.crt
+        client-key: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/{{ include "common.names.fullname" . }}.key
+        ca-cert: file://{{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.crt
+        accounts: {{ .Values.vouch.accountmanager.dirk.accounts }}
+        timeout: {{ .Values.vouch.accountmanager.dirk.timeout }}
+    feerecipient:
+      default-address: {{ .Values.vouch.feerecipient.defaultaddress | quote }}
+    metrics:
+      prometheus:
+        log-level: {{ .Values.vouch.metrics.prometheus.loglevel }}
+        listen-address: {{ .Values.vouch.metrics.prometheus.listenaddress }}
+    blockrelay:
+      fallback-fee-recipient: {{ .Values.vouch.blockrelay.fallbackfeerecipient | quote }}
+      config:
+        url: 'file://{{ .Values.vouchDataDir }}/execution_config.json'
+    {{- if .Values.vouch.tracing }}
+    tracing:
+      {{- toYaml .Values.vouch.tracing | nindent 6 }}
+    {{- end }}
+    {{- if .Values.vouch.strategies }}
+    strategies:
+      {{- toYaml .Values.vouch.strategies | nindent 6 }}
+    {{- end }}
+    {{- if .Values.vouch.submitter }}
+    submitter:
+      {{- toYaml .Values.vouch.submitter | nindent 6 }}
+    {{- end }}
+  {{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}-scripts
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+{{ $root := . }}
+{{- range $path, $_ :=  .Files.Glob  "scripts/**.sh" }}
+{{- with $root }}
+  {{ $path | replace "scripts/" ""}}: |-
+{{ .Files.Get $path | indent 4 }}
+{{- end }}
+{{- end }}

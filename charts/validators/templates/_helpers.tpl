@@ -24,6 +24,19 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 
 {{/*
+Extract the last part of a string after the hyphen ("-"). Defining the validators owner.
+*/}}
+{{- define "validators.ownership" -}}
+{{- $fullname := .Values.fullnameOverride }}
+{{- if not $fullname }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- $fullname = printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- $parts := split "-" $fullname }}
+{{- index $parts (sub (len $parts) 1) }}
+{{- end }}
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "validators.chart" -}}
@@ -91,12 +104,13 @@ Validator beacon node
 {{- else if eq $.Values.type "lighthouse" }}
 - "--beacon-nodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- else if eq $.Values.type "teku" }}
-{{- $beaconChainRpcEndpointsLen := len $.Values.beaconChainRpcEndpoints }}
-{{- if gt $beaconChainRpcEndpointsLen 1 }}
-- "--beacon-node-api-endpoints={{ $.Values.beaconChainRpcEndpoints | join "," }}"
-{{- else }}
-- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints }}"
+- "--beacon-node-api-endpoint={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+{{- else if eq $.Values.type "nimbus" }}
+{{- range $.Values.beaconChainRpcEndpoints }}
+- "--beacon-node={{ . }}"
 {{- end }}
+{{- else if eq $.Values.type "lodestar" }}
+- "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
 {{- end }}
 {{- end }}
 
@@ -105,11 +119,16 @@ Validator graffiti
 */}}
 {{- define "validator-graffiti" -}}
 {{- if $.Values.graffiti }}
-{{- if or (eq $.Values.type "prysm") (eq $.Values.type "lighthouse") }}
-- "--graffiti={{ $.Values.graffiti }}"
-{{- else if eq $.Values.type "teku" }}
+{{- if eq $.Values.type "teku" }}
 - "--validators-graffiti={{ $.Values.graffiti }}"
+{{- else }}
+- "--graffiti={{ $.Values.graffiti }}"
 {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "web3signer" -}}
+{{- if $.Values.web3signerEndpoint }}{{ $.Values.web3signerEndpoint }}{{- else }}http://{{ $.Values.global.project }}-{{ $.Values.global.label }}-web3signer:6174
 {{- end }}
 {{- end }}
 

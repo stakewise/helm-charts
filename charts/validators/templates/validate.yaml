@@ -1,7 +1,0 @@
-{{- if and (not .Values.beaconChainRpcEndpoints) (not .Values.beaconChainRpcEndpointsRandomized) }}
-{{- fail ".Values.beaconChainRpcEndpoints is empty" }}
-{{- end }}
-
-{{- if not .Values.suggestedFeeRecipient }}
-{{- fail ".Values.suggestedFeeRecipient is empty" }}
-{{- end }}
