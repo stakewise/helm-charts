@@ -12,13 +12,14 @@ data:
 
   GCP_STORAGE_CONTENT_BUCKET: {{ .Values.settings.gcpStorageContentBucket | quote }}
   GCP_STORAGE_DOMAIN_ALIAS: {{ .Values.settings.gcpStorageDomainAlias | quote }}
-  GCP_STORAGE_EXIT_SIGNATURES_BUCKET: {{ .Values.settings.gcpStorageExitSignaturesBucket | quote }}
+  GCP_STORAGE_IPFS_BUCKET: {{ .Values.settings.gcpStorageIpfsBucket | quote }}
 
   SEND_EMAILS: {{ .Values.settings.sendEmails | quote }}
   MAILGUN_SENDER_DOMAIN: {{ .Values.settings.mailgunSenderDomain | quote }}
   MAILGUN_API_URL: {{ .Values.settings.mailgunApiUrl | quote }}
   DEFAULT_FROM_EMAIL: {{ .Values.settings.defaultFromEmail | quote }}
 
+  IPFS_FILEBASE_BUCKET: {{ .Values.settings.ipfsFilebaseBucket | quote }}
   IPFS_PINATA_PIN_ENDPOINT: {{ .Values.settings.ipfsPinataPinEndpoints | quote }}
   IPFS_FETCH_ENDPOINTS: {{ .Values.settings.ipfsFetchEndpoints | quote }}
 

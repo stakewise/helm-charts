@@ -34,7 +34,7 @@ settings:
   gcpStorageContentBucket: ""
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
-  gcpStorageExitSignaturesBucket: ""
+  gcpStorageIpfsBucket: ""
   gcpPerspectiveApiKey: ""
   gcpCloudVisionApiKey: ""
 
@@ -45,7 +45,9 @@ settings:
   ipfsInfuraClientPassword: ""
   ipfsPinataApiKey: ""
   ipfsPinataSecretKey: ""
-  ipfsWeb3StorageToken: ""
+  ipfsFilebaseBucket: ""
+  ipfsFilebaseAPIToken: ""
+  ipfsQuikcnodeAPIToken: ""
 
   executionEndpoints: ""
   consensusEndpoints: ""
