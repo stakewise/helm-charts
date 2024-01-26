@@ -97,7 +97,7 @@ image:
   repository: sigp/lighthouse
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v4.5.0"
+  tag: "v4.6.0"
 
 imagePullSecrets: []
 nameOverride: ""
