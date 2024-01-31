@@ -113,7 +113,7 @@ image:
   prysm:
     registry: "gcr.io"
     repository: "prysmaticlabs/prysm/validator"
-    tag: "v4.2.0"
+    tag: "v4.2.1"
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
