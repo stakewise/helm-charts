@@ -153,11 +153,7 @@ svc:
               port:
                 number: 6061
 
-svc_lb:
-  enabled: false
-  clustertype: LoadBalancer
-  hostname: integration.juno.prod
-  wss_hostname: integration-wss.juno.prod
+
 
 ### Horizontal pod scaling
 hpa:
