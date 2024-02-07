@@ -25,4 +25,4 @@ data:
   MAX_FEE_PER_GAS_GWEI: {{ .Values.settings.maxFeePerGasGwei | quote }}
   {{- if .Values.settings.sentryDSN }}
   SENTRY_DSN: {{ .Values.settings.sentryDSN | quote }}
-  {{- else }}
+  {{- end }}
