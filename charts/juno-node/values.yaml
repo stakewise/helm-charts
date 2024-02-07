@@ -84,13 +84,14 @@ serviceAccount:
 ### Networking Service
 svc:
   globalStaticIpName: ""
+  globalStaticInternalIpName: ""
   rpc:
     clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
     port: "6060"
     backendConfig:
       timeoutSec: 400
       sessionAffinity:
-        affinityType: "CLIENT_IP"
+        affinityType: "GENERATED_COOKIE"
       connectionDraining:
         drainingTimeoutSec: 300
       healthCheck:
@@ -108,14 +109,10 @@ svc:
         - "X-XSS-Protection: 1; mode=block"
         - "Referrer-Policy: no-referrer-when-downgrade"
         - "Strict-Transport-Security: max-age=63072000; includeSubDomains; preload"
-        
-  wss:
-    clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
-    port: "6061"
-    backendConfig:
+    internalBackendConfig:
       timeoutSec: 400
       sessionAffinity:
-        affinityType: "CLIENT_IP"
+        affinityType: "GENERATED_COOKIE"
       connectionDraining:
         drainingTimeoutSec: 300
       healthCheck:
@@ -125,10 +122,43 @@ svc:
         unhealthyThreshold: 2 
         port: 6060
         type: HTTP
+        requestPath: /
+        
+  wss:
+    clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
+    port: "6061"
+    backendConfig:
+      timeoutSec: 400
+      sessionAffinity:
+        affinityType: "GENERATED_COOKIE"
+      connectionDraining:
+        drainingTimeoutSec: 300
+      healthCheck:
+        checkIntervalSec: 15
+        timeoutSec: 15
+        healthyThreshold: 1
+        unhealthyThreshold: 2 
+        port: 6060
+        type: HTTP
+    internalBackendConfig:
+      timeoutSec: 400
+      sessionAffinity:
+        affinityType: "GENERATED_COOKIE"
+      connectionDraining:
+        drainingTimeoutSec: 300
+      healthCheck:
+        checkIntervalSec: 15
+        timeoutSec: 15
+        healthyThreshold: 1
+        unhealthyThreshold: 2 
+        port: 6060
+        type: HTTP
+        requestPath: /
     ## ALB Ingress Rules
     # Ingress
   ingress:
     enabled: true
+    internal: false
     host: "test.juno.rpc.nethermind.dev"
     extraHost:
       enabled: false
@@ -181,3 +211,4 @@ env:
   data:
   - name: NETWORK
     value: "juno"
+

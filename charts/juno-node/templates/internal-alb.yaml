@@ -1,0 +1,88 @@
+{{- if and $.Values.svc.ingress.enabled (or .Values.svc.ingress.internal ) -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.projectName }}
+  annotations:
+    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.rpc.port }}":"{{ .Values.deployment.projectName }}-internal"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: {{ .Values.svc.rpc.clustertype }}
+  ports:
+  - port: {{ .Values.svc.rpc.port }}
+    name: port-{{ .Values.svc.rpc.port }}
+    targetPort: {{ .Values.svc.rpc.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.deployment.projectName }}
+    
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal-wss
+  namespace: {{ .Values.deployment.namespace }}
+  labels:
+    app: {{ .Values.deployment.projectName }}
+  annotations:
+    cloud.google.com/backend-config:  '{"ports": {"{{ $.Values.svc.wss.port }}":"{{ .Values.deployment.projectName }}-internal-wss"}}'
+    cloud.google.com/neg: '{"ingress": true}'
+spec:
+  type: {{ .Values.svc.wss.clustertype }}
+  ports:
+  - port: {{ .Values.svc.wss.port }}
+    name: port-{{ .Values.svc.wss.port }}
+    targetPort: {{ .Values.svc.wss.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.deployment.projectName }}
+
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+{{ toYaml .Values.svc.rpc.internalBackendConfig | indent 2 }}
+
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal-wss
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+{{ toYaml .Values.svc.wss.internalBackendConfig | indent 2 }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.deployment.projectName }}-internal-alb
+  namespace: {{ .Values.deployment.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: "gce-internal"
+    {{- if .Values.svc.globalStaticInternalIpName }}
+    kubernetes.io/ingress.global-static-ip-name: "{{ $.Values.svc.globalStaticInternalIpName }}"
+    {{- end }}
+spec:
+  defaultBackend:
+    service:
+      name: {{ .Values.deployment.projectName }}-internal
+      port:
+        number: {{ .Values.svc.rpc.port }}
+  rules:
+  - http:
+      paths:
+       - path: /ws
+         pathType: ImplementationSpecific
+         backend:
+           service:
+             name: {{ .Values.deployment.projectName }}-internal-wss
+             port:
+               number: {{ .Values.svc.wss.port }}           
+{{- end -}}
