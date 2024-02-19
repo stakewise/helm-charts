@@ -3,19 +3,19 @@
 # Declare variables to be passed into your templates.
 
 global:
-  # Options: mainnet, goerli, sepolia
+  # -- Options: mainnet, goerli, sepolia
   network: "mainnet"
 
-  ## Credentials to fetch images from private registry
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-  ##
+  # -- Credentials to fetch images from private registry
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  #
   imagePullSecrets: []
 
   serviceAccount:
     create: true
-  ## Pod Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  ##
+  # -- Pod Security Context
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 10000
@@ -28,22 +28,22 @@ global:
     capabilities:
       drop:
       - ALL
-      
-# Relay URLs
+
+# -- Relay URLs
 relays:
-  mainnet: 
+  mainnet:
     # Flashbots
     - "https://0xac6e77dfe25ecd6110b8e780608cce0dab71fdd5ebea22a16c0205200f2f8e2e3ad3b71d3499c54ad14d6c21b41a37ae@boost-relay.flashbots.net"
-  goerli: 
+  goerli:
     - "https://0xafa4c6985aa049fb79dd37010438cfebeb0f2bd42b115b89dd678dab0670c1de38da0c4e9138c9290a398ecd9a0b3110@builder-relay-goerli.flashbots.net"
-  sepolia: 
+  sepolia:
     - "https://0x845bd072b7cd566f02faeb0a4033ce9399e42839ced64e8b2adcfc859ed1e8e1a5a293336a49feac6d9a5edb779be53a@builder-relay-sepolia.flashbots.net"
 
-# minimum loglevel: trace, debug, info, warn/warning, error, fatal, panic
+# -- minimum loglevel: trace, debug, info, warn/warning, error, fatal, panic
 logLevel: info
 
-## Extra flags for mev-boost
-##
+# -- Extra flags for mev-boost
+#
 extraFlags: []
 
 replicaCount: 1
@@ -51,7 +51,7 @@ replicaCount: 1
 image:
   repository: flashbots/mev-boost
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Overrides the image tag whose default is the chart appVersion.
   tag: "1.6"
 
 imagePullSecrets: []
@@ -59,11 +59,11 @@ nameOverride: ""
 fullnameOverride: ""
 
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
@@ -73,11 +73,11 @@ service:
   type: ClusterIP
   port: 18550
 
+# -- We usually recommend not to specify default resources and to leave this as a conscious
+# choice for the user. This also increases chances charts run on environments with little
+# resources, such as Minikube. If you do want to specify resources, uncomment the following
+# lines, adjust them as necessary, and remove the curly braces after 'resources:'.
 resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
   # limits:
   #   cpu: 100m
   #   memory: 128Mi

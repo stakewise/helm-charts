@@ -1,4 +1,4 @@
-rpcSaas: 
+rpcSaas:
   clustersecretstore:
     projectID: dummy
     clusterLocation: dummy

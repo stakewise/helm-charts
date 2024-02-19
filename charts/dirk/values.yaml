@@ -5,24 +5,40 @@
 global:
   serviceAccount:
     create: true
+  # -- Pod Security Context
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+    capabilities:
+      drop:
+      - ALL
 
 replicaCount: 3
 
 image:
   repository: attestant/dirk
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
+  # -- Overrides the image tag whose default is the chart appVersion.
   tag: "1.2.0"
 
-## Init image is used to chown data volume, etc.
-##
+# -- Init image is used to chown data volume, etc.
+#
 initImage:
   repository: bash
   tag: "5.2"
   pullPolicy: IfNotPresent
 
-## CLI image is used to fetch private keys.
-##
+# -- CLI image is used to fetch private keys.
+#
 cliImage:
   repository: nethermindeth/keystores-cli
   tag: "v1.0.0"
@@ -45,24 +61,24 @@ dirk:
 
 imagePullSecrets: []
 
-## Provide a name in place of operator for `app:` labels
-##
+# -- Provide a name in place of operator for `app:` labels
+#
 nameOverride: ""
 
-## Provide a name to substitute for the full names of resources
-##
+# -- Provide a name to substitute for the full names of resources
+#
 fullnameOverride: ""
 
-## Sets logging verbosity.
-## Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
+# -- Sets logging verbosity.
+# Log levels are OFF, FATAL, WARN, INFO, DEBUG, TRACE, ALL.
 loggingLevel: "INFO"
 
-## Port on which dirk HTTP listens.
-##
+# -- Port on which dirk HTTP listens.
+#
 httpPort: 8881
 
-## The port (TCP) on which Prometheus accesses metrics
-##
+# -- The port (TCP) on which Prometheus accesses metrics
+#
 metricsPort: 9000
 
 readinessProbe:
@@ -95,39 +111,24 @@ livenessProbe:
   failureThreshold: 1
 
 
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
+# -- ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+#
 serviceAccount:
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
 podAnnotations: {}
 
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-podSecurityContext:
-  fsGroup: 1000
-  runAsUser: 1000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
 service:
   type: ClusterIP
   httpPort: 8881
 
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-##
+# -- Configure resource requests and limits.
+# ref: http://kubernetes.io/docs/user-guide/compute-resources/
+#
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -140,47 +141,47 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
+# -- Node labels for pod assignment
+# ref: https://kubernetes.io/docs/user-guide/node-selection/
+#
 nodeSelector: {}
 
-## Tolerations for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
+# -- Tolerations for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#
 tolerations: {}
 
-## Affinity for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-##
+# -- Affinity for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+#
 affinity: {}
 
-## Prometheus Service Monitor
-## ref: https://github.com/coreos/prometheus-operator
-##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-##
+# -- Prometheus Service Monitor
+# ref: https://github.com/coreos/prometheus-operator
+#      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+#
 serviceMonitor:
-  ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-  ##
+  # -- Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+  #
   enabled: false
-  ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
-  ##
+  # -- The namespace in which the ServiceMonitor will be created
+  #
   namespace: ""
-  ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
-  ##
+  # -- The interval at which metrics should be scraped
+  #
   interval: 30s
-  ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
-  ##
+  # -- The timeout after which the scrape is ended
+  #
   scrapeTimeout: ""
-  ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
-  ##
+  # -- RelabelConfigs to apply to samples before scraping.
+  #
   relabellings: []
-  ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
-  ##
+  # -- Metrics RelabelConfigs to apply to samples before ingestion.
+  #
   metricRelabelings: []
-  ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
-  ##
+  # -- Specify honorLabels parameter to add the scrape endpoint
+  #
   honorLabels: false
-  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-  ##
+  # -- Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+  #
   additionalLabels: {}

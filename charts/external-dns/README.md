@@ -1,118 +1,104 @@
-# ExternalDNS
+# external-dns
 
-[ExternalDNS](https://github.com/kubernetes-sigs/external-dns/) synchronizes exposed Kubernetes Services and Ingresses with DNS providers.
+![Version: 1.13.1](https://img.shields.io/badge/Version-1.13.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.13.5](https://img.shields.io/badge/AppVersion-0.13.5-informational?style=flat-square)
 
-## Installing the Chart
+ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with DNS providers.
 
-Before you can install the chart you will need to add the `external-dns` repo to [Helm](https://helm.sh/).
+**Homepage:** <https://github.com/kubernetes-sigs/external-dns/>
 
-```shell
-helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
-```
+## Maintainers
 
-After you've installed the repo you can install the chart.
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Manjeet-Nethermind | <manjeet@nethermind.io> |  |
+| gehlotanish | <anish@nethermind.io> |  |
 
-```shell
-helm upgrade --install external-dns external-dns/external-dns
-```
+## Source Code
 
-## Configuration
+* <https://github.com/kubernetes-sigs/external-dns/>
 
-The following table lists the configurable parameters of the _ExternalDNS_ chart and their default values.
+## Values
 
-| Parameter                          | Description                                                                                                                                                                                                                                                                                                           | Default                                     |
-|------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------|
-| `image.repository`                 | Image repository.                                                                                                                                                                                                                                                                                                     | `registry.k8s.io/external-dns/external-dns` |
-| `image.tag`                        | Image tag, will override the default tag derived from the chart app version.                                                                                                                                                                                                                                          | `""`                                        |
-| `image.pullPolicy`                 | Image pull policy.                                                                                                                                                                                                                                                                                                    | `IfNotPresent`                              |
-| `imagePullSecrets`                 | Image pull secrets.                                                                                                                                                                                                                                                                                                   | `[]`                                        |
-| `nameOverride`                     | Override the `name` of the chart.                                                                                                                                                                                                                                                                                     | `""`                                        |
-| `fullnameOverride`                 | Override the `fullname` of the chart.                                                                                                                                                                                                                                                                                 | `""`                                        |
-| `serviceAccount.create`            | If `true`, create a new `serviceaccount`.                                                                                                                                                                                                                                                                             | `true`                                      |
-| `serviceAccount.annotations`       | Annotations to add to the service account.                                                                                                                                                                                                                                                                            | `{}`                                        |
-| `serviceAccount.labels`            | Labels to add to the service account.                                                                                                                                                                                                                                                                                 | `{}`                                        |
-| `serviceAccount.name`              | Service account to be used. If not set and `serviceAccount.create` is `true`, a name is generated using the full name template.                                                                                                                                                                                       | `""`                                        |
-| `rbac.create`                      | If `true`, create the RBAC resources.                                                                                                                                                                                                                                                                                 | `true`                                      |
-| `rbac.additionalPermissions`       | Additional permissions to be added to the cluster role.                                                                                                                                                                                                                                                               | `{}`                                        |
-| `initContainers`                   | Add init containers to the pod.                                                                                                                                                                                                                                                                                       | `[]`                                        |
-| `deploymentAnnotations`            | Annotations to add to the Deployment.                                                                                                                                                                                                                                                                                 | `{}`                                        |
-| `podLabels`                        | Labels to add to the pod.                                                                                                                                                                                                                                                                                             | `{}`                                        |
-| `podAnnotations`                   | Annotations to add to the pod.                                                                                                                                                                                                                                                                                        | `{}`                                        |
-| `podSecurityContext`               | Security context for the pod, this supports the full [PodSecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#podsecuritycontext-v1-core) API.                                                                                                                                       | _see values.yaml_                           |
-| `shareProcessNamespace`            | If `true` enable [Process Namespace Sharing](https://kubernetes.io/docs/tasks/configure-pod-container/share-process-namespace/)                                                                                                                                                                                       | `false`                                     |
-| `securityContext`                  | Security context for the _external-dns_ container, this supports the full [SecurityContext](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#securitycontext-v1-core) API.                                                                                                                        | _see values.yaml_                           |
-| `priorityClassName`                | Priority class name to use for the pod.                                                                                                                                                                                                                                                                               | `""`                                        |
-| `terminationGracePeriodSeconds`    | Termination grace period for the pod.                                                                                                                                                                                                                                                                                 | `null`                                      |
-| `serviceMonitor.enabled`           | If `true`, create a _Prometheus_ service monitor.                                                                                                                                                                                                                                                                     | `false`                                     |
-| `serviceMonitor.namespace`         | Forced namespace for ServiceMonitor.                                                                                                                                                                                                                                                                                  | `null`                                      |
-| `serviceMonitor.annotations`       | Annotations to be set on the ServiceMonitor.                                                                                                                                                                                                                                                                          | `{}`                                        |
-| `serviceMonitor.additionalLabels`  | Additional labels to be set on the ServiceMonitor.                                                                                                                                                                                                                                                                    | `{}`                                        |
-| `serviceMonitor.interval`          | _Prometheus_ scrape frequency.                                                                                                                                                                                                                                                                                        | `null`                                      |
-| `serviceMonitor.scrapeTimeout`     | _Prometheus_ scrape timeout.                                                                                                                                                                                                                                                                                          | `null`                                      |
-| `serviceMonitor.scheme`            | _Prometheus_ scrape scheme.                                                                                                                                                                                                                                                                                           | `null`                                      |
-| `serviceMonitor.tlsConfig`         | _Prometheus_ scrape tlsConfig.                                                                                                                                                                                                                                                                                        | `{}`                                        |
-| `serviceMonitor.metricRelabelings` | _Prometheus_ scrape metricRelabelings.                                                                                                                                                                                                                                                                                | `[]`                                        |
-| `serviceMonitor.relabelings`       | _Prometheus_ scrape relabelings.                                                                                                                                                                                                                                                                                      | `[]`                                        |
-| `serviceMonitor.targetLabels`      | _Prometheus_ scrape targetLabels.                                                                                                                                                                                                                                                                                     | `[]`                                        |
-| `env`                              | [Environment variables](https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/) for the _external-dns_ container, this supports the full [EnvVar](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#envvar-v1-core) API including secrets and configmaps. | `[]`                                        |
-| `livenessProbe`                    | [Liveness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) for the _external-dns_ container, this supports the full [Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#probe-v1-core) API.                                     | See _values.yaml_                           |
-| `readinessProbe`                   | [Readiness probe](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) for the _external-dns_ container, this supports the full [Probe](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#probe-v1-core) API.                                    | See _values.yaml_                           |
-| `service.annotations`              | Annotations to add to the service.                                                                                                                                                                                                                                                                                    | `{}`                                        |
-| `service.port`                     | Port to expose via the service.                                                                                                                                                                                                                                                                                       | `7979`                                      |
-| `extraVolumes`                     | Additional volumes for the pod, this supports the full [VolumeDevice](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#volumedevice-v1-core) API.                                                                                                                                                 | `[]`                                        |
-| `extraVolumeMounts`                | Additional volume mounts for the _external-dns_ container, this supports the full [VolumeMount](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#volumemount-v1-core) API.                                                                                                                        | `[]`                                        |
-| `resources`                        | Resource requests and limits for the _external-dns_ container, this supports the full [ResourceRequirements](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#resourcerequirements-v1-core) API.                                                                                                  | `{}`                                        |
-| `nodeSelector`                     | Node labels for pod assignment.                                                                                                                                                                                                                                                                                       | `{}`                                        |
-| `tolerations`                      | Tolerations for pod assignment, this supports the full [Toleration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#toleration-v1-core) API.                                                                                                                                                     | `[]`                                        |
-| `affinity`                         | Affinity settings for pod assignment, this supports the full [Affinity](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#affinity-v1-core) API.                                                                                                                                                   | `{}`                                        |
-| `topologySpreadConstraints`        | TopologySpreadConstraint settings for pod assignment, this supports the full [TopologySpreadConstraints](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.22/#topologyspreadconstraint-v1-core) API.                                                                                                  | `[]`                                        |
-| `logLevel`                         | Verbosity of the logs, available values are: `panic`, `debug`, `info`, `warning`, `error`, `fatal`.                                                                                                                                                                                                                   | `info`                                      |
-| `logFormat`                        | Formats of the logs, available values are: `text`, `json`.                                                                                                                                                                                                                                                            | `text`                                      |
-| `interval`                         | The interval for DNS updates.                                                                                                                                                                                                                                                                                         | `1m`                                        |
-| `triggerLoopOnEvent`               | When enabled, triggers run loop on create/update/delete events in addition of regular interval.                                                                                                                                                                                                                       | `false`                                     |
-| `namespaced`                       | When enabled, external-dns runs on namespace scope. Additionally, Role and Rolebinding will be namespaced, too.                                                                                                                                                                                                       | `false`                                     |
-| `sources`                          | K8s resources type to be observed for new DNS entries.                                                                                                                                                                                                                                                                | See _values.yaml_                           |
-| `policy`                           | How DNS records are synchronized between sources and providers, available values are: `sync`, `upsert-only`.                                                                                                                                                                                                          | `upsert-only`                               |
-| `registry`                         | Registry Type, available types are: `txt`, `noop`.                                                                                                                                                                                                                                                                    | `txt`                                       |
-| `txtOwnerId`                       | TXT registry identifier.                                                                                                                                                                                                                                                                                              | `""`                                        |
-| `txtPrefix`                        | Prefix to create a TXT record with a name following the pattern `prefix.<CNAME record>`.                                                                                                                                                                                                                              | `""`                                        |
-| `domainFilters`                    | Limit possible target zones by domain suffixes.                                                                                                                                                                                                                                                                       | `[]`                                        |
-| `provider`                         | DNS provider where the DNS records will be created, for the available providers and how to configure them see the [README](https://github.com/kubernetes-sigs/external-dns#deploying-to-a-cluster) (this can be templated).                                                                                           | `aws`                                       |
-| `extraArgs`                        | Extra arguments to pass to the _external-dns_ container, these are needed for provider specific arguments (these can be templated).                                                                                                                                                                                   | `[]`                                        |
-| `deploymentStrategy`               | .spec.strategy of the external-dns Deployment. Defaults to 'Recreate' since multiple external-dns pods may conflict with each other.                                                                                                                                                                                  | `{type: Recreate}`                          |
-| `secretConfiguration.enabled`      | Enable additional secret configuration.                                                                                                                                                                                                                                                                               | `false`                                     |
-| `secretConfiguration.mountPath`    | Mount path of secret configuration secret (this can be templated).                                                                                                                                                                                                                                                    | `""`                                        |
-| `secretConfiguration.data`         | Secret configuration secret data. Could be used to store DNS provider credentials.                                                                                                                                                                                                                                    | `{}`                                        |
-| `secretConfiguration.subPath`      | Sub-path of secret configuration secret (this can be templated).                                                                                                                                                                                                                                                      | `""`                                        |
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity | object | `{}` |  |
+| commonLabels | object | `{}` |  |
+| deploymentAnnotations | object | `{}` |  |
+| deploymentStrategy.type | string | `"Recreate"` |  |
+| dnsPolicy | string | `nil` |  |
+| domainFilters | list | `[]` |  |
+| env | list | `[]` |  |
+| extraArgs | list | `[]` |  |
+| extraVolumeMounts | list | `[]` |  |
+| extraVolumes | list | `[]` |  |
+| fullnameOverride | string | `""` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"registry.k8s.io/external-dns/external-dns"` |  |
+| image.tag | string | `""` |  |
+| imagePullSecrets | list | `[]` |  |
+| initContainers | list | `[]` |  |
+| interval | string | `"1m"` |  |
+| livenessProbe.failureThreshold | int | `2` |  |
+| livenessProbe.httpGet.path | string | `"/healthz"` |  |
+| livenessProbe.httpGet.port | string | `"http"` |  |
+| livenessProbe.initialDelaySeconds | int | `10` |  |
+| livenessProbe.periodSeconds | int | `10` |  |
+| livenessProbe.successThreshold | int | `1` |  |
+| livenessProbe.timeoutSeconds | int | `5` |  |
+| logFormat | string | `"text"` |  |
+| logLevel | string | `"info"` |  |
+| nameOverride | string | `""` |  |
+| namespaced | bool | `false` |  |
+| nodeSelector | object | `{}` |  |
+| podAnnotations | object | `{}` |  |
+| podLabels | object | `{}` |  |
+| podSecurityContext.fsGroup | int | `65534` |  |
+| podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
+| policy | string | `"upsert-only"` |  |
+| priorityClassName | string | `""` |  |
+| provider | string | `"google"` |  |
+| rbac.additionalPermissions | list | `[]` |  |
+| rbac.create | bool | `true` |  |
+| readinessProbe.failureThreshold | int | `6` |  |
+| readinessProbe.httpGet.path | string | `"/healthz"` |  |
+| readinessProbe.httpGet.port | string | `"http"` |  |
+| readinessProbe.initialDelaySeconds | int | `5` |  |
+| readinessProbe.periodSeconds | int | `10` |  |
+| readinessProbe.successThreshold | int | `1` |  |
+| readinessProbe.timeoutSeconds | int | `5` |  |
+| registry | string | `"txt"` |  |
+| resources | object | `{}` |  |
+| secretConfiguration.data | object | `{}` |  |
+| secretConfiguration.enabled | bool | `false` |  |
+| secretConfiguration.mountPath | string | `""` |  |
+| secretConfiguration.subPath | string | `""` |  |
+| securityContext.allowPrivilegeEscalation | bool | `false` |  |
+| securityContext.capabilities.drop[0] | string | `"ALL"` |  |
+| securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `65534` |  |
+| service.annotations | object | `{}` |  |
+| service.port | int | `7979` |  |
+| serviceAccount.annotations."iam.gke.io/gcp-service-account" | string | `"external-dns@juno-dev-nth.iam.gserviceaccount.com"` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.labels | object | `{}` |  |
+| serviceAccount.name | string | `""` |  |
+| serviceMonitor.additionalLabels | object | `{}` |  |
+| serviceMonitor.annotations | object | `{}` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.metricRelabelings | list | `[]` |  |
+| serviceMonitor.relabelings | list | `[]` |  |
+| serviceMonitor.targetLabels | list | `[]` |  |
+| shareProcessNamespace | bool | `false` |  |
+| sources[0] | string | `"service"` |  |
+| sources[1] | string | `"ingress"` |  |
+| terminationGracePeriodSeconds | string | `nil` |  |
+| tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` |  |
+| triggerLoopOnEvent | bool | `false` |  |
+| txtOwnerId | string | `""` |  |
+| txtPrefix | string | `""` |  |
+| txtSuffix | string | `""` |  |
 
-## Namespaced scoped installation
-
-external-dns supports running on a namespaced only scope, too.
-If `namespaced=true` is defined, the helm chart will setup `Roles` and `RoleBindings` instead `ClusterRoles` and `ClusterRoleBindings`.
-
-### Limited supported
-Not all sources are supported in namespaced scope, since some sources depends on cluster-wide resources.
-For example: Source `node` isn't supported, since `kind: Node` has scope `Cluster`.
-Sources like `istio-virtualservice` only work, if all resources like `Gateway` and `VirtualService` are present in the same
-namespaces as `external-dns`.
-
-The annotation `external-dns.alpha.kubernetes.io/endpoints-type: NodeExternalIP` is not supported.
-
-If `namespaced` is set to `true`, please ensure that `sources` my only contains supported sources (Default: `service,ingress`.
-
-### Support matrix
-
-| Source                 | Supported | Infos                  |
-|------------------------|-----------|------------------------|
-| `ingress`              | ✅         |                        |
-| `istio-gateway`        | ✅         |                        |
-| `istio-virtualservice` | ✅         |                        |
-| `crd`                  | ✅         |                        |
-| `kong-tcpingress`      | ✅         |                        |
-| `openshift-route`      | ✅         |                        |
-| `skipper-routegroup`   | ✅         |                        |
-| `gloo-proxy`           | ✅         |                        |
-| `contour-httpproxy`    | ✅         |                        |
-| `service`              | ⚠️️       | NodePort not supported |
-| `node`                 | ❌         |                        |
-| `pod`                  | ❌         |                        |
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.12.0](https://github.com/norwoodj/helm-docs/releases/v1.12.0)

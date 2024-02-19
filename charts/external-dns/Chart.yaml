@@ -2,7 +2,7 @@ apiVersion: v2
 name: external-dns
 description: ExternalDNS synchronizes exposed Kubernetes Services and Ingresses with DNS providers.
 type: application
-version: 1.13.0
+version: 1.13.1
 appVersion: 0.13.5
 keywords:
   - kubernetes
@@ -16,8 +16,10 @@ icon: https://github.com/kubernetes-sigs/external-dns/raw/master/docs/img/extern
 sources:
   - https://github.com/kubernetes-sigs/external-dns/
 maintainers:
-  - name: stevehipwell
-    email: steve.hipwell@gmail.com
+  - name: Manjeet-Nethermind
+    email: manjeet@nethermind.io
+  - name: gehlotanish
+    email: anish@nethermind.io
 annotations:
   artifacthub.io/changes: |
     - kind: changed

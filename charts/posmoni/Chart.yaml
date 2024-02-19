@@ -2,15 +2,15 @@ apiVersion: v2
 name: posmoni
 description: A Helm chart for installing and configuring Posmoni
 type: application
-version: 1.0.0
+version: 1.0.1
 appVersion: "v0.0.1"
-
 keywords:
   - ethereum
-
 home: https://nethermind.io/
-
 dependencies:
 - name: common
   repository: file://../common
-  version: 1.0.0
+  version: 1.0.1
+maintainers:
+  - name: matilote
+  - name: aivarasko

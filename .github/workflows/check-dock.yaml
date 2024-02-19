@@ -1,0 +1,27 @@
+name: Helm Docs Check
+
+on:
+  pull_request
+
+jobs:
+  helm-docs-validation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      - name: Run helm-docs
+        run: docker run --rm --volume "$(pwd):/helm-docs" -u "$(id -u)" jnorwood/helm-docs:latest   
+
+      - name: Check for unstaged changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Unstaged changes detected. Please update the Helm chart documentation in your PR."
+            exit 1
+          else
+            echo "No unstaged changes detected. Documentation is up-to-date."
+          fi

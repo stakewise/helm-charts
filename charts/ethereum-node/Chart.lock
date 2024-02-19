@@ -1,0 +1,9 @@
+dependencies:
+- name: nethermind
+  repository: https://ethpandaops.github.io/ethereum-helm-charts
+  version: 1.0.9
+- name: prysm
+  repository: https://ethpandaops.github.io/ethereum-helm-charts
+  version: 1.1.1
+digest: sha256:f750d4f14a7426dc1f35996a3bcd9cd78b8d7f88481a4a2938dcf56ea7a4dc07
+generated: "2024-01-24T15:59:22.691251+01:00"

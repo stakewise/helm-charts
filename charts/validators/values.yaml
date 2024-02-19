@@ -7,9 +7,9 @@ global:
   project: ""
   imagePullSecrets: []
   network: mainnet
-  ## Pod Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  ##
+  # -- Pod Security Context
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 10000
@@ -23,39 +23,39 @@ global:
       drop:
       - ALL
 
-## Provide a name in place of operator for `app:` labels
-##
+# -- Provide a name in place of operator for `app:` labels
+#
 nameOverride: ""
 
-## Provide a name to substitute for the full names of resources
-##
+# -- Provide a name to substitute for the full names of resources
+#
 fullnameOverride: ""
 
-## RBAC configuration.
-## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-##
+# -- RBAC configuration.
+# ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+#
 rbac:
   create: true
-  name: ""	
-  rules:	
-    - apiGroups: [""]	
-      resources:	
-      - "services"	
-      - "pods"	
-      verbs:	
-      - "list"	
-      - "get"	
+  name: ""
+  rules:
+    - apiGroups: [""]
+      resources:
+      - "services"
+      - "pods"
+      verbs:
+      - "list"
+      - "get"
       - "patch"
 
-## Init image is used to chown data volume, initialise genesis, etc.
-##
+# -- Init image is used to chown data volume, initialise genesis, etc.
+#
 initImageBusybox:
   repository: "busybox"
   tag: "1.36"
   pullPolicy: IfNotPresent
 
-## CLI image is used to fetch public keys.
-##
+# -- CLI image is used to fetch public keys.
+#
 cliImage:
   repository: nethermindeth/keystores-cli
   tag: "v1.0.0"
@@ -68,122 +68,122 @@ externalSecrets:
     kind: secretStoreKind
   data: []
 
-## Configuration for validators
-## ref: https://lighthouse-book.sigmaprime.io/validator-management.html
-## ref: https://docs.prylabs.network/docs/getting-started
-##
+# Configuration for validators
+# ref: https://lighthouse-book.sigmaprime.io/validator-management.html
+# ref: https://docs.prylabs.network/docs/getting-started
+#
 
-## Whether to enable validator statefulset or not
-## Can be used to temporarily disable validators
-## until synchronization of eth1/eth2 nodes is complete
-##
+# -- Whether to enable validator statefulset or not
+# Can be used to temporarily disable validators
+# until synchronization of eth1/eth2 nodes is complete
+#
 enabled: true
 
-## What type of validator to use.
-## Options for Ethereum: prysm, lighthouse, teku, nimbus, lodestar
-## Options for Gnosis: teku, lighthouse, nimbus
-##
+# -- What type of validator to use.
+# Options for Ethereum: prysm, lighthouse, teku, nimbus, lodestar
+# Options for Gnosis: teku, lighthouse, nimbus
+#
 type: teku
 
-## If you want to run multiple validator types (e.g lighouse, teku,...)
-## you need to adjust the key index to prevent double signing.
-## Please be careful with this setting and be aware of boundaries
-## of each validator client you would like to run.
-##
-## Example:
-## - 700 Keys in Web3Signer database
-## - 4 Lighthouse validators
-## - 3 Prysm validators
-##
-## Deployment 1 => validatorsKeyIndex: 0
-##                 validatorsCount: 4
-##                 type: lighthouse
-##
-## Deployment 2 => validatorsKeyIndex: 4
-##                 validatorsCount: 3
-##                 type: prysm
-##
-## **NB! If you not fully understand what is done here, keep this value at 0 and set validatorsCount to the maximum of
-## your keys and do not spin up this Chart multiple times!
+# -- If you want to run multiple validator types (e.g lighouse, teku,...)
+# you need to adjust the key index to prevent double signing.
+# Please be careful with this setting and be aware of boundaries
+# of each validator client you would like to run.
+#
+# Example:
+# - 700 Keys in Web3Signer database
+# - 4 Lighthouse validators
+# - 3 Prysm validators
+#
+# Deployment 1 => validatorsKeyIndex: 0
+#                 validatorsCount: 4
+#                 type: lighthouse
+#
+# Deployment 2 => validatorsKeyIndex: 4
+#                 validatorsCount: 3
+#                 type: prysm
+#
+# **NB! If you not fully understand what is done here, keep this value at 0 and set validatorsCount to the maximum of
+# your keys and do not spin up this Chart multiple times!
 validatorsKeyIndex: 0
 
-## How many validators to run
-## **NB! Each validtor hosts a certain number of keys specified when using CLI sync-db command,
-## so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
-##
+# -- How many validators to run
+# **NB! Each validtor hosts a certain number of keys specified when using CLI sync-db command,
+# so the number of validators must be >= (total number of validator keys) / validator capacity specified in CLI
+#
 validatorsCount: 0
 
 validatorsNoOfKeys: 100
 
-## Whether a builder should be used for proposalConfig
+# -- Whether a builder should be used for proposalConfig
 enableBuilder: false
 
-## Validators image version
-## ref: https://gcr.io/prysmaticlabs/prysm/validator
-## ref: https://hub.docker.com/r/sigp/lighthouse
+# -- Validators image version
+# ref: https://gcr.io/prysmaticlabs/prysm/validator
+# ref: https://hub.docker.com/r/sigp/lighthouse
 image:
   pullPolicy: IfNotPresent
-  prysm: 
+  prysm:
     repository: "gcr.io/prylabs-dev/prysm/validator"
     tag: "v4.1.1"
-  teku: 
+  teku:
     repository: "consensys/teku"
     tag: "23.11.0"
-  lighthouse: 
+  lighthouse:
     repository: "sigp/lighthouse"
     tag: "v4.5.0"
-  nimbus: 
+  nimbus:
     repository: "statusim/nimbus-validator-client"
     tag: "multiarch-v23.11.0"
-  lodestar: 
+  lodestar:
     repository: "chainsafe/lodestar"
     tag: "v1.12.0"
 
-## Credentials to fetch images from private registry
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-##
+# -- Credentials to fetch images from private registry
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+#
 imagePullSecrets: []
 
 terminationGracePeriodSeconds: 120
 
-## Spearate service account per validator.
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
+# -- Spearate service account per validator.
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+#
 serviceAccount:
-  # Specifies whether a service account should be created
+  # -- Specifies whether a service account should be created
   create: true
   name: ""
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
 
-## Node labels for pod assignment
-## ref: https://kubernetes.io/docs/user-guide/node-selection/
-##
+# -- Node labels for pod assignment
+# ref: https://kubernetes.io/docs/user-guide/node-selection/
+#
 nodeSelector: {}
 
-## Tolerations for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-##
+# -- Tolerations for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+#
 tolerations: {}
 
-## Affinity for pod assignment
-## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-##
+# -- Affinity for pod assignment
+# ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+#
 affinity: {}
 
-## used to assign priority to pods
-## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-##
+# -- used to assign priority to pods
+# ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+#
 priorityClassName: ""
 
-## Network ID
-## Options for Ethereum: mainnet, prater
-## Options for Gnosis: gnosis
-##
+# -- Network ID
+# Options for Ethereum: mainnet, prater
+# Options for Gnosis: gnosis
+#
 network: "mainnet"
 
-## Validators flags
-##
+# -- Validators flags
+#
 flags:
   prysm:
     - "--datadir=/data/prysm"
@@ -207,63 +207,63 @@ flags:
     - "--non-interactive"
     - "--log-level=INFO"
     - "--doppelganger-detection=off"
-  lodestar: 
+  lodestar:
     - "validator"
     - "--dataDir=/data/lodestar"
     - "--logLevel=info"
 
-## Validators extra flags
-##
+# -- Validators extra flags
+#
 extraFlags:
   prysm: []
   lighthouse: []
   teku: []
-  nimbus: []	
+  nimbus: []
   lodestar: []
 
-## Web3Signer Endpoint
-##
+# -- Web3Signer Endpoint
+#
 web3signerEndpoint: ""
 
-## List of Beacon Chain node addresses
-##
+# -- List of Beacon Chain node addresses
+#
 beaconChainRpcEndpoints: []
 
-## Randomize endpoints if specified
-## Has a higher priority than beaconChainRpcEndpoints,
-## all specified hosts will be randomly assigned to all validators,
-## used to more evenly distribute the load
-##
+# -- Randomize endpoints if specified
+# Has a higher priority than beaconChainRpcEndpoints,
+# all specified hosts will be randomly assigned to all validators,
+# used to more evenly distribute the load
+#
 beaconChainRpcEndpointsRandomized: []
 
-## if using beaconChainRpcEndpointsRandomized
-## fallbackRpcEndpoints will be appended to the list 
-## always serving as the last, failover endpoint
-##
+# -- If using beaconChainRpcEndpointsRandomized
+# fallbackRpcEndpoints will be appended to the list
+# always serving as the last, failover endpoint
+#
 fallbackRpcEndpoints: []
 
-## You can use the graffiti to add a string to your proposed blocks,
-## which will be seen on the block explorer.
-## ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
-##
+# -- You can use the graffiti to add a string to your proposed blocks,
+# which will be seen on the block explorer.
+# ref: https://docs.prylabs.network/docs/prysm-usage/parameters#validator-configuration
+#
 graffiti: ""
 
 enableWatcher: false
 
-## Lodestar specific setting	
-## Enables strict checking of the validator's feeRecipient with the one returned by engine	
+# -- Lodestar specific setting
+# Enables strict checking of the validator's feeRecipient with the one returned by engine
 strictFeeRecipientCheck: false
 
-## Monitoring
-##
+# -- Monitoring
+#
 metrics:
-  # Whether to enable metrics collection or not
+  # -- Whether to enable metrics collection or not
   enabled: true
 
-  # Prometheus exporter port
+  # -- Prometheus exporter port
   port: 9090
 
-  # Extra flags to pass for collecting metrics
+  # -- Extra flags to pass for collecting metrics
   flags:
     prysm:
       - "--monitoring-port=9090"
@@ -286,81 +286,81 @@ metrics:
       - "--metrics.address=0.0.0.0"
       - "--metrics.port=9090"
 
-  ## Prometheus Service Monitor
-  ## ref: https://github.com/coreos/prometheus-operator
-  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-  ##
+  # -- Prometheus Service Monitor
+  # ref: https://github.com/coreos/prometheus-operator
+  #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  #
   serviceMonitor:
-    ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-    ##
+    # -- ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+    #
     enabled: false
-    ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
-    ##
+    # -- The namespace in which the ServiceMonitor will be created
+    #
     namespace: ""
-    ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
-    ##
+    # -- The interval at which metrics should be scraped
+    #
     interval: 30s
-    ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
-    ##
+    # -- The timeout after which the scrape is ended
+    #
     scrapeTimeout: ""
-    ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
-    ##
+    # -- Metrics RelabelConfigs to apply to samples before scraping.
+    #
     relabelings: []
-    ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
-    ##
+    # -- Metrics RelabelConfigs to apply to samples before ingestion.
+    #
     metricRelabelings: []
-    ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
-    ##
+    # -- Specify honorLabels parameter to add the scrape endpoint
+    #
     honorLabels: false
-    ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-    ##
+    # -- Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    #
     additionalLabels: {}
-  ## Custom PrometheusRule to be defined
-  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-  ##
+  # -- Custom PrometheusRule to be defined
+  # ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  #
   prometheusRule:
-    ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-    ##
+    # -- Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+    #
     enabled: false
-    ## @param metrics.prometheusRule.default Create a default set of Alerts
-    ##
+    # -- Create a default set of Alerts
+    #
     default: true
-    ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
-    ##
+    # -- The namespace in which the prometheusRule will be created
+    #
     namespace: ""
-    ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
-    ##
+    # -- Additional labels for the prometheusRule
+    #
     additionalLabels: {}
-    ## @param metrics.prometheusRule.rules Custom Prometheus rules
-    ## e.g:
-    ## rules:
-    ##   - alert: PrysmValidatorHourlyEarningLessOrEqual0
-    ##     expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
-    ##     for: 5m
-    ##     labels:
-    ##       severity: critical
-    ##     annotations:
-    ##       summary: Prysm validator hourly earning <= 0
-    ##       description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##   - alert: PrysmValidatorAlotOfErrorsLastHour
-    ##     expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
-    ##     for: 5m
-    ##     labels:
-    ##       severity: warning
-    ##     annotations:
-    ##       summary: Many validator errors or warnings last hour
-    ##       description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
-    ##
+    # -- Custom Prometheus rules
     rules: {}
+    # e.g:
+    # rules:
+    #   - alert: PrysmValidatorHourlyEarningLessOrEqual0
+    #     expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+    #     for: 5m
+    #     labels:
+    #       severity: critical
+    #     annotations:
+    #       summary: Prysm validator hourly earning <= 0
+    #       description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+    #   - alert: PrysmValidatorAlotOfErrorsLastHour
+    #     expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
+    #     for: 5m
+    #     labels:
+    #       severity: warning
+    #     annotations:
+    #       summary: Many validator errors or warnings last hour
+    #       description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+    #
 
-## Configure resource requests and limits.
-## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-##
+# -- Configure resource requests and limits.
+# ref: http://kubernetes.io/docs/user-guide/compute-resources/
+#
 resources: {}
 
-## Configure liveness and readiness probes
-## https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-##
+# -- Configure liveness and readiness probes
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+#
 readinessProbe:
   prysm:
     initialDelaySeconds: 60

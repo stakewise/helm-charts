@@ -1,0 +1,29 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Validate PR
+        run: |
+          chmod +x scripts/validate-pr.sh
+          scripts/validate-pr.sh
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          TARGET_BRANCH: ${{ github.event.pull_request.base.ref }}

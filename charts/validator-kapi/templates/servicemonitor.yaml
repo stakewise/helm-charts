@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "kapi.fullname" . }}
   {{- if .Values.serviceMonitor.namespace }}
   namespace: {{ .Values.serviceMonitor.namespace }}
   {{- else }}
   namespace: {{ .Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "kapi.labels" . | nindent 4 }}
     {{- if .Values.serviceMonitor.additionalLabels }}
     {{- toYaml .Values.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
@@ -37,5 +37,5 @@ spec:
       - {{ .Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
+      {{- include "kapi.matchLabels" . | nindent 6 }}
 {{- end }}

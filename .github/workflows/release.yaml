@@ -1,11 +1,9 @@
 name: Helm Charts Release
 
-on: 
+on:
   push:
     branches:
-      - "!*"
-    tags:
-      - "v*"
+      - main
 
 jobs:
   release:
@@ -14,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -23,23 +21,26 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
-      - name: Install Helm
+      - name: Set up Helm
         uses: azure/setup-helm@v3
+        with:
+          version: v3.12.1
 
       - name: Helm Dependencies
         run: |
-          for dir in $(ls -d charts/*); do
-            helm dependency update $dir;
+          for dir in charts/*; do
+            helm dependency update "$dir";
           done
           helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add bitnami https://charts.bitnami.com/bitnami
+          helm repo add prometheus-charts https://prometheus-community.github.io/helm-charts
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo add external-secrets https://charts.external-secrets.io
 
-      - name: Publish Helm chart
-        uses: stefanprodan/helm-gh-pages@v1.7.0
+      - name: Run chart-releaser
+        uses: helm/chart-releaser-action@v1.6.0
         with:
-          token: ${{ secrets.BOT_TOKEN  }}
           charts_dir: charts
-          charts_url: https://nethermindeth.github.io/helm-charts
-          repository: helm-charts
-          branch: gh-pages
-          target_dir: charts
-          index_dir: .
+        env:
+          CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}" # The GitHub token of this repository
+          CR_GENERATE_RELEASE_NOTES: true

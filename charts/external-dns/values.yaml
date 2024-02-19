@@ -20,7 +20,7 @@ serviceAccount:
   create: true
   # Annotations to add to the service account
   annotations:
-      iam.gke.io/gcp-service-account: external-dns@juno-dev-nth.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: external-dns@juno-dev-nth.iam.gserviceaccount.com
   # Labels to add to the service account
   labels: {}
   # The name of the service account to use.

@@ -76,7 +76,7 @@ serviceAccount:
   automount: true
   # -- Annotations to add to the service account.
   annotations:
-      iam.gke.io/gcp-service-account: dummy-workloadIdentity-account
+    iam.gke.io/gcp-service-account: dummy-workloadIdentity-account
   # -- Extra Labels to add to the service account.
   extraLabels: {}
   # -- The name of the service account to use.

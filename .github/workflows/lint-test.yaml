@@ -1,0 +1,69 @@
+name: Lint and Test Charts
+
+on: pull_request
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          check-latest: true
+
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.6.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+            changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+            if [[ -n "$changed" ]]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            fi
+
+      - name: Helm Dependencies
+        if: steps.list-changed.outputs.changed == 'true'
+        run: |
+          for dir in charts/*; do
+            helm dependency update "$dir";
+          done
+          # helm repo add bitnami https://charts.bitnami.com/bitnami
+          # helm repo add prometheus-charts https://prometheus-community.github.io/helm-charts
+          # helm repo add grafana https://grafana.github.io/helm-charts
+          # helm repo add ethereum-helm-charts https://ethpandaops.github.io/ethereum-helm-charts
+
+      - name: Run chart-testing (lint)
+        if: steps.list-changed.outputs.changed == 'true'
+        run: ct lint --config ct.yaml
+
+      # Our charts are to big to be tested in github actions
+      # - name: Create kind cluster
+      #   if: steps.list-changed.outputs.changed == 'true'
+      #   uses: helm/kind-action@v1.8.0
+
+      # - name: Run chart-testing (install)
+      #   if: steps.list-changed.outputs.changed == 'true'
+      #   run: |
+      #       changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+      #       if [[ "$changed" == "charts/example1" ]]; then
+      #       # Do not run `ct install` for example1 chart.
+      #       # This is an example of a chart that has some requirement/dependencies and requires
+      #       # some additional setup to be able to run `ct install`, thus we skip it here.
+      #       exit 0
+      #       elif [[ "$changed" == "charts/example2" ]]; then
+      #       # Do not run `ct install` for example2. This serves as a placeholder for subsequent charts that may be
+      #       # skipped for some reason.
+      #       exit 0
+      #       fi
+      #       ct install --config ct.yaml --excluded-charts execution-beacon,ethereum-node 

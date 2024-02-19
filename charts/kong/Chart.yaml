@@ -4,14 +4,14 @@ engine: gotpl
 home: https://konghq.com/
 icon: https://s3.amazonaws.com/downloads.kong/universe/assets/icon-kong-inc-large.png
 maintainers:
-- name: hbagdi
-  email: harry@konghq.com
-- name: rainest
-  email: traines@konghq.com
+  - name: Manjeet-Nethermind
+    email: manjeet@nethermind.io
+  - name: gehlotanish
+    email: anish@nethermind.io
 name: kong
 sources:
 - https://github.com/Kong/charts/tree/main/charts/kong
-version: 2.26.5
+version: 2.26.6
 appVersion: "3.3"
 dependencies:
 - name: postgresql

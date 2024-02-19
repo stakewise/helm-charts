@@ -16,9 +16,9 @@ global:
       mainnet:
         execution:
           nethermind:
-          - --Pruning.Mode=Hybrid 
+          - --Pruning.Mode=Hybrid
           - --Pruning.FullPruningTrigger=VolumeFreeSpace
-          - --Pruning.FullPruningThresholdMb=256000 
+          - --Pruning.FullPruningThresholdMb=256000
           - --Pruning.AvailableSpaceCheckEnabled=false
           - --Sync.NonValidatorNode=true
           - --Sync.DownloadBodiesInFastSync=false
@@ -42,7 +42,7 @@ global:
 
   ########################
   ###
-  ###  Secret Store 
+  ###  Secret Store
   ###
   ########################
   secretStore:
@@ -157,4 +157,3 @@ ethereum-metrics-exporter:
         - eth
         - net
         - web3
-

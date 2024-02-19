@@ -65,7 +65,7 @@ spec:
               printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
               printenv dirk-ca.key | base64 -d  > /data/dirk/certs/ca.key;
               bash /scripts/generate_cert.sh /data/dirk/certs/ ca ${HOSTNAME}.{{ include "dirk.fullname" . }};
-              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/dirk;
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}

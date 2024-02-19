@@ -1,9 +1,9 @@
 apiVersion: v2
 name: execution-beacon
-version: 1.0.0
+version: 1.1.0
 appVersion: 0.0.1
 kubeVersion: "^1.23.0-0"
-description: Execution and Beacon
+description: A Helm chart that combines Kubernetes manifests and scripts to deploy Ethereum full-nodes without validators with top-notch performance as the goal.
 type: application
 keywords:
   - ethereum
@@ -12,8 +12,11 @@ keywords:
   - prysm
   - p2p
 home: https://www.ethereum.org/
-
 dependencies:
   - name: common
     repository: file://../common
-    version: 1.0.0
+    version: 1.0.1
+maintainers:
+  - name: matilote
+  - name: aivarasko
+  - name: AntiD2ta

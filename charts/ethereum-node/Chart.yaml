@@ -3,4 +3,16 @@ description: 'This chart acts as an umbrella chart and allows to run a ethereum 
   and consensus layer client. It''s also able to deploy optional monitoring applications. '
 name: ethereum-node
 type: application
-version: 0.0.19
+version: 0.0.20
+dependencies:
+  - name: nethermind
+    version: 1.0.9
+    repository: https://ethpandaops.github.io/ethereum-helm-charts
+  - name: prysm
+    version: 1.1.1
+    repository: https://ethpandaops.github.io/ethereum-helm-charts
+maintainers:
+  - name: Manjeet-Nethermind
+    email: manjeet@nethermind.io
+  - name: gehlotanish
+    email: anish@nethermind.io

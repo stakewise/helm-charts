@@ -31,13 +31,12 @@ An open-source Ethereum 2.0 client, written in Go
 | fullnameOverride | string | `""` | Overrides the chart's computed fullname |
 | httpPort | int | `3500` | HTTP Port |
 | image.pullPolicy | string | `"IfNotPresent"` | Prysm container pull policy |
-| image.repository | string | `"ethpandaops/prysm"` | Prysm container image repository |
-| image.tag | string | `"master"` |  |
+| image.repository | string | `"gcr.io/prylabs-dev/prysm/beacon-chain"` | Prysm container image repository repository: gcr.io/prysmaticlabs/prysm/beacon-chain |
+| image.tag | string | `"v4.1.1"` | Prysm container image tag |
 | imagePullSecrets | list | `[]` | Image pull secrets for Docker images |
 | ingress.annotations | object | `{}` | Annotations for Ingress |
 | ingress.enabled | bool | `false` | Ingress resource for the HTTP API |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths | list | `[]` |  |
+| ingress.hosts | list | `[{"host":"chart-example.local","paths":[]}]` | Ingress host |
 | ingress.tls | list | `[]` | Ingress TLS |
 | initChownData.enabled | bool | `true` | Init container to set the correct permissions to access data directories |
 | initChownData.image.pullPolicy | string | `"IfNotPresent"` | Container pull policy |
@@ -45,7 +44,6 @@ An open-source Ethereum 2.0 client, written in Go
 | initChownData.image.tag | string | `"1.34.0"` | Container tag |
 | initChownData.resources | object | `{}` | Resource requests and limits |
 | initContainers | list | `[]` | Additional init containers |
-| jwt | string | `"ecb22bc24e7d4061f7ed690ccd5846d7d73f5d2b9733267e12f56790398d908a"` | JWT secret used by client as a secret. Change this value. |
 | livenessProbe | object | See `values.yaml` | Liveness probe |
 | metricsPort | int | `8080` | Metrics Port |
 | mode | string | `"beacon"` | Mode can be 'beacon' or 'validator' |
@@ -92,8 +90,8 @@ An open-source Ethereum 2.0 client, written in Go
 | serviceMonitor.scrapeTimeout | string | `"30s"` | ServiceMonitor scrape timeout |
 | serviceMonitor.tlsConfig | object | `{}` | ServiceMonitor TLS configuration |
 | terminationGracePeriodSeconds | int | `300` | How long to wait until the pod is forcefully terminated |
-| tolerations | list | `[]` | Tolerations for pods |
-| topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pods |
+| tolerations | list | `[]` | Tolerations for pods # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/ |
+| topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pods # ref: https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/ |
 | updateStrategy | object | `{"type":"RollingUpdate"}` | Update stategy for the Statefulset |
 | updateStrategy.type | string | `"RollingUpdate"` | Update stategy type |
 

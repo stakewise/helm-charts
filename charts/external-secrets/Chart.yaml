@@ -8,8 +8,10 @@ keywords:
 - secrets
 kubeVersion: '>= 1.19.0-0'
 maintainers:
-- email: kellinmcavoy@gmail.com
-  name: mcavoyk
+  - name: Manjeet-Nethermind
+    email: manjeet@nethermind.io
+  - name: gehlotanish
+    email: anish@nethermind.io
 name: external-secrets
 type: application
-version: 0.9.9
+version: 0.9.10

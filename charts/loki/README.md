@@ -1,82 +1,140 @@
-# Loki Helm Chart
+# loki
 
-## Prerequisites
+![Version: 2.11.2](https://img.shields.io/badge/Version-2.11.2-informational?style=flat-square) ![AppVersion: v2.5.0](https://img.shields.io/badge/AppVersion-v2.5.0-informational?style=flat-square)
 
-Make sure you have Helm [installed](https://helm.sh/docs/using_helm/#installing-helm).
+Loki: like Prometheus, but for logs.
 
-## Get Repo Info
+**Homepage:** <https://grafana.com/loki>
 
-```console
-helm repo add grafana https://grafana.github.io/helm-charts
-helm repo update
-```
+## Maintainers
 
-_See [helm repo](https://helm.sh/docs/helm/helm_repo/) for command documentation._
+| Name | Email | Url |
+| ---- | ------ | --- |
+| Manjeet-Nethermind | <manjeet@nethermind.io> |  |
+| gehlotanish | <anish@nethermind.io> |  |
 
+## Source Code
 
-## Deploy Loki only
+* <https://github.com/grafana/loki>
 
-```bash
-helm upgrade --install loki grafana/loki
-```
+## Requirements
 
-## Run Loki behind https ingress
+Kubernetes: `^1.10.0-0`
 
-If Loki and Promtail are deployed on different clusters you can add an Ingress in front of Loki.
-By adding a certificate you create an https endpoint. For extra security enable basic authentication on the Ingress.
+## Values
 
-In Promtail set the following values to communicate with https and basic auth
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key | string | `"node_pool"` |  |
+| affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator | string | `"In"` |  |
+| affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0] | string | `"monitoring"` |  |
+| alerting_groups | list | `[]` |  |
+| annotations | object | `{}` |  |
+| client | object | `{}` |  |
+| config.auth_enabled | bool | `false` |  |
+| config.chunk_store_config.max_look_back_period | string | `"0s"` |  |
+| config.compactor.shared_store | string | `"gcs"` |  |
+| config.compactor.working_directory | string | `"/data/loki/boltdb-shipper-compactor"` |  |
+| config.ingester.chunk_block_size | int | `262144` |  |
+| config.ingester.chunk_idle_period | string | `"3m"` |  |
+| config.ingester.chunk_retain_period | string | `"1m"` |  |
+| config.ingester.lifecycler.ring.kvstore.store | string | `"inmemory"` |  |
+| config.ingester.lifecycler.ring.replication_factor | int | `1` |  |
+| config.ingester.max_transfer_retries | int | `0` |  |
+| config.ingester.wal.dir | string | `"/data/loki/wal"` |  |
+| config.limits_config.enforce_metric_name | bool | `false` |  |
+| config.limits_config.max_entries_limit_per_query | int | `5000` |  |
+| config.limits_config.reject_old_samples | bool | `true` |  |
+| config.limits_config.reject_old_samples_max_age | string | `"168h"` |  |
+| config.schema_config.configs[0].from | string | `"2020-10-24"` |  |
+| config.schema_config.configs[0].index.period | string | `"24h"` |  |
+| config.schema_config.configs[0].index.prefix | string | `"index_"` |  |
+| config.schema_config.configs[0].object_store | string | `"gcs"` |  |
+| config.schema_config.configs[0].schema | string | `"v11"` |  |
+| config.schema_config.configs[0].store | string | `"boltdb-shipper"` |  |
+| config.server.http_listen_port | int | `3100` |  |
+| config.storage_config.boltdb_shipper.active_index_directory | string | `"/data/loki/boltdb-shipper-active"` |  |
+| config.storage_config.boltdb_shipper.cache_location | string | `"/data/loki/boltdb-shipper-cache"` |  |
+| config.storage_config.boltdb_shipper.cache_ttl | string | `"24h"` |  |
+| config.storage_config.boltdb_shipper.shared_store | string | `"gcs"` |  |
+| config.storage_config.gcs.bucket_name | string | `"loki-logs-juno-dev"` |  |
+| config.table_manager.retention_deletes_enabled | bool | `false` |  |
+| config.table_manager.retention_period | string | `"0s"` |  |
+| env | list | `[]` |  |
+| extraArgs | object | `{}` |  |
+| extraContainers | list | `[]` |  |
+| extraPorts | list | `[]` |  |
+| extraVolumeMounts | list | `[]` |  |
+| extraVolumes | list | `[]` |  |
+| image.pullPolicy | string | `"IfNotPresent"` |  |
+| image.repository | string | `"grafana/loki"` |  |
+| image.tag | string | `"2.5.0"` |  |
+| ingress.annotations | object | `{}` |  |
+| ingress.enabled | bool | `false` |  |
+| ingress.hosts[0].host | string | `"chart-example.local"` |  |
+| ingress.hosts[0].paths | list | `[]` |  |
+| ingress.tls | list | `[]` |  |
+| initContainers | list | `[]` |  |
+| livenessProbe.httpGet.path | string | `"/ready"` |  |
+| livenessProbe.httpGet.port | string | `"http-metrics"` |  |
+| livenessProbe.initialDelaySeconds | int | `45` |  |
+| networkPolicy.enabled | bool | `false` |  |
+| nodeSelector | object | `{}` |  |
+| persistence.accessModes[0] | string | `"ReadWriteOnce"` |  |
+| persistence.annotations | object | `{}` |  |
+| persistence.enabled | bool | `false` |  |
+| persistence.size | string | `"10Gi"` |  |
+| podAnnotations."prometheus.io/port" | string | `"http-metrics"` |  |
+| podAnnotations."prometheus.io/scrape" | string | `"true"` |  |
+| podDisruptionBudget | object | `{}` |  |
+| podLabels | object | `{}` |  |
+| podManagementPolicy | string | `"OrderedReady"` |  |
+| rbac.create | bool | `true` |  |
+| rbac.pspEnabled | bool | `true` |  |
+| readinessProbe.httpGet.path | string | `"/ready"` |  |
+| readinessProbe.httpGet.port | string | `"http-metrics"` |  |
+| readinessProbe.initialDelaySeconds | int | `45` |  |
+| replicas | int | `1` |  |
+| resources | object | `{}` |  |
+| securityContext.fsGroup | int | `10001` |  |
+| securityContext.runAsGroup | int | `10001` |  |
+| securityContext.runAsNonRoot | bool | `true` |  |
+| securityContext.runAsUser | int | `10001` |  |
+| service.annotations | object | `{}` |  |
+| service.labels | object | `{}` |  |
+| service.nodePort | string | `nil` |  |
+| service.port | int | `3100` |  |
+| service.targetPort | string | `"http-metrics"` |  |
+| service.type | string | `"ClusterIP"` |  |
+| serviceAccount.annotations."iam.gke.io/gcp-service-account" | string | `"monitoring-sa@juno-dev-nth.iam.gserviceaccount.com"` |  |
+| serviceAccount.automountServiceAccountToken | bool | `true` |  |
+| serviceAccount.create | bool | `true` |  |
+| serviceAccount.name | string | `nil` |  |
+| serviceMonitor.additionalLabels | object | `{}` |  |
+| serviceMonitor.annotations | object | `{}` |  |
+| serviceMonitor.enabled | bool | `false` |  |
+| serviceMonitor.interval | string | `""` |  |
+| serviceMonitor.prometheusRule.additionalLabels | object | `{}` |  |
+| serviceMonitor.prometheusRule.enabled | bool | `false` |  |
+| serviceMonitor.prometheusRule.rules | list | `[]` |  |
+| service_lb.annotations."cloud.google.com/load-balancer-type" | string | `"internal"` |  |
+| service_lb.annotations."external-dns.alpha.kubernetes.io/hostname" | string | `"loki.juno.dev"` |  |
+| service_lb.annotations."networking.gke.io/internal-load-balancer-allow-global-access" | string | `"true"` |  |
+| service_lb.enable | bool | `true` |  |
+| service_lb.labels | object | `{}` |  |
+| service_lb.nodePort | string | `nil` |  |
+| service_lb.port | int | `80` |  |
+| service_lb.targetPort | string | `"http-metrics"` |  |
+| service_lb.type | string | `"LoadBalancer"` |  |
+| terminationGracePeriodSeconds | int | `4800` |  |
+| tolerations[0].effect | string | `"PreferNoSchedule"` |  |
+| tolerations[0].key | string | `"monitoring"` |  |
+| tolerations[0].operator | string | `"Equal"` |  |
+| tolerations[0].value | bool | `true` |  |
+| tracing.jaegerAgentHost | string | `nil` |  |
+| updateStrategy.type | string | `"RollingUpdate"` |  |
+| useExistingAlertingGroup.configmapName | string | `""` |  |
+| useExistingAlertingGroup.enabled | bool | `false` |  |
 
-```yaml
-loki:
-  serviceScheme: https
-  user: user
-  password: pass
-```
-
-Sample helm template for ingress:
-
-```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: loki
-  annotations:
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-    ingress.kubernetes.io/auth-type: basic
-    ingress.kubernetes.io/auth-secret: {{ .Values.ingress.basic.secret }}
-spec:
-  rules:
-  - host: {{ .Values.ingress.host }}
-    http:
-      paths:
-      - backend:
-          service:
-            name: loki
-            port:
-              number: 3100
-        path: /
-        pathType: Prefix
-  tls:
-  - hosts:
-    - {{ .Values.ingress.host }}
-    secretName: {{ .Values.ingress.cert }}
-```
-
-## Use Loki Alerting
-
-You can add your own alerting rules with `alerting_groups` in `values.yaml`. This will create a ConfigMap with your rules and additional volumes and mounts for Loki.
-
-This does **not** enable the Loki `ruler` component which does the evaluation of your rules. The `values.yaml` file does contain a simple example. For more details take a look at the official [alerting docs](https://grafana.com/docs/loki/latest/rules/).
-
-## Enable retention policy (log deletion)
-
-Set Helm value `config.compactor.retention_enabled` to enable retention using the default policy, which deletes logs after 31 days.
-
-```yaml
-config:
-  compactor:
-    retention_enabled: true
-```
-
-See [the documentation](https://grafana.com/docs/loki/latest/operations/storage/retention/) for additional options.
+----------------------------------------------
+Autogenerated from chart metadata using [helm-docs v1.12.0](https://github.com/norwoodj/helm-docs/releases/v1.12.0)

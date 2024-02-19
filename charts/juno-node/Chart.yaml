@@ -1,10 +1,10 @@
 apiVersion: v2
 name: juno-chart
-version: 0.1.1
+version: 0.1.2
 appVersion: "1"
 description: A Helm chart for deploying Juno service
 maintainers:
-  - name: Manjeet
+  - name: Manjeet-Nethermind
     email: manjeet@nethermind.io
-  - name: Anish
+  - name: gehlotanish
     email: anish@nethermind.io

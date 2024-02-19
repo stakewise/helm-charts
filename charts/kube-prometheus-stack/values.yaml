@@ -730,15 +730,15 @@ alertmanager:
     ## Assign custom affinity rules to the alertmanager instance
     ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
     ##
-    affinity: 
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node_pool
-                  operator: In
-                  values:
-                  - monitoring
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_pool
+              operator: In
+              values:
+              - monitoring
     # nodeAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     nodeSelectorTerms:
@@ -2026,14 +2026,14 @@ prometheusOperator:
       podAnnotations: {}
       nodeSelector: {}
       affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node_pool
-                  operator: In
-                  values:
-                  - monitoring
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node_pool
+                operator: In
+                values:
+                - monitoring
       tolerations:
       - effect: PreferNoSchedule
         key: monitoring
@@ -2279,10 +2279,10 @@ prometheusOperator:
   ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
   ##
   tolerations:
-      - effect: PreferNoSchedule
-        key: monitoring
-        operator: Equal
-        value: "true"
+    - effect: PreferNoSchedule
+      key: monitoring
+      operator: Equal
+      value: "true"
   # - key: "key"
   #   operator: "Equal"
   #   value: "value"
@@ -2291,15 +2291,15 @@ prometheusOperator:
   ## Assign custom affinity rules to the prometheus operator
   ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
   ##
-  affinity: 
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node_pool
-                  operator: In
-                  values:
-                  - monitoring
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node_pool
+            operator: In
+            values:
+            - monitoring
     # nodeAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     nodeSelectorTerms:
@@ -2629,10 +2629,10 @@ prometheus:
 
     sessionAffinity: ""
 
-#internal-LB service
+# internal-LB service
   service_lb:
     enabled: false
-    annotations: 
+    annotations:
       cloud.google.com/load-balancer-type: internal
       networking.gke.io/internal-load-balancer-allow-global-access: "true"
       external-dns.alpha.kubernetes.io/hostname: prometheus.juno.dev
@@ -3267,14 +3267,14 @@ prometheus:
     ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
     ##
     affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node_pool
-                  operator: In
-                  values:
-                  - monitoring
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_pool
+              operator: In
+              values:
+              - monitoring
     # nodeAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     nodeSelectorTerms:
@@ -4060,15 +4060,14 @@ thanosRuler:
     ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
     ##
     affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-              - matchExpressions:
-                - key: node_pool
-                  operator: In
-                  values:
-                  - monitoring
-                
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: node_pool
+              operator: In
+              values:
+              - monitoring
     # nodeAffinity:
     #   requiredDuringSchedulingIgnoredDuringExecution:
     #     nodeSelectorTerms:
@@ -4082,7 +4081,7 @@ thanosRuler:
     ## If specified, the pod's tolerations.
     ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
     ##
-    tolerations: 
+    tolerations:
       - effect: PreferNoSchedule
         key: monitoring
         operator: Equal

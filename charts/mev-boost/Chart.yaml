@@ -1,7 +1,7 @@
 apiVersion: v2
 name: mev-boost
 description: mev-boost allows proof-of-stake Ethereum consensus clients to outsource block construction
-version: 1.0.0
+version: 1.0.1
 home: https://boost.flashbots.net/
 keywords:
   - ethereum
@@ -9,8 +9,10 @@ keywords:
   - mev-boost
 type: application
 appVersion: "1.6.0"
-
 dependencies:
 - name: common
   repository: file://../common
-  version: 1.0.0
+  version: 1.0.1
+maintainers:
+  - name: matilote
+  - name: aivarasko

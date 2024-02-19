@@ -1,15 +1,15 @@
-apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+apiVersion: {{ include "kapi.statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
-  name: {{ include "common.names.fullname" . }}
+  name: {{ include "kapi.fullname" . }}
   labels:
-    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- include "kapi.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.global.replicaCount }}
   selector:
     matchLabels:
-      {{- include "common.labels.matchLabels" . | nindent 6 }}
-  serviceName: {{ include "common.names.fullname" . }}
+      {{- include "kapi.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "kapi.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -17,7 +17,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "common.labels.matchLabels" . | nindent 8 }}
+        {{- include "kapi.matchLabels" . | nindent 8 }}
     spec:
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -92,7 +92,7 @@ spec:
           {{- if .Values.global.externalSecrets.enabled }}
           envFrom:
             - secretRef:
-                name: eso-{{ include "common.names.fullname" . }}
+                name: eso-{{ include "kapi.fullname" . }}
           {{- end }}
           ports:
             - name: api

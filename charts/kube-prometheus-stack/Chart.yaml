@@ -3,25 +3,15 @@ description: kube-prometheus-stack collects Kubernetes manifests, Grafana dashbo
 icon: https://raw.githubusercontent.com/prometheus/prometheus.github.io/master/assets/prometheus_logo-cb55bb5c346.png
 type: application
 maintainers:
-  - name: andrewgkew
-    email: andrew@quadcorps.co.uk
-  - name: gianrubio
-    email: gianrubio@gmail.com
-  - name: gkarthiks
-    email: github.gkarthiks@gmail.com
-  - name: GMartinez-Sisti
-    email: kube-prometheus-stack@sisti.pt
-  - name: scottrigby
-    email: scott@r6by.com
-  - name: Xtigyro
-    email: miroslav.hadzhiev@gmail.com
-  - name: QuentinBisson
-    email: quentin.bisson@gmail.com
+  - name: Manjeet-Nethermind
+    email: manjeet@nethermind.io
+  - name: gehlotanish
+    email: anish@nethermind.io
 name: kube-prometheus-stack
 sources:
   - https://github.com/prometheus-community/helm-charts
   - https://github.com/prometheus-operator/kube-prometheus
-version: 48.4.0
+version: 48.4.1
 appVersion: v0.66.0
 kubeVersion: ">=1.16.0-0"
 home: https://github.com/prometheus-operator/kube-prometheus

@@ -51,6 +51,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels to use on deploy.spec.selector.matchLabels and svc.spec.selector
+*/}}
+{{- define "kapi.matchLabels" -}}
+app.kubernetes.io/name: {{ include "kapi.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- if .Values.additionalLabels }}
+{{- toYaml .Values.additionalLabels | nindent 0 }}
+{{- end }}
+{{- end -}}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "kapi.serviceAccountName" -}}
@@ -60,3 +71,29 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Return the target Kubernetes version
+*/}}
+{{- define "kapi.kubeVersion" -}}
+{{- if .Values.global }}
+    {{- if .Values.global.kubeVersion }}
+    {{- .Values.global.kubeVersion -}}
+    {{- else }}
+    {{- default .Capabilities.KubeVersion.Version .Values.kubeVersion -}}
+    {{- end -}}
+{{- else }}
+{{- default .Capabilities.KubeVersion.Version .Values.kubeVersion -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Return the appropriate apiVersion for statefulset.
+*/}}
+{{- define "kapi.statefulset.apiVersion" -}}
+{{- if semverCompare "<1.14-0" (include "kapi.kubeVersion" .) -}}
+{{- print "apps/v1beta1" -}}
+{{- else -}}
+{{- print "apps/v1" -}}
+{{- end -}}
+{{- end -}}

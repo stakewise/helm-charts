@@ -3,66 +3,65 @@
 global:
   replicaCount: 1
 
-  ## Ethereum network
-  ##
+  # -- Ethereum network
   network: mainnet
 
   image:
     imagePullPolicy: IfNotPresent
     execution:
-      nethermind: 
+      nethermind:
         repository: "nethermind/nethermind"
         tag: "1.24.0"
-      geth: 
+      geth:
         repository: "ethereum/client-go"
         tag: "v1.13.8"
-      bseu: 
+      bseu:
         repository: "hyperledger/besu"
         tag: "23.10.2"
-      erigon: 
+      erigon:
         repository: "thorax/erigon"
         tag: "v2.55.1"
     beacon:
-      prysm: 
+      prysm:
         repository: "gcr.io/prylabs-dev/prysm/beacon-chain"
         tag: "v4.1.1"
-      teku: 
+      teku:
         repository: "consensys/teku"
         tag: "23.12.1"
-      lighthouse: 
+      lighthouse:
         repository: "sigp/lighthouse"
         tag: "v4.5.0"
-      nimbus: 
+      nimbus:
         repository: "statusim/nimbus-eth2"
         tag: "multiarch-v24.1.0"
-      lodestar: 
+      lodestar:
         repository: "chainsafe/lodestar"
         tag: "v1.13.0"
 
-  ## JSON Web Token (JWT) authentication is used to secure the communication
-  ## between the beacon node and execution client. You can generate a JWT using
-  ## a command line tool, for example:
-  ## openssl rand -hex 32 > token.txt
-  ##
+  # -- JSON Web Token (JWT) authentication is used to secure the communication
+  # between the beacon node and execution client. You can generate a JWT using
+  # a command line tool, for example:
+  # openssl rand -hex 32 > token.txt
   JWTSecret: ""
 
-  ## Credentials to fetch images from private registry
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
-  ##
+  # -- Credentials to fetch images from private registry
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  #
   imagePullSecrets: []
-  # Node labels for pod assignment
-  ## ref: https://kubernetes.io/docs/user-guide/node-selection/
-  ##
+  # -- Node labels for pod assignment
+  # ref: https://kubernetes.io/docs/user-guide/node-selection/
+  #
   nodeSelector: {}
 
-  ## Tolerations for pod assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-  ##
+  # -- Tolerations for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+  #
   tolerations: {}
 
-  ## Affinity for pod assignment
-  ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-  ##
+  # -- Affinity for pod assignment
+  # ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+  #
+  affinity: {}
   ## Example:
   ## affinity:
   ##   podAntiAffinity:
@@ -74,17 +73,15 @@ global:
   ##           values:
   ##           - prysm
   ##       topologyKey: kubernetes.io/hostname
-  ##
-  affinity: {}
 
-  ## Used to assign priority to pods
-  ## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
-  ##
+  # -- Used to assign priority to pods
+  # ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+  #
   priorityClassName: ""
 
-    ## Whether or not to allocate persistent volume disk for the data directory.
-  ## In case of node failure, the node data directory will still persist.
-  ##
+  # -- Whether or not to allocate persistent volume disk for the data directory.
+  # In case of node failure, the node data directory will still persist.
+  #
   sharedPersistence:
     enabled: false
     storageClassName: ""
@@ -95,7 +92,7 @@ global:
 
   externalSecrets:
     enabled: false
-    secretStoreRef: 
+    secretStoreRef:
       name: secretStoreRef
       kind: SecretStore
     data: []
@@ -106,10 +103,10 @@ global:
     tag: "v1.0.0"
     pullPolicy: IfNotPresent
     bindAddr: 3000
-    ## Configure liveness and readiness probes
-    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    ## NB! readinessProbe and livenessProbe must be disabled before genesis
-    ##
+    # -- Configure liveness and readiness probes
+    # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+    # NB! readinessProbe and livenessProbe must be disabled before genesis
+    #
     livenessProbe:
       enabled: false
       initialDelaySeconds: 10
@@ -139,110 +136,92 @@ global:
     type: ClusterIP
 
   sessionAffinity:
-    # Whether to enable session affinity or not
+    # -- Whether to enable session affinity or not
     enabled: false
-    # The session duration in seconds
+    # -- The session duration in seconds
     timeoutSeconds: 86400
 
-  ## Service account
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-  ##
+  # -- Service account
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  #
   serviceAccount:
     create: true
 
-  ## RBAC configuration.
-  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-  ##
+  # -- RBAC configuration.
+  # ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  #
   rbac:
     create: true
-  
-  ## Termination Grace Period
-  ## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
-  ##
+
+  # -- Termination Grace Period
+  # ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+  #
   terminationGracePeriodSeconds: 120
 
-  ## Init image is used to chown data volume, initialise genesis, etc.
-  ##
+  # -- Init image is used to chown data volume, initialise genesis, etc.
   initImage:
     repository: "bitnami/kubectl"
     tag: "1.28"
     pullPolicy: IfNotPresent
 
-  ## Monitoring
-  ## 
+  # -- Monitoring
   metrics:
     enabled: true
     annotations: {}
-    ## Prometheus Service Monitor
-    ## ref: https://github.com/coreos/prometheus-operator
-    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-    ##
+    # -- Prometheus Service Monitor
+    # ref: https://github.com/coreos/prometheus-operator
+    #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    #
     serviceMonitor:
-      ## The namespace in which the ServiceMonitor will be created
-      ##
+      # -- The namespace in which the ServiceMonitor will be created
       namespace: ""
-      ## The interval at which metrics should be scraped
-      ##
+      # -- The interval at which metrics should be scraped
       interval: 30s
-      ## The timeout after which the scrape is ended
-      ##
+      # -- The timeout after which the scrape is ended
       scrapeTimeout: ""
-      ## Metrics RelabelConfigs to apply to samples before scraping.
-      ##
+      # -- Metrics RelabelConfigs to apply to samples before scraping.
       relabellings: []
-      ## Metrics RelabelConfigs to apply to samples before ingestion.
-      ##
+      # -- Metrics RelabelConfigs to apply to samples before ingestion.
       metricRelabelings: []
-      ## Specify honorLabels parameter to add the scrape endpoint
-      ##
+      # -- Specify honorLabels parameter to add the scrape endpoint
       honorLabels: false
-      ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
-      ##
+      # -- Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
       additionalLabels: {}
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
+    # -- Custom PrometheusRule to be defined
+    # ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    #
     prometheusRule:
-      ## Create a default set of Alerts
-      ##
+      # -- Create a default set of Alerts
       default: true
-      ## The namespace in which the prometheusRule will be created
-      ##
+      # -- The namespace in which the prometheusRule will be created
       namespace: ""
-      ## Additional labels for the prometheusRule
-      ##
+      # -- Additional labels for the prometheusRule
       additionalLabels: {}
-      ## Custom Prometheus rules
-      ##
+      # -- Custom Prometheus rules
       rules: []
 
-  ## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
-  ## This will generate a service for each replica, with a port binding via NodePort.
-  ## This is useful if you want to expose and announce your node to the Internet.
-  ##
+  # -- When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+  # This will generate a service for each replica, with a port binding via NodePort.
+  # This is useful if you want to expose and announce your node to the Internet.
+  #
   p2pNodePort:
-    ## @param p2pNodePort.enabled Expose P2P port via NodePort
-    ##
+    # -- Expose P2P port via NodePort
     enabled: false
-    ## @param p2pNodePort.annotations
-    ##
     annotations: {}
-    ## @param p2pNodePort.type
-    ## Options: NodePort, LoadBalancer
+    # -- Options: NodePort, LoadBalancer
     type: NodePort
-    ## @param p2pNodePort.startAt The ports allocation will start from this value
-    ##
+    # -- The ports allocation will start from this value
     startAtExecution: 31100
     startAtBeacon: 31200
-    ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
-    ## @default -- See `values.yaml` for example
+    # -- Overwrite a port for specific replicas
+    # @default -- See `values.yaml` for example
     replicaToNodePort: {}
     #  "0": 32345
     #  "3": 32348
 
-  ## Pod Security Context
-  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-  ##
+  # -- Pod Security Context
+  # ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  #
   podSecurityContext:
     runAsNonRoot: true
     runAsUser: 10000
@@ -260,44 +239,44 @@ global:
     enabled: false
     ingressClassName: nginx
 
-    ## Route Prefix. Can skip it if any item of path has the path defined.
-    ##
+    # -- Route Prefix. Can skip it if any item of path has the path defined.
     routePrefix: /
 
     annotations: {}
     labels: {}
 
-    ## Hostnames.
-    ## Must be provided if Ingress is enabled.
-    ##
+    # -- Hostnames.
+    # Must be provided if Ingress is enabled.
+    #
+    hosts: []
     # hosts:
     #   - prometheus.domain.com
-    hosts: []
 
-    ## Paths to use for ingress rules
-    ## By default, the Service created by this chart is used as the target
-    ## Service for the Ingress.
-    ## If not defined the following default object will be used:
-    ## - path: "/"
-    ##   port: 8545
-    ##   pathType: "ImplementationSpecific"
-    ##   serviceName: "<common.names.fullname>"
+    # -- Paths to use for ingress rules
+    # By default, the Service created by this chart is used as the target
+    # Service for the Ingress.
+    # If not defined the following default object will be used:
+    # - path: "/"
+    #   port: 8545
+    #   pathType: "ImplementationSpecific"
+    #   serviceName: "<common.names.fullname>"
+    #
     paths: []
-      ## paths:
-      ##  - path: "/execution"
-      ##    port: 8545
-      ##    pathType: "Prefix"
-      ##  - path: "/beacon"
-      ##    port: 8080
-      ##    pathType: "Exact"
-      ##  - path: "/execution"
-      ##    port: 8545
-      ##    pathType: "Prefix"
-      ##    serviceName: "alternativeServiceName"
+      # paths:
+      #  - path: "/execution"
+      #    port: 8545
+      #    pathType: "Prefix"
+      #  - path: "/beacon"
+      #    port: 8080
+      #    pathType: "Exact"
+      #  - path: "/execution"
+      #    port: 8545
+      #    pathType: "Prefix"
+      #    serviceName: "alternativeServiceName"
 
-    ## TLS configuration for Ingress
-    ## Secret must be manually created in the namespace
-    ##
+    # -- TLS configuration for Ingress
+    # Secret must be manually created in the namespace
+    #
     tls: []
       # - secretName: execution-beacon-general-tls
       #   hosts:
@@ -306,9 +285,9 @@ global:
 execution:
   client: nethermind
 
-  ## Whether or not to allocate persistent volume disk for the data directory.
-  ## In case of node failure, the node data directory will still persist.
-  ##
+  # -- Whether or not to allocate persistent volume disk for the data directory.
+  # In case of node failure, the node data directory will still persist.
+  #
   persistence:
     enabled: true
     storageClassName: ""
@@ -317,47 +296,44 @@ execution:
     size: 100Gi
     annotations: {}
 
-  ## If false, data ownership will not be reset at startup
-  ## This allows the execution node to be run with an arbitrary user
-  ##
+  # -- If false, data ownership will not be reset at startup
+  # This allows the execution node to be run with an arbitrary user
+  #
   initChownData: true
 
-  # private api network address, for example: 127.0.0.1:9090,
+  # -- Private api network address, for example: 127.0.0.1:9090,
   # empty string means not to start the listener.
   # Do not expose to public network.
   # Serves remote database interface (default: "127.0.0.1:9090")
+  #
   privateApiAddr: "127.0.0.1:9090"
 
-  ## Monitoring
-  ## Additional settings could be made in non-global section.
-  ##
+  # -- Monitoring
+  # Additional settings could be made in non-global section.
+  #
   metrics:
-    ## Whether to enable metrics collection or not
-    ##
+    # -- Whether to enable metrics collection or not
     enabled: true
-
     port: 8008
     host: "0.0.0.0"
 
-    ## Prometheus Service Monitor
-    ## ref: https://github.com/coreos/prometheus-operator
-    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-    ##
+    # -- Prometheus Service Monitor
+    # ref: https://github.com/coreos/prometheus-operator
+    #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    #
     serviceMonitor:
-      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-      ##
+      # -- Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
       enabled: true
 
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
+    # -- Custom PrometheusRule to be defined
+    # ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    #
     prometheusRule:
-      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-      ##
+      # -- Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       enabled: true
 
   ## -------------------------- Execution node specific settings -----------------------------------------
-  # Manually specify TerminalTotalDifficulty, overriding the bundled setting
+  # -- Manually specify TerminalTotalDifficulty, overriding the bundled setting
   terminalTotalDifficulty: ""
 
   jsonrpc:
@@ -400,36 +376,35 @@ execution:
       corsOrigins:
         - "*"
 
-  ## Besu specific setting
+  # -- Besu specific setting
   javaOpts:
     enabled: false
-    # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
+    # -- This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
     # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
     # https://besu.hyperledger.org/en/stable/public-networks/how-to/configure-jvm/manage-memory/
+    maxHeapSize: ""
     # Example for kubernetes resources at 8Gi memory:
     # maxHeapSize: "-Xmx3g"
-    maxHeapSize: ""
 
-  # Nethermind HealthChecks module
+  # -- Nethermind HealthChecks module
   healthchecks:
     enabled: true
     slug: "/health"
     pollingInterval: 5
     lowStorageSpaceShutdownThreshold: 0
     lowStorageSpaceWarningThreshold: 5
-  
+
   targetPeers: 50
-  ## Extra flags to pass to the node
-  ##
+  # -- Extra flags to pass to the node
   extraFlags: []
   resources: {}
 
 beacon:
   client: nimbus
 
-  ## Whether or not to allocate persistent volume disk for the data directory.
-  ## In case of node failure, the node data directory will still persist.
-  ##
+  # -- Whether or not to allocate persistent volume disk for the data directory.
+  # In case of node failure, the node data directory will still persist.
+  #
   persistence:
     enabled: true
     storageClassName: ""
@@ -438,22 +413,21 @@ beacon:
     size: 100Gi
     annotations: {}
 
-  ## If false, data ownership will not be reset at startup
-  ## This allows the beacon node to be run with an arbitrary user
-  ##
+  # -- If false, data ownership will not be reset at startup
+  # This allows the beacon node to be run with an arbitrary user
+  #
   initChownData: true
 
   metrics:
-    ## Whether to enable metrics collection or not
-    ##
+    # -- Whether to enable metrics collection or not
     enabled: true
     annotations: {}
 
     port: 9090
     host: "0.0.0.0"
 
-    ## Monitoring
-    ## Teku Metric categories to enable
+    # -- Monitoring
+    # Teku Metric categories to enable
     categories:
       - JVM
       - PROCESS
@@ -469,69 +443,66 @@ beacon:
       - VALIDATOR
       - VALIDATOR_PERFORMANCE
 
-    # List of hostnames to allow, or * to allow any host
+    # -- List of hostnames to allow, or * to allow any host
     hostAllowList:
       - "*"
-    ## Prometheus Service Monitor
-    ## ref: https://github.com/coreos/prometheus-operator
-    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
-    ##
+    # -- Prometheus Service Monitor
+    # ref: https://github.com/coreos/prometheus-operator
+    #      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    #
     serviceMonitor:
-      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
-      ##
+      # -- Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
       enabled: true
 
-    ## Custom PrometheusRule to be defined
-    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
-    ##
+    # -- Custom PrometheusRule to be defined
+    # ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    #
     prometheusRule:
-      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
-      ##
+      # -- Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
       enabled: true
 
-  ## To get Beacon node up and running in only a few minutes
-  ## from a recent finalized checkpoint state rather than syncing from genesis.
-  ##
+  # -- To get Beacon node up and running in only a few minutes
+  # from a recent finalized checkpoint state rather than syncing from genesis.
+  #
   checkPointSync:
     enabled: true
     url: "https://mainnet-checkpoint-sync.attestant.io"
     trustedSourceUrl: ""
 
-  ## Post bellatrix, this address will receive the transaction fees produced
-  ## by any blocks from this node. Default to junk whilst bellatrix is in development state.
-  ## Validator client can override this value through the preparebeaconproposer api. 
-  ##
+  # -- Post bellatrix, this address will receive the transaction fees produced
+  # by any blocks from this node. Default to junk whilst bellatrix is in development state.
+  # Validator client can override this value through the preparebeaconproposer api.
+  #
   suggestedFeeRecipient: ""
 
-  # Lighthouse specific setting
+  # -- Lighthouse specific setting
   proposerOnly: false
 
-  ## Teku specific setting
+  # -- Teku specific setting
   javaOpts:
     enabled: true
-    # This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
+    # -- This option is used to set java specific values for heap size and should be used if you experience out of memory errors.
     # The Xmx option stands for the maximum memory allocation pool for a Java Virtual Machine ( JVM ).
     # https://besu.hyperledger.org/en/stable/public-networks/how-to/configure-jvm/manage-memory/
+    maxHeapSize: "-Xmx3g"
     # Example for kubernetes resources at 8Gi memory:
     # maxHeapSize: "-Xmx3g"
-    maxHeapSize: "-Xmx3g"
 
-  ## MEV Boost endpoint
-  ##
+  # -- MEV Boost endpoint
   builderEndpoint: ""
 
-  # Rest API Settings
+  # -- Rest API Settings
   restApi:
-    # Enables Beacon Rest API
+    # -- Enables Beacon Rest API
     enabled: true
     host: "0.0.0.0"
-    # Comma-separated list of hostnames to allow, or *
+    # -- Comma-separated list of hostnames to allow, or *
     # to allow any host
     hostAllowList:
       - "*"
     corsOrigins:
       - "*"
-    # Port number of Beacon Rest API
+    # -- Port number of Beacon Rest API
     portMap:
       teku: 5051
       prysm: 8080
@@ -548,46 +519,44 @@ beacon:
   targetPeers: 50
   targetPeersMin: 40
 
-  ## Sets the total difficulty to manual overrides the default
-  ## TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you
-  ## have a clear understanding that community has decided to override the terminal difficulty.
-  ## Incorrect usage will result in your node experience consensus failure.
+  # -- Sets the total difficulty to manual overrides the default
+  # TERMINAL_TOTAL_DIFFICULTY value. WARNING: This flag should be used only if you
+  # have a clear understanding that community has decided to override the terminal difficulty.
+  # Incorrect usage will result in your node experience consensus failure.
+  #
   totalDifficultyOverride: ""
 
-  ## Extra flags to pass to the node
-  ##
+  # -- Extra flags to pass to the node
   extraFlags: []
   resources: {}
 
-## Service account
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
-##
+# -- Service account
+# ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+#
 serviceAccount:
-  # Annotations to add to the service account
+  # -- Annotations to add to the service account
   annotations: {}
-  # The name of the service account to use.
+  # -- The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
+  #
   name: ""
 
-## Provide a name in place of geth for `app:` labels
-##
+# -- Provide a name in place of geth for `app:` labels
 nameOverride: ""
 
-## Provide a name to substitute for the full names of resources
-##
+# -- Provide a name to substitute for the full names of resources
 fullnameOverride: ""
-# RBAC configuration.
-## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
-##
+# -- RBAC configuration.
+# ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+#
 rbac:
-  # The name of the cluster role to use.
+  # -- The name of the cluster role to use.
   # If not set and create is true, a name is generated using the fullname template
+  #
   name: ""
-  ## Required ClusterRole rules
-  ##
+  # -- Required ClusterRole rules
   clusterRules:
-    ## Required to obtain the nodes external IP
-    ##
+    # -- Required to obtain the nodes external IP
     - apiGroups: [""]
       resources:
       - "nodes"
@@ -595,11 +564,10 @@ rbac:
       - "get"
       - "list"
       - "watch"
-  ## Required Role rules
-  ##
+  # -- Required Role rules
   rules:
-    ## Required to get information about the services nodePort.
-    ##
+    # -- Required to get information about the services nodePort.
+    #
     - apiGroups: [""]
       resources:
       - "services"

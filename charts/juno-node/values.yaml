@@ -5,7 +5,7 @@ deployment:
   replicas: 1
   imagename: nethermind/juno
   imagetag: v0.6.2
-  snapshotUrl: "" # if Value is Null sync start from 0 block
+  snapshotUrl: ""  # if Value is Null sync start from 0 block
   resources:
     limits:
       cpu: "4"
@@ -17,15 +17,15 @@ deployment:
   - 6060
   - 6061
   healthCheck:
-   enabled: false
-   livenessProbe: 
-     initialDelaySeconds: 9600
-     failureThreshold: 6
-     periodSeconds: 600
-   readinessProbe:
-     initialDelaySeconds: 9600
-     failureThreshold: 6
-     periodSeconds: 600
+    enabled: false
+    livenessProbe:
+      initialDelaySeconds: 9600
+      failureThreshold: 6
+      periodSeconds: 600
+    readinessProbe:
+      initialDelaySeconds: 9600
+      failureThreshold: 6
+      periodSeconds: 600
 
 ### Container Arguments
 args:
@@ -40,7 +40,7 @@ args:
   --pending-poll-interval: "2s"
   --ws: "true"
   --ws-port: "6061"
-  --ws-host: "0.0.0.0" 
+  --ws-host: "0.0.0.0"
 
 ### Node selector and Tanits
 nodeSelector:
@@ -51,12 +51,12 @@ nodeSelector:
 taintsToleration:
   enabled: false
   tolerations:
-      network: juno
+    network: juno
 
   ### Configmap
 
 
-  ### PGO Container 
+  ### PGO Container
 pgo:
   enabled: false
   image: "gcr.io/juno-dev-nth/node-pgo-monitor:4.0"
@@ -76,7 +76,7 @@ pgo:
     URL: "http://localhost:6062/debug/pprof/profile"
 
   ### Service account
-serviceAccount: 
+serviceAccount:
   enabled: false
   name: "juno-pgo"
   gcpServiceAccount: "monitoring-sa-euw1@juno-prod-nth.iam.gserviceaccount.com"
@@ -98,7 +98,7 @@ svc:
         checkIntervalSec: 15
         timeoutSec: 15
         healthyThreshold: 1
-        unhealthyThreshold: 2 
+        unhealthyThreshold: 2
         port: 6060
         type: HTTP
         requestPath: /
@@ -119,11 +119,10 @@ svc:
         checkIntervalSec: 15
         timeoutSec: 15
         healthyThreshold: 1
-        unhealthyThreshold: 2 
+        unhealthyThreshold: 2
         port: 6060
         type: HTTP
         requestPath: /
-        
   wss:
     clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
     port: "6061"
@@ -137,7 +136,7 @@ svc:
         checkIntervalSec: 15
         timeoutSec: 15
         healthyThreshold: 1
-        unhealthyThreshold: 2 
+        unhealthyThreshold: 2
         port: 6060
         type: HTTP
     internalBackendConfig:
@@ -150,7 +149,7 @@ svc:
         checkIntervalSec: 15
         timeoutSec: 15
         healthyThreshold: 1
-        unhealthyThreshold: 2 
+        unhealthyThreshold: 2
         port: 6060
         type: HTTP
         requestPath: /
@@ -163,7 +162,7 @@ svc:
     extraHost:
       enabled: false
       hosts:
-       - ""
+        - ""
     rules:
       - host: "test.juno.rpc.nethermind.dev"
         http:
@@ -183,8 +182,6 @@ svc:
               port:
                 number: 6061
 
-
-
 ### Horizontal pod scaling
 hpa:
   enabled: false
@@ -193,8 +190,8 @@ hpa:
   cpuUtilization: 80
 
 batchjob:
-   enabled: false
-   schedule: "* */1 * * *"
+  enabled: false
+  schedule: "* */1 * * *"
 ### Persistant Volume
 pvc:
   enabled: true
@@ -205,10 +202,9 @@ pvc:
     mountPath: /var/lib/juno
     storageSize: 250Gi
 
-### ENVIRONMENT VARIABLES 
+### ENVIRONMENT VARIABLES
 env:
   enabled: false
   data:
   - name: NETWORK
     value: "juno"
-

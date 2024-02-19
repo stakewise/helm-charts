@@ -28,15 +28,15 @@ ingress:
 
 ## Affinity for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
-affinity: 
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: node_pool
-                operator: In
-                values:
-                - monitoring
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: node_pool
+          operator: In
+          values:
+          - monitoring
 # podAntiAffinity:
 #   requiredDuringSchedulingIgnoredDuringExecution:
 #   - labelSelector:
@@ -211,7 +211,7 @@ service:
   labels: {}
   targetPort: http-metrics
 
-##internal-loadbalancer-service
+## internal-loadbalancer-service
 service_lb:
   enable: true
   type: LoadBalancer
@@ -229,7 +229,7 @@ serviceAccount:
   create: true
   name:
   annotations:
-        iam.gke.io/gcp-service-account: monitoring-sa@juno-dev-nth.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: monitoring-sa@juno-dev-nth.iam.gserviceaccount.com
   automountServiceAccountToken: true
 
 terminationGracePeriodSeconds: 4800
@@ -237,11 +237,10 @@ terminationGracePeriodSeconds: 4800
 ## Tolerations for pod assignment
 ## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
 tolerations:
-
-      - effect: PreferNoSchedule
-        key: monitoring
-        operator: Equal
-        value: true
+  - effect: PreferNoSchedule
+    key: monitoring
+    operator: Equal
+    value: true
 
 # The values to set in the PodDisruptionBudget spec
 # If not set then a PodDisruptionBudget will not be created

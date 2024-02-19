@@ -1,0 +1,32 @@
+# See https://github.com/scottrigby/prometheus-helm-charts/issues/12
+# https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners
+# https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-code-owners#codeowners-syntax
+
+# The repo admins team will be the default owners for everything in the repo.
+# Unless a later match takes precedence, they will be requested for review when someone opens a pull request.
+* @NethermindEth/angkor-validator-operators
+
+/.github/workflows/ @NethermindEth/angkor-validator-operators @AntiD2ta @aivarasko @matilote
+
+/charts/cert-manager/ @gehlotanish @Manjeet-Nethermind
+/charts/common/ @aivarasko @matilote
+/charts/dirk/ @aivarasko @matilote
+/charts/ethereum-node/ @gehlotanish @Manjeet-Nethermind
+/charts/execution-beacon/ @aivarasko @AntiD2ta @matilote
+/charts/external-dns/ @gehlotanish @Manjeet-Nethermind
+/charts/external-secrets/ @gehlotanish @Manjeet-Nethermind
+/charts/juno-node/ @gehlotanish @Manjeet-Nethermind
+/charts/kong/ @gehlotanish @Manjeet-Nethermind
+/charts/kube-prometheus-stack/ @gehlotanish @Manjeet-Nethermind
+/charts/lodestar/ @aivarasko @matilote @refl3ction @stdevMac
+/charts/loki/ @gehlotanish @Manjeet-Nethermind
+/charts/mev-boost/ @aivarasko @matilote
+/charts/mysql/ @gehlotanish @Manjeet-Nethermind
+/charts/posmoni/ @aivarasko @matilote
+/charts/promtail/ @gehlotanish @Manjeet-Nethermind
+/charts/rpc-saas-secretStore/ @gehlotanish @Manjeet-Nethermind
+/charts/validator-ejector/ @aivarasko @matilote
+/charts/validator-kapi/ @aivarasko @matilote
+/charts/validators/ @aivarasko @matilote
+/charts/vouch/ @aivarasko @matilote
+/charts/web3signer/ @aivarasko @matilote

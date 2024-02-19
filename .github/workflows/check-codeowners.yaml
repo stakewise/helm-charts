@@ -1,0 +1,23 @@
+name: Check CODEOWNERS
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          sudo snap install yq
+
+      - name: Generate CODEOWNERS
+        run: |
+          chmod +x ./scripts/check-codeowners.sh
+          ./scripts/check-codeowners.sh > .github/CODEOWNERS
+
+      - name: Check CODEOWNERS for modifications
+        run: |
+          git diff --exit-code || echo "::warning::There is at least one codeowner mismatch."
