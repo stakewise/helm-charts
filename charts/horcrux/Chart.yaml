@@ -10,6 +10,7 @@ keywords:
   - blockchain
   - staking
 home: https://stakewise.io/
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 sources:
   - https://github.com/stakewise/bls-horcrux/
 maintainers:

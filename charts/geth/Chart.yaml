@@ -4,6 +4,7 @@ version: 2.4.2
 kubeVersion: "^1.20.0-0"
 description: Official Golang implementation of the Ethereum v1 protocol.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -15,7 +16,6 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: v1.13.13
 
 dependencies:

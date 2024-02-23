@@ -4,6 +4,6 @@ dependencies:
   version: 1.0.0
 - name: ipfs
   repository: https://charts.stakewise.io/
-  version: 2.0.1
-digest: sha256:5f83f5ead4f9a04749ffdb12d9e4c7f70549ff16a964c1f16477f9cc9173442f
-generated: "2023-04-14T14:42:16.882137+04:00"
+  version: 2.0.4
+digest: sha256:c218ddebb280b18f60b1b306977791e5fe7f72852f4110688a0557cc2ec303f4
+generated: "2024-02-23T10:41:03.941111+03:00"

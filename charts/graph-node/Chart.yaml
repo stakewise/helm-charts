@@ -1,6 +1,7 @@
 apiVersion: v2
 name: graph-node
 description: Graph Node indexes data from blockchains such as Ethereum and serves it over GraphQL
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #

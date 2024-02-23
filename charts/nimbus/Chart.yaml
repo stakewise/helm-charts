@@ -4,6 +4,7 @@ version: 2.2.11
 kubeVersion: "^1.18.0-0"
 description: Nim implementation of the Ethereum Beacon Chain
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -15,10 +16,9 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: multiarch-v22.11.0
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

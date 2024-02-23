@@ -5,6 +5,7 @@ appVersion: v2.4.23
 kubeVersion: "^1.18.0-0"
 description: The StakeWise backend application.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain

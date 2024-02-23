@@ -1,7 +1,7 @@
 apiVersion: v2
 name: charon
 description: Charon is an open-source Ethereum Distributed validator client written in golang.
-icon: https://raw.githubusercontent.com/ObolNetwork/charon/main/docs/images/charonlogo.svg
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 home: https://obol.tech/
 sources:
   - https://github.com/ObolNetwork/charon
@@ -37,4 +37,3 @@ version: 0.1.1
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "0.11.0"
-

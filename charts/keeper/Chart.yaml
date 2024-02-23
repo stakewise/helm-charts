@@ -5,6 +5,7 @@ appVersion: v2.8.10
 kubeVersion: "^1.14.0-0"
 description: StakeWise Keeper is used to aggregate transactions from the oracles and submit them on-chain.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -17,6 +18,6 @@ maintainers:
     email: dmitri@stakewise.io
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

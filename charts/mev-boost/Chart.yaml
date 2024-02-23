@@ -2,6 +2,7 @@ apiVersion: v2
 name: mev-boost
 description: mev-boost allows proof-of-stake Ethereum consensus clients to outsource block construction
 home: https://boost.flashbots.net/
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -29,6 +30,6 @@ version: 1.5.0
 appVersion: "v1.5.0"
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x
