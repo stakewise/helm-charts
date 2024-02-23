@@ -171,7 +171,7 @@ sidecar:
 image:
   registry: "gcr.io"
   repository: "prysmaticlabs/prysm/beacon-chain"
-  tag: "v4.2.1"
+  tag: "v5.0.0"
   pullPolicy: IfNotPresent
 imageGnosis:
   registry: "ghcr.io"
