@@ -4,6 +4,7 @@ description: .NET Core Ethereum client
 type: application
 version: 2.5.2
 appVersion: "v1.25.4"
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -12,7 +13,6 @@ keywords:
 home: https://nethermind.io/
 sources:
   - https://github.com/NethermindEth/nethermind
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 
 dependencies:
   - name: common

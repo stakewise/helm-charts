@@ -4,6 +4,7 @@ version: 3.2.10
 appVersion: v1.0.8
 description: Operator hosted service for Stakewise V3 protocol.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain

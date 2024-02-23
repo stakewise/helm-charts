@@ -1,6 +1,7 @@
 apiVersion: v2
 name: whitelist
 description: Harbour whitelist service helm chart for Kubernetes
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -24,6 +25,6 @@ version: 1.0.2
 appVersion: "v1.0.3"
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

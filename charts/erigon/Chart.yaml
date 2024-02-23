@@ -1,7 +1,7 @@
 apiVersion: v2
 name: erigon
 description: Ethereum implementation on the efficiency frontier
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #

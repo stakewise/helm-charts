@@ -1,6 +1,7 @@
 apiVersion: v2
 name: lighthouse-validator
 description: A Lighthouse Validator Chart
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -24,6 +25,6 @@ version: 5.0.0
 appVersion: "5.0.0"
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

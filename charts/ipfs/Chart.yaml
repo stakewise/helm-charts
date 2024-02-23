@@ -1,6 +1,7 @@
 apiVersion: v2
 name: ipfs
 description: IPFS implementation in Go
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -31,6 +32,6 @@ sources:
   - https://github.com/ipfs/kubo
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

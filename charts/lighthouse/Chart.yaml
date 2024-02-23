@@ -4,6 +4,7 @@ version: 5.0.0
 kubeVersion: "^1.20.0-0"
 description: Rust Ethereum 2.0 Client.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -15,10 +16,9 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: v5.0.0
 
 dependencies:
-- name: common
-  repository: https://charts.stakewise.io/
-  version: 1.x.x
+  - name: common
+    repository: https://charts.stakewise.io/
+    version: 1.x.x

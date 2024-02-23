@@ -3,6 +3,7 @@ name: lodestar
 version: 1.0.7
 kubeVersion: "^1.20.0-0"
 description: Rust Ethereum 2.0 Client.
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 type: application
 keywords:
   - ethereum
@@ -15,7 +16,6 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 appVersion: v1.15.1
 
 dependencies:

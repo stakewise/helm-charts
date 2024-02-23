@@ -1,7 +1,7 @@
 apiVersion: v2
 name: teku
 description: Teku is an open-source Ethereum 2.0 client written in Java.
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 home: https://stakewise.io/
 sources:
   - https://github.com/ConsenSys/teku

@@ -5,6 +5,7 @@ appVersion: v4.2.1
 kubeVersion: "^1.18.0-0"
 description: Go implementation of Ethereum proof of stake.
 type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
   - ethereum
   - blockchain
@@ -16,7 +17,6 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-icon: https://raw.githubusercontent.com/ethereum/ethereum-org/master/public/images/logos/ETHEREUM-ICON_Black.png
 
 dependencies:
   - name: common
