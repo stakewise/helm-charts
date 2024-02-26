@@ -11,6 +11,7 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: {{ .Values.svc.rpc.clustertype }}
+  externalTrafficPolicy: {{ default "Cluster" .Values.svc.externalTrafficPolicy }}
   ports:
   - port: {{ .Values.svc.rpc.port }}
     name: port-{{ .Values.svc.rpc.port }}
@@ -32,6 +33,7 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: {{ .Values.svc.wss.clustertype }}
+  externalTrafficPolicy: {{ default "Cluster" .Values.svc.externalTrafficPolicy }}
   ports:
   - port: {{ .Values.svc.wss.port }}
     name: port-{{ .Values.svc.wss.port }}

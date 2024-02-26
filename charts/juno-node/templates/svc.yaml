@@ -10,10 +10,7 @@ metadata:
     cloud.google.com/neg: '{"ingress": true}'
 spec:
   type: {{ .Values.svc.rpc.clustertype }}
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 30
+  externalTrafficPolicy: {{ default "Cluster" .Values.svc.externalTrafficPolicy }}
   ports:
   - port: {{ .Values.svc.rpc.port }}
     name: port-{{ .Values.svc.rpc.port }}

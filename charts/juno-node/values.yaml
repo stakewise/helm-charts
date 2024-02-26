@@ -85,6 +85,7 @@ serviceAccount:
 svc:
   globalStaticIpName: ""
   globalStaticInternalIpName: ""
+  externalTrafficPolicy: ""
   rpc:
     clustertype: ClusterIP     # Support: LoadBalancer, NodePort, ClusterIP
     port: "6060"
