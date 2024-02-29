@@ -51,8 +51,8 @@ spec:
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            readOnlyRootFilesystem: false
-            runAsNonRoot: false
+            runAsUser: 0
+            allowPrivilegeEscalation: true
           command:
             - bash
             - -xc
