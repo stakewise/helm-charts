@@ -45,7 +45,7 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "dirk.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
@@ -65,7 +65,7 @@ spec:
               printenv dirk-ca.crt | base64 -d  > /data/dirk/certs/ca.crt;
               printenv dirk-ca.key | base64 -d  > /data/dirk/certs/ca.key;
               bash /scripts/generate_cert.sh /data/dirk/certs/ ca ${HOSTNAME}.{{ include "dirk.fullname" . }};
-              chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} /data/dirk;
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} /data/dirk;
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -80,13 +80,7 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
-            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
-            fsGroup: {{ .Values.global.securityContext.fsGroup | default 10000 }}
-            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -111,13 +105,7 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
-            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
-            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
-            fsGroup: {{ .Values.global.securityContext.fsGroup | default 10000 }}
-            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
-            capabilities:
-              drop:
-                - ALL
+              {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
@@ -162,13 +150,7 @@ spec:
           image: "{{ .Values.cliImage.repository }}:{{ .Values.cliImage.tag }}"
           imagePullPolicy: {{ .Values.cliImage.pullPolicy }}
           securityContext:
-            runAsNonRoot: {{ .Values.global.securityContext.runAsNonRoot | default true }}
-            runAsUser: {{ .Values.global.securityContext.runAsUser | default 10000 }}
-            fsGroup: {{ .Values.global.securityContext.fsGroup | default 10000 }}
-            readOnlyRootFilesystem: {{ .Values.global.securityContext.readOnlyRootFilesystem | default true }}
-            capabilities:
-              drop:
-                - ALL
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           envFrom:
             - secretRef:
                 name: eso-{{ include "common.names.fullname" . }}
