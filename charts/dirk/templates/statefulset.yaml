@@ -51,8 +51,7 @@ spec:
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            allowPrivilegeEscalation: false
-            runAsUser: 0
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           command:
             - bash
             - -xc
