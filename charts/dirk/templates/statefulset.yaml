@@ -56,7 +56,6 @@ spec:
             - bash
             - -xc
             - >
-              apk add openssl envsubst;
               rm -f /data/dirk/dirty;
               mkdir -p /data/dirk/certs;
               export INDEX=$((${HOSTNAME##*-}+1));
