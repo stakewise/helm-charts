@@ -52,11 +52,7 @@ spec:
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             readOnlyRootFilesystem: false
-            runAsNonRoot: true
-            runAsUser: 10000
-            capabilities:
-              drop:
-              - ALL
+            runAsNonRoot: false
           command:
             - bash
             - -xc
