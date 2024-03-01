@@ -46,10 +46,6 @@ spec:
           securityContext:
             readOnlyRootFilesystem: false
             runAsNonRoot: false
-            runAsUser: 10000
-            capabilities:
-              drop:
-              - ALL
           command:
             - sh
             - -ac
