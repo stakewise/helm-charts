@@ -21,6 +21,9 @@ data:
       id: $INDEX
       name: $HOSTNAME.{{ include "dirk.fullname" . }}
       listen-address: 0.0.0.0:{{ .Values.service.httpPort }}
+      rules:
+        # admin-ips is a list of IP addresses from which requests for voluntary exists will be accepted.
+        admin-ips: {{ .Values.dirk.server.rules.adminIPs }}
     certificates:
       ca-cert: file:///data/dirk/certs/ca.crt
       server-cert: file:///data/dirk/certs/$HOSTNAME.{{ include "dirk.fullname" . }}.crt

@@ -52,8 +52,8 @@ spec:
               apk add openssl;
               mkdir -p {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/;
               cp /config/vouch.yaml {{ .Values.vouchDataDir }}/;
-              printenv vouch-ca.crt | base64 -d  > {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.crt;
-              printenv vouch-ca.key | base64 -d  > {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.key;
+              printenv CA_CRT | base64 -d  > {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.crt;
+              printenv CA_KEY | base64 -d  > {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ca.key;
               bash /scripts/generate_cert.sh {{ .Values.vouchDataDir }}/{{ include "common.names.fullname" . }}/certs/ ca {{ include "common.names.fullname" . }};
               chown -R {{ .Values.podSecurityContext.runAsUser }}:{{ .Values.podSecurityContext.fsGroup }} {{ .Values.vouchDataDir }};
           envFrom:
