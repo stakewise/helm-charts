@@ -45,7 +45,7 @@ spec:
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
             readOnlyRootFilesystem: false
-            runAsNonRoot: true
+            runAsNonRoot: false
             runAsUser: 10000
             capabilities:
               drop:
