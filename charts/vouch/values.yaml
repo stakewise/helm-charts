@@ -5,18 +5,33 @@
 global:
   serviceAccount:
     create: true
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
 
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
+      
 image:
   repository: attestant/vouch
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "1.7.6"
+  tag: "1.8.0"
 
 ## Init image is used to chown data volume, etc.
 ##
 initImage:
-  repository: bash
-  tag: "5.2"
+  repository: nethermindeth/bash
+  tag: "5.2-alpine3.19"
   pullPolicy: IfNotPresent
 
 cliImage:
@@ -125,21 +140,6 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
-## Pod Security Context
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
-##
-podSecurityContext:
-  fsGroup: 1000
-  runAsUser: 1000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 
 service:
   type: ClusterIP
