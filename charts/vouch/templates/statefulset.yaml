@@ -44,7 +44,12 @@ spec:
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            {{- toYaml .Values.global.securityContext | nindent 12 }}
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+            capabilities:
+              drop:
+              - ALL
           command:
             - sh
             - -ac
