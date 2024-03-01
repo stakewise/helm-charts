@@ -38,14 +38,13 @@ spec:
       {{- end }}
       serviceAccountName: {{ include "vouch.serviceAccountName" . }}
       securityContext:
-        {{- toYaml .Values.global.securityContext | nindent 12 }}
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
           image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
           imagePullPolicy: {{ .Values.initImage.pullPolicy }}
           securityContext:
-            readOnlyRootFilesystem: false
-            runAsNonRoot: false
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
           command:
             - sh
             - -ac
