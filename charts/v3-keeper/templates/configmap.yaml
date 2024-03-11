@@ -10,3 +10,6 @@ data:
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   METRICS_HOST: {{ .Values.serviceMonitor.host | quote }}
+
+  IPFS_LOCAL_CLIENT_ENDPOINT: {{ .Values.settings.ipfsLocalClientEndpoint | quote }}
+  IPFS_INFURA_CLIENT_ENDPOINT: {{ .Values.settings.ipfsInfuraClientEndpount | quote }}
