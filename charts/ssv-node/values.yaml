@@ -21,7 +21,7 @@ image:
   repository: bloxstaking/ssv-node
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.3.1"
+  tag: "v1.3.2"
 
 imagePullSecrets: []
 nameOverride: ""
