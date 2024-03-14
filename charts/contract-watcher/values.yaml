@@ -21,6 +21,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 wsUrl: ""
+wsGnosisUrl: ""
 telegramApiToken: ""
 telegramReceivers: ""
 discordWebhookUrl: ""

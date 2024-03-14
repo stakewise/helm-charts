@@ -36,6 +36,8 @@ spec:
           env:
             - name: WS_URL
               value: {{ .Values.wsUrl | quote }}
+            - name: WS_GNOSIS_URL
+              value: {{ .Values.wsGnosisUrl | quote }}
             - name: TELEGRAM_API_TOKEN
               value: {{ .Values.telegramApiToken | quote }}
             - name: TELEGRAM_RECEIVERS
