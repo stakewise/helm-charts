@@ -102,6 +102,9 @@ spec:
             - name: http
               containerPort: {{ .Values.service.httpPort }}
               protocol: TCP
+            - name: blockrelay
+              containerPort: {{ .Values.blockRelayPort }}
+              protocol: TCP
             - name: metrics
               containerPort: {{ .Values.metricsPort }}
               protocol: TCP
