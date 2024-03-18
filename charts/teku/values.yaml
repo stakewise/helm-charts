@@ -330,8 +330,8 @@ podAnnotations: {}
 # if --data-storage-mode is set to PRUNE
 dataStorageArchiveFrequency: "2048"
 # Sets the strategy for handling historical chain data
-# (Valid values: ARCHIVE, PRUNE)
-dataStorageMode: PRUNE
+# (Valid values: archive, prune, minimal)
+dataStorageMode: minimal
 # Store non-canonical blocks
 dataStorageNonCanonicalBlocksEnabled: false
 # Rest API Settings
