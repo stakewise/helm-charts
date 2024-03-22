@@ -12,7 +12,9 @@ spec:
     matchLabels:
       app: {{ .Values.deployment.projectName }}
   serviceName: {{ .Values.deployment.projectName }}
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.deployment.replicas }}
+  {{- end }}
   template:
     metadata:
       annotations:
