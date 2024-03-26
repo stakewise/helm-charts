@@ -74,7 +74,7 @@ loggingLevel: "INFO"
 
 ## Number of epochs to keep when pruning the slashing protection database.
 ##
-pruningEpochToKeep: 100
+pruningEpochToKeep: 10
 
 ## Hours between slashing protection database pruning operations.
 ##
