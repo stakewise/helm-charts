@@ -355,12 +355,19 @@ restApi:
   # Enable swagger-docs and swagger-ui endpoints
   docsEnabled: false
 
-## If set, teku will download a recent finalized checkpoint state from a beacon node. For more information see here: https://docs.teku.consensys.net/en/latest/HowTo/Get-Started/Checkpoint-Start/
+## Note: The newer way to perform a checkpoint sync is using 'checkpointSyncUrl'.
+## However, you can still use 'initialState'. If you provide both accidentally, 'checkpointSyncUrl' will be prioritized.
+
+## If set, teku will perform a checkpoint sync. For more information see here: https://docs.teku.consensys.io/reference/cli#checkpoint-sync-url
 ## Respective public checkpoint sync endpoints can be found here: https://eth-clients.github.io/checkpoint-sync-endpoints/
 ## It is not recommended to blindly trust any public beacon node.
 ## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root
+##
+checkpointSyncUrl: ""
+
+## If set, teku will download a recent finalized checkpoint state from a beacon node. For more information see here: https://docs.teku.consensys.net/en/latest/HowTo/Get-Started/Checkpoint-Start/
 ## Note:
-## Additionally to the checkpoint sync url Teku needs the following path to obtain the finalized state: /eth/v2/debug/beacon/states/finalized
+## Additionally to 'checkpointSyncUrl', Teku needs the following path to obtain the finalized state: /eth/v2/debug/beacon/states/finalized
 ## To keep UX similar across all charts, the path is hardcoded in the statefulset, so you DON'T need to add it here.
 ##
 initialState: ""

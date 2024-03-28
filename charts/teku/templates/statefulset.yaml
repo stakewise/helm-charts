@@ -116,6 +116,9 @@ spec:
             {{- if .Values.initialState }}
               --initial-state={{ .Values.initialState }}/eth/v2/debug/beacon/states/finalized
             {{- end }}
+            {{- if .Values.checkpointSyncUrl }}  
+              --checkpoint-sync-url={{ .Values.checkpointSyncUrl }}
+            {{- end }}
               --config-file=/data/teku/config.yaml
               --data-beacon-path=/data/teku/beacon
               --data-path=/data/teku
