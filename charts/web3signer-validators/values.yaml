@@ -113,11 +113,11 @@ image:
   prysm:
     registry: "gcr.io"
     repository: "prysmaticlabs/prysm/validator"
-    tag: "v5.0.0"
+    tag: "v5.0.2"
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
-    tag: "v5.1.2"
+    tag: "v5.1.3"
   teku:
     registry: "docker.io"
     repository: "consensys/teku"
