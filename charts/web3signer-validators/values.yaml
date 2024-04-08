@@ -46,7 +46,7 @@ initImageBusybox:
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v1.1.0"
+  tag: "v1.1.1"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
@@ -113,7 +113,7 @@ image:
   prysm:
     registry: "gcr.io"
     repository: "prysmaticlabs/prysm/validator"
-    tag: "v5.0.2"
+    tag: "v5.0.3"
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
