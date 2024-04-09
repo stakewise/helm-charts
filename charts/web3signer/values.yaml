@@ -51,7 +51,7 @@ decryptionKey: ""
 flywayImage:
   registry: "docker.io"
   repository: flyway/flyway
-  tag: "9-alpine"
+  tag: "10.11-alpine"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
