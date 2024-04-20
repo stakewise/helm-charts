@@ -1,0 +1,217 @@
+{{- if .Values.backupJunoDataJob.enabled -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.deployment.projectName }}-backup-junodata-sa
+  namespace: {{ .Values.deployment.namespace }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.deployment.projectName }}-backup-junodata-role
+  namespace: {{ .Values.deployment.namespace }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "persistentvolumeclaims"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.deployment.projectName }}-backup-junodata-rolebinding
+  namespace: {{ .Values.deployment.namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.deployment.projectName }}-backup-junodata-sa
+    namespace: {{ .Values.deployment.namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.deployment.projectName }}-backup-junodata-role
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rclone-config
+  namespace: {{ .Values.deployment.namespace }}
+stringData:
+  rclone.conf: |
+    [R2]
+    type = s3
+    provider = Cloudflare
+    access_key_id = 95c74078b7e7c98b7d22c16ae35ae19c
+    secret_access_key = 6eab1ca3029d262bda40508c011542c74ebd57ef8eeed5c80c9b85781f804075
+    endpoint = https://d1cc7d59ae8f8dc2b1aa530c41b5c6ec.r2.cloudflarestorage.com
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.deployment.namespace }}-juno-data-backup-pvc
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: premium-rwo
+  resources:
+    requests:
+      storage: 200Gi
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloning-disk-manifest
+  namespace: {{ .Values.deployment.namespace }}
+data:
+  cloning-disk-manifest.yaml: |
+    kind: PersistentVolumeClaim
+    apiVersion: v1
+    metadata:
+      name: {{ .Values.deployment.namespace }}-pv-ssd-snapshot
+      namespace: {{ .Values.deployment.namespace }}
+    spec:
+      dataSource:
+        name: {{ .Values.backupJunoDataJob.dataSource }}
+        kind: PersistentVolumeClaim
+      accessModes:
+      - ReadWriteOnce
+      storageClassName: premium-rwo
+      resources:
+        requests:
+          storage: {{ .Values.backupJunoDataJob.strageSize }}
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloning-juno-manifest
+  namespace: {{ .Values.deployment.namespace }}
+data:
+  cloning-juno-manifest.yaml: |
+    apiVersion: v1
+    kind: Pod
+    metadata:
+      name: juno-data-archival-pod-0
+      namespace: {{ .Values.deployment.namespace }}
+    spec:
+      serviceAccountName: {{ .Values.deployment.projectName }}-backup-junodata-sa
+      volumes:
+      - name: juno-data-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.deployment.namespace }}-pv-ssd-snapshot
+      - name: rclone-config
+        secret:
+          secretName: rclone-config
+      - name: tar-backup-volume
+        persistentVolumeClaim:
+          claimName: {{ .Values.deployment.namespace }}-juno-data-backup-pvc
+      initContainers:
+      - name: juno-archival-tar
+        image: ukemzyskywalker/archiver:v2
+        command: ["/bin/sh", "-c"]
+        args:
+        - |
+          rm -rf /mnt/juno-tar-backup/*.tar &&
+          rm -rf /mnt/data/*.tar &&
+          tar -czvf /mnt/juno-tar-backup/juno_{{ .Values.backupJunoDataJob.network }}_{{ .Values.deployment.imagetag }}_$(date +\%Y\%m\%d).tar --exclude=./lost+found -C /mnt/data .  && sleep 10
+        volumeMounts:
+        - name: juno-data-volume
+          mountPath: /mnt/data
+        - name: tar-backup-volume
+          mountPath: /mnt/juno-tar-backup
+      containers:
+      - name: rclone-upload-container
+        image: rclone/rclone:latest
+        command: ["/bin/sh"]
+        args: ["-c", "rclone copy /mnt/juno-tar-backup/*.tar R2:/juno-snapshot/{{ .Values.backupJunoDataJob.network}}"]
+        volumeMounts:
+        - name: rclone-config
+          mountPath: /config/rclone
+        - name: tar-backup-volume
+          mountPath: /mnt/juno-tar-backup
+      restartPolicy: OnFailure
+
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ .Values.deployment.projectName }}-backup-junodata-cronjob
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  schedule: "{{ .Values.backupJunoDataJob.backupSchedule}}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      completions: 1
+      ttlSecondsAfterFinished: 30
+      template:
+        spec:
+          serviceAccountName: {{ .Values.deployment.projectName }}-backup-junodata-sa
+          restartPolicy: Never
+          initContainers:
+            - name: copy-disk-kubectl-container
+              image: bitnami/kubectl:latest
+              command: ["/bin/sh"]
+              args: ["-c", "kubectl apply -f /cloning-disk-manifest/cloning-disk-manifest.yaml"]
+              volumeMounts:
+                - name: cloning-disk-manifest-volume
+                  mountPath: /cloning-disk-manifest
+          containers:
+            - name: clone-juno-kubectl-container
+              image: bitnami/kubectl:latest
+              command: ["/bin/sh"]
+              args: ["-c", "kubectl apply -f /cloning-juno-manifest/cloning-juno-manifest.yaml"]
+              volumeMounts:
+                - name: cloning-juno-manifest-volume
+                  mountPath: /cloning-juno-manifest
+          volumes:
+            - name: cloning-juno-manifest-volume
+              configMap:
+                name: cloning-juno-manifest
+            - name: cloning-disk-manifest-volume
+              configMap:
+                name: cloning-disk-manifest
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: delete-completed-pod-cronjob
+  namespace: {{ .Values.deployment.namespace }}
+spec:
+  schedule: "{{ .Values.backupJunoDataJob.cleanupSchedule}}"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      completions: 1
+      ttlSecondsAfterFinished: 30
+      template:
+        spec:
+          serviceAccountName: {{ .Values.deployment.projectName }}-backup-junodata-sa
+          restartPolicy: OnFailure
+          containers:
+            - name: kubectl-container
+              image: bitnami/kubectl:latest
+              command:
+                - "/bin/bash"
+                - "-c"
+                - |
+                  kubectl delete pod --field-selector=status.phase==Succeeded
+                  sleep 10
+                  describe_output=$(kubectl describe pvc {{ .Values.deployment.namespace }}-pv-ssd-snapshot)
+                  if echo "$describe_output" | grep -q "Used By:[[:space:]]*<none>"; then
+                    echo "deleting {{ .Values.deployment.namespace }}-pv-ssd-snapshot....."
+                    kubectl delete pvc {{ .Values.deployment.namespace }}-pv-ssd-snapshot
+                    sleep 30
+                  fi
+                  describe_output=$(kubectl describe pvc {{ .Values.deployment.namespace }}-juno-data-backup-pvc)
+                  if echo "$describe_output" | grep -q "Used By:[[:space:]]*<none>"; then
+                    echo "deleting {{ .Values.deployment.namespace }}-juno-data-backup-pvc....."
+                    kubectl delete pvc {{ .Values.deployment.namespace }}-juno-data-backup-pvc
+                    sleep 30
+                  fi
+  {{- end -}}

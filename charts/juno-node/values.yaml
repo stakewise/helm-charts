@@ -209,3 +209,12 @@ env:
   data:
   - name: NETWORK
     value: "juno"
+
+### Back up juno data and upload to R2 cloud
+backupJunoDataJob:
+  enabled: true
+  dataSource: "juno-sepolia-pv-ssd-juno-sepolia-0"
+  backupSchedule: "*/20 * * * *"
+  cleanupSchedule: "*/40 * * * *"
+  network: "sepolia"
+  strageSize: 200Gi
