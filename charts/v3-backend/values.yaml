@@ -65,6 +65,7 @@ settings:
     postgresUser: ""
     postgresPassword: ""
     vaultsTable: ""
+    exitRequestsTable: ""
 
   postgres:
     host: localhost
@@ -76,7 +77,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v1.3.3"
+  tag: "v1.5.3"
   pullPolicy: IfNotPresent
   pullSecrets: []
 

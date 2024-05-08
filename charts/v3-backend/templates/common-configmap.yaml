@@ -44,3 +44,4 @@ data:
   GRAPH_POSTGRES_PORT: {{ .Values.settings.graph.postgresPort | quote }}
   GRAPH_POSTGRES_DB: {{ .Values.settings.graph.postgresDB | quote }}
   GRAPH_VAULTS_TABLE: {{ .Values.settings.graph.vaultsTable | quote }}
+  GRAPH_EXIT_REQUESTS_TABLE: {{ .Values.settings.graph.exitRequestsTable | quote }}
