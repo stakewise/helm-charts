@@ -45,7 +45,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-keeper"
-  tag: "v0.7.2"
+  tag: "v0.7.5"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
