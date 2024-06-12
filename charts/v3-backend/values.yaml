@@ -32,7 +32,6 @@ settings:
   multisigOwnersTelegramChatId: ""
 
   gcpStorageContentBucket: ""
-  gcpStorageExitSignaturesBucket: ""
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
   gcpStorageIpfsBucket: ""

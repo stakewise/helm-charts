@@ -11,7 +11,6 @@ data:
   CELERY_CONCURRENCY: {{ .Values.settings.celeryConcurrency | quote }}
 
   GCP_STORAGE_CONTENT_BUCKET: {{ .Values.settings.gcpStorageContentBucket | quote }}
-  GCP_STORAGE_EXIT_SIGNATURES_BUCKET: {{ .Values.settings.gcpStorageExitSignaturesBucket | quote }}
   GCP_STORAGE_DOMAIN_ALIAS: {{ .Values.settings.gcpStorageDomainAlias | quote }}
   GCP_STORAGE_IPFS_BUCKET: {{ .Values.settings.gcpStorageIpfsBucket | quote }}
 
