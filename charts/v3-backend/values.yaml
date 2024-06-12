@@ -32,6 +32,7 @@ settings:
   multisigOwnersTelegramChatId: ""
 
   gcpStorageContentBucket: ""
+  gcpStorageExitSignaturesBucket: ""
   gcpStorageOauthCredentials: ""
   gcpStorageDomainAlias: ""
   gcpStorageIpfsBucket: ""
@@ -77,7 +78,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v1.6.0"
+  tag: "v1.6.5"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
