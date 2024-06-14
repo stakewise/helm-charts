@@ -33,10 +33,11 @@ graph:
     database: ""
     username: ""
     password: ""
+    poolSize: "30"
 
   # -- Blockchain configuration for Graph Node
   chains:
-  # -- Ethereum Mainnet
+    # -- Ethereum Mainnet
     mainnet:
       # -- Enable this configuring graph-node with this chain
       enabled: false
@@ -44,8 +45,7 @@ graph:
       shard: primary
       ## -- A list of JSON-RPC endpoints for this node
       provider:
-        - 
-          # -- Label for the RPC endpoint
+        - # -- Label for the RPC endpoint
           label: eth-mainnet
           # -- URL for JSON-RPC endpoint
           url: ""
@@ -67,7 +67,7 @@ graph:
     [store]
       [store.primary]
       connection = "postgresql://{{ $.Values.graph.postgresql.username }}:{{ $.Values.graph.postgresql.password }}@{{ $.Values.graph.postgresql.host }}:{{ $.Values.graph.postgresql.port }}/{{ $.Values.graph.postgresql.database }}"
-      pool_size = 30
+      pool_size = {{ $.Values.graph.postgresql.poolSize }}
       weight = 1
     # Chain configuration
     {{- $patchedChains := dict "ingestor" (print (include "common.names.fullname" $) "-0" ) }}
@@ -136,7 +136,8 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
