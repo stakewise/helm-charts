@@ -83,27 +83,27 @@ settings:
 
   ## Graph
   ## Options:
-  ## mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+  ## mainnet: "https://graph.stakewise.io/subgraphs/name/stakewise/stakewise"
   ## goerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-goerli"
   ## permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
-  ## gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-gnosis"
+  ## gnosis: "https://graph-gno.stakewise.io/subgraphs/name/stakewise/stakewise"
   ## harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-harbour-mainnet"
   ## harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/stakewise-perm-goerli"
-  stakewiseSubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/stakewise,https://api.thegraph.com/subgraphs/name/stakewise/stakewise-mainnet"
+  stakewiseSubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/stakewise"
 
   ## Options:
-  ## mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+  ## mainnet: "https://graph.stakewise.io/subgraphs/name/stakewise/uniswap-v3"
   ## goerli: "https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-goerli"
-  uniswapV3SubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/uniswap-v3,https://api.thegraph.com/subgraphs/name/stakewise/uniswap-v3-mainnet"
+  uniswapV3SubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/uniswap-v3"
 
   ## Options:
-  ## mainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+  ## mainnet: "https://graph.stakewise.io/subgraphs/name/stakewise/ethereum"
   ## goerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
   ## permGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
-  ## gnosis: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-gnosis"
+  ## gnosis: "https://graph-gno.stakewise.io/subgraphs/name/stakewise/ethereum"
   ## harbourMainnet: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
   ## harbourGoerli: "https://api.thegraph.com/subgraphs/name/stakewise/ethereum-goerli"
-  ethereumSubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/ethereum,https://api.thegraph.com/subgraphs/name/stakewise/ethereum-mainnet"
+  ethereumSubgraphUrls: "https://graph.stakewise.io/subgraphs/name/stakewise/ethereum"
 
   ## Credentials
   ##
