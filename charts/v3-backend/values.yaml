@@ -51,6 +51,8 @@ settings:
 
   executionEndpoints: ""
   consensusEndpoints: ""
+  exchangeRateExecutionEndpoints: ""
+  exchangeRateConsensusEndpoints: ""
 
   memcachedUrl: ""
   brokerUrl: ""
