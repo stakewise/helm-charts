@@ -1,0 +1,24 @@
+apiVersion: v2
+name: reth
+version: 1.0.0
+kubeVersion: "^1.20.0-0"
+description: Official Golang implementation of the Ethereum v1 protocol.
+type: application
+icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
+keywords:
+  - ethereum
+  - blockchain
+  - reth
+  - p2p
+home: https://www.ethereum.org/
+sources:
+  - https://github.com/ethereum/go-ethereum/
+maintainers:
+  - name: Dmitri Tsumak
+    email: dmitri@stakewise.io
+appVersion: v1.0.0
+
+dependencies:
+  - name: common
+    version: 1.x.x
+    repository: https://charts.stakewise.io/
