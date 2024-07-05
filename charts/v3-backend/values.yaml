@@ -53,6 +53,8 @@ settings:
   consensusEndpoints: ""
   exchangeRateExecutionEndpoints: ""
   exchangeRateConsensusEndpoints: ""
+  consensusTimeout: "30"
+  consensusRetryTimeout: "60"
 
   memcachedUrl: ""
   brokerUrl: ""

@@ -27,6 +27,9 @@ data:
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   EXCHANGE_RATE_EXECUTION_ENDPOINTS: {{ .Values.settings.exchangeRateExecutionEndpoints | quote }}
   EXCHANGE_RATE_CONSENSUS_ENDPOINTS: {{ .Values.settings.exchangeRateConsensusEndpoints | quote }}
+  CONSENSUS_TIMEOUT: {{ .Values.settings.consensusTimeout | quote }}
+  CONSENSUS_RETRY_TIMEOUT: {{ .Values.settings.consensusRetryTimeout | quote }}
+
 
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
 
