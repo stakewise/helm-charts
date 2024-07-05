@@ -2,7 +2,7 @@ apiVersion: v2
 name: reth
 version: 1.0.0
 kubeVersion: "^1.20.0-0"
-description: Official Golang implementation of the Ethereum v1 protocol.
+description: Reth (short for Rust Ethereum, pronunciation) is an Ethereum full node implementation that is focused on being user-friendly, highly modular, as well as being fast and efficient.
 type: application
 icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
@@ -10,9 +10,9 @@ keywords:
   - blockchain
   - reth
   - p2p
-home: https://www.ethereum.org/
+home: https://reth.rs/
 sources:
-  - https://github.com/ethereum/go-ethereum/
+  - https://github.com/paradigmxyz/reth
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io

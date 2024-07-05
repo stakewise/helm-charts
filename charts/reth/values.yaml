@@ -93,7 +93,6 @@ sidecar:
   bindPort: 3000
 
 ## Reth image version
-## ref: https://hub.docker.com/r/ethereum/client-go/tags/
 ##
 image:
   registry: "ghcr.io"
