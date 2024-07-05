@@ -1,0 +1,383 @@
+# Default values for reth.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  replicaCount: 1
+
+  ## Eth2 network ID
+  ##
+  network: mainnet
+
+  ## JSON Web Token (JWT) authentication is used to secure the communication
+  ## between the beacon node and execution client. You can generate a JWT using
+  ## a command line tool, for example:
+  ## openssl rand -hex 32 > token.txt
+  ##
+  JWTSecret: ""
+
+  ## Credentials to fetch images from private registry
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  imagePullSecrets: []
+
+  ## Service account
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+  ## Additional settings could be made in non-global section.
+  ##
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+
+  ## RBAC configuration.
+  ## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+  ## Additional settings could be made in non-global section.
+  ##
+  rbac:
+    ## Specifies whether RBAC resources are to be created
+    ##
+    create: true
+
+  ## Monitoring
+  ## Additional settings could be made in non-global section.
+  ##
+  metrics:
+    ## Whether to enable metrics collection or not
+    ##
+    enabled: true
+
+    ## Prometheus Service Monitor
+    ## ref: https://github.com/coreos/prometheus-operator
+    ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+    ##
+    serviceMonitor:
+      ## Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+    ## Custom PrometheusRule to be defined
+    ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+    ##
+    prometheusRule:
+      ## Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+      ##
+      enabled: false
+
+  ## Configure liveness and readiness probes
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+  ## NB! readinessProbe and livenessProbe must be disabled before fully synced
+  ## Additional settings could be made in non-global section.
+  ##
+  livenessProbe:
+    enabled: true
+
+  readinessProbe:
+    enabled: true
+
+## Init image is used to chown data volume, initialise genesis, etc.
+##
+initImage:
+  registry: "docker.io"
+  repository: "bitnami/kubectl"
+  tag: "1.24"
+  pullPolicy: IfNotPresent
+
+## Sidecar image is used to perform Liveness/Readiness probes.
+##
+sidecar:
+  registry: "europe-west4-docker.pkg.dev"
+  repository: "stakewiselabs/public/ethnode-sidecar"
+  tag: "v1.0.6"
+  pullPolicy: IfNotPresent
+  bindAddr: "0.0.0.0"
+  bindPort: 3000
+
+## Reth image version
+##
+image:
+  registry: "ghcr.io"
+  repository: "paradigmxyz/reth"
+  tag: ""
+  pullPolicy: IfNotPresent
+
+## Credentials to fetch images from private registry
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+##
+imagePullSecrets: []
+
+## Provide a name in place of reth for `app:` labels
+##
+nameOverride: ""
+
+## Provide a name to substitute for the full names of resources
+##
+fullnameOverride: ""
+
+## Service account
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+## Additional labels for all resources
+##
+additionalLabels:
+  client-type: "execution"
+
+## Termination Grace Period
+## ref: https://kubernetes.io/docs/tasks/run-application/force-delete-stateful-set-pod/#delete-pods
+##
+terminationGracePeriodSeconds: 300
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  fsGroup: 0
+  runAsUser: 0
+
+## RBAC configuration.
+## ref: https://kubernetes.io/docs/reference/access-authn-authz/rbac/
+##
+rbac:
+  # The name of the cluster role to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+  ## Required ClusterRole rules
+  ##
+  clusterRules:
+    ## Required to obtain the nodes external IP
+    ##
+    - apiGroups: [""]
+      resources:
+        - "nodes"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+  ## Required Role rules
+  ##
+  rules:
+    ## Required to get information about the serices nodePort.
+    ##
+    - apiGroups: [""]
+      resources:
+        - "services"
+      verbs:
+        - "get"
+        - "list"
+        - "watch"
+
+## AuthRPC configuration.
+##
+authRpc:
+  port: "8551"
+  addr: "0.0.0.0"
+
+## RPC configuration.
+##
+http:
+  enabled: true
+  port: "8545"
+  api: "web3,eth,net"
+  corsDomain: ""
+
+## WebSocket configuration.
+##
+ws:
+  enabled: true
+  port: "8546"
+  api: "web3,eth,net"
+  origins: "*"
+
+## Extra flags to pass to the node
+##
+extraFlags:
+  - "--full"
+
+## Extra annotations for StatefulSet pods
+podAnnotations: {}
+
+## Configure pod disruption budgets for Alertmanager
+## ref: https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget
+## This configuration is immutable once created and will require the PDB to be deleted to be changed
+## https://github.com/kubernetes/kubernetes/issues/45398
+##
+podDisruptionBudget:
+  enabled: true
+  maxUnavailable: 1
+
+## Defines whether the service must be headless
+##
+svcHeadless: true
+
+## Configure session affinity for validator clients to hit the same beacon node
+## for the period specified in `timeoutSeconds`
+## ref: https://kubernetes.io/docs/concepts/services-networking/service/#proxy-mode-userspace
+##
+sessionAffinity:
+  # Whether to enable session affinity or not
+  enabled: false
+  # The session duration in seconds
+  timeoutSeconds: 86400
+
+## When p2pNodePort is enabled, your P2P port will be exposed via service type NodePort.
+## This will generate a service for each replica, with a port binding via NodePort.
+## This is useful if you want to expose and announce your node to the Internet.
+##
+p2pNodePort:
+  ## @param p2pNodePort.enabled Expose P2P port via NodePort
+  ##
+  enabled: false
+  ## @param p2pNodePort.annotations
+  ##
+  annotations: {}
+  ## @param p2pNodePort.type
+  ## Options: NodePort, LoadBalancer
+  type: NodePort
+  ## @param p2pNodePort.startAt The ports allocation will start from this value
+  ##
+  startAt: 31100
+  ## @param p2pNodePort.replicaToNodePort Overwrite a port for specific replicas
+  ## @default -- See `values.yaml` for example
+  replicaToNodePort: {}
+  #  "0": 32345
+  #  "3": 32348
+
+## Monitoring
+##
+metrics:
+  ## Prometheus exporter port
+  ##
+  port: 6060
+
+  ## Extra flags to pass for collecting metrics
+  ##
+  flags:
+    - "--metrics=0.0.0.0:6060"
+
+  ## Prometheus Service Monitor
+  ## ref: https://github.com/coreos/prometheus-operator
+  ##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+  ##
+  serviceMonitor:
+    ## The namespace in which the ServiceMonitor will be created
+    ##
+    namespace: ""
+    ## The interval at which metrics should be scraped
+    ##
+    interval: 30s
+    ## The timeout after which the scrape is ended
+    ##
+    scrapeTimeout: ""
+    ## Metrics RelabelConfigs to apply to samples before scraping.
+    ##
+    relabellings: []
+    ## Metrics RelabelConfigs to apply to samples before ingestion.
+    ##
+    metricRelabelings: []
+    ## Specify honorLabels parameter to add the scrape endpoint
+    ##
+    honorLabels: false
+    ## Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+    ##
+    additionalLabels: {}
+  ## Custom PrometheusRule to be defined
+  ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
+  ##
+  prometheusRule:
+    ## Create a default set of Alerts
+    ##
+    default: true
+    ## The namespace in which the prometheusRule will be created
+    ##
+    namespace: ""
+    ## Additional labels for the prometheusRule
+    ##
+    additionalLabels: {}
+    ## Custom Prometheus rules
+    ##
+    rules: []
+
+## Configure resource requests and limits.
+## http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+
+## If false, data ownership will not be reset at startup
+## This allows the reth node to be run with an arbitrary user
+##
+initChownData: true
+
+## Whether or not to allocate persistent volume disk for the data directory.
+## In case of node failure, the node data directory will still persist.
+##
+persistence:
+  enabled: true
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 900Gi
+  annotations: {}
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+## Example:
+## affinity:
+##   podAntiAffinity:
+##     requiredDuringSchedulingIgnoredDuringExecution:
+##     - labelSelector:
+##         matchExpressions:
+##         - key: app.kubernetes.io/name
+##           operator: In
+##           values:
+##           - reth
+##       topologyKey: kubernetes.io/hostname
+##
+affinity: {}
+
+## used to assign priority to pods
+## ref: https://kubernetes.io/docs/concepts/configuration/pod-priority-preemption/
+##
+priorityClassName: ""
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
+## NB! readinessProbe and livenessProbe must be disabled before fully synced
+##
+livenessProbe:
+  initialDelaySeconds: 900
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 3
+  successThreshold: 1
+  httpGet:
+    path: /eth1/liveness
+    port: sidecar
+    scheme: HTTP
+
+readinessProbe:
+  initialDelaySeconds: 30
+  timeoutSeconds: 3
+  periodSeconds: 30
+  failureThreshold: 30
+  successThreshold: 1
+  httpGet:
+    path: /eth1/readiness
+    port: sidecar
+    scheme: HTTP
