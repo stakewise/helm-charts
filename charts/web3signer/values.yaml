@@ -35,7 +35,7 @@ initImage:
 cliImage:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v1.3.0"
+  tag: "v2.0.0.alpha.2"
   pullPolicy: IfNotPresent
 
 ## Database connection string, ex. 'postgresql://username:pass@hostname/dbname'
