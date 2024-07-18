@@ -16,6 +16,12 @@ global:
   ##
   JWTSecret: ""
 
+  ## If you would like the JSON Web Token (JWT) to be managed by a secert outside
+  ## of this chart, an existing secret name can be passed here. If specified, JWTSecret should not be set. 
+  ## jwtsecret should be the key of the token in the secret.
+  ##
+  secretNameOverride: ""
+
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
@@ -405,3 +411,25 @@ metrics:
     ## Custom Prometheus rules
     ##
     rules: []
+
+## Specify extra volumes which can be useful for for things like SecretProviderClass.
+## Useful if secretNameOverride is passed.
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+##
+extraVolumes: {}
+# - name: vault
+#   csi:
+#     driver: secrets-store.csi.k8s.io
+#     readOnly: true
+#     volumeAttributes:
+#       secretProviderClass: "nethermind"
+
+## Specify extra volume mounts which can be useful for things like SecretProviderClass.
+## Useful if secretNameOverride is passed.
+## ref: https://kubernetes.io/docs/concepts/storage/volumes/
+##
+extraVolumeMounts: {}
+# An example is listed below on how to specify an extra volume mount using SecretProviderClass
+# - name: 'vault'
+#   mountPath: '/mnt/secrets-store'
+#   readOnly: true
