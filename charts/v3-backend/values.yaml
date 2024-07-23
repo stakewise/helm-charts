@@ -7,7 +7,7 @@ global:
 settings:
   ## Possible values: goerli, perm_goerli, gnosis, mainnet, harbour_goerli, harbour_mainnet
   ##
-  network: goerli
+  network: mainnet
   logLevel: "INFO"
   celeryConcurrency: "8"
 
@@ -19,8 +19,6 @@ settings:
   mailgunApiKey: ""
   mailgunSenderDomain: "mail.stakewise.io"
   defaultFromEmail: '"Stakewise" <no-reply@mail.stakewise.io>'
-
-  faucetPrivateKey: ""
 
   sentryDsn: ""
 
@@ -81,7 +79,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v1.6.5"
+  tag: "v2.0.5"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
