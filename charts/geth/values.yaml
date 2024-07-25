@@ -6,8 +6,19 @@ global:
   replicaCount: 1
 
   ## Eth2 network ID
+  ## Use one of the predefined testnets or mainnet:
+  ## - mainnet (default)
+  ## - goerli
+  ## - sepolia
+  ## - holesky
+  ##
+  ## If using a custom network, comment out 'network' and set 'networkid' instead.
   ##
   network: mainnet
+
+  ## Custom network ID for private or other networks.
+  ## Only set this if 'network' is not defined.
+  # networkid: 100
 
   ## JSON Web Token (JWT) authentication is used to secure the communication
   ## between the beacon node and execution client. You can generate a JWT using
