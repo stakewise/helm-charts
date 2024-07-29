@@ -91,6 +91,7 @@ spec:
               echo 'p2p-udp-port: {{ include "prysm.p2pPort" . }}' >> /config/config.yaml;
           {{- end }}
               INDEX=$((${HOSTNAME##*-}+1));
+              cat data/scripts/execution-endpoints.txt;
               EE=$(sed "${INDEX}q;d" /data/scripts/execution-endpoints.txt);
               echo "execution-endpoint: ${EE}" >> /config/config.yaml;
               echo "Pod will connect to the ${EE} endpoint";
@@ -103,10 +104,8 @@ spec:
               mountPath: /config
             - name: data
               mountPath: /data
-      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
             - name: scripts
               mountPath: /data/scripts
-      {{- end }}
       {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: download-genesis-state
           image: "curlimages/curl:latest"
@@ -273,11 +272,9 @@ spec:
           configMap:
             name: {{ include "common.names.fullname" . }}-gnosis
       {{- end }}
-      {{- if or (eq .Values.global.network "prater") (eq .Values.global.network "goerli") (eq .Values.global.network "ropsten") (eq .Values.global.network "sepolia") }}
         - name: scripts
           configMap:
             name: {{ include "common.names.fullname" . }}
-      {{- end }}
 {{- if (not .Values.persistence.enabled) }}
         - name: data
           emptyDir: {}
