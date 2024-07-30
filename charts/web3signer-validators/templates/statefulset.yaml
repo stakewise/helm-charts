@@ -78,7 +78,7 @@ spec:
             - --network
             - {{ $root.Values.global.network }}
             - --vault
-            - {{ $root.Values.global.vault }}
+            - {{ lower $root.Values.global.vault }}
             - "--db-url"
             - "{{ $root.Values.dbKeystoreUrl }}"
             - setup-validator
