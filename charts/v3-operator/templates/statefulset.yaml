@@ -47,7 +47,7 @@ spec:
             - sh
             - -c
             - >
-              mkdir -p /data/{{ .Values.settings.vault }}/keystores || true;
+              mkdir -p /data/{{ lower .Values.settings.vault }}/keystores || true;
               chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data
           volumeMounts:
             - name: data
@@ -69,7 +69,7 @@ spec:
             - --db-url
             - {{ .Values.settings.remoteDbConfig.dbUrl }}
             - --vault
-            - {{ .Values.settings.vault }}
+            - {{ lower .Values.settings.vault }}
             - setup-operator
           env:
             - name: PYTHONPATH
@@ -113,15 +113,15 @@ spec:
         {{- if or .Values.settings.depositDataSecretName .Values.settings.keystoresSecretName .Values.settings.walletSecretName }}
           {{- if .Values.settings.depositDataSecretName }}
             - name: deposit-data
-              mountPath: /data/{{ .Values.settings.vault }}/deposit
+              mountPath: /data/{{ lower .Values.settings.vault }}/deposit
           {{- end }}
           {{- if .Values.settings.keystoresSecretName }}
             - name: keystores
-              mountPath: /data/{{ .Values.settings.vault }}/keystores
+              mountPath: /data/{{ lower .Values.settings.vault }}/keystores
           {{- end }}
           {{- if .Values.settings.walletSecretName }}
             - name: wallet
-              mountPath: /data/{{ .Values.settings.vault }}/wallet
+              mountPath: /data/{{ lower .Values.settings.vault }}/wallet
           {{- end }}
         {{- end }}
             - name: data

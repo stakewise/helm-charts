@@ -255,7 +255,6 @@ totalDifficultyOverride: ""
 extraFlags:
   # p2p options
   - "--p2p-max-peers=160"
-  - "--enable-peer-scorer"
 
 ## Extra annotations for StatefulSet pods
 podAnnotations: {}
