@@ -294,9 +294,9 @@ persistence:
 ## Besu Settings
 
 ## Sync Mode
-## ref: https://besu.hyperledger.org/en/stable/public-networks/how-to/connect/sync-node
+## ref: https://besu.hyperledger.org/public-networks/get-started/connect/sync-node
 ##
-syncMode: "X_SNAP"
+syncMode: "SNAP"
 
 ## Extra flags for besu node
 ##
