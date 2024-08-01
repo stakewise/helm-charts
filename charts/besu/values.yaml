@@ -95,7 +95,7 @@ image:
   repository: hyperledger/besu
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "24.6.0"
+  tag: "24.7.1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -288,7 +288,7 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 300Gi
+  size: 700Gi
   annotations: {}
 
 ## Besu Settings
