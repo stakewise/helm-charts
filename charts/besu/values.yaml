@@ -95,7 +95,7 @@ image:
   repository: hyperledger/besu
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "24.6.0"
+  tag: "24.7.1"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -288,15 +288,15 @@ persistence:
   storageClassName: ""
   accessModes:
     - ReadWriteOnce
-  size: 300Gi
+  size: 700Gi
   annotations: {}
 
 ## Besu Settings
 
 ## Sync Mode
-## ref: https://besu.hyperledger.org/en/stable/public-networks/how-to/connect/sync-node
+## ref: https://besu.hyperledger.org/public-networks/get-started/connect/sync-node
 ##
-syncMode: "X_SNAP"
+syncMode: "SNAP"
 
 ## Extra flags for besu node
 ##
