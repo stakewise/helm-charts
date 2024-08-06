@@ -1,0 +1,20 @@
+apiVersion: v2
+name: validator-balval
+description: A Helm chart for installing and configuring Lido's validator-balval
+type: application
+version: 1.0.0
+appVersion: "v4.6.0"
+
+keywords:
+  - ethereum
+  - lido
+  - validators
+  - monitoring
+  - balval
+
+home: https://nethermind.io/
+
+dependencies:
+- name: common
+  repository: file://../common
+  version: 1.0.0

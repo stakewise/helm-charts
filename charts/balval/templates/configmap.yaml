@@ -1,0 +1,13 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  custom_mainnet.yaml: |
+    operators:
+      - name: Test
+        keys:
+          - "0xb1294eeeab227054786e3da41566f0472c581e4dc74834fca7287817a64edb4a4a4e912c7ae8ae703d417fe43a221cdb"

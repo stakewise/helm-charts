@@ -1,0 +1,158 @@
+apiVersion: {{ include "common.capabilities.statefulset.apiVersion" . }}
+kind: StatefulSet
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.global.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "common.labels.matchLabels" . | nindent 6 }}
+  serviceName: {{ include "common.names.fullname" . }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "common.labels.matchLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.global.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "balval.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.global.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: init
+          image: "{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
+          imagePullPolicy: {{ .Values.initImage.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.global.securityContext | nindent 12 }}
+          command:
+            - sh
+            - -ac
+            - >
+              mkdir -p {{ .Values.balval.dataDir }};
+              cp /config/custom_mainnet.yaml {{ .Values.balval.dataDir }}/;
+              chown -R {{ .Values.global.podSecurityContext.runAsUser }}:{{ .Values.global.podSecurityContext.fsGroup }} {{ .Values.balval.dataDir }};
+              cat {{ .Values.balval.dataDir }}/custom_mainnet.yaml
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            readOnlyRootFilesystem: false
+            runAsNonRoot: true
+            runAsUser: 10000
+          image: "{{ .Values.global.image.repository }}:{{ .Values.global.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: WORKING_MODE
+              value: "{{ .Values.balval.workingMode }}"
+            - name: NODE_ENV
+              value: "{{ .Values.balval.env }}"
+            - name: DRY_RUN
+              value: "{{ .Values.balval.dryRun }}"
+            - name: LOG_LEVEL
+              value: "{{ .Values.balval.logLevel }}"
+            - name: LOG_FORMAT
+              value: "{{ .Values.balval.logFormat }}"  
+            - name: HTTP_PORT
+              value: "{{ .Values.balval.httpPort }}"
+            {{- with .Values.clickhouse }}
+            - name: DB_NAME
+              value: "{{ .auth.database }}"
+            - name: DB_HOST
+              value: "{{ .hostname }}"
+            - name: DB_USER
+              value: "{{ .auth.username }}"
+            - name: DB_PASSWORD
+              value: "{{ .auth.password }}"
+            - name: DB_PORT
+              value: "{{ .service.ports.http }}"
+            {{- end }}
+            - name: DB_MAX_RETRIES
+              value: "{{ .Values.balval.dbMaxRetries }}"
+            - name: DB_MIN_BACKOFF_SEC
+              value: "{{ .Values.balval.dbMinBackoffSec }}"
+            - name: DB_MAX_BACKOFF_SEC
+              value: "{{ .Values.balval.dbMaxBackoffSec }}"
+            - name: START_EPOCH
+              value: "{{ .Values.balval.startEpoch }}"
+            - name: ETH_NETWORK
+              value: "{{ .Values.balval.network }}"                       
+            - name: VALIDATOR_REGISTRY_SOURCE
+              value: "{{ .Values.balval.validatorRegistrySource }}"                       
+            - name: VALIDATOR_REGISTRY_FILE_SOURCE_PATH
+              value: "{{ .Values.balval.validatorRegistryFileSourcePath }}"      
+            - name: VALIDATOR_REGISTRY_LIDO_SOURCE_SQLITE_CACHE_PATH
+              value: "{{ .Values.balval.validatorRegistryLidoSourceSqliteCachePath }}"      
+            - name: EL_RPC_URLS
+              value: "{{ .Values.balval.elRpcUrls }}"
+            - name: CL_API_URLS
+              value: "{{ .Values.balval.clRpcUrls }}"                
+            - name: CL_API_RETRY_DELAY_MS
+              value: "{{ .Values.balval.clApiRetryDelayMs }}"     
+            - name: CL_API_GET_RESPONSE_TIMEOUT
+              value: "{{ .Values.balval.clApiGetResponseTimeout }}"    
+            - name: CL_API_MAX_RETRIES
+              value: "{{ .Values.balval.clApiMaxRetries }}"    
+            - name: CL_API_GET_BLOCK_INFO_MAX_RETRIES
+              value: "{{ .Values.balval.clApiGetBlockInfoMaxRetries }}" 
+            - name: FETCH_INTERVAL_SLOTS
+              value: "{{ .Values.balval.fetchIntervalSlots }}"  
+            - name: CHAIN_SLOT_TIME_SECONDS
+              value: "{{ .Values.balval.chainSlotTimeSeconds }}"            
+            - name: SYNC_PARTICIPATION_DISTANCE_DOWN_FROM_CHAIN_AVG
+              value: "{{ .Values.balval.syncParticipationDistanceDownFromChainAvg }}"
+            - name: SYNC_PARTICIPATION_EPOCHS_LESS_THAN_CHAIN_AVG
+              value: "{{ .Values.balval.syncParticipationEpochsLessThanChainAvg }}"                
+            - name: BAD_ATTESTATION_EPOCHS
+              value: "{{ .Values.balval.badAttestationEpochs }}"   
+            - name: CRITICAL_ALERTS_ALERTMANAGER_URL
+              value: "{{ .Values.balval.alertmanagerUrl }}"
+            - name: CRITICAL_ALERTS_MIN_VAL_COUNT
+              value: "{{ .Values.balval.minValCount }}"
+          {{- if .Values.global.externalSecrets.enabled }}
+          envFrom:
+            - secretRef:
+                name: eso-{{ include "common.names.fullname" . }}
+          {{- end }}
+          ports:
+            - name: metrics
+              containerPort: {{ .Values.balval.httpPort }}
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "common.names.fullname" . }}
+        - name: data
+          emptyDir:
+            medium: Memory
+            sizeLimit: 128Mi

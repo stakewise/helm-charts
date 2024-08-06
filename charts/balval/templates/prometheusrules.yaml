@@ -1,0 +1,124 @@
+{{- if .Values.prometheusRule.enabled }}
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  {{- if .Values.prometheusRule.namespace }}
+  namespace: {{ .Values.prometheusRule.namespace }}
+  {{- else }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- end }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+    {{- if .Values.prometheusRule.additionalLabels }}
+    {{- toYaml .Values.prometheusRule.additionalLabels | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+  {{- with .Values.prometheusRule.rules }}
+    - name: {{ include "common.names.fullname" $ }}
+      rules: {{- tpl (toYaml .) $ | nindent 8 }}
+  {{- end }}
+  {{- if .Values.prometheusRule.default }}
+    - name: {{ include "common.names.fullname" $ }}-default
+      rules:
+        - alert: UserSlashedValidators
+          expr: (ethereum_validators_monitoring_user_validators{status="slashed"} - ethereum_validators_monitoring_user_validators{status="slashed"} offset 1m) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 🔪
+            summary: "Operators have slashed validators"
+            description: 'Number of slashed validators per operator'
+        - alert: DataActuality
+          expr: absent(ethereum_validators_monitoring_data_actuality) OR (ethereum_validators_monitoring_data_actuality / 1000 > 3600)
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            emoji: ⏳
+            summary: "Data actuality greater then 1 hour"
+            resolved_summary: "Data actuality is back to normal and now less then 1 hour"
+            description: "It's not OK. Please, check app health"
+        - alert: NumValidatorsWithNegativeDelta
+          expr: ethereum_validators_monitoring_validator_count_with_negative_balances_delta > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 💸
+            summary: 'Operators have a negative balance delta'
+            resolved_summary: 'Operators have a positive balance delta'
+            description: 'Number of validators per operator who have a negative balance delta.'
+        - alert: NumValidatorsWithMissAttestationLastNEpoch
+          expr: ethereum_validators_monitoring_validator_count_miss_attestation_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 📝❌
+            summary: 'Operators have missed attestation in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            resolved_summary: 'Operators not have missed attestation in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            description: 'Number of validators per operator who have missed attestations.'
+        - alert: NumValidatorsWithHighIncDelayAttestationLastNEpoch
+          expr: ethereum_validators_monitoring_validator_count_high_inc_delay_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 📝🐢
+            summary: 'Operators have attestation inc. delay greater than 2 in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            description: 'Number of validators per operator who have attestation with high inc. delay.'
+        - alert: NumValidatorsWithInvalidPropertyAttestationLastNEpoch
+          expr: ethereum_validators_monitoring_validator_count_invalid_attestation_property_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: '📝🏷️'
+            summary: 'Operators have invalid attestation property in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            description: 'Number of validators per operator who have invalid attestation property.'
+        - alert: NumValidatorsWithMissPropose
+          expr: ethereum_validators_monitoring_validator_count_miss_propose > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 📥
+            summary: 'Operators missed block propose in the last finalized epoch'
+            resolved_summary: 'Operators not missed block propose in the last finalized epoch'
+            description: 'Number of validators per operator who missed block propose.'
+        - alert: NumValidatorsWithSyncParticipationLessAvgLastNEpoch
+          expr: ethereum_validators_monitoring_validator_count_with_sync_participation_less_avg_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: 🔄
+            summary: 'Operators sync participation less than average in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            resolved_summary: 'Operators sync participation higher or equal than average in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs'
+            description: 'Number of validators per operator whose sync participation less than average.'
+        - alert: HighRewardNumValidatorsWithSyncParticipationLessAvgLastNEpoch
+          expr: ethereum_validators_monitoring_high_reward_validator_count_with_sync_participation_less_avg_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: '📈🔄'
+            summary: 'Operators may get high rewards in the future, but sync participation less than average in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs!'
+            resolved_summary: 'Operators sync participation higher or equal than average in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epoch. Now may get high rewards in the future!'
+            description: 'Number of validators per operator whose sync participation less than average.'
+        - alert: HighRewardNumValidatorsWithMissAttestationLastNEpoch
+          expr: ethereum_validators_monitoring_high_reward_validator_count_miss_attestation_last_n_epoch > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: '📈📝❌'
+            summary: 'Operators may get high rewards in the future, but missed attestation in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs!'
+            resolved_summary: 'Operators not have missed attestation in last {{ printf "{{ $labels.epoch_interval }}" }} finalized epochs. Now may get high rewards in the future!'
+            description: 'Number of validators per operator who have missed attestations.'
+        - alert: HighRewardNumValidatorsWithMissPropose
+          expr: ethereum_validators_monitoring_high_reward_validator_count_miss_propose > 0 AND ON() changes(ethereum_validators_monitoring_epoch_number[1m]) > 0
+          labels:
+            severity: critical
+          annotations:
+            emoji: '📈📥'
+            summary: 'Operators may get high rewards in the future, but missed block propose in the last finalized epoch!'
+            resolved_summary: 'Operators not missed block propose in the last finalized epoch. Now may get high rewards in the future!'
+            description: 'Number of validators per operator who missed block propose.'
+  {{- end }}
+{{- end }}

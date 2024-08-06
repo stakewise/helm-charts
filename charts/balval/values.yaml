@@ -1,0 +1,214 @@
+# Default values for web3signer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+global:
+  serviceAccount:
+    create: true
+  imagePullSecrets: []
+  ## Pod Security Context
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  ##
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10000
+    fsGroup: 10000
+
+  securityContext:
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 10000
+    capabilities:
+      drop:
+      - ALL
+
+  replicaCount: 1
+
+  externalSecrets:
+    enabled: false
+    secretStoreRef: secretStoreRef
+    data:
+      - secretKey: DB_NAME
+        remoteRef:
+          key: validatorBalvalSecrets
+          property: dbName
+      - secretKey: DB_PORT
+        remoteRef:
+          key: validatorBalvalSecrets
+          property: dbPort
+      - secretKey: DB_HOST
+        remoteRef:
+          key: validatorBalvalSecrets
+          property: dbHost
+      - secretKey: DB_USER
+        remoteRef:
+          key: validatorBalvalSecrets
+          property: dbUser
+      - secretKey: DB_PASSWORD
+        remoteRef:
+          key: validatorBalvalSecrets
+          property: dbPassword
+
+  image:
+    repository: lidofinance/ethereum-validators-monitoring
+    pullPolicy: IfNotPresent
+    tag: "4.6.0"
+
+nameOverride: ""
+fullnameOverride: ""
+
+## Init image is used to chown data volume, etc.
+##
+initImage:
+  repository: busybox
+  tag: "1.36"
+  pullPolicy: IfNotPresent
+
+balval:
+  env: "production"
+  workingMode: "head"
+  dryRun: false
+  logLevel: "debug"
+  logFormat: "json"
+  httpPort: 8080
+  dbMaxRetries: 10
+  dbMinBackoffSec: 1
+  dbMaxBackoffSec: 120
+  startEpoch: 270292
+  network: 1
+  validatorRegistrySource: "file"
+  dataDir: "/data/balval"
+  validatorRegistryFileSourcePath: "/data/balval/custom_mainnet.yaml"
+  validatorRegistryLidoSourceSqliteCachePath: "/data/balval/lido_mainnet.db"
+  elRpcUrls: "http://localhost:8545"
+  clRpcUrls: "http://localhost:5052"
+  clApiRetryDelayMs: 500
+  clApiGetResponseTimeout: 30000
+  clApiMaxRetries: 2
+  clApiGetBlockInfoMaxRetries: 2
+  fetchIntervalSlots: 32
+  chainSlotTimeSeconds: 12
+  syncParticipationDistanceDownFromChainAvg: 0
+  syncParticipationEpochsLessThanChainAvg: 3
+  badAttestationEpochs: 3
+  alertmanagerUrl: "http://localhost:9093"
+  minValCount: 100
+
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+##
+serviceAccount:
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+clickhouse:
+  enabled: true
+  hostname: clickhouse
+  auth:
+    username: default
+    password: ""
+    database: default
+    existingSecret: ""
+    existingSecretKey: ""
+  service:
+    ports:
+      http: 8123
+
+## Configure resource requests and limits.
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+## Node labels for pod assignment
+## ref: https://kubernetes.io/docs/user-guide/node-selection/
+##
+nodeSelector: {}
+
+## Tolerations for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+##
+tolerations: {}
+
+## Affinity for pod assignment
+## ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
+##
+affinity: {}
+
+## Prometheus Service Monitor
+## ref: https://github.com/coreos/prometheus-operator
+##      https://github.com/coreos/prometheus-operator/blob/master/Documentation/api.md#endpoint
+##
+serviceMonitor:
+  ## @param metrics.serviceMonitor.enabled Create ServiceMonitor resource(s) for scraping metrics using PrometheusOperator
+  ##
+  enabled: false
+  ## @param metrics.serviceMonitor.namespace The namespace in which the ServiceMonitor will be created
+  ##
+  namespace: ""
+  ## @param metrics.serviceMonitor.interval The interval at which metrics should be scraped
+  ##
+  interval: 30s
+  ## @param metrics.serviceMonitor.scrapeTimeout The timeout after which the scrape is ended
+  ##
+  scrapeTimeout: ""
+  ## @param metrics.serviceMonitor.relabellings Metrics RelabelConfigs to apply to samples before scraping.
+  ##
+  relabelings: []
+  ## @param metrics.serviceMonitor.metricRelabelings Metrics RelabelConfigs to apply to samples before ingestion.
+  ##
+  metricRelabelings: []
+  ## @param metrics.serviceMonitor.honorLabels Specify honorLabels parameter to add the scrape endpoint
+  ##
+  honorLabels: false
+  ## @param metrics.serviceMonitor.additionalLabels Additional labels that can be used so ServiceMonitor resource(s) can be discovered by Prometheus
+  ##
+  additionalLabels: {}
+
+prometheusRule:
+  ## @param metrics.prometheusRule.enabled Create a custom prometheusRule Resource for scraping metrics using PrometheusOperator
+  ##
+  enabled: false
+  ## @param metrics.prometheusRule.default Create a default set of Alerts
+  ##
+  default: true
+  ## @param metrics.prometheusRule.namespace The namespace in which the prometheusRule will be created
+  ##
+  namespace: ""
+  ## @param metrics.prometheusRule.additionalLabels Additional labels for the prometheusRule
+  ##
+  additionalLabels: {}
+  ## @param metrics.prometheusRule.rules Custom Prometheus rules
+  ## e.g:
+  ## rules:
+  ##   - alert: PrysmValidatorHourlyEarningLessOrEqual0
+  ##     expr: sum(validator_balance) - sum(validator_balance offset 1h) - count(validator_balance > 16)*32 + count(validator_balance offset 1h > 0)*32
+  ##     for: 5m
+  ##     labels:
+  ##       severity: critical
+  ##     annotations:
+  ##       summary: Prysm validator hourly earning <= 0
+  ##       description: Check validators immediately. Pod - {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+  ##   - alert: PrysmValidatorAlotOfErrorsLastHour
+  ##     expr: sum(delta(log_entries_total{job='{{ include "operator.fullname" . }}-validator', level="error"}[1h]) > 0)
+  ##     for: 5m
+  ##     labels:
+  ##       severity: warning
+  ##     annotations:
+  ##       summary: Many validator errors or warnings last hour
+  ##       description: Check validator {{ printf "{{ $labels.pod }}" }}. Namespace - {{ printf "{{ $labels.namespace }}" }}
+  ##
+  rules: {}
