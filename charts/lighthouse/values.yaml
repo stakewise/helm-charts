@@ -108,7 +108,7 @@ sidecar:
 image:
   registry: "docker.io"
   repository: "sigp/lighthouse"
-  tag: "v5.2.1"
+  tag: "v5.3.0"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
