@@ -24,6 +24,8 @@ settings:
 
   sendTelegramNotifaction: "false"
 
+  beaconchaApiToken: ""
+
   telegramToken: ""
   telegramChatId: ""
   multisigOwnersTelegramToken: ""
