@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "common.names.fullname" . }}
+  labels:
+    {{- include "common.labels.standard" . | nindent 4 }}
+data:
+  RELAYER_HOST: "0.0.0.0"
+  RELAYER_PORT: {{ .Values.service.port | quote }}
+  SIGNATURE_THRESHOLD: {{ .Values.settings.signatureThreshold | quote }}
+  NETWORK: {{ .Values.settings.network | quote }}
+  EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
+  CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
+  DATABASE: {{ .Values.settings.databasePath | quote }}

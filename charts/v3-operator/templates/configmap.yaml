@@ -26,3 +26,4 @@ data:
   {{- if .Values.settings.sentryDSN }}
   SENTRY_DSN: {{ .Values.settings.sentryDSN | quote }}
   {{- end }}
+  DISABLE_DEPOSIT_DATA_WARNINGS: {{ .Values.settings.disableDepositDataWarnings | quote }}

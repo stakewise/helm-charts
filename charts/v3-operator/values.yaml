@@ -112,6 +112,8 @@ settings:
   # If specified, wallet will be obtained from the secret
   walletSecretName: ""
 
+  disableDepositDataWarnings: "False"
+
   # Sentry connection string
   # sentryDSN: ""
 
