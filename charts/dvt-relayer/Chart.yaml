@@ -1,8 +1,9 @@
 apiVersion: v2
-name: v3-operator
-version: 3.3.5
-appVersion: v1.3.3
-description: Operator hosted service for Stakewise V3 protocol.
+name: dvt-relayer
+version: 0.0.1
+appVersion: "relayer"
+kubeVersion: "^1.14.0-0"
+description: The relayer for the v3-operator service to register DVT validators that used DKG to generate the private keys.
 type: application
 icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:
@@ -11,7 +12,7 @@ keywords:
   - staking
 home: https://stakewise.io/
 sources:
-  - https://github.com/stakewise/v3-operator/
+  - https://github.com/stakewise/dvt-relayer
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
