@@ -70,6 +70,20 @@ settings:
     postgresPassword: ""
     vaultsTable: ""
     exitRequestsTable: ""
+  fallbackGraph:
+    postgresHost: ""
+    postgresPort: ""
+    postgresDB: ""
+    postgresUser: ""
+    postgresPassword: ""
+    vaultsTable: ""
+  stageGraph:
+    postgresHost: ""
+    postgresPort: ""
+    postgresDB: ""
+    postgresUser: ""
+    postgresPassword: ""
+    vaultsTable: ""
 
   postgres:
     host: localhost
