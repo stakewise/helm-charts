@@ -49,3 +49,13 @@ data:
   GRAPH_POSTGRES_DB: {{ .Values.settings.graph.postgresDB | quote }}
   GRAPH_VAULTS_TABLE: {{ .Values.settings.graph.vaultsTable | quote }}
   GRAPH_EXIT_REQUESTS_TABLE: {{ .Values.settings.graph.exitRequestsTable | quote }}
+
+  FALLBACK_GRAPH_POSTGRES_HOST: {{ .Values.settings.fallbackGraph.postgresHost | quote }}
+  FALLBACK_GRAPH_POSTGRES_PORT: {{ .Values.settings.fallbackGraph.postgresPort | quote }}
+  FALLBACK_GRAPH_POSTGRES_DB: {{ .Values.settings.fallbackGraph.postgresDB | quote }}
+  FALLBACK_GRAPH_VAULTS_TABLE: {{ .Values.settings.fallbackGraph.vaultsTable | quote }}
+
+  STAGE_GRAPH_POSTGRES_HOST: {{ .Values.settings.stageGraph.postgresHost | quote }}
+  STAGE_GRAPH_POSTGRES_PORT: {{ .Values.settings.stageGraph.postgresPort | quote }}
+  STAGE_GRAPH_POSTGRES_DB: {{ .Values.settings.stageGraph.postgresDB | quote }}
+  STAGE_GRAPH_VAULTS_TABLE: {{ .Values.settings.stageGraph.vaultsTable | quote }}
