@@ -27,6 +27,8 @@ data:
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
   MAINNET_EXECUTION_ENDPOINTS: {{ .Values.settings.mainnetExecutionEndpoints | quote }}
   MAINNET_CONSENSUS_ENDPOINTS: {{ .Values.settings.mainnetConsensusEndpoints | quote }}
+  GNOSIS_EXECUTION_ENDPOINTS: {{ .Values.settings.gnosisExecutionEndpoints | quote }}
+  GNOSIS_CONSENSUS_ENDPOINTS: {{ .Values.settings.gnosisConsensusEndpoints | quote }}
   CONSENSUS_TIMEOUT: {{ .Values.settings.consensusTimeout | quote }}
   CONSENSUS_RETRY_TIMEOUT: {{ .Values.settings.consensusRetryTimeout | quote }}
 

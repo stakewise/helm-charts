@@ -53,6 +53,8 @@ settings:
   consensusEndpoints: ""
   mainnetExecutionEndpoints: ""
   mainnetConsensusEndpoints: ""
+  gnosisExecutionEndpoints: ""
+  gnosisConsensusEndpoints: ""
   consensusTimeout: "30"
   consensusRetryTimeout: "60"
 
