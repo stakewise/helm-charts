@@ -51,8 +51,8 @@ settings:
 
   executionEndpoints: ""
   consensusEndpoints: ""
-  exchangeRateExecutionEndpoints: ""
-  exchangeRateConsensusEndpoints: ""
+  mainnetExecutionEndpoints: ""
+  mainnetConsensusEndpoints: ""
   consensusTimeout: "30"
   consensusRetryTimeout: "60"
 
@@ -95,7 +95,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v2.0.5"
+  tag: "v2.0.26"
   pullPolicy: IfNotPresent
   pullSecrets: []
 

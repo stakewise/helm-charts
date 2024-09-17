@@ -25,8 +25,8 @@ data:
 
   EXECUTION_ENDPOINTS: {{ .Values.settings.executionEndpoints | quote }}
   CONSENSUS_ENDPOINTS: {{ .Values.settings.consensusEndpoints | quote }}
-  EXCHANGE_RATE_EXECUTION_ENDPOINTS: {{ .Values.settings.exchangeRateExecutionEndpoints | quote }}
-  EXCHANGE_RATE_CONSENSUS_ENDPOINTS: {{ .Values.settings.exchangeRateConsensusEndpoints | quote }}
+  MAINNET_EXECUTION_ENDPOINTS: {{ .Values.settings.mainnetExecutionEndpoints | quote }}
+  MAINNET_CONSENSUS_ENDPOINTS: {{ .Values.settings.mainnetConsensusEndpoints | quote }}
   CONSENSUS_TIMEOUT: {{ .Values.settings.consensusTimeout | quote }}
   CONSENSUS_RETRY_TIMEOUT: {{ .Values.settings.consensusRetryTimeout | quote }}
 
