@@ -95,7 +95,7 @@ image:
   repository: hyperledger/besu
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "24.9.0"
+  tag: "24.9.1"
 
 imagePullSecrets: []
 nameOverride: ""
