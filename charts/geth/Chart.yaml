@@ -1,6 +1,6 @@
 apiVersion: v2
 name: geth
-version: 2.4.11
+version: 2.4.12
 kubeVersion: "^1.20.0-0"
 description: Official Golang implementation of the Ethereum v1 protocol.
 type: application
@@ -16,7 +16,7 @@ sources:
 maintainers:
   - name: Dmitri Tsumak
     email: dmitri@stakewise.io
-appVersion: v1.14.8
+appVersion: v1.14.9
 
 dependencies:
   - name: common
