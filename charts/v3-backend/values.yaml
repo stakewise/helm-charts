@@ -79,6 +79,7 @@ settings:
     postgresUser: ""
     postgresPassword: ""
     vaultsTable: ""
+    exitRequestsTable: ""
   stageGraph:
     postgresHost: ""
     postgresPort: ""
@@ -86,6 +87,7 @@ settings:
     postgresUser: ""
     postgresPassword: ""
     vaultsTable: ""
+    exitRequestsTable: ""
 
   postgres:
     host: localhost
@@ -97,7 +99,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v2.0.26"
+  tag: "v2.0.27"
   pullPolicy: IfNotPresent
   pullSecrets: []
 

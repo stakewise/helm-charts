@@ -57,6 +57,7 @@ data:
   FALLBACK_GRAPH_POSTGRES_PORT: {{ .Values.settings.fallbackGraph.postgresPort | quote }}
   FALLBACK_GRAPH_POSTGRES_DB: {{ .Values.settings.fallbackGraph.postgresDB | quote }}
   FALLBACK_GRAPH_VAULTS_TABLE: {{ .Values.settings.fallbackGraph.vaultsTable | quote }}
+  FALLBACK_GRAPH_EXIT_REQUESTS_TABLE: {{ .Values.settings.fallbackGraph.exitRequestsTable | quote }}
   {{- end }}
 
   {{- if .Values.settings.stageGraph.postgresHost }}
@@ -64,4 +65,5 @@ data:
   STAGE_GRAPH_POSTGRES_PORT: {{ .Values.settings.stageGraph.postgresPort | quote }}
   STAGE_GRAPH_POSTGRES_DB: {{ .Values.settings.stageGraph.postgresDB | quote }}
   STAGE_GRAPH_VAULTS_TABLE: {{ .Values.settings.stageGraph.vaultsTable | quote }}
+  STAGE_GRAPH_EXIT_REQUESTS_TABLE: {{ .Values.settings.stageGraph.exitRequestsTable | quote }}
   {{- end }}
