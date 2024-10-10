@@ -115,11 +115,11 @@ image:
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
-    tag: "v5.2.1"
+    tag: "v5.3.0"
   teku:
     registry: "docker.io"
     repository: "consensys/teku"
-    tag: "24.6.0"
+    tag: "24.10.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
