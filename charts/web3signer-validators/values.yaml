@@ -113,7 +113,7 @@ image:
   prysm:
     registry: "gcr.io"
     repository: "prysmaticlabs/prysm/validator"
-    tag: "v5.1.0"
+    tag: "v5.1.2"
   lighthouse:
     registry: "docker.io"
     repository: "sigp/lighthouse"
@@ -121,7 +121,7 @@ image:
   teku:
     registry: "docker.io"
     repository: "consensys/teku"
-    tag: "24.10.1"
+    tag: "24.10.2"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
