@@ -1,7 +1,7 @@
 apiVersion: v2
 name: dvt-relayer
-version: 0.0.2
-appVersion: "relayer"
+version: 0.2.2
+appVersion: "v0.2.2"
 kubeVersion: "^1.14.0-0"
 description: The relayer for the v3-operator service to register DVT validators that used DKG to generate the private keys.
 type: application
