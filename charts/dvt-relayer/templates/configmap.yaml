@@ -12,3 +12,4 @@ data:
   EXECUTION_ENDPOINT: {{ .Values.settings.executionEndpoint | quote }}
   CONSENSUS_ENDPOINT: {{ .Values.settings.consensusEndpoint | quote }}
   DATABASE: {{ .Values.settings.databasePath | quote }}
+  SENTRY_DSN: {{ .Values.settings.sentryDsn | quote }}

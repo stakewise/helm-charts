@@ -103,6 +103,7 @@ settings:
   databasePath: "/data/relayer.db"
   executionEndpoint: ""
   consensusEndpoint: ""
+  sentryDsn: ""
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
