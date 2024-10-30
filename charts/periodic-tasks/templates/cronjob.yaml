@@ -1,0 +1,66 @@
+{{ range $cronjob := .Values.cronJobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ $cronjob.name }}
+  labels:
+    {{- include "periodic-tasks.labels" $ | nindent 4 }}
+    component: "{{ $cronjob.name }}"
+spec:
+  schedule: {{ $cronjob.schedule | quote }}
+  {{- if $cronjob.timezone }}
+  timeZone: {{ $cronjob.timezone | quote }}
+  {{- end }}
+  {{- if $cronjob.concurrencyPolicy }}
+  concurrencyPolicy: {{ $cronjob.concurrencyPolicy | quote }}
+  {{- end }}
+  {{- if $cronjob.suspend }}
+  suspend: {{ $cronjob.suspend | quote }}
+  {{- end }}
+  startingDeadlineSeconds: 100
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          {{- if $cronjob.volumes }}
+          volumes:
+            {{- tpl (toYaml $cronjob.volumes) . | nindent 12 }}
+          {{- end }}
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with $cronjob.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          containers:
+          - name: {{ $cronjob.name }}
+            image: {{ $cronjob.image }}
+            imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          {{- if $cronjob.arguments }}
+            args:
+            {{- range $arg := $cronjob.arguments }}
+              - {{ $arg }}
+            {{- end }}
+          {{- end }}
+            {{- with $.Values.env }}
+            env:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- with $.Values.envFrom }}
+            envFrom:
+              {{- toYaml . | nindent 14 }}
+            {{- end }}
+            {{- if $cronjob.volumeMounts }}
+            volumeMounts:
+              {{- tpl (toYaml $cronjob.volumeMounts) . | nindent 12 }}
+            {{- end }}
+            resources:
+              {{- toYaml $cronjob.resources | nindent 14 }}
+          restartPolicy: OnFailure
+---
+{{- end }}
