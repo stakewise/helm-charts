@@ -1,0 +1,73 @@
+# Default values for periodic-tasks.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+image:
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+## CronJobs
+## Example:
+## cronJobs:
+##   - name: cronjob
+##     image: busybox
+##     arguments:
+##       - /bin/sh
+##       - -c
+##       - "sleep 100"
+##     schedule: "*/1 * * * *"
+##     timeZone: "Europe/Moscow"
+##     concurrencyPolicy: Forbid
+##     suspend: false
+##
+cronJobs: {}
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# Application Configuration
+env: []
+  # - name: KEY
+  #   value: value
+  # - name: TOKEN
+  #   valueFrom:
+  #     secretKeyRef:
+  #       name: my-secret
+  #       key: my_secret_value
+
+# Additional environment from configmap or secret
+envFrom: []
+  # - configMapRef:
+  #     name: env-configmap
+  # - secretRef:
+  #     name: env-secrets
+
+# Extra ConfigMaps that will be managed by the chart
+# (You can use them with EnvFrom or some of the extraContainerVolumes values).
+# The format for configmap data is "key/value" where
+#    * key (can be templated) is the name of the configmap that will be created
+#    * value: an object with the standard 'data' key.
+#          The value associated with this keys must be a string (can be templated)
+extraConfigMaps: {}
+# eg:
+# extraConfigMaps:
+#   custom-config:
+#     labels:
+#       my.custom.label/v2: my_custom_label_value_2
+#     data: |
+#       config.json: |
+#         {"key": "some data here in any format, e.g. json, yaml, toml, plaintext and so on"}
+#       data.csv: |
+#         column 1 name,column 2 name, column 3 name
+#         first row data 1,first row data 2,first row data 3
+#         second row data 1,second row data 2,second row data 3
+
