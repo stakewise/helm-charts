@@ -94,10 +94,10 @@ sidecar:
 
 image:
   registry: "docker.io"
-  repository: thorax/erigon
+  repository: erigontech/erigon
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "2.60.8"
+  tag: "v2.60.10"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
