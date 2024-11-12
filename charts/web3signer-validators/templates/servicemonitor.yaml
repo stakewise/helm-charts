@@ -1,41 +1,47 @@
 {{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
+{{- $root := . -}}
+{{- range (untilStep (int .Values.validatorsKeyIndex) (int (add .Values.validatorsKeyIndex .Values.validatorsCount)) 1) }}
+---
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "validators.fullname" . }}
-  {{- if .Values.metrics.serviceMonitor.namespace }}
-  namespace: {{ .Values.metrics.serviceMonitor.namespace }}
+  name: {{ template "validators.fullname" $root }}-validator{{ . }}
+  {{- if $root.Values.metrics.serviceMonitor.namespace }}
+  namespace: {{ $root.Values.metrics.serviceMonitor.namespace }}
   {{- else }}
-  namespace: {{ .Release.Namespace | quote }}
+  namespace: {{ $root.Release.Namespace | quote }}
   {{- end }}
   labels:
-    {{- include "validators.labels" . | nindent 4 }}
-    {{- if .Values.metrics.serviceMonitor.additionalLabels }}
-    {{- toYaml .Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
+    {{- include "validators.labels" $root | nindent 4 }}
+    {{- if $root.Values.metrics.serviceMonitor.additionalLabels }}
+    {{- toYaml $root.Values.metrics.serviceMonitor.additionalLabels | nindent 4 }}
     {{- end }}
 spec:
   endpoints:
     - port: metrics
       path: /metrics
-      {{- if .Values.metrics.serviceMonitor.interval }}
-      interval: {{ .Values.metrics.serviceMonitor.interval }}
+      {{- if $root.Values.metrics.serviceMonitor.interval }}
+      interval: {{ $root.Values.metrics.serviceMonitor.interval }}
       {{- end }}
-      {{- if .Values.metrics.serviceMonitor.scrapeTimeout }}
-      scrapeTimeout: {{ .Values.metrics.serviceMonitor.scrapeTimeout }}
+      {{- if $root.Values.metrics.serviceMonitor.scrapeTimeout }}
+      scrapeTimeout: {{ $root.Values.metrics.serviceMonitor.scrapeTimeout }}
       {{- end }}
-      {{- if .Values.metrics.serviceMonitor.honorLabels }}
-      honorLabels: {{ .Values.metrics.serviceMonitor.honorLabels }}
+      {{- if $root.Values.metrics.serviceMonitor.honorLabels }}
+      honorLabels: {{ $root.Values.metrics.serviceMonitor.honorLabels }}
       {{- end }}
-      {{- if .Values.metrics.serviceMonitor.relabelings }}
-      relabelings: {{- toYaml .Values.metrics.serviceMonitor.relabelings | nindent 6 }}
+      {{- if $root.Values.metrics.serviceMonitor.relabelings }}
+      relabelings: {{- toYaml $root.Values.metrics.serviceMonitor.relabelings | nindent 6 }}
       {{- end }}
-      {{- if .Values.metrics.serviceMonitor.metricRelabelings }}
-      metricRelabelings: {{- toYaml .Values.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
+      {{- if $root.Values.metrics.serviceMonitor.metricRelabelings }}
+      metricRelabelings: {{- toYaml $root.Values.metrics.serviceMonitor.metricRelabelings | nindent 6 }}
       {{- end }}
   namespaceSelector:
     matchNames:
-      - {{ .Release.Namespace }}
+      - {{ $root.Release.Namespace }}
   selector:
     matchLabels:
-      {{- include "validators.selectorLabels" . | nindent 6 }}
+      {{- include "validators.selectorLabels" $root | nindent 6 }}
+      index: {{ template "validators.fullname" $root }}-validator{{ . }}
+
+{{- end }}
 {{- end }}
