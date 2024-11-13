@@ -25,16 +25,19 @@ metadata:
   name: {{ template "validators.fullname" $root }}-validator{{.}}
   labels:
     {{- include "validator.labels" $root | nindent 4 }}
+    index: {{ template "validators.fullname" $root }}-validator{{.}}
 spec:
   replicas: 1
   selector:
     matchLabels:
       {{- include "validators.selectorLabels" $root | nindent 6 }}
+      index: {{ template "validators.fullname" $root }}-validator{{.}}
   serviceName: {{ template "validators.fullname" $root }}
   template:
     metadata:
       labels:
         {{- include "validators.selectorLabels" $root | nindent 8 }}
+        index: {{ template "validators.fullname" $root }}-validator{{.}}
     spec:
       {{- with (concat $root.Values.imagePullSecrets $root.Values.global.imagePullSecrets) }}
       imagePullSecrets:
