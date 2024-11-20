@@ -90,7 +90,7 @@ image:
   registry: "docker.io"
   repository: "chainsafe/lodestar"
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1.22.0"
+  tag: "v1.23.0"
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []

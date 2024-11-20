@@ -108,7 +108,7 @@ sidecar:
 image:
   registry: "docker.io"
   repository: "chainsafe/lodestar"
-  tag: "v1.22.0"
+  tag: "v1.23.0"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
