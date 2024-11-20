@@ -109,7 +109,7 @@ sidecar:
 image:
   registry: "docker.io"
   repository: "ethereum/client-go"
-  tag: "v1.14.11"
+  tag: "v1.14.12"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
