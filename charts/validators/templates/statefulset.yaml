@@ -104,7 +104,7 @@ spec:
             {{- end }}
             {{- if $root.Values.gasLimit }}
             - "--gas-limit"
-            - "{{ .Values.gasLimit }}"
+            - "{{ $root.Values.gasLimit }}"
             {{- end }}
           volumeMounts:
             - name: data
