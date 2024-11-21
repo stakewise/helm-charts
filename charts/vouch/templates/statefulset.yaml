@@ -81,6 +81,10 @@ spec:
           - "{{ .Values.vouchDataDir }}"
           - "--relays"
           - '{{ join "," .Values.relays }}'
+          {{- if .Values.gasLimit }}
+          - "--gas-limit"
+          - "{{ .Values.gasLimit }}"
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
@@ -155,6 +159,10 @@ spec:
           - '{{ join "," .Values.relays }}'
           - "--refresh-frequency"
           - "1800"
+          {{- if .Values.gasLimit }}
+          - "--gas-limit"
+          - "{{ .Values.gasLimit }}"
+          {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data

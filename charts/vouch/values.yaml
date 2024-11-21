@@ -47,6 +47,8 @@ externalSecrets:
   dataFrom:
     key: vouch
 
+gasLimit:
+
 vouchDataDir: /data/vouch
 
 # use vouchFullConfig: to provide all vouch.yaml values

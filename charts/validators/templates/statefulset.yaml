@@ -102,6 +102,10 @@ spec:
             {{- if not $root.Values.enableBuilder }}
             - "--no-proposal-builder-enabled"
             {{- end }}
+            {{- if $root.Values.gasLimit }}
+            - "--gas-limit"
+            - "{{ .Values.gasLimit }}"
+            {{- end }}
           volumeMounts:
             - name: data
               mountPath: /data
