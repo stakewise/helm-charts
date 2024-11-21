@@ -110,7 +110,7 @@ Validator beacon node
 - "--beacon-node={{ . }}"
 {{- end }}
 {{- else if eq $.Values.type "lodestar" }}
-- "--beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}"
+- --beaconNodes={{ $.Values.beaconChainRpcEndpoints | join "," }}
 {{- end }}
 {{- end }}
 
