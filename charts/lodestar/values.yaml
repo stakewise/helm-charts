@@ -14,6 +14,12 @@ global:
   ##
   JWTSecret: ""
 
+  ## If you would like the JSON Web Token (JWT) to be managed by a secret outside
+  ## of this chart, an existing secret name can be passed here. If specified, JWTSecret should not be set.
+  ## jwtsecret should be the key of the token in the secret.
+  ##
+  secretNameOverride: ""
+
   ## Server endpoints for an execution layer jwt authenticated HTTP JSON-RPC connection.
   ## Uses the same endpoint to populate the deposit cache.
   ## A separate Statefulset will be created for each specified address

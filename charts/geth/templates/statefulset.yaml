@@ -106,7 +106,7 @@ spec:
               . /env/init-nodeport;
             {{- end }}
               exec geth
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
               --authrpc.jwtsecret=/secret/jwtsecret
               --authrpc.addr={{ .Values.authRpc.addr }}
               --authrpc.port={{ .Values.authRpc.port }}
@@ -157,7 +157,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: authrpc
               containerPort: {{ .Values.authRpc.port }}
           {{- end }}
@@ -184,7 +184,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -234,10 +234,10 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.global.JWTSecret }}
+        {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
         {{- end }}
         - name: env-nodeport
           emptyDir: {}

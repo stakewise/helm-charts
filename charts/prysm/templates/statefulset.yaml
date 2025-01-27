@@ -264,7 +264,7 @@ spec:
       volumes:
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
         - name: config
           emptyDir: {}
       {{- if eq .Values.global.network "gnosis" }}

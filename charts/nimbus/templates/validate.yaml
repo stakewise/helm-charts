@@ -1,5 +1,5 @@
-{{- if not .Values.global.JWTSecret }}
-{{- fail ".Values.global.JWTSecret is required" }}
+{{- if or (not .Values.global.JWTSecret) (not .Values.global.secretNameOverride) }}
+{{- fail ".Values.global.JWTSecret or .Values.global.secretNameOverride is required" }}
 {{- end }}
 
 {{- $endpoints := uniq .Values.global.executionEndpoints -}}
