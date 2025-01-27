@@ -115,7 +115,7 @@ spec:
               --http.api={{ .Values.http.api }}
               --http.port={{ .Values.http.port }}
           {{- end }}
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
               --authrpc.jwtsecret=/secret/jwtsecret
               --authrpc.addr={{ .Values.authRpc.addr }}
               --authrpc.port={{ .Values.authRpc.port }}
@@ -144,7 +144,7 @@ spec:
               protocol: TCP
               containerPort: {{ .Values.http.port }}
           {{- end }}
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: authrpc
               protocol: TCP
               containerPort: {{ .Values.authRpc.port }}
@@ -167,7 +167,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -225,10 +225,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if .Values.global.JWTSecret }}
+        {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
         {{- end }}
         - name: env-nodeport
           emptyDir: {}

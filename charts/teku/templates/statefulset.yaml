@@ -226,7 +226,7 @@ spec:
       volumes:
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
         - name: configs
           configMap:
             name: {{ include "common.names.fullname" . }}

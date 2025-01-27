@@ -1,6 +1,6 @@
 apiVersion: v2
 name: nimbus
-version: 2.2.11
+version: 2.2.12
 kubeVersion: "^1.18.0-0"
 description: Nim implementation of the Ethereum Beacon Chain
 type: application
