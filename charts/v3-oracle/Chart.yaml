@@ -20,7 +20,7 @@ maintainers:
 dependencies:
   - name: common
     repository: https://charts.stakewise.io/
-    version: 2.x.x
+    version: 1.x.x
   - name: ipfs
     repository: https://charts.stakewise.io/
     version: 2.x.x
