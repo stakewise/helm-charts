@@ -138,6 +138,7 @@ settings:
   executionClientTimeout: "30"
   mevRelayTimeout: "10"
   consensusBlockConcurrency: "5"
+  # subgraphEndpoints: ""
 
   ## IPFS Settings
   ##
