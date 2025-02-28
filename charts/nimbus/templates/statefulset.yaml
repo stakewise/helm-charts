@@ -44,6 +44,7 @@ spec:
     {{- end }}
       serviceAccountName: {{ include "common.names.serviceAccountName" . }}
       priorityClassName: {{ .Values.priorityClassName | quote }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
       initContainers:
         - name: init
           image: "{{ .Values.initImage.registry }}/{{ .Values.initImage.repository }}:{{ .Values.initImage.tag }}"
@@ -100,6 +101,27 @@ spec:
               mountPath: /data
             - name: configs
               mountPath: /configs
+      {{- if .Values.trustedNodeSync.enabled }}
+        - name: "init-trusted-node-sync"
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+        {{- with .Values.trustedNodeSync.initContainerResources }}
+          resources:
+            {{ toYaml . | nindent 12 | trim }}
+        {{- end }}
+          command:
+            - sh
+            - -c
+            - >
+              exec /home/user/nimbus-eth2/build/nimbus_beacon_node trustedNodeSync
+              --network={{ .Values.global.network }}
+              --data-dir=/data
+              --trusted-node-url={{ .Values.trustedNodeSync.url }}
+              --backfill=false
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -118,6 +140,7 @@ spec:
               --data-dir=/data
               --jwt-secret=/secret/jwtsecret
               --non-interactive
+              --history={{ .Values.historyMode }}
             {{- if .Values.http.enabled }}
               --rest
               --rest-port={{ .Values.http.port }}

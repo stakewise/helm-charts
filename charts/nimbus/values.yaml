@@ -92,7 +92,7 @@ global:
 initImage:
   registry: "docker.io"
   repository: "bitnami/kubectl"
-  tag: "1.24"
+  tag: "1.32.2"
   pullPolicy: IfNotPresent
 
 ## Sidecar image is used to perform Liveness/Readiness probes.
@@ -112,7 +112,7 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v23.5.1"
+  tag: "multiarch-v25.2.0"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -141,9 +141,30 @@ http:
   # Access-Control-Allow-Origin response HTTP header
   allowOrigin: "*"
 
+## Data storage mode
+## possible values: prune, archive
+## If set to archive and if trusted node sync is enabled, Nimbus will archive all data starting from the synced checkpoint
+## For more information see here: https://nimbus.guide/history.html#history-modes
+##
+historyMode: "prune"
+
+## If enabled, an init-container will perform a trusted node sync which is comparable to a checkpoint sync on other clients.
+## For more information see here: https://nimbus.guide/trusted-node-sync.html
+## Respective public endpoints can be found here: https://eth-clients.github.io/checkpoint-sync-endpoints/
+## It is not recommended to blindly trust any public beacon node.
+## Therefore please verify that you are on the correct chain: https://notes.ethereum.org/@launchpad/checkpoint-sync#1-Obtaining-finalized-checkpoint-amp-state-root
+##
+trustedNodeSync:
+  enabled: true
+  url: ""
+  initContainerResources: {}
+
 ## The target number of peers.
 ##
 targetPeers: 80
+
+## termination grace period
+terminationGracePeriodSeconds: "300"
 
 ## Extra flags for nimbus beacon chain node
 ##
@@ -363,6 +384,9 @@ metrics:
   ## ref: https://github.com/coreos/prometheus-operator#customresourcedefinitions
   ##
   prometheusRule:
+    ## Create a default set of Alerts
+    ##
+    default: true
     ## The namespace in which the prometheusRule will be created
     ##
     namespace: ""
