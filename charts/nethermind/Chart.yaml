@@ -2,7 +2,7 @@ apiVersion: v2
 name: nethermind
 description: .NET Core Ethereum client
 type: application
-version: 2.7.6
+version: 2.7.7
 appVersion: "v1.31.1"
 icon: https://storage.googleapis.com/stakewise-charts/stakewise.png
 keywords:

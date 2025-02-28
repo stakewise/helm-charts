@@ -90,6 +90,8 @@ spec:
               mkdir -p /data && chown -R {{ .Values.securityContext.runAsUser }}:{{ .Values.securityContext.runAsUser }} /data;
           {{- end }}
           volumeMounts:
+            - name: data
+              mountPath: /data
             - name: env-nodeport
               mountPath: /env
       containers:
@@ -151,6 +153,11 @@ spec:
           {{- range .Values.extraFlags }}
               {{ . | quote }}
           {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
           ports:
           {{- if .Values.jsonrpc.enabled }}
             - name: json-rest
