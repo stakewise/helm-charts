@@ -151,7 +151,7 @@ settings:
   ipfsPinataSecretKey: ""
   ipfsWeb3StorageToken: ""
   ipfsDataFetchTimeout: "300"
-  ipfsFetchEndpoints: "https://stakewise-v3.infura-ipfs.io,http://cloudflare-ipfs.com,https://gateway.pinata.cloud,https://ipfs.io"
+  ipfsFetchEndpoints: "https://stakewise-v3.infura-ipfs.io,https://gateway.pinata.cloud,https://ipfs.io"
 
 ## If false, data ownership will not be reset at startup
 ## This allows the geth node to be run with an arbitrary user
