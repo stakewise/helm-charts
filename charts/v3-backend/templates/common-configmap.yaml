@@ -33,6 +33,7 @@ data:
   CONSENSUS_RETRY_TIMEOUT: {{ .Values.settings.consensusRetryTimeout | quote }}
 
   SEND_TELEGRAM_NOTIFICATIONS: {{ .Values.settings.sendTelegramNotifaction | quote }}
+  CHROMA_HOST: {{ .Values.settings.chromaHost | quote }}
 
   {{- if and (.Values.ipfs.enabled) (not .Values.settings.ipfsLocalClientEndpoint) }}
   IPFS_LOCAL_CLIENT_ENDPOINT: "/dns/{{ .Release.Name }}-ipfs/tcp/5001/http"
