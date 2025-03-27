@@ -66,6 +66,7 @@ settings:
   openaiApiKey: ""
   chromaHost: ""
   chromaToken: ""
+  cfTurnstileSecretKey: ""
 
   graph:
     APIUrl: ""
