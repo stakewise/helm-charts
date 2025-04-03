@@ -1,8 +1,8 @@
-{{- if or (not .Values.global.JWTSecret) (not .Values.global.secretNameOverride) }}
+{{- if or (and .Values.global.JWTSecret .Values.global.secretNameOverride) (and (not .Values.global.JWTSecret) (not .Values.global.secretNameOverride)) }}
 {{- fail ".Values.global.JWTSecret or .Values.global.secretNameOverride is required" }}
 {{- end }}
 
 {{- $endpoints := uniq .Values.global.executionEndpoints -}}
 {{- if lt (len $endpoints) (len .Values.global.executionEndpoints)}}
-{{- fail ".Values.global.executionClients must only contain unique values, since each consensus client must be connected to a unique execution client." }}
+{{- fail ".Values.global.executionEndpoints must only contain unique values, since each consensus client must be connected to a unique execution client." }}
 {{- end }}
