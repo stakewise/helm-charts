@@ -112,7 +112,7 @@ image:
   repository: statusim/nimbus-eth2
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "multiarch-v25.2.0"
+  tag: "multiarch-v25.3.1"
 
 ## Credentials to fetch images from private registry
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
