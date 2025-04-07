@@ -1,0 +1,39 @@
+{{- /*
+This template validates that if network is "hoodi", the image tag must be greater than or equal to 1.9.0 or 1.9-rc3 respectively.
+*/ -}}
+
+{{- $network := .Values.global.network }}
+{{- $imageTag := .Values.image.tag }}
+
+{{- /* Define a function to normalize version strings */ -}}
+{{- define "semverCompare" -}}
+{{- /* This helper normalizes version strings for comparison */ -}}
+{{- if regexMatch "^[0-9]+\\.[0-9]+\\.[0-9]+$" . -}}
+  {{- /* It's a full semver (e.g., 1.9.0) */ -}}
+  {{- . -}}
+{{- else if regexMatch "^[0-9]+\\.[0-9]+$" . -}}
+  {{- /* It's a short version (e.g., 1.9) - convert to 1.9.0 */ -}}
+  {{- printf "%s.0" . -}}
+{{- else if regexMatch "^[0-9]+\\.[0-9]+rc[0-9]+$" . -}}
+  {{- /* It's a semver with rc suffix without hyphen (format: 1.9rc3) */ -}}
+  {{- $parts := regexSplit "rc" . -1 -}}
+  {{- printf "%s-rc%s" (index $parts 0) (index $parts 1) -}}
+{{- else -}}
+  {{- /* It's something else */ -}}
+  {{- . -}}
+{{- end -}}
+{{- end -}}
+
+{{- /* Check if we need to validate (only for "hoodi" network) */ -}}
+{{- if eq $network "hoodi" -}}
+  {{- /* Transform the tag for comparison */ -}}
+  {{- $normalizedTag := include "semverCompare" $imageTag -}}
+  
+  {{- /* Debug - uncomment if needed */}}
+  {{- /* fail (printf "DEBUG: Original tag: %s, Normalized: %s" $imageTag $normalizedTag) */}}
+
+  {{- /* Perform the validation checks */ -}}
+  {{- if or (semverCompare "< 1.9.0" $normalizedTag) (semverCompare "< 1.9-rc3" $normalizedTag) -}}
+    {{- fail "ERROR: For network 'hoodi', image tag must be at least '1.9.0' or '1.9rc3'" -}}
+  {{- end -}}
+{{- end -}}
