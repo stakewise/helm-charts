@@ -14,9 +14,10 @@ This template validates that if network is "hoodi", the image tag must be greate
 {{- else if regexMatch "^[0-9]+\\.[0-9]+$" . -}}
   {{- /* It's a short version (e.g., 1.9) - convert to 1.9.0 */ -}}
   {{- printf "%s.0" . -}}
-{{- else if regexMatch "^[0-9]+\\.[0-9]+-rc[0-9]+$" . -}}
-  {{- /* It's a semver with rc suffix (format: 1.9-rc3) */ -}}
-  {{- . -}}
+{{- else if regexMatch "^[0-9]+\\.[0-9]+rc[0-9]+$" . -}}
+  {{- /* It's a semver with rc suffix without hyphen (format: 1.9rc3) */ -}}
+  {{- $parts := regexSplit "rc" . -1 -}}
+  {{- printf "%s-rc%s" (index $parts 0) (index $parts 1) -}}
 {{- else -}}
   {{- /* It's something else */ -}}
   {{- . -}}
@@ -33,6 +34,6 @@ This template validates that if network is "hoodi", the image tag must be greate
 
   {{- /* Perform the validation checks */ -}}
   {{- if or (semverCompare "< 1.9.0" $normalizedTag) (semverCompare "< 1.9-rc3" $normalizedTag) -}}
-    {{- fail "ERROR: For network 'hoodi', image tag must be at least '1.9.0' or '1.9-rc3'" -}}
+    {{- fail "ERROR: For network 'hoodi', image tag must be at least '1.9.0' or '1.9rc3'" -}}
   {{- end -}}
 {{- end -}}
