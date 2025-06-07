@@ -94,12 +94,25 @@ spec:
             - --remote-signer-url
             - {{ .Values.settings.remoteDbConfig.remoteSignerUrl }}
           {{- end }}
+          {{- if .Values.settings.hcVaultConfig.enabled }}
+            - --hashi-vault-url
+            - {{ .Values.settings.hcVaultConfig.hcVaultUrl }}
+            - --hashi-vault-token
+            - $(HASHICORP_VAULT_TOKEN)
+            - --hashi-vault-key-path
+            - {{ .Values.settings.hcVaultConfig.hcVaultKeyPath }}
+          {{- end }}
           {{- range .Values.settings.extraFlags }}
             - {{ . }}
           {{- end }}
           env:
             - name: PYTHONPATH
               value: "."
+            - name: HASHICORP_VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.settings.hcVaultConfig.hcVaultTokenSecretName }}
+                  key: token
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
