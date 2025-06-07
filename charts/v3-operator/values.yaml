@@ -105,6 +105,13 @@ settings:
     dbUrl: "postgresql://postgres:postgres@localhost/operator"
     remoteSignerUrl: "http://web3signer:6174"
 
+  # Whether to receive keystores from HashiCorp Vault
+  hcVaultConfig:
+    enabled: false
+    hcVaultUrl: "http://vault:8200"
+    hcVaultTokenSecretName: ""
+    hcVaultKeyPath: "stakewise"
+
   # If specified, deposit data will be obtained from the secret
   depositDataSecretName: ""
   # If specified, keystores will be obtained from the secret
