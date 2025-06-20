@@ -89,10 +89,18 @@ spec:
             - python
           args:
             - src/main.py
+          {{- if .Values.settings.api_mode.enabled}}
+            - start-api
+            - --relayer-type
+            - {{.Values.settings.api_mode.relayer_type}}
+            - --relayer-endpoint
+            - {{.Values.settings.api_mode.relayer_endpoint}}
+          {{- else }}
             - start
-          {{- if .Values.settings.remoteDbConfig.enabled }}
+            {{- if .Values.settings.remoteDbConfig.enabled }}
             - --remote-signer-url
             - {{ .Values.settings.remoteDbConfig.remoteSignerUrl }}
+            {{- end }}
           {{- end }}
           {{- range .Values.settings.extraFlags }}
             - {{ . }}
