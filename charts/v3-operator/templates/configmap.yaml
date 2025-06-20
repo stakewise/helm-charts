@@ -9,7 +9,7 @@ data:
   {{- if .Values.settings.remoteDbConfig.enabled }}
   DEPOSIT_DATA_FILE: "/data/{{ lower .Values.settings.vault }}/deposit_data.json"
   REMOTE_SIGNER_URL: {{ .Values.settings.remoteDbConfig.remoteSignerUrl | quote }}
-  {{- else }}
+  {{- else if not .Values.settings.api_mode.enabled}}
   DEPOSIT_DATA_FILE: "/data/{{ lower .Values.settings.vault }}/deposit/deposit_data.json"
   {{- end }}
   DATABASE_DIR: "/data"
