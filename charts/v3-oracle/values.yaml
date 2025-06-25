@@ -119,12 +119,13 @@ settings:
   walletSecretName: ""
   sentryDsn: ""
 
-  validatorsWithdrawalsConcurrency: "20"
-  validatorsFetchChunkSize: "100"
-  validatorsWithdrawalsChunkSize: "86400" # seconds
-  consensusBlockChunkSize: "100"
-  defaultRetryTime: "180"
-  eventsBlockRangeInterval: "43200"
+  eventsBlockRangeInterval: ""
+  validatorsWithdrawalsConcurrency: ""
+  validatorsFetchChunkSize: ""
+  validatorsWithdrawalsChunkSize: "" # seconds
+  consensusBlockChunkSize: ""
+  consensusBlockConcurrency: ""
+  defaultRetryTime: ""
 
   metricsEnabled: "False"
   healthzEnabled: "False"
@@ -137,7 +138,6 @@ settings:
   consensusClientTimeout: "30"
   executionClientTimeout: "30"
   mevRelayTimeout: "10"
-  consensusBlockConcurrency: "5"
   # subgraphEndpoints: ""
 
   ## IPFS Settings
