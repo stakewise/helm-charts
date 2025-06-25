@@ -107,7 +107,7 @@ spec:
             {{- end }}
               exec /usr/local/bin/reth
               node
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
               --authrpc.jwtsecret=/secret/jwtsecret
               --authrpc.addr={{ .Values.authRpc.addr }}
               --authrpc.port={{ .Values.authRpc.port }}
@@ -149,7 +149,7 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
           ports:
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: authrpc
               containerPort: {{ .Values.authRpc.port }}
           {{- end }}
@@ -176,7 +176,7 @@ spec:
           volumeMounts:
             - name: data
               mountPath: /data/ethereum
-          {{- if .Values.global.JWTSecret }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
             - name: jwtsecret
               mountPath: /secret
               readOnly: true
@@ -195,7 +195,16 @@ spec:
             - name: SERVER_BINDADDR
               value: "{{ .Values.sidecar.bindAddr }}:{{ .Values.sidecar.bindPort }}"
             - name: CLIENT_PORT
-              value: {{ .Values.http.port | quote }}
+              value: {{ quote (coalesce (and .Values.global.JWTSecret .Values.authRpc.port) (and .Values.global.secretNameOverride .Values.authRpc.port) .Values.http.port) }}
+          {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
+            - name: CLIENT_AUTHORIZATIONTYPE
+              value: "bearer"
+            - name: CLIENT_JWTSECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
+                  key: jwtsecret
+          {{- end }}
           ports:
             - containerPort: {{ .Values.sidecar.bindPort }}
               name: sidecar
@@ -226,10 +235,10 @@ spec:
         {{- end }}
       {{- end }}
       volumes:
-        {{- if .Values.global.JWTSecret }}
+        {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
         - name: jwtsecret
           secret:
-            secretName: {{ include "common.names.fullname" . }}
+            secretName: {{ coalesce .Values.global.secretNameOverride (include "common.names.fullname" .) }}
         {{- end }}
         - name: env-nodeport
           emptyDir: {}
