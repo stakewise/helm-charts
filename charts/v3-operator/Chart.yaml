@@ -1,7 +1,7 @@
 apiVersion: v2
 name: v3-operator
-version: 3.4.0
-appVersion: v3.0.3
+version: 3.5.0
+appVersion: v3.1.8
 description: Operator hosted service for Stakewise V3 protocol.
 type: application
 icon: https://storage.googleapis.com/stakewise-charts/stakewise.png

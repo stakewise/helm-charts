@@ -57,7 +57,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-operator"
-  tag: "v3.0.3"
+  tag: "v3.1.8"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -104,6 +104,13 @@ settings:
     enabled: false
     dbUrl: "postgresql://postgres:postgres@localhost/operator"
     remoteSignerUrl: "http://web3signer:6174"
+
+  # Whether to receive keystores from HashiCorp Vault
+  hcVaultConfig:
+    enabled: false
+    hcVaultUrl: "http://vault:8200"
+    hcVaultTokenSecretName: ""
+    hcVaultKeyPath: "stakewise"
 
   # If specified, deposit data will be obtained from the secret
   depositDataSecretName: ""
