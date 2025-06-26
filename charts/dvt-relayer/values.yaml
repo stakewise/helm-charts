@@ -52,7 +52,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/dvt-relayer"
-  tag: ""
+  tag: "v0.3.0"
   pullPolicy: IfNotPresent
   pullSecrets: []
 
@@ -98,8 +98,8 @@ ingress:
 settings:
   # BLS signature threshold for a cluster
   signatureThreshold: "3"
-  # Network choices: mainnet,holesky,gnosis,chiado
-  network: "holesky"
+  # Network choices: mainnet,hoodi,gnosis,chiado
+  network: "hoodi"
   databasePath: "/data/relayer.db"
   executionEndpoint: ""
   consensusEndpoint: ""

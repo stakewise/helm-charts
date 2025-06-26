@@ -45,7 +45,7 @@ serviceAccount:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/public/v3-keeper"
-  tag: "v0.10.1"
+  tag: "v0.13.3"
   pullPolicy: IfNotPresent
 
 ## Credentials to fetch images from private registry
@@ -88,6 +88,9 @@ settings:
   ipfsPinataSecretKey: ""
   ipfsFilebaseAPIToken: ""
   ipfsQuikcnodeAPIToken: ""
+
+  ## whether to skip distributor rewards
+  skipDistributorRewards: false
 
 ## Prometheus Service Monitor
 ## ref: https://github.com/coreos/prometheus-operator
