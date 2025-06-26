@@ -89,10 +89,18 @@ spec:
             - python
           args:
             - src/main.py
+          {{- if .Values.settings.apiMode.enabled }}
+            - start-api
+            - --relayer-type
+            - {{ .Values.settings.apiMode.relayerType }}
+            - --relayer-endpoint
+            - {{ .Values.settings.apiMode.relayerEndpoint }}
+          {{- else }}
             - start
-          {{- if .Values.settings.remoteDbConfig.enabled }}
+            {{- if .Values.settings.remoteDbConfig.enabled }}
             - --remote-signer-url
             - {{ .Values.settings.remoteDbConfig.remoteSignerUrl }}
+            {{- end }}
           {{- end }}
           {{- if .Values.settings.hcVaultConfig.enabled }}
             - --hashi-vault-url

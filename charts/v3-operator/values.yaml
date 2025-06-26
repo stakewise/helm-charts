@@ -75,6 +75,12 @@ resources:
 priorityClassName: ""
 
 settings:
+  ## Running operator service as API Service
+  apiMode:
+    enabled: false
+    relayerType: "DEFAULT"  # or "DVT"
+    relayerEndpoint: ""
+
   ## Enable debug mode. Default is false.
   verbose: "false"
 
