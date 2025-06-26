@@ -7,11 +7,9 @@ metadata:
 data:
   DATA_DIR: "/data"
   {{- if not (and .Values.settings.apiMode.enabled (eq (lower .Values.settings.apiMode.relayerType) "default")) }}
-  {{- if .Values.settings.remoteDbConfig.enabled }}
-  DEPOSIT_DATA_FILE: "/data/{{ lower .Values.settings.vault }}/deposit_data.json"
-  REMOTE_SIGNER_URL: {{ .Values.settings.remoteDbConfig.remoteSignerUrl | quote }}
-  {{- else }}
   DEPOSIT_DATA_FILE: "/data/{{ lower .Values.settings.vault }}/deposit/deposit_data.json"
+  {{- if .Values.settings.remoteDbConfig.enabled }}
+  REMOTE_SIGNER_URL: {{ .Values.settings.remoteDbConfig.remoteSignerUrl | quote }}
   {{- end }}
   {{- end }}
   DATABASE_DIR: "/data"
