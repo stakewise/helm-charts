@@ -116,11 +116,13 @@ spec:
           env:
             - name: PYTHONPATH
               value: "."
+          {{- if .Values.settings.hcVaultConfig.enabled }}
             - name: HASHICORP_VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.settings.hcVaultConfig.hcVaultTokenSecretName }}
                   key: token
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}
