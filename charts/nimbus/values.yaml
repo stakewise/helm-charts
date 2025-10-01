@@ -91,7 +91,7 @@ global:
 ##
 initImage:
   registry: "docker.io"
-  repository: "bitnami/kubectl"
+  repository: "bitnamilegacy/kubectl"
   tag: "1.32.2"
   pullPolicy: IfNotPresent
 
