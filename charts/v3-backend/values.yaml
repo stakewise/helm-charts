@@ -104,7 +104,7 @@ settings:
 image:
   registry: "europe-west4-docker.pkg.dev"
   repository: "stakewiselabs/private/v3-backend"
-  tag: "v3.3.1"
+  tag: "v3.7.14"
   pullPolicy: IfNotPresent
   pullSecrets: []
 

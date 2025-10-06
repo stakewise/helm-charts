@@ -22,6 +22,9 @@ Kubernetes secrets are used to store sensitive information related to the v3-ope
 kubectl create secret generic v3-operator-deposit-data --from-file=/home/username/.stakewise/0xeefffd4c23d2e8c845870e273861e7d60df49663/deposit_data.json
 kubectl create secret generic v3-operator-keystores-data --from-file=/home/username/.stakewise/0xeefffd4c23d2e8c845870e273861e7d60df49663/keystores
 kubectl create secret generic v3-operator-wallet-data --from-file=/home/username/.stakewise/0xeefffd4c23d2e8c845870e273861e7d60df49663/wallet
+
+# optional if you are using HashiCorp Vault
+kubectl create secret generic v3-operator-hcv-token --from-literal=token=<insert token here>
 ```
 
 > Replace `0xeefffd4c23d2e8c845870e273861e7d60df49663` with the actual vault contract address

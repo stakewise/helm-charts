@@ -89,10 +89,26 @@ spec:
             - python
           args:
             - src/main.py
+          {{- if .Values.settings.apiMode.enabled }}
+            - start-api
+            - --relayer-type
+            - {{ .Values.settings.apiMode.relayerType }}
+            - --relayer-endpoint
+            - {{ .Values.settings.apiMode.relayerEndpoint }}
+          {{- else }}
             - start
-          {{- if .Values.settings.remoteDbConfig.enabled }}
+            {{- if .Values.settings.remoteDbConfig.enabled }}
             - --remote-signer-url
             - {{ .Values.settings.remoteDbConfig.remoteSignerUrl }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.settings.hcVaultConfig.enabled }}
+            - --hashi-vault-url
+            - {{ .Values.settings.hcVaultConfig.hcVaultUrl }}
+            - --hashi-vault-token
+            - $(HASHICORP_VAULT_TOKEN)
+            - --hashi-vault-key-path
+            - {{ .Values.settings.hcVaultConfig.hcVaultKeyPath }}
           {{- end }}
           {{- range .Values.settings.extraFlags }}
             - {{ . }}
@@ -100,6 +116,13 @@ spec:
           env:
             - name: PYTHONPATH
               value: "."
+          {{- if .Values.settings.hcVaultConfig.enabled }}
+            - name: HASHICORP_VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.settings.hcVaultConfig.hcVaultTokenSecretName }}
+                  key: token
+          {{- end }}
           envFrom:
             - configMapRef:
                 name: {{ include "common.names.fullname" . }}

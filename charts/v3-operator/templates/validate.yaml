@@ -9,3 +9,9 @@
 {{- if not .Values.settings.vault }}
 {{- fail ".Values.settings.vault is empty" }}
 {{- end }}
+
+{{- if .Values.settings.hcVaultConfig.enabled -}}
+{{- if not .Values.settings.hcVaultConfig.hcVaultTokenSecretName }}
+{{- fail ".Values.settings.hcVaultConfig.hcVaultTokenSecretName is empty" }}
+{{- end }}
+{{- end }}

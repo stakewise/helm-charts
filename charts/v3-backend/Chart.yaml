@@ -1,7 +1,7 @@
 apiVersion: v2
 name: v3-backend
-version: 3.5.3
-appVersion: v3.5.3
+version: 3.6.0
+appVersion: v3.7.14
 kubeVersion: "^1.20.0-0"
 description: The StakeWise backend application.
 type: application

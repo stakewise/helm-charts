@@ -18,7 +18,7 @@ spec:
 {{- end }}
   type: ClusterIP
   ports:
-  {{- if .Values.global.JWTSecret }}
+  {{- if or .Values.global.JWTSecret .Values.global.secretNameOverride }}
     - name: authrpc
       port: {{ .Values.authRpc.port }}
       targetPort: authrpc

@@ -16,6 +16,12 @@ global:
   ##
   JWTSecret: ""
 
+  ## If you would like the JSON Web Token (JWT) to be managed by a secret outside
+  ## of this chart, an existing secret name can be passed here. If specified, JWTSecret should not be set.
+  ## jwtsecret should be the key of the token in the secret.
+  ##
+  secretNameOverride: ""
+
   ## Credentials to fetch images from private registry
   ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   ##
